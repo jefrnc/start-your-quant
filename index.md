@@ -3,70 +3,72 @@ layout: default
 title: Home
 ---
 
-# Start Your Quant
+# Empieza tu Quant
 
-Welcome to the comprehensive guide for quantitative trading strategies and implementation.
+Bienvenido a la guía completa para estrategias de trading cuantitativo e implementación.
 
-## Documentation Sections
+Este repositorio está disponible en [GitHub](https://github.com/jefrnc/start-your-quant) y tiene como objetivo brindar información práctica y recursos para iniciarse en el trading cuantitativo. Si tienes sugerencias, mejoras o recomendaciones sobre qué temas cubrir, no dudes en contactarme a través de mi perfil de [GitHub](https://github.com/jefrnc).
 
-### Fundamentals
-- [What is Quantitative Trading?](docs/fundamentals/what_is_quant.md)
-- [Discretionary vs Quantitative Trading](docs/fundamentals/discretionary_vs_quant.md)
-- [Strategy Types](docs/fundamentals/strategy_types.md)
-- [Why Code?](docs/fundamentals/why_code.md)
+## Secciones de Documentación
 
-### Data & Analysis
-- [Data Sources](docs/data/data_sources.md)
-- [Data Types](docs/data/data_types.md)
-- [Data Cleaning](docs/data/data_cleaning.md)
-- [Backtesting Datasets](docs/data/backtesting_datasets.md)
+### Fundamentos
+- [¿Qué es el Trading Cuantitativo?](docs/fundamentals/what_is_quant.md)
+- [Trading Discrecional vs Cuantitativo](docs/fundamentals/discretionary_vs_quant.md)
+- [Tipos de Estrategias](docs/fundamentals/strategy_types.md)
+- [¿Por qué Programar?](docs/fundamentals/why_code.md)
 
-### Technical Indicators
-- [Moving Averages](docs/indicators/moving_averages.md)
+### Datos y Análisis
+- [Fuentes de Datos](docs/data/data_sources.md)
+- [Tipos de Datos](docs/data/data_types.md)
+- [Limpieza de Datos](docs/data/data_cleaning.md)
+- [Datasets para Backtesting](docs/data/backtesting_datasets.md)
+
+### Indicadores Técnicos
+- [Medias Móviles](docs/indicators/moving_averages.md)
 - [VWAP](docs/indicators/vwap.md)
-- [Volume RVOL](docs/indicators/volume_rvol.md)
+- [Volumen RVOL](docs/indicators/volume_rvol.md)
 - [Gap Float](docs/indicators/gap_float.md)
 - [Spike HOD/LOD](docs/indicators/spike_hod_lod.md)
 
-### Trading Strategies
+### Estrategias de Trading
 - [Gap and Go](docs/strategies/gap_and_go.md)
-- [VWAP Reclaim](docs/strategies/vwap_reclaim.md)
+- [Recuperación VWAP](docs/strategies/vwap_reclaim.md)
 - [Low Float Runners](docs/strategies/low_float_runners.md)
-- [Parabolic Reversal](docs/strategies/parabolic_reversal.md)
-- [First Green Red Day](docs/strategies/first_green_red_day.md)
-- [Advanced Short Selling](docs/strategies/short_selling_advanced.md)
+- [Reversión Parabólica](docs/strategies/parabolic_reversal.md)
+- [Primer Día Verde/Rojo](docs/strategies/first_green_red_day.md)
+- [Ventas en Corto Avanzadas](docs/strategies/short_selling_advanced.md)
 
 ### Backtesting
-- [What is Backtesting?](docs/backtesting/what_is_backtest.md)
-- [Simple Backtesting Engine](docs/backtesting/simple_engine.md)
-- [Metrics](docs/backtesting/metrics.md)
-- [Advanced Analysis](docs/backtesting/advanced_analysis.md)
-- [Avoiding Overfitting](docs/backtesting/overfitting.md)
+- [¿Qué es el Backtesting?](docs/backtesting/what_is_backtest.md)
+- [Motor Simple de Backtesting](docs/backtesting/simple_engine.md)
+- [Métricas](docs/backtesting/metrics.md)
+- [Análisis Avanzado](docs/backtesting/advanced_analysis.md)
+- [Evitar Sobreajuste](docs/backtesting/overfitting.md)
 
-### Risk Management
-- [Position Sizing](docs/risk/position_sizing.md)
+### Gestión de Riesgo
+- [Dimensionamiento de Posiciones](docs/risk/position_sizing.md)
 - [Stop Losses](docs/risk/stops.md)
-- [Risk Limits](docs/risk/risk_limits.md)
-- [Asymmetric Risk](docs/risk/asymmetric_risk.md)
+- [Límites de Riesgo](docs/risk/risk_limits.md)
+- [Riesgo Asimétrico](docs/risk/asymmetric_risk.md)
 
-### Setup & Tools
-- [Getting Started](docs/setup/getting_started.md)
-- [Broker Integration](docs/setup/broker_integration.md)
-- [Data Providers](docs/setup/data_providers.md)
-- [DAS Trader Integration](docs/setup/das_trader_integration.md)
-- [Essential Libraries](docs/tools/essential_libraries.md)
-- [Development Workflow](docs/tools/development_workflow.md)
-- [Advanced Trading Infrastructure](docs/tools/advanced_trading_infrastructure.md)
-- [Flash Research Config](docs/tools/flash_research_config.md)
+### Configuración y Herramientas
+- [Primeros Pasos](docs/setup/getting_started.md)
+- [Integración con Brokers](docs/setup/broker_integration.md)
+- [Proveedores de Datos](docs/setup/data_providers.md)
+- [Integración DAS Trader](docs/setup/das_trader_integration.md)
+- [Librerías Esenciales](docs/tools/essential_libraries.md)
+- [Flujo de Desarrollo](docs/tools/development_workflow.md)
+- [Infraestructura Avanzada de Trading](docs/tools/advanced_trading_infrastructure.md)
+- [Configuración Flash Research](docs/tools/flash_research_config.md)
 
-### Analysis & Performance
-- [Market Microstructure](docs/analysis/market_microstructure.md)
-- [Performance Tracking](docs/analysis/performance_tracking.md)
-- [Trade Validation](docs/analysis/trade_validation.md)
+### Análisis y Rendimiento
+- [Microestructura del Mercado](docs/analysis/market_microstructure.md)
+- [Seguimiento de Rendimiento](docs/analysis/performance_tracking.md)
+- [Validación de Trades](docs/analysis/trade_validation.md)
 
-### Automation
-- [Automation Strategies](docs/automation/automation_strategies.md)
-- [System Architecture](docs/automation/system_architecture.md)
+### Automatización
+- [Estrategias de Automatización](docs/automation/automation_strategies.md)
+- [Arquitectura del Sistema](docs/automation/system_architecture.md)
 
-### Examples
-- [Platform Integration](docs/examples/platform_integration.md)
+### Ejemplos
+- [Integración de Plataformas](docs/examples/platform_integration.md)
