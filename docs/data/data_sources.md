@@ -85,10 +85,13 @@ quotes = client.list_quotes(
 )
 ```
 
-### Planes y Precios
-- **Starter**: $29/mes - Datos EOD + 2 años historical
-- **Developer**: $99/mes - 5 años historical + websocket
-- **Advanced**: $249/mes - Full historical + todas las features
+### Planes y Precios (2024)
+- **Basic**: $0/mes - 2 años histórico, EOD, 5 calls/min
+- **Starter**: $29/mes - 5 años histórico, 15-min delayed, WebSockets
+- **Developer**: $79/mes - 10 años histórico, 15-min delayed, trades data
+- **Advanced**: $199/mes - 20+ años histórico, real-time data, quotes
+
+> **Nota**: Precios para usuarios individuales. Planes profesionales tienen costos diferentes.
 
 ### Cuándo Usar
 - Estrategias intraday que necesitan precisión
@@ -290,7 +293,7 @@ class DataManager:
 | Fuente | Costo | Lo que obtienes |
 |--------|-------|-----------------|
 | Yahoo Finance | $0 | EOD data, screening básico |
-| Polygon.io | $99 | 5 años intraday, websocket |
+| Polygon.io | $79 | 10 años intraday, websocket |
 | IBKR | $10 + comms | Real-time, ejecución |
 | DAS Trader | $150 | Plataforma pro + data |
 | QuantConnect | $0-$200 | Backtest + live deployment |
@@ -301,7 +304,7 @@ class DataManager:
 ## Tips para Empezar
 
 1. **Empieza gratis**: Yahoo Finance + paper trading IBKR
-2. **Primer upgrade**: Polygon.io Developer ($99)
+2. **Primer upgrade**: Polygon.io Developer ($79)
 3. **Cuando seas consistente**: Agrega DAS o similar
 4. **Para escalar**: QuantConnect para múltiples estrategias
 

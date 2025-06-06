@@ -4,6 +4,8 @@
 
 Position sizing es la diferencia entre ser rentable y quebrar. Puedes tener la mejor estrategia del mundo, pero si arriesgas demasiado en cada trade, un streak de perdidas te elimina.
 
+> **⚠️ Small Caps Warning**: La volatilidad extrema requiere position sizing más conservador que blue chips. Nuestra regla: máximo 1-2% de riesgo por trade en small caps.
+
 ## Filosofía: Risk-First Approach
 
 ```python

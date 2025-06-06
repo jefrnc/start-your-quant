@@ -4,6 +4,8 @@
 
 El trading cuantitativo es un enfoque sistemático para operar en los mercados financieros que se basa en modelos matemáticos, análisis estadístico y algoritmos computacionales para identificar oportunidades de trading y ejecutar operaciones.
 
+> **📊 Enfoque de esta guía**: Nos especializamos en **small caps** (capitalización < $2B), que ofrecen mayor volatilidad y oportunidades que large caps, pero requieren técnicas específicas de gestión de riesgo.
+
 ## Características Principales
 
 ### 1. **Basado en Datos**

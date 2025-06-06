@@ -4,6 +4,8 @@
 
 La estrategia VWAP Reclaim se basa en el comportamiento predecible de small caps que han estado traded por debajo del VWAP (Volume Weighted Average Price) y logran reclamarlo con volumen significativo. Este reclaim suele indicar un cambio de momentum institucional.
 
+> **⚠️ DISCLAIMER**: Small caps requieren experiencia avanzada. Esta estrategia involucra timing preciso y gestión de riesgo estricta. Solo para cuentas con $25k+ y conocimiento sólido de market microstructure.
+
 ## Fundamentos Teóricos
 
 ### ¿Por Qué Funciona?

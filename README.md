@@ -7,6 +7,7 @@ Guía completa para iniciarte en el trading cuantitativo, con enfoque especial e
 ### 🚀 [0. Setup Inicial](docs/setup/)
 - [Getting Started - Configuración inicial](docs/setup/getting_started.md)
 - [Integración con Brokers](docs/setup/broker_integration.md)
+- [DAS Trader Integration](docs/setup/das_trader_integration.md) 🔥 **Nuevo**
 - [Configuración de Data Providers](docs/setup/data_providers.md)
 
 ### 🧠 [1. Fundamentos del Trading Cuantitativo](docs/fundamentals/)
@@ -76,7 +77,8 @@ Guía completa para iniciarte en el trading cuantitativo, con enfoque especial e
 2. **Configura tus fuentes de datos**
    - [Yahoo Finance](docs/setup/data_providers.md) (gratuito para empezar)
    - [Polygon.io](docs/setup/data_providers.md) (API key requerida)
-   - [IBKR TWS](docs/setup/broker_integration.md) (para trading real)
+   - [IBKR TWS](docs/setup/broker_integration.md) (para trading institucional)
+   - [DAS Trader](docs/setup/das_trader_integration.md) (para small caps/day trading)
 
 3. **Explora las estrategias**
    - Empieza con [Gap & Go](docs/strategies/gap_and_go.md)
@@ -109,14 +111,15 @@ Guía completa para iniciarte en el trading cuantitativo, con enfoque especial e
 - **Pandas/NumPy** para manipulación de datos
 - **Plotly/Matplotlib** para visualización
 - **yfinance/Polygon** para datos de mercado
-- **IBKR TWS/Alpaca** para ejecución
+- **IBKR TWS/DAS Trader/Alpaca** para ejecución
 - **QuantConnect** para backtesting en la nube
 - **Streamlit** para dashboards
 - **Docker/Kubernetes** para deployment
 
 ## 📝 Notas Importantes
 
-- Esta documentación está enfocada en **small caps** y **day trading**
+- Esta documentación está enfocada en **small caps** (market cap < $2B) y **day trading**
 - El contenido asume conocimiento básico de **trading** y **Python**
 - Todas las estrategias incluyen **advertencias de riesgo** apropiadas
 - Los ejemplos usan **datos reales** de las plataformas mencionadas
+- **⚠️ Small caps son extremadamente volátiles** - requieren experiencia y gestión de riesgo estricta

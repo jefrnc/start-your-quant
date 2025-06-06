@@ -4,6 +4,8 @@
 
 Gap & Go es la estrategia más conocida y rentable para small caps. Cuando un stock gappea arriba con volumen y continúa, puedes capturar movimientos explosivos. La clave está en el screening y timing.
 
+> **⚠️ DISCLAIMER**: Small caps son extremadamente volátiles. Esta estrategia requiere experiencia, capital suficiente y gestión de riesgo estricta. Los ejemplos son educativos, no consejos financieros.
+
 ## Filosofía del Gap & Go
 
 ### ¿Por Qué Funciona?
@@ -431,7 +433,7 @@ class GapVWAPStrategy:
 
 ### 1. Position Sizing Específico
 ```python
-def calculate_gap_position_size(account_value, gap_data, risk_tolerance=0.02):
+def calculate_gap_position_size(account_value, gap_data, risk_tolerance=0.015):
     """Position sizing específico para gaps"""
     
     base_risk = account_value * risk_tolerance
@@ -490,7 +492,7 @@ def calculate_gap_position_size(account_value, gap_data, risk_tolerance=0.02):
     shares = int(adjusted_risk / risk_per_share)
     
     # Position limits
-    max_position_value = account_value * 0.20  # 20% max
+    max_position_value = account_value * 0.10  # 10% max en small caps volátiles
     max_shares = int(max_position_value / entry_price)
     
     return min(shares, max_shares)
@@ -794,10 +796,11 @@ GAP_CONFIG = {
         'max_entry_time': '11:00'
     },
     'risk_management': {
-        'base_risk_pct': 0.025,
-        'max_position_pct': 0.15,
+        'base_risk_pct': 0.015,        # 1.5% para principiantes, 2.5% para avanzados
+        'max_position_pct': 0.10,      # 10% max en small caps volátiles
         'stop_strategy': 'adaptive',
-        'time_stop': '15:45'
+        'time_stop': '15:45',
+        'beginner_mode': True          # Usar parámetros conservadores
     },
     'profit_targets': {
         'quick_profit': 0.08,   # 8% quick scalp

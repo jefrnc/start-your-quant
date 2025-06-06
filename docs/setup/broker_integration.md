@@ -1,5 +1,25 @@
 # Integración con Brokers
 
+Comparativa de brokers recomendados para trading cuantitativo y sus casos de uso específicos.
+
+## 📊 Comparativa de Brokers
+
+| Broker | Mejor Para | API Quality | Comisiones | Data Quality |
+|--------|------------|-------------|------------|--------------|
+| **IBKR** | All-around, institucional | ⭐⭐⭐⭐⭐ | Muy bajas | ⭐⭐⭐⭐⭐ |
+| **Alpaca** | Desarrollo, algoritmos | ⭐⭐⭐⭐⭐ | Sin comisiones | ⭐⭐⭐⭐ |
+| **Charles Schwab** | Retail, 401k | ⭐⭐⭐ | Sin comisiones | ⭐⭐⭐⭐ |
+| **TD Ameritrade** | Retail avanzado | ⭐⭐⭐⭐ | Sin comisiones | ⭐⭐⭐⭐ |
+
+## 💻 Plataformas de Trading
+
+| Plataforma | Compatible con | Mejor Para | Características Clave |
+|------------|----------------|------------|----------------------|
+| **DAS Trader Pro** | Charles Schwab, Zimtra, otros | Day trading, small caps | Level 2, routing avanzado, hotkeys |
+| **TWS (IBKR)** | Interactive Brokers | Trading institucional | API robusta, datos globales |
+| **Think or Swim** | TD Ameritrade | Análisis técnico | Charting avanzado, paper trading |
+| **Webull Desktop** | Webull | Trading retail | Gratis, análisis básico |
+
 ## Interactive Brokers (IBKR) - Recomendado Principal
 
 ### Ventajas de IBKR
@@ -146,17 +166,20 @@ class IBKRConnection:
         )
         
         # Convertir a DataFrame
-        df = pd.DataFrame([{
-            'date': bar.date,
-            'open': bar.open,
-            'high': bar.high,
-            'low': bar.low,
-            'close': bar.close,
-            'volume': bar.volume
-        } for bar in bars])
-        
-        df.set_index('date', inplace=True)
-        return df
+        if bars:
+            df = pd.DataFrame([{
+                'date': bar.date,
+                'open': bar.open,
+                'high': bar.high,
+                'low': bar.low,
+                'close': bar.close,
+                'volume': bar.volume
+            } for bar in bars])
+            
+            df.set_index('date', inplace=True)
+            return df
+        else:
+            return pd.DataFrame()  # Return empty DataFrame if no data
 
 # Ejemplo de uso
 def test_ibkr_connection():
@@ -181,6 +204,98 @@ def test_ibkr_connection():
     
     return False
 ```
+
+## DAS Trader Pro - Plataforma para Day Trading
+
+> **🔥 Nuevo:** Integración disponible a través del [das-bridge](https://github.com/jefrnc/das-bridge)
+
+**Nota importante:** DAS Trader Pro es una **plataforma de trading**, no un broker. Se conecta a brokers como Charles Schwab, Zimtra, Lightspeed, y otros que ofrecen compatibilidad con DAS.
+
+### ¿Por Qué Usar DAS como Plataforma?
+- **Borrows amplios** para short selling de small caps
+- **Routing avanzado** (ARCA, EDGX, BATS) para mejor fill
+- **Level 2 premium** con Times & Sales profundo
+- **Hotkeys configurables** para ejecución ultra-rápida
+- **Comunidad activa** de day traders profesionales
+
+### Casos de Uso Ideales
+- Day trading agresivo en small caps
+- Short selling de pump & dumps
+- Scalping con volumen alto
+- Trading con buying power 4:1 o 6:1
+
+### Setup Básico DAS Bridge
+
+```bash
+# Instalar el bridge
+git clone https://github.com/jefrnc/das-bridge.git
+cd das-bridge
+pip install -r requirements.txt
+pip install -e .
+```
+
+```python
+# config/das_config.py
+import os
+
+DAS_CONFIG = {
+    'host': os.getenv('DAS_HOST', 'localhost'),
+    'port': int(os.getenv('DAS_PORT', '9910')),
+    'username': os.getenv('DAS_USERNAME'),
+    'password': os.getenv('DAS_PASSWORD'),
+    'account': os.getenv('DAS_ACCOUNT'),
+    'paper_trading': True  # Cambiar a False para live trading
+}
+
+# Límites de riesgo específicos para DAS
+DAS_RISK_LIMITS = {
+    'max_position_size': 10000,      # $10k máximo por posición
+    'max_daily_loss': 1000,          # $1k pérdida máxima diaria
+    'max_buying_power_usage': 0.8,   # 80% del buying power máximo
+    'max_trades_per_minute': 5       # Límite de velocidad
+}
+```
+
+### Ejemplo de Integración
+
+```python
+# examples/das_trading_basic.py
+import asyncio
+from das_trader import DASTraderClient
+
+async def das_example():
+    """Ejemplo básico con DAS"""
+    
+    client = DASTraderClient(host="localhost", port=9910)
+    
+    try:
+        # Conectar
+        success = await client.connect("usuario", "password", "cuenta")
+        if not success:
+            print("❌ Error conectando a DAS")
+            return
+        
+        print("✅ Conectado a DAS Trader")
+        
+        # Obtener buying power
+        bp = await client.get_buying_power()
+        print(f"💰 Buying Power: ${bp:,.2f}")
+        
+        # Suscribirse a quote
+        await client.subscribe_quote("AAPL")
+        
+        # Ejemplo de orden (comentado para seguridad)
+        # order = await client.send_order("AAPL", "BUY", 100, "MARKET")
+        # print(f"📝 Orden enviada: {order.order_id}")
+        
+    finally:
+        await client.disconnect()
+
+if __name__ == "__main__":
+    asyncio.run(das_example())
+```
+
+> **📖 Documentación completa:** Ver [DAS Trader Integration](das_trader_integration.md) para setup avanzado.
 
 ### Configuración TWS
 

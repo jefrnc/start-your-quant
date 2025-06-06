@@ -204,8 +204,13 @@ class VWAPStrategy(Strategy):
                     if ticker in self.entry_prices:
                         del self.entry_prices[ticker]
         
-        except KeyError:
+        except KeyError as e:
             # Datos no disponibles para este timestamp
+            print(f"Warning: No data available for {ticker} at {timestamp}: {e}")
+            pass
+        except Exception as e:
+            # Error inesperado al procesar ticker
+            print(f"Error processing {ticker} at {timestamp}: {e}")
             pass
     
     def calculate_position_size(self, ticker, price):
