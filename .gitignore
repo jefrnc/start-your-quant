@@ -1,0 +1,139 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+ENV/
+env/
+.venv
+.env
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# Data files
+data/raw/
+data/historical/
+data/cache/
+*.csv
+*.pickle
+*.pkl
+*.h5
+*.hdf5
+*.parquet
+
+# Configuration and secrets
+config/secrets.ini
+config/api_keys.json
+*.key
+*.pem
+.env.local
+.env.production
+
+# Trading specific
+logs/
+backtest_results/
+live_trades/
+paper_trades/
+*.log
+portfolio_*.json
+trades_*.json
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# DAS Trader
+DAS/
+das_config/
+
+# IBKR TWS
+IBController/
+tws_logs/
+*.tws
+
+# QuantConnect
+lean/
+lean_results/
+
+# Research and analysis
+research/scratch/
+research/temp/
+*.tmp
+
+# Model files
+models/checkpoints/
+models/saved/
+*.h5
+*.ckpt
+*.pth
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Misc
+*.bak
+*.swp
+*~
+.project
+.pydevproject
