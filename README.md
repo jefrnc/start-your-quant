@@ -28,6 +28,9 @@ Guía completa para iniciarte en el trading cuantitativo, con enfoque especial e
 - [Volumen y RVol](docs/indicators/volume_rvol.md)
 - [Spike HOD/LOD](docs/indicators/spike_hod_lod.md)
 - [Gap % y Float](docs/indicators/gap_float.md)
+- [Bollinger Bands](docs/indicators/bollinger_bands.md) 🔥 **Nuevo**
+- [Parabolic SAR](docs/indicators/parabolic_sar.md) 🔥 **Nuevo**
+- [SuperTrend](docs/indicators/super_tendencia.md) 🔥 **Nuevo**
 
 ### 🧪 [4. Backtesting](docs/backtesting/)
 - [¿Qué es un backtest?](docs/backtesting/what_is_backtest.md)
@@ -60,6 +63,9 @@ Guía completa para iniciarte en el trading cuantitativo, con enfoque especial e
 - [Validación de Trades](docs/analysis/trade_validation.md)
 - [Tracking de Performance](docs/analysis/performance_tracking.md)
 - [Market Microstructure y Tape Reading](docs/analysis/market_microstructure.md)
+- [Machine Learning para Trading](docs/analysis/machine_learning.md) 🔥 **Nuevo**
+- [Análisis de Sentimiento](docs/analysis/sentiment_analysis.md) 🔥 **Nuevo**
+- [Análisis Fundamental](docs/analysis/fundamental_analysis.md) 🔥 **Nuevo**
 
 ### 🤖 [9. Automatización](docs/automation/)
 - [Arquitectura del Sistema](docs/automation/system_architecture.md)
@@ -123,3 +129,67 @@ Guía completa para iniciarte en el trading cuantitativo, con enfoque especial e
 - Todas las estrategias incluyen **advertencias de riesgo** apropiadas
 - Los ejemplos usan **datos reales** de las plataformas mencionadas
 - **⚠️ Small caps son extremadamente volátiles** - requieren experiencia y gestión de riesgo estricta
+
+## 🤝 Contribución y Desarrollo
+
+Esta documentación es un proyecto en constante evolución, desarrollado con un enfoque riguroso en la validación técnica y optimización continua. El objetivo es mantener:
+
+- **Precisión técnica** en todas las fórmulas e implementaciones
+- **Código optimizado** y siguiendo mejores prácticas
+- **Metodologías actualizadas** con los últimos desarrollos del sector
+- **Contenido verificado** a través de backtesting y análisis cuantitativo
+
+### Contribuciones Bienvenidas
+
+Cualquier **mejora, corrección u observación es enormemente agradecida**:
+
+- 🐛 **Reporta errores** en implementaciones o documentación
+- 💡 **Sugiere mejoras** en estrategias o metodologías
+- 📚 **Propón nuevo contenido** basado en tu experiencia
+- 🔧 **Optimiza código** existente o agrega nuevas funcionalidades
+
+**Formas de contribuir:**
+- Abre un issue en GitHub con tu sugerencia
+- Propón cambios vía pull request
+- Comparte tu experiencia implementando las estrategias
+- Reporta resultados de backtesting en diferentes condiciones de mercado
+
+Tu experiencia práctica y feedback son fundamentales para mantener esta documentación actualizada y útil para la comunidad de traders cuantitativos.
+
+## 📚 Recursos Adicionales Recomendados
+
+### 🎓 Cursos y Material Educativo
+
+**🔥 Altamente Recomendado:**
+- **[Trading Cuantitativo en Python](https://github.com/AxelMunguiaQuintero/Trading-Cuantitativo-en-Python)** - Curso completo con 15+ módulos prácticos que incluye:
+  - Integración con brokers (OANDA, FXCM, Interactive Brokers)
+  - Machine Learning aplicado a trading (HMM, XGBoost, Redes Neuronales)
+  - Análisis de sentimiento con VADER y web scraping
+  - Sistema de trading completo y unificado
+  - Optimización de portafolios con métodos cuantitativos
+  - **Material base que inspiró muchas implementaciones de este repositorio**
+
+### 🛠️ Herramientas y Plataformas
+- **[QuantConnect](https://www.quantconnect.com/)** - Backtesting en la nube con datos institucionales
+- **[Zipline](https://github.com/quantopian/zipline)** - Motor de backtesting open source
+- **[Backtrader](https://github.com/mementum/backtrader)** - Framework de backtesting en Python
+- **[TradingView](https://www.tradingview.com/)** - Análisis técnico y alertas
+
+### 📖 Libros Fundamentales
+- **"Quantitative Trading" - Ernest Chan** - Fundamentos del trading algorítmico
+- **"Algorithmic Trading" - Ernie Chan** - Estrategias prácticas
+- **"The Little Book of Common Sense Investing" - John Bogle** - Fundamentos de inversión
+- **"A Man for All Markets" - Edward Thorp** - Historia del trading cuantitativo
+
+### 🌐 Comunidades y Blogs
+- **[QuantStart](https://www.quantstart.com/)** - Artículos técnicos de trading cuantitativo
+- **[r/algotrading](https://reddit.com/r/algotrading)** - Comunidad activa de traders algorítmicos
+- **[Quantitative Finance Stack Exchange](https://quant.stackexchange.com/)** - Preguntas técnicas especializadas
+
+### 💡 APIs y Proveedores de Datos
+- **[Alpha Vantage](https://www.alphavantage.co/)** - API gratuita con límites
+- **[IEX Cloud](https://iexcloud.io/)** - Datos de mercado económicos
+- **[Quandl](https://www.quandl.com/)** - Datos económicos y alternativos
+- **[Polygon.io](https://polygon.io/)** - Datos en tiempo real y históricos
+
+**Nota**: El repositorio de **Trading Cuantitativo en Python** es especialmente valioso ya que proporciona implementaciones detalladas de muchos conceptos avanzados y sirvió como referencia técnica para el desarrollo de varias secciones de esta documentación.
