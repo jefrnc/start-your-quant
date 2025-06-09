@@ -181,4 +181,4 @@ No es una competencia entre discretionary y quant. Es sobre elegir la herramient
 
 ## Siguiente Paso
 
-Continúa con [Por qué usar código](por_que_codigo.md) para entender las ventajas prácticas de programar tu trading.
+Continúa con [Por qué usar código](why_code.md) para entender las ventajas prácticas de programar tu trading.

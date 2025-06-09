@@ -33,6 +33,55 @@ class SimpleBacktestEngine:
         self.daily_returns = []
 ```
 
+## Exportación de Resultados para Análisis
+
+### Integración con TraderVue
+
+Una de las mejores formas de analizar tus resultados es usando plataformas especializadas como TraderVue. Nuestro sistema incluye exportación automática:
+
+```python
+from backtesting.trade_reporting import TradeReporter, export_backtest_results
+
+# Después de ejecutar tu backtest
+results = backtester.run_backtest(data, strategy)
+
+# Exportar todos los reportes automáticamente
+export_backtest_results(results, output_dir="./mis_reportes/")
+
+# O exportar específicamente para TraderVue
+reporter = TradeReporter(results['trades'])
+reporter.to_tradervue_csv("trades_para_tradervue.csv", account_name="Mi_Backtest")
+```
+
+### Formatos de Exportación Disponibles
+
+1. **TraderVue CSV**: Compatible directamente con la importación de TraderVue
+2. **Detalle de Trades**: CSV con todas las métricas de cada trade
+3. **Journal Diario**: Resumen por día para análisis de patrones
+4. **Reporte de Performance**: JSON/CSV con métricas completas
+5. **Curva de Equity**: Para graficar evolución del capital
+
+### Análisis Post-Backtest
+
+```python
+# Generar reporte detallado de performance
+reporter.generate_performance_report("performance_analysis.json")
+
+# Exportar para journal personal
+reporter.to_journal_format("mi_journal_trading.csv")
+
+# CSV genérico con todas las métricas
+reporter.to_generic_csv("trades_completos.csv")
+```
+
+### Ventajas del Análisis Externo
+
+- **Visualizaciones avanzadas**: TraderVue genera gráficos profesionales
+- **Análisis por tags**: Categorizar trades por estrategia, hora, etc.
+- **Comparación**: Comparar diferentes backtests lado a lado
+- **Métricas adicionales**: MAE/MFE, análisis por hora del día, etc.
+- **Compartir resultados**: Exportar reportes para inversores
+
 ## Ejecución de Órdenes
 
 ```python

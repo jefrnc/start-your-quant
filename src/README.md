@@ -13,7 +13,8 @@ src/
 ├── strategies/                        # Estrategias de trading
 │   └── gap_and_go.py                 # Estrategia Gap and Go
 ├── backtesting/                       # Motor de backtesting
-│   └── simple_engine.py              # Motor simple de backtesting
+│   ├── simple_engine.py              # Motor simple de backtesting
+│   └── trade_reporting.py            # Exportación CSV para TraderVue
 ├── risk/                             # Gestión de riesgo
 │   └── position_sizing.py            # Modelos de dimensionamiento
 ├── data/                             # Fuentes de datos
@@ -36,6 +37,7 @@ src/
 ### 🔄 Backtesting (`backtesting/`)
 
 - **Simple Engine**: Motor básico de backtesting con gestión de portafolio
+- **Trade Reporting**: Exportación de trades a CSV para TraderVue, TradesViz y análisis personal
 
 ### ⚖️ Gestión de Riesgo (`risk/`)
 
@@ -90,6 +92,7 @@ Cada módulo de código está diseñado para complementar específicamente la do
 | `indicators/vwap.py` | `docs/indicators/vwap.md` |
 | `strategies/gap_and_go.py` | `docs/strategies/gap_and_go.md` |
 | `backtesting/simple_engine.py` | `docs/backtesting/simple_engine.md` |
+| `backtesting/trade_reporting.py` | `docs/backtesting/simple_engine.md` |
 | `risk/position_sizing.py` | `docs/risk/position_sizing.md` |
 | `data/data_sources.py` | `docs/data/data_sources.md` |
 

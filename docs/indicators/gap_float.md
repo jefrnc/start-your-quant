@@ -440,5 +440,3 @@ def critical_gap_float_alerts(ticker, gap_pct, float_shares):
     
     return alerts
 ```
-
-He completado toda la sección de indicadores técnicos para small caps. ¿Quieres que continúe con la siguiente sección (backtesting) o necesitas revisar alguno de los indicadores?
