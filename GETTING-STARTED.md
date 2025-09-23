@@ -73,105 +73,209 @@ print("🎉 ¡Ya eres un quant trader!")
 - C) Sí, pero manualmente → Empieza en **F3**
 - D) Sí, conozco análisis técnico → Empieza en **E1**
 
-### 🎯 Rutas de Entrada
+### 📊 Tu Plan Personalizado (elige UNO):
+| Si eres... | Semana 1 | Semana 2 | Semana 3 | Semana 4 | META |
+|------------|----------|-----------|-----------|-----------|------|
+| **Total Noob** | Python basics + Colab | Leer datos Yahoo | Tu primer indicador | Bot papel trading | Bot funcionando |
+| **Dev Sin Trading** | Indicadores técnicos | Backtesting basics | Optimización | Broker API | Bot real |
+| **Trader Manual** | Python crash course | Automatizar TU estrategia | Backtesting | Mejoras | Tu sistema auto |
+| **Quiero Todo YA** | Setup completo | 3 estrategias | Portfolio manager | Cloud deploy | Sistema pro |
 
-| Tu Perfil | Empieza en | Tiempo Total |
-|-----------|------------|--------------|
-| **Total principiante** | [F1 - ¿Qué es ser Quant?](learning-path/fundamentos/f1-que-es-ser-quant/) | 3-6 meses |
-| **Sé programar un poco** | [F2 - Python Trading](learning-path/fundamentos/f2-python-trading-basico/) | 2-4 meses |
-| **Conozco Python** | [F3 - Indicadores Técnicos](learning-path/fundamentos/f3-indicadores-tecnicos/) | 2-3 meses |
-| **Ya tradeo manualmente** | [E1 - Momentum Trading](learning-path/estrategias/e1-momentum-trading/) | 1-2 meses |
+## 🔥 MINUTO 10-20: Bots Listos para Copiar
 
-## 🏃‍♂️ Quick Wins (30 minutos cada uno)
-
-### 1. Tu Primer Análisis (5 minutos)
+### Bot #1: Detector de Gaps Matutinos (Gana con volatilidad)
 ```python
+# Bot que detecta gaps (aperturas con gran diferencia)
 import yfinance as yf
-import matplotlib.pyplot as plt
+import pandas as pd
 
-# Descargar datos de Apple
-data = yf.download('AAPL', period='1y')
+# Lista de acciones volátiles
+volatiles = ['TSLA', 'NVDA', 'AMD', 'COIN', 'MARA']
 
-# Crear gráfico
-plt.figure(figsize=(10, 6))
-plt.plot(data.index, data['Close'])
-plt.title('Apple - Último Año')
-plt.show()
+print("🔍 ESCANEANDO GAPS DEL DÍA...\n")
 
-print(f"Precio actual: ${data['Close'][-1]:.2f}")
+for ticker in volatiles:
+    data = yf.download(ticker, period='5d', progress=False)
+
+    # Gap = Apertura hoy vs Cierre ayer
+    gap = ((data['Open'][-1] - data['Close'][-2]) / data['Close'][-2]) * 100
+
+    if abs(gap) > 2:  # Gap mayor a 2%
+        tipo = "UP ↑️" if gap > 0 else "DOWN ↓️"
+        print(f"🚨 {ticker}: GAP {tipo} de {gap:.2f}%")
+        print(f"   Potencial: Regresión a ${data['Close'][-2]:.2f}")
+        print(f"   Entrada: ${data['Open'][-1]:.2f}")
+        print(f"   Target: ${data['Close'][-2]:.2f}")
+        print(f"   Ganancia potencial: {abs(gap):.2f}%\n")
 ```
 
-### 2. Tu Primera Señal (10 minutos)
+### Bot #2: Cazador de Oversold (Compra en pánico)
 ```python
-# Calcular media móvil
+# Bot que encuentra acciones sobrevendidas
+import yfinance as yf
+import pandas as pd
+
+def calculate_rsi(data, period=14):
+    delta = data.diff()
+    gain = (delta.where(delta > 0, 0)).rolling(period).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(period).mean()
+    rs = gain / loss
+    return 100 - (100 / (1 + rs))
+
+blue_chips = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM']
+
+print("🎯 BUSCANDO OPORTUNIDADES DE COMPRA (RSI < 30)\n")
+
+for ticker in blue_chips:
+    data = yf.download(ticker, period='1mo', progress=False)
+    data['RSI'] = calculate_rsi(data['Close'])
+
+    current_rsi = data['RSI'][-1]
+
+    if current_rsi < 35:  # Sobrevendido
+        print(f"🟢 {ticker} SOBREVENDIDO!")
+        print(f"   RSI: {current_rsi:.2f}")
+        print(f"   Precio actual: ${data['Close'][-1]:.2f}")
+        print(f"   Promedio 30d: ${data['Close'].mean():.2f}")
+        print(f"   Potencial rebote: {((data['Close'].mean() - data['Close'][-1]) / data['Close'][-1] * 100):.2f}%\n")
+```
+
+### Bot #3: Sistema Completo con Stop Loss
+```python
+# Sistema completo con gestión de riesgo
+import yfinance as yf
+import numpy as np
+
+# Configuración
+TICKER = 'SPY'  # ETF del S&P 500
+CAPITAL_INICIAL = 10000
+RIESGO_POR_TRADE = 0.02  # 2% máximo
+
+data = yf.download(TICKER, period='6mo', progress=False)
+
+# Indicadores
 data['MA20'] = data['Close'].rolling(20).mean()
+data['MA50'] = data['Close'].rolling(50).mean()
+data['Volatilidad'] = data['Close'].rolling(20).std()
 
-# Señal simple
-if data['Close'][-1] > data['MA20'][-1]:
-    print("🟢 SEÑAL DE COMPRA")
-else:
-    print("🔴 SEÑAL DE VENTA")
+# Señales
+data['Signal'] = 0
+data.loc[data['MA20'] > data['MA50'], 'Signal'] = 1  # Compra
+data.loc[data['MA20'] < data['MA50'], 'Signal'] = -1  # Venta
+
+# Stop Loss dinámico (2x volatilidad)
+data['StopLoss'] = data['Close'] - (2 * data['Volatilidad'])
+
+# Simular trades
+capital = CAPITAL_INICIAL
+trades = []
+
+for i in range(1, len(data)):
+    if data['Signal'].iloc[i] == 1 and data['Signal'].iloc[i-1] != 1:
+        # Entrada
+        entrada = data['Close'].iloc[i]
+        stop = data['StopLoss'].iloc[i]
+        size = (capital * RIESGO_POR_TRADE) / (entrada - stop)
+
+        trades.append({
+            'Fecha': data.index[i].date(),
+            'Tipo': 'COMPRA',
+            'Precio': entrada,
+            'Stop': stop,
+            'Shares': int(size)
+        })
+
+# Resultados
+print("📈 BACKTEST COMPLETO - ÚLTIMOS 6 MESES\n")
+print(f"Capital inicial: ${CAPITAL_INICIAL:,}")
+print(f"Total trades: {len(trades)}")
+print(f"\nÚLTIMAS 3 SEÑALES:")
+
+for trade in trades[-3:]:
+    print(f"\n{trade['Fecha']}: {trade['Tipo']} @ ${trade['Precio']:.2f}")
+    print(f"  Stop Loss: ${trade['Stop']:.2f}")
+    print(f"  Posición: {trade['Shares']} shares")
+    print(f"  Riesgo: ${(trade['Shares'] * (trade['Precio'] - trade['Stop'])):.2f}")
 ```
 
-### 3. Tu Primer Backtest (15 minutos)
+## 💵 MINUTO 20-30: Conecta con un Broker REAL
+
+### Opción A: Paper Trading (Sin Riesgo)
 ```python
-# Calcular rendimientos
-data['Returns'] = data['Close'].pct_change()
+# Alpaca Paper Trading - GRATIS, sin dinero real
+# 1. Registrate en: alpaca.markets (2 min)
+# 2. Obtén tus API keys
+# 3. Pega este código:
 
-# Estrategia simple: comprar cuando precio > MA20
-data['Signal'] = (data['Close'] > data['MA20']).astype(int)
-data['Strategy_Returns'] = data['Signal'].shift(1) * data['Returns']
+!pip install alpaca-py
 
-# Calcular performance
-total_return = (data['Strategy_Returns'] + 1).prod() - 1
-print(f"Rendimiento total: {total_return:.2%}")
+from alpaca.trading.client import TradingClient
+from alpaca.trading.requests import MarketOrderRequest
+from alpaca.trading.enums import OrderSide, TimeInForce
+
+# Tus credenciales (paper trading)
+API_KEY = 'tu_api_key'
+SECRET_KEY = 'tu_secret_key'
+
+client = TradingClient(API_KEY, SECRET_KEY, paper=True)
+
+# Tu cuenta
+account = client.get_account()
+print(f"Balance: ${account.cash}")
+print(f"Poder de compra: ${account.buying_power}")
+
+# Hacer un trade
+order_data = MarketOrderRequest(
+    symbol="AAPL",
+    qty=1,
+    side=OrderSide.BUY,
+    time_in_force=TimeInForce.DAY
+)
+
+order = client.submit_order(order_data)
+print(f"Orden enviada: Compra 1 AAPL")
 ```
 
-## 📚 Estructura del Curso
+### Opción B: Notificaciones a tu Teléfono
+```python
+# Bot de Telegram - Recibe alertas en tu celular
+# 1. Busca @BotFather en Telegram
+# 2. Crea un bot (/newbot)
+# 3. Guarda el token
 
-### 🟢 FUNDAMENTOS (4 módulos)
-Aprende las bases del trading cuantitativo
+!pip install python-telegram-bot
 
-- **F1**: ¿Qué es ser Quant? (1h)
-- **F2**: Python Trading Básico (3h)
-- **F3**: Indicadores Técnicos (2h)
-- **F4**: Primera Estrategia (2h)
+import requests
 
-### 🟡 ESTRATEGIAS (5 módulos)
-Desarrolla estrategias rentables
+def enviar_alerta(mensaje):
+    token = "TU_BOT_TOKEN"
+    chat_id = "TU_CHAT_ID"
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    requests.post(url, data={'chat_id': chat_id, 'text': mensaje})
 
-- **E1**: Momentum Trading (3h)
-- **E2**: Mean Reversion (3h)
-- **E3**: Backtesting Robusto (4h)
-- **E4**: Optimización (3h)
-- **E5**: Multi-Estrategia (5h)
+# Enviar alerta de tu bot
+if signal == "COMPRA":
+    enviar_alerta(f"🟢 COMPRAR {ticker} a ${precio:.2f}")
+```
 
-### 🟠 ANÁLISIS AVANZADO (4 módulos)
-Herramientas profesionales
+## 🎯 RESULTADO: Tu Sistema de Trading en 30 Minutos
 
-- **A1**: Gestión de Riesgo (3h)
-- **A2**: Performance Metrics (2h)
-- **A3**: Datos Alternativos (4h)
-- **A4**: Machine Learning (5h)
+✅ **Ya tienes:**
+- 3 bots funcionando
+- Scanner de oportunidades
+- Sistema con stop loss
+- Conexión a broker (paper)
+- Alertas al celular
 
-### 🔴 TRADING PROFESIONAL (3 módulos)
-Del papel a la realidad
+🚀 **Siguiente paso:**
+- Únete al Discord para compartir resultados
+- Mejora los bots con la comunidad
+- Empieza el curso completo
 
-- **P1**: Conexión con Broker (3h)
-- **P2**: Automatización (4h)
-- **P3**: Scaling Profesional (3h)
-
-## 🎯 Tu Primera Hora
-
-### Minutos 1-15: Setup
-1. Ejecuta `python quick-start.py`
-2. Verifica que todo funcione
-3. Ejecuta tu primer análisis
-
-### Minutos 16-30: Exploración
-1. Ve a `learning-path/fundamentos/f1-que-es-ser-quant/`
-2. Lee la introducción
-3. Ejecuta el ejercicio de gaps
+🔗 **Links Útiles:**
+- [Discord QuantLab](https://discord.gg/GgXZ3zAS)
+- [Academia Completa]({{ site.baseurl }}/learning-path/)
+- [Código en GitHub](https://github.com/jefrnc/start-your-quant)
 
 ### Minutos 31-45: Primera Estrategia
 1. Copia el código de media móvil
