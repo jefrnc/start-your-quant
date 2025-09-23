@@ -7,29 +7,77 @@
 
 {% seo %}
     <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
+    <link rel="stylesheet" href="{{ "/assets/css/custom.css?v=" | append: site.github.build_revision | relative_url }}">
   </head>
   <body>
-    <header class="page-header" role="banner">
-      <h1 class="project-name">{{ page.title | default: site.title | default: site.github.repository_name }}</h1>
-      <h2 class="project-tagline">{{ page.description | default: site.description | default: site.github.project_tagline }}</h2>
-      {% if site.github.is_project_page %}
-        <a href="{{ site.github.repository_url }}" class="btn">Ver en GitHub</a>
-      {% endif %}
-      <a href="{{ site.baseurl }}/" class="btn">Inicio</a>
-      <a href="{{ site.baseurl }}/GETTING-STARTED" class="btn">Empezar</a>
-      <a href="{{ site.baseurl }}/learning-path/" class="btn">Academia</a>
-      <a href="{{ site.baseurl }}/ROADMAP" class="btn">Roadmap</a>
-    </header>
+    {% include navigation.html %}
 
-    <main id="content" class="main-content" role="main">
-      {{ content }}
+    <div class="page-wrapper">
+      {% unless page.url == "/" %}
+        {% include breadcrumbs.html %}
+      {% endunless %}
 
-      <footer class="site-footer">
-        {% if site.github.is_project_page %}
-          <span class="site-footer-owner"><a href="{{ site.github.repository_url }}">{{ site.github.repository_name }}</a> mantenido por <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a>.</span>
-        {% endif %}
-        <span class="site-footer-credits">Start Your Quant - Academia de Trading Cuantitativo</span>
-      </footer>
-    </main>
+      <div class="content-wrapper">
+        <main id="content" class="main-content" role="main">
+          {% if page.url == "/" %}
+            <header class="hero-header">
+              <h1 class="hero-title">{{ page.title | default: site.title }}</h1>
+              <p class="hero-description">{{ page.description | default: site.description }}</p>
+            </header>
+          {% else %}
+            <header class="page-header">
+              <h1 class="page-title">{{ page.title }}</h1>
+              {% if page.description %}
+                <p class="page-description">{{ page.description }}</p>
+              {% endif %}
+            </header>
+          {% endif %}
+
+          <article class="content">
+            {{ content }}
+          </article>
+        </main>
+
+        {% unless page.url == "/" or page.sidebar == false %}
+          {% include sidebar.html %}
+        {% endunless %}
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>📈 Start Your Quant</h4>
+          <p>Academia de Trading Cuantitativo</p>
+          <p>De cero a quant trader profesional</p>
+        </div>
+        <div class="footer-section">
+          <h4>🔗 Enlaces Rápidos</h4>
+          <ul>
+            <li><a href="{{ site.baseurl }}/learning-path/">Academia</a></li>
+            <li><a href="{{ site.baseurl }}/GETTING-STARTED">Empezar</a></li>
+            <li><a href="{{ site.baseurl }}/examples/">Ejemplos</a></li>
+            <li><a href="{{ site.baseurl }}/ROADMAP">Roadmap</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>🌐 Comunidad</h4>
+          <ul>
+            <li><a href="https://github.com/jefrnc/start-your-quant" target="_blank">GitHub</a></li>
+            <li><a href="https://github.com/jefrnc/start-your-quant/issues" target="_blank">Soporte</a></li>
+            <li><a href="https://github.com/jefrnc/start-your-quant/discussions" target="_blank">Discusiones</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 Start Your Quant | Creado con pasión por la comunidad quant</p>
+      </div>
+    </footer>
+
+    <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top">
+      ↑
+    </button>
+
+    <script src="{{ "/assets/js/main.js" | relative_url }}"></script>
   </body>
 </html>

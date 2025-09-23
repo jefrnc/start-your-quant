@@ -1,0 +1,101 @@
+{% assign crumbs = page.url | split: '/' %}
+
+<nav class="breadcrumbs" aria-label="breadcrumb">
+  <ol class="breadcrumb-list">
+    <li class="breadcrumb-item">
+      <a href="{{ site.baseurl }}/" class="breadcrumb-link">
+        <span class="breadcrumb-icon">🏠</span>
+        Inicio
+      </a>
+    </li>
+
+    {% assign crumb_path = '' %}
+    {% for crumb in crumbs %}
+      {% if crumb != '' and crumb != 'index.html' %}
+        {% assign crumb_path = crumb_path | append: '/' | append: crumb %}
+
+        {% if forloop.last %}
+          <li class="breadcrumb-item active" aria-current="page">
+            {{ page.title | default: crumb | replace: '-', ' ' | capitalize }}
+          </li>
+        {% else %}
+          <li class="breadcrumb-item">
+            <a href="{{ site.baseurl }}{{ crumb_path }}/" class="breadcrumb-link">
+              {{ crumb | replace: '-', ' ' | capitalize }}
+            </a>
+          </li>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  </ol>
+</nav>
+
+<style>
+.breadcrumbs {
+  margin: 80px 0 20px;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+.breadcrumb-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.breadcrumb-item:not(:last-child)::after {
+  content: '›';
+  margin: 0 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.2rem;
+}
+
+.breadcrumb-link {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  transition: color 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumb-link:hover {
+  color: white;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.breadcrumb-icon {
+  margin-right: 0.5rem;
+}
+
+.breadcrumb-item.active {
+  font-weight: 600;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .breadcrumbs {
+    margin-top: 70px;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .breadcrumb-item {
+    font-size: 0.85rem;
+  }
+
+  .breadcrumb-item:not(:last-child)::after {
+    margin: 0 0.5rem;
+  }
+}
+</style>
