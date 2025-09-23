@@ -1,28 +1,60 @@
-title: Start Your Quant
-description: A comprehensive guide to quantitative trading strategies and implementation
-baseurl: "/start-your-quant"
-url: "https://your-username.github.io"
+# GitHub Pages Configuration
+title: "Start Your Quant"
+description: "Academia de Trading Cuantitativo - De cero a quant trader profesional"
+baseurl: ""
+url: "https://tu-usuario.github.io/start-your-quant"
 
-markdown: kramdown
-highlighter: rouge
+# Theme
+theme: minima
 plugins:
   - jekyll-feed
   - jekyll-sitemap
+  - jekyll-seo-tag
 
-defaults:
-  - scope:
-      path: ""
-      type: "pages"
-    values:
-      layout: "default"
+# Navigation
+header_pages:
+  - learning-path/README.md
+  - GETTING-STARTED.md
+  - core-concepts/Introduction.md
+  - templates/README.md
+  - infrastructure/README.md
 
+# Markdown settings
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Collections
+collections:
+  fundamentos:
+    output: true
+    permalink: /:collection/:name/
+  estrategias:
+    output: true
+    permalink: /:collection/:name/
+  analisis:
+    output: true
+    permalink: /:collection/:name/
+
+# SEO
+google_analytics: # Tu código de Google Analytics aquí
+twitter:
+  username: # Tu usuario de Twitter
+
+# Social links
+github_username: tu-usuario
+linkedin_username: tu-linkedin
+
+# Exclude files
 exclude:
-  - README.md
+  - .gitignore
+  - requirements.txt
   - Gemfile
   - Gemfile.lock
   - node_modules
-  - vendor
-  - .bundle
-  - .sass-cache
-  - .jekyll-cache
-  - .jekyll-metadata
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/

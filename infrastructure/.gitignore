@@ -1,0 +1,60 @@
+# Archivos de configuración sensibles
+.env
+*.env
+!.env.example
+
+# Secrets y credenciales
+secrets/
+credentials/
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Archivos de configuración con datos sensibles
+**/config.yaml
+**/config.yml
+!**/config.example.yaml
+!**/config.example.yml
+
+# Logs que pueden contener información sensible
+logs/
+*.log
+
+# Archivos de base de datos
+*.db
+*.sqlite
+*.sqlite3
+
+# Backups que pueden contener datos sensibles
+backups/
+*.backup
+*.dump
+*.sql
+
+# Certificados SSL/TLS
+*.crt
+*.cert
+*.cer
+
+# API Keys y tokens
+api_keys.txt
+tokens.txt
+
+# Archivos temporales de Docker
+.dockerignore
+docker-compose.override.yml
+
+# Datos de Kubernetes secrets (si se generan localmente)
+*-secret.yaml
+*-configmap.yaml
+
+# Archivos de Terraform (si se usan)
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars
+!*.tfvars.example
+
+# Otros archivos sensibles comunes
+.DS_Store
+Thumbs.db

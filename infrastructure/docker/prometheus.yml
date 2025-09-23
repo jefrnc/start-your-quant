@@ -1,0 +1,80 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "/etc/prometheus/rules/*.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Trading Engine metrics
+  - job_name: 'trading-engine'
+    static_configs:
+      - targets: ['trading-engine:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+    scrape_timeout: 5s
+
+  # Market Data Service metrics
+  - job_name: 'market-data'
+    static_configs:
+      - targets: ['market-data:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+
+  # Risk Manager metrics
+  - job_name: 'risk-manager'
+    static_configs:
+      - targets: ['risk-manager:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 1s  # Alta frecuencia para risk management
+
+  # Backtesting Service metrics
+  - job_name: 'backtester'
+    static_configs:
+      - targets: ['backtester:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # PostgreSQL metrics
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+    scrape_interval: 30s
+
+  # Redis metrics
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 15s
+
+  # Kafka metrics
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka-exporter:9308']
+    scrape_interval: 30s
+
+  # System metrics (node exporter)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 15s
+
+  # Custom trading metrics
+  - job_name: 'trading-metrics'
+    static_configs:
+      - targets: ['trading-engine:8080']
+    metrics_path: '/trading-metrics'
+    scrape_interval: 1s
+    params:
+      format: ['prometheus']

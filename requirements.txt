@@ -1,0 +1,75 @@
+# Librerías esenciales para trading cuantitativo
+# Instalar todas con: pip install -r requirements.txt
+
+# === DATOS Y ANÁLISIS ===
+yfinance>=0.2.18           # Datos de mercado gratuitos
+pandas>=2.0.0              # Manipulación de datos
+numpy>=1.24.0              # Computación numérica
+scipy>=1.10.0              # Estadísticas avanzadas
+
+# === VISUALIZACIÓN ===
+matplotlib>=3.7.0          # Gráficos básicos
+seaborn>=0.12.0            # Gráficos estadísticos
+plotly>=5.15.0             # Gráficos interactivos
+
+# === ANÁLISIS TÉCNICO ===
+ta-lib                     # Indicadores técnicos (opcional, requiere compilación)
+pandas-ta>=0.3.14b         # Indicadores técnicos para pandas
+stockstats>=0.6.2          # Más indicadores técnicos
+
+# === MACHINE LEARNING ===
+scikit-learn>=1.3.0        # ML básico
+tensorflow>=2.13.0         # Deep learning (opcional)
+lightgbm>=4.0.0           # Gradient boosting
+
+# === BACKTESTING ===
+backtrader>=1.9.78.123     # Framework de backtesting
+vectorbt>=0.25.0          # Backtesting vectorizado
+zipline-reloaded>=2.2.0   # Backtesting avanzado (opcional)
+
+# === BROKERS Y TRADING EN VIVO ===
+ib-insync>=0.9.86         # Interactive Brokers API
+alpaca-trade-api>=3.0.0   # Alpaca API
+ccxt>=4.0.0               # Crypto exchanges
+
+# === UTILIDADES ===
+jupyter>=1.0.0            # Notebooks interactivos
+notebook>=7.0.0           # Jupyter notebook server
+requests>=2.31.0          # HTTP requests
+python-dotenv>=1.0.0      # Variables de entorno
+tqdm>=4.65.0              # Barras de progreso
+
+# === ANÁLISIS FUNDAMENTAL ===
+financedatabase>=2.2.0    # Base de datos financiera
+fundamentalanalysis>=0.2.14  # Datos fundamentales
+
+# === DATOS ALTERNATIVOS ===
+tweepy>=4.14.0            # Twitter API
+praw>=7.7.0               # Reddit API
+newsapi-python>=0.2.6    # News API
+
+# === NOTIFICACIONES ===
+python-telegram-bot>=20.0  # Telegram bot
+smtplib                   # Email (built-in)
+
+# === OPTIMIZACIÓN ===
+optuna>=3.3.0             # Optimización de hiperparámetros
+hyperopt>=0.2.7           # Optimización bayesiana
+
+# === BASE DE DATOS ===
+sqlalchemy>=2.0.0         # ORM para bases de datos
+psycopg2-binary>=2.9.0    # PostgreSQL adapter
+redis>=4.6.0              # Redis client
+
+# === CONCURRENCIA ===
+asyncio                   # Async programming (built-in)
+aiohttp>=3.8.0           # Async HTTP
+concurrent-futures        # Threading (built-in)
+
+# === TESTING ===
+pytest>=7.4.0            # Testing framework
+pytest-cov>=4.1.0        # Coverage testing
+
+# === DOCUMENTACIÓN ===
+sphinx>=7.1.0            # Documentation generator
+mkdocs>=1.5.0            # Documentation site generator

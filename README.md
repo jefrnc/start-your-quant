@@ -1,98 +1,96 @@
-# Start Your Quant 🚀
+# 🎓 Start Your Quant - Academia de Trading Cuantitativo
 
-Guía completa para iniciarte en el trading cuantitativo, con enfoque especial en small caps y estrategias algorítmicas. Documentación profesional con ejemplos prácticos usando Yahoo Finance, Polygon.io, IBKR TWS, DAS Trader, QuantConnect y Flash Research.
+**De cero a quant trader profesional con módulos prácticos y progresivos.**
 
-## 📚 Índice de Documentación
+Aprende trading cuantitativo de forma estructurada, a tu propio ritmo, con ejemplos reales y ejercicios hands-on. Desde conceptos básicos hasta estrategias institucionales.
 
-### 🚀 [0. Setup Inicial](docs/setup/)
-- [Getting Started - Configuración inicial](docs/setup/getting_started.md)
-- [Integración con Brokers](docs/setup/broker_integration.md)
-- [DAS Trader Integration](docs/setup/das_trader_integration.md) 🔥 **Nuevo**
-- [Configuración de Data Providers](docs/setup/data_providers.md)
+> 🌟 **Completamente gratis y open source** - Perfecto para GitHub Pages
 
-### 🧠 [1. Fundamentos del Trading Cuantitativo](docs/fundamentals/)
-- [¿Qué es el trading cuantitativo?](docs/fundamentals/what_is_quant.md)
-- [Diferencias entre discretionary y quant](docs/fundamentals/discretionary_vs_quant.md)
-- [Por qué usar código](docs/fundamentals/why_code.md)
-- [Tipos de estrategias cuantitativas](docs/fundamentals/strategy_types.md)
+## 📚 Índice del Playbook
 
-### 💾 [2. Obtención y Manejo de Datos](docs/data/)
-- [Fuentes de datos (Yahoo, Polygon, IBKR, etc.)](docs/data/data_sources.md)
-- [Tipos de datos: EOD, intradía y tick](docs/data/data_types.md)
-- [Limpieza y estructuración](docs/data/data_cleaning.md)
-- [Creación de datasets para backtesting](docs/data/backtesting_datasets.md)
+### Conceptos Fundamentales
+- [Introducción](./core-concepts/Introduction.md) - Qué es el trading cuantitativo y por qué funciona
+- [Microestructura de Mercado](./core-concepts/Market-Microstructure.md) - Entendiendo la mecánica del mercado
+- [Gestión de Riesgo](./core-concepts/Risk-Management.md) - Frameworks sistemáticos de control de riesgo
+- [Métricas de Performance](./core-concepts/Performance-Metrics.md) - Métricas clave para evaluación de estrategias
 
-### 📊 [3. Indicadores Técnicos para Small Caps](docs/indicators/)
-- [VWAP y VWAP Reclaim](docs/indicators/vwap.md)
-- [Medias móviles (EMA/SMA)](docs/indicators/moving_averages.md)
-- [Volumen y RVol](docs/indicators/volume_rvol.md)
-- [Spike HOD/LOD](docs/indicators/spike_hod_lod.md)
-- [Gap % y Float](docs/indicators/gap_float.md)
-- [Bollinger Bands](docs/indicators/bollinger_bands.md) 🔥 **Nuevo**
-- [Parabolic SAR](docs/indicators/parabolic_sar.md) 🔥 **Nuevo**
-- [SuperTrend](docs/indicators/super_tendencia.md) 🔥 **Nuevo**
+### Prácticas Técnicas
+- [Ingeniería de Datos](./technical-practices/Data-Engineering.md) - Pipelines de datos financieros y procesamiento
+- [Desarrollo de Estrategias](./technical-practices/Strategy-Development.md) - Enfoque sistemático para creación de estrategias
+- [Backtesting](./technical-practices/Backtesting.md) - Metodologías de backtesting realista
+- [Optimización de Parámetros](./technical-practices/Parameter-Optimization.md) - Optimización bayesiana y walk-forward
+- [Trading en Vivo](./technical-practices/Live-Trading.md) - Mejores prácticas para despliegue en producción
 
-### 🧪 [4. Backtesting](docs/backtesting/)
-- [¿Qué es un backtest?](docs/backtesting/what_is_backtest.md)
-- [Motor de backtest simple](docs/backtesting/simple_engine.md)
-- [Métricas clave](docs/backtesting/metrics.md)
-- [Cómo evitar overfitting](docs/backtesting/overfitting.md)
-- [Análisis avanzado con ML](docs/backtesting/advanced_analysis.md)
+### Arquitectura y Patrones
+- [Trading Dirigido por Eventos](./architecture-patterns/Event-Driven-Trading.md) - Arquitecturas de trading en tiempo real
+- [Microservicios para Finanzas](./architecture-patterns/Microservices-for-Finance.md) - Diseño escalable de sistemas de trading
+- [Arquitectura de Data Lake](./architecture-patterns/Data-Lake-Architecture.md) - Patrones de almacenamiento de datos financieros
+- [Integración Multi-Broker](./architecture-patterns/Multi-Broker-Integration.md) - Sistemas de trading agnósticos al broker
 
-### 🛡️ [5. Gestión de Riesgo Cuantitativa](docs/risk/)
-- [Tamaño de posición con riesgo fijo](docs/risk/position_sizing.md)
-- [Límites de riesgo diario](docs/risk/risk_limits.md)
-- [Stop loss y trailing stops](docs/risk/stops.md)
-- [Riesgo asimétrico](docs/risk/asymmetric_risk.md)
+### Temas Avanzados
+- [Machine Learning en Trading](./advanced-topics/Machine-Learning-Trading.md) - Estrategias potenciadas por ML
+- [Datos Alternativos](./advanced-topics/Alternative-Data.md) - Fuentes de datos no tradicionales
+- [Optimización de Portafolios](./advanced-topics/Portfolio-Optimization.md) - Aplicación de teoría moderna de portafolios
+- [Trading de Alta Frecuencia](./advanced-topics/High-Frequency-Trading.md) - Sistemas de ultra-baja latencia
+- [Trading de Crypto](./advanced-topics/Crypto-Trading.md) - Estrategias para activos digitales
 
-### 🎯 [6. Estrategias Aplicadas a Small Caps](docs/strategies/)
-- [Gap & Go](docs/strategies/gap_and_go.md)
-- [VWAP Reclaim](docs/strategies/vwap_reclaim.md)
-- [First Green/Red Day](docs/strategies/first_green_red_day.md)
-- [Low Float Runners](docs/strategies/low_float_runners.md)
-- [Parabolic Reversal](docs/strategies/parabolic_reversal.md)
-- [Short Selling Avanzado](docs/strategies/short_selling_advanced.md)
+### Operaciones y Monitoreo
+- [Analytics de Trading](./operations-monitoring/Trading-Analytics.md) - Monitoreo de performance en tiempo real
+- [Manejo de Incidentes](./operations-monitoring/Incident-Management.md) - Respuesta a incidentes en sistemas de trading
+- [Compliance y Reportes](./operations-monitoring/Compliance-Reporting.md) - Requerimientos regulatorios
+- [Monitoreo de Performance de Estrategias](./operations-monitoring/Strategy-Performance-Monitoring.md) - Evaluación continua de estrategias
 
-### 🛠️ [7. Herramientas y Librerías](docs/tools/)
-- [Infraestructura Trading Avanzada](docs/tools/advanced_trading_infrastructure.md)
-- [Configuración Flash Research](docs/tools/flash_research_config.md)
-- [Librerías Esenciales Python](docs/tools/essential_libraries.md)
-- [Workflow de Desarrollo](docs/tools/development_workflow.md)
+### Templates y Scripts
+- [Templates de Estrategias](./templates/strategies/) - Frameworks listos para usar
+- [Templates de Backtesting](./templates/backtesting/) - Configuraciones realistas de backtesting
+- [Templates de Infraestructura](./templates/infrastructure/) - Despliegues completos de stack de trading
+- [Dashboards de Monitoreo](./templates/monitoring/) - Dashboards de Grafana y alertas
+- [Calculadoras de Métricas](./scripts/strategy-metrics/) - Scripts de métricas de performance
+- [Recolección de Datos](./scripts/data-collection/) - Utilidades de ingesta de datos
 
-### 📈 [8. Análisis y Validación](docs/analysis/)
-- [Validación de Trades](docs/analysis/trade_validation.md)
-- [Tracking de Performance](docs/analysis/performance_tracking.md)
-- [Market Microstructure y Tape Reading](docs/analysis/market_microstructure.md)
-- [Machine Learning para Trading](docs/analysis/machine_learning.md) 🔥 **Nuevo**
-- [Análisis de Sentimiento](docs/analysis/sentiment_analysis.md) 🔥 **Nuevo**
-- [Análisis Fundamental](docs/analysis/fundamental_analysis.md) 🔥 **Nuevo**
+### Ejemplos del Mundo Real
+- [IBKR Premarket Trader](./examples/ibkr-premarket-trader/) - Sistema de gap trading para small caps
+- [Crypto Momentum](./examples/crypto-momentum/) - Estrategias de momentum para activos digitales
+- [Estrategias de Opciones](./examples/options-strategies/) - Trading sistemático de opciones
+- [Rebalanceo de Portafolios](./examples/portfolio-rebalancing/) - Gestión automatizada de portafolios
 
-### 🤖 [9. Automatización](docs/automation/)
-- [Arquitectura del Sistema](docs/automation/system_architecture.md)
-- [Estrategias Automatizadas](docs/automation/automation_strategies.md)
-
-### 💡 [10. Ejemplos Prácticos](docs/examples/)
-- [Integración Multi-Plataforma](docs/examples/platform_integration.md)
+## Documentación Legacy (En Migración)
+- [Guía de Setup Original](./docs/) - Documentación tradicional estilo tutorial
+- [Ejemplos de Estrategias](./docs/strategies/) - Implementaciones individuales de estrategias
+- [Integraciones de Herramientas](./docs/tools/) - Integraciones específicas de plataformas
 
 ## 🚀 Quick Start
 
-1. **Revisa los requisitos iniciales**
-   - Consulta [Getting Started](docs/setup/getting_started.md) para configuración completa
-   - Instala Python 3.8+ y las librerías requeridas
+### 🚀 ¡Empezar Ahora!
 
-2. **Configura tus fuentes de datos**
+**Sin instalaciones complejas - Todo en tu navegador:**
+
+| Tu Nivel | Empieza Aquí | Tiempo |
+|----------|--------------|--------|
+| **Total principiante** | [🎯 ¿Qué es ser Quant?](learning-path/fundamentos/f1-que-es-ser-quant/) | 2-4 meses |
+| **Sé algo de Python** | [🐍 Python Trading](learning-path/fundamentos/f2-python-trading-basico/) | 1-3 meses |
+| **Ya tradeo manualmente** | [📈 Estrategias](learning-path/estrategias/e1-momentum-trading/) | 1-2 meses |
+| **Desarrollador avanzado** | [🏗️ Infraestructura](infrastructure/) | Inmediato |
+
+### 📚 Ruta de Aprendizaje
+
+🟢 **[FUNDAMENTOS](learning-path/)** → 🟡 **ESTRATEGIAS** → 🟠 **ANÁLISIS** → 🔴 **PROFESIONAL**
+
+**¿No sabes por dónde empezar?** → [📖 Guía de Inicio](GETTING-STARTED.md)
+
+### 🏗️ Para Desarrolladores Avanzados
+1. **Configura tus fuentes de datos**
    - [Yahoo Finance](docs/setup/data_providers.md) (gratuito para empezar)
    - [Polygon.io](docs/setup/data_providers.md) (API key requerida)
    - [IBKR TWS](docs/setup/broker_integration.md) (para trading institucional)
-   - [DAS Trader](docs/setup/das_trader_integration.md) (para small caps/day trading)
 
-3. **Explora las estrategias**
-   - Empieza con [Gap & Go](docs/strategies/gap_and_go.md)
-   - Implementa [VWAP Reclaim](docs/strategies/vwap_reclaim.md)
+2. **Explora estrategias avanzadas**
+   - [Gap & Go](docs/strategies/gap_and_go.md)
+   - [VWAP Reclaim](docs/strategies/vwap_reclaim.md)
 
-4. **Ejecuta tu primer backtest**
-   - Usa el [Motor Simple](docs/backtesting/simple_engine.md)
-   - Analiza las [Métricas](docs/backtesting/metrics.md)
+3. **Usa la infraestructura profesional**
+   - [Templates de Infraestructura](infrastructure/) - Stack completo con Docker/Kubernetes
+   - [Sistemas Distribuidos](architecture-patterns/) - Microservicios para trading
 
 ## 📖 Cómo usar esta guía
 

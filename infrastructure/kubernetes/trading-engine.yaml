@@ -1,0 +1,297 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: trading-engine-secret
+  namespace: trading-system
+type: Opaque
+data:
+  DB_PASSWORD: Q0hBTkdFX1RISVNfREJfUEFTU1dPUkQ=  # CHANGE_THIS_DB_PASSWORD (base64)
+  IB_PASSWORD: Q0hBTkdFX1RISVNfSUJfUEFTU1dPUkQ=  # CHANGE_THIS_IB_PASSWORD (base64)
+  POLYGON_API_KEY: WU9VUl9QT0xZR09OX0FQSV9LRVk=  # YOUR_POLYGON_API_KEY (base64)
+  TELEGRAM_BOT_TOKEN: WU9VUl9URUxFR1JBTV9CT1RfVE9LRU4=  # YOUR_TELEGRAM_BOT_TOKEN (base64)
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trading-engine-config
+  namespace: trading-system
+data:
+  config.yaml: |
+    # Trading Engine Configuration
+    database:
+      host: postgres
+      port: 5432
+      name: trading_db
+      user: trader
+      pool_size: 20
+      max_overflow: 30
+
+    redis:
+      host: redis
+      port: 6379
+      db: 0
+      password: ""
+
+    kafka:
+      brokers:
+        - kafka:9092
+      topics:
+        market_data: market_data
+        trades: trades
+        risk_events: risk_events
+
+    risk_management:
+      max_daily_loss: 1000
+      max_position_size: 10000
+      max_portfolio_value: 100000
+      position_size_percentage: 0.02
+
+    strategies:
+      gap_and_go:
+        enabled: true
+        min_gap_percent: 5.0
+        max_gap_percent: 25.0
+        min_volume: 100000
+        max_price: 15.0
+        stop_loss_percent: 5.0
+
+    brokers:
+      interactive_brokers:
+        host: ib-gateway
+        port: 4001
+        client_id: 1
+
+    logging:
+      level: INFO
+      format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+    monitoring:
+      metrics_port: 9090
+      health_check_port: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trading-engine
+  namespace: trading-system
+  labels:
+    app: trading-engine
+    tier: application
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: trading-engine
+  template:
+    metadata:
+      labels:
+        app: trading-engine
+        tier: application
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: trading-engine-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+      - name: trading-engine
+        image: trading-engine:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        - containerPort: 9090
+          name: metrics
+          protocol: TCP
+        env:
+        - name: DB_HOST
+          value: "postgres"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "trading_db"
+        - name: DB_USER
+          value: "trader"
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: trading-engine-secret
+              key: DB_PASSWORD
+        - name: REDIS_HOST
+          value: "redis"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: KAFKA_BROKERS
+          value: "kafka:9092"
+        - name: POLYGON_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: trading-engine-secret
+              key: POLYGON_API_KEY
+        - name: TELEGRAM_BOT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: trading-engine-secret
+              key: TELEGRAM_BOT_TOKEN
+        - name: TRADING_MODE
+          value: "paper"
+        - name: LOG_LEVEL
+          value: "INFO"
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+          readOnly: true
+        - name: logs
+          mountPath: /app/logs
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+      volumes:
+      - name: config
+        configMap:
+          name: trading-engine-config
+      - name: logs
+        emptyDir: {}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - trading-engine
+              topologyKey: kubernetes.io/hostname
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trading-engine
+  namespace: trading-system
+  labels:
+    app: trading-engine
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  - port: 9090
+    targetPort: 9090
+    protocol: TCP
+    name: metrics
+  selector:
+    app: trading-engine
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: trading-engine-sa
+  namespace: trading-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: trading-system
+  name: trading-engine-role
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: trading-engine-rolebinding
+  namespace: trading-system
+subjects:
+- kind: ServiceAccount
+  name: trading-engine-sa
+  namespace: trading-system
+roleRef:
+  kind: Role
+  name: trading-engine-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: trading-engine-hpa
+  namespace: trading-system
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: trading-engine
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60

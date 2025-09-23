@@ -1,6 +1,50 @@
-# 🚀 Start Your Quant - ROADMAP
+# Roadmap de Aprendizaje Quant Trading 2025
 
-Este roadmap presenta las características, estrategias y experimentos planeados para el desarrollo del proyecto de trading cuantitativo.
+## 🗺️ Ruta Interactiva de Trading Cuantitativo
+
+```mermaid
+graph TB
+    Start([Inicia tu Ruta Quant]) --> Foundations
+
+    subgraph Foundations[1. Fundamentos]
+        A1[Python & Análisis de Datos]
+        A2[Mercados Financieros]
+        A3[Estadística & Probabilidad]
+        A4[Git & Versionado]
+    end
+
+    Foundations --> Core
+
+    subgraph Core[2. Core Quant]
+        B1[Backtesting & Validación]
+        B2[Gestión de Riesgo]
+        B3[APIs de Datos Financieros]
+        B4[Desarrollo de Estrategias]
+    end
+
+    Core --> Advanced
+
+    subgraph Advanced[3. Prácticas Avanzadas]
+        C1[Machine Learning Trading]
+        C2[Optimización de Parámetros]
+        C3[Trading en Vivo]
+        C4[Microestructura de Mercado]
+    end
+
+    Advanced --> Expert
+
+    subgraph Expert[4. Nivel Experto]
+        D1[Sistemas Multi-Broker]
+        D2[HFT & Ultra-Baja Latencia]
+        D3[Datos Alternativos]
+        D4[Portfolio Management]
+    end
+
+    Expert --> Leader([Quant Leader])
+
+    style Start fill:#f9f,stroke:#333,stroke-width:4px
+    style Leader fill:#9f9,stroke:#333,stroke-width:4px
+```
 
 ## ✅ Estado Actual (Completado)
 

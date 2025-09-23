@@ -1,0 +1,353 @@
+version: '3.8'
+
+services:
+  # PostgreSQL principal para almacenamiento de trades y configuraciones
+  postgres:
+    image: postgres:15-alpine
+    container_name: trading_postgres
+    environment:
+      POSTGRES_DB: trading_db
+      POSTGRES_USER: trader
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secure_password}
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trader -d trading_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - trading_network
+
+  # TimescaleDB para datos de mercado (time series)
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: trading_timescale
+    environment:
+      POSTGRES_DB: market_data
+      POSTGRES_USER: market_user
+      POSTGRES_PASSWORD: ${TIMESCALE_PASSWORD:-timescale_password}
+    ports:
+      - "5433:5432"
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+      - ./timescale-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U market_user -d market_data"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - trading_network
+
+  # Redis para cache y session management
+  redis:
+    image: redis:7-alpine
+    container_name: trading_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - trading_network
+
+  # Apache Kafka para streaming de datos
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: trading_zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+      - zookeeper_logs:/var/lib/zookeeper/log
+    restart: unless-stopped
+    networks:
+      - trading_network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: trading_kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - trading_network
+
+  # MinIO para almacenamiento de objetos (backups, logs, reportes)
+  minio:
+    image: minio/minio:latest
+    container_name: trading_minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin123}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - trading_network
+
+  # Prometheus para métricas
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: trading_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    networks:
+      - trading_network
+
+  # Grafana para dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: trading_grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin123}
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - trading_network
+
+  # Trading Engine Principal
+  trading-engine:
+    build:
+      context: ./trading-engine
+      dockerfile: Dockerfile
+    container_name: trading_engine
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: trading_db
+      DB_USER: trader
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-secure_password}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      KAFKA_BROKERS: kafka:9092
+      LOG_LEVEL: INFO
+      STRATEGY_CONFIG_PATH: /app/config/strategies.yaml
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./trading-engine/config:/app/config
+      - ./trading-engine/logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - trading_network
+
+  # Market Data Service
+  market-data:
+    build:
+      context: ./market-data
+      dockerfile: Dockerfile
+    container_name: market_data_service
+    environment:
+      TIMESCALE_HOST: timescaledb
+      TIMESCALE_PORT: 5432
+      TIMESCALE_DB: market_data
+      TIMESCALE_USER: market_user
+      TIMESCALE_PASSWORD: ${TIMESCALE_PASSWORD:-timescale_password}
+      KAFKA_BROKERS: kafka:9092
+      POLYGON_API_KEY: ${POLYGON_API_KEY}
+      ALPHA_VANTAGE_API_KEY: ${ALPHA_VANTAGE_API_KEY}
+      UPDATE_INTERVAL: 5
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./market-data/config:/app/config
+      - ./market-data/logs:/app/logs
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - trading_network
+
+  # Risk Management Service
+  risk-manager:
+    build:
+      context: ./risk-manager
+      dockerfile: Dockerfile
+    container_name: risk_manager
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: trading_db
+      DB_USER: trader
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-secure_password}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      KAFKA_BROKERS: kafka:9092
+      MAX_DAILY_LOSS: 500
+      MAX_POSITION_SIZE: 10000
+      RISK_CHECK_INTERVAL: 1
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./risk-manager/config:/app/config
+      - ./risk-manager/logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - trading_network
+
+  # Backtesting Service
+  backtester:
+    build:
+      context: ./backtester
+      dockerfile: Dockerfile
+    container_name: backtesting_service
+    environment:
+      TIMESCALE_HOST: timescaledb
+      TIMESCALE_PORT: 5432
+      TIMESCALE_DB: market_data
+      TIMESCALE_USER: market_user
+      TIMESCALE_PASSWORD: ${TIMESCALE_PASSWORD:-timescale_password}
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin123}
+      PARALLEL_WORKERS: 4
+    ports:
+      - "8083:8080"
+    volumes:
+      - ./backtester/config:/app/config
+      - ./backtester/results:/app/results
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - trading_network
+
+  # Jupyter Notebook para análisis
+  jupyter:
+    image: jupyter/scipy-notebook:latest
+    container_name: trading_jupyter
+    environment:
+      JUPYTER_ENABLE_LAB: "yes"
+      JUPYTER_TOKEN: ${JUPYTER_TOKEN:-trading123}
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - jupyter_data:/home/jovyan
+    depends_on:
+      - postgres
+      - timescaledb
+    restart: unless-stopped
+    networks:
+      - trading_network
+
+volumes:
+  postgres_data:
+  timescale_data:
+  redis_data:
+  zookeeper_data:
+  zookeeper_logs:
+  kafka_data:
+  minio_data:
+  prometheus_data:
+  grafana_data:
+  jupyter_data:
+
+networks:
+  trading_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

@@ -1,0 +1,482 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-topics-config
+  namespace: trading-system
+data:
+  create-topics.sh: |
+    #!/bin/bash
+
+    # Esperar a que Kafka esté disponible
+    echo "Esperando a que Kafka esté disponible..."
+    while ! kafka-topics --bootstrap-server kafka:9092 --list > /dev/null 2>&1; do
+      sleep 5
+    done
+
+    echo "Kafka disponible. Creando topics..."
+
+    # Topic para datos de mercado en tiempo real
+    kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists \
+      --topic market-data-realtime \
+      --partitions 6 \
+      --replication-factor 1 \
+      --config retention.ms=86400000 \
+      --config compression.type=lz4 \
+      --config max.message.bytes=1048576
+
+    # Topic para trades ejecutados
+    kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists \
+      --topic trades-executed \
+      --partitions 3 \
+      --replication-factor 1 \
+      --config retention.ms=604800000 \
+      --config compression.type=snappy
+
+    # Topic para señales de trading
+    kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists \
+      --topic trading-signals \
+      --partitions 6 \
+      --replication-factor 1 \
+      --config retention.ms=86400000 \
+      --config compression.type=lz4
+
+    # Topic para eventos de riesgo
+    kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists \
+      --topic risk-events \
+      --partitions 3 \
+      --replication-factor 1 \
+      --config retention.ms=2592000000 \
+      --config compression.type=gzip
+
+    # Topic para órdenes
+    kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists \
+      --topic orders \
+      --partitions 6 \
+      --replication-factor 1 \
+      --config retention.ms=604800000 \
+      --config compression.type=snappy
+
+    # Topic para métricas de performance
+    kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists \
+      --topic performance-metrics \
+      --partitions 3 \
+      --replication-factor 1 \
+      --config retention.ms=2592000000 \
+      --config compression.type=gzip
+
+    # Topic para logs de auditoría
+    kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists \
+      --topic audit-logs \
+      --partitions 3 \
+      --replication-factor 1 \
+      --config retention.ms=7776000000 \
+      --config compression.type=gzip
+
+    # Topic para datos alternativos (sentiment, news, etc.)
+    kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists \
+      --topic alternative-data \
+      --partitions 6 \
+      --replication-factor 1 \
+      --config retention.ms=259200000 \
+      --config compression.type=lz4
+
+    echo "Todos los topics creados exitosamente"
+
+    # Mostrar lista de topics
+    echo "Lista de topics:"
+    kafka-topics --bootstrap-server kafka:9092 --list
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-streams-config
+  namespace: trading-system
+data:
+  market-data-processor.py: |
+    """
+    Kafka Streams processor para datos de mercado
+    Agrega, normaliza y distribuye datos de mercado en tiempo real
+    """
+
+    import json
+    import asyncio
+    from kafka import KafkaConsumer, KafkaProducer
+    from kafka.errors import KafkaError
+    import logging
+    from datetime import datetime
+    from typing import Dict, Any
+
+    class MarketDataProcessor:
+        def __init__(self):
+            self.consumer = KafkaConsumer(
+                'market-data-raw',
+                bootstrap_servers=['kafka:9092'],
+                value_deserializer=lambda m: json.loads(m.decode('utf-8')),
+                group_id='market-data-processor',
+                enable_auto_commit=True,
+                auto_offset_reset='latest'
+            )
+
+            self.producer = KafkaProducer(
+                bootstrap_servers=['kafka:9092'],
+                value_serializer=lambda v: json.dumps(v).encode('utf-8'),
+                compression_type='lz4',
+                batch_size=16384,
+                linger_ms=10
+            )
+
+            self.logger = logging.getLogger(__name__)
+
+        def normalize_market_data(self, raw_data: Dict[str, Any]) -> Dict[str, Any]:
+            """Normaliza datos de mercado de diferentes fuentes"""
+
+            normalized = {
+                'symbol': raw_data.get('symbol', '').upper(),
+                'timestamp': datetime.utcnow().isoformat(),
+                'source': raw_data.get('source', 'unknown'),
+                'price': float(raw_data.get('price', 0)),
+                'volume': int(raw_data.get('volume', 0)),
+                'bid': float(raw_data.get('bid', 0)),
+                'ask': float(raw_data.get('ask', 0)),
+                'bid_size': int(raw_data.get('bid_size', 0)),
+                'ask_size': int(raw_data.get('ask_size', 0)),
+                'last_trade_time': raw_data.get('last_trade_time'),
+                'market_status': raw_data.get('market_status', 'unknown')
+            }
+
+            # Calcular spread
+            if normalized['bid'] > 0 and normalized['ask'] > 0:
+                normalized['spread'] = normalized['ask'] - normalized['bid']
+                normalized['spread_percent'] = (normalized['spread'] / normalized['ask']) * 100
+            else:
+                normalized['spread'] = 0
+                normalized['spread_percent'] = 0
+
+            # Validar datos
+            if normalized['price'] <= 0 or not normalized['symbol']:
+                return None
+
+            return normalized
+
+        async def process_messages(self):
+            """Procesa mensajes de market data en tiempo real"""
+
+            try:
+                for message in self.consumer:
+                    raw_data = message.value
+
+                    # Normalizar datos
+                    normalized_data = self.normalize_market_data(raw_data)
+
+                    if normalized_data:
+                        # Enviar a topic de datos normalizados
+                        await self.send_normalized_data(normalized_data)
+
+                        # Generar señales si es necesario
+                        await self.check_trading_signals(normalized_data)
+
+                    else:
+                        self.logger.warning(f"Datos inválidos descartados: {raw_data}")
+
+            except Exception as e:
+                self.logger.error(f"Error procesando mensajes: {e}")
+
+        async def send_normalized_data(self, data: Dict[str, Any]):
+            """Envía datos normalizados al topic correspondiente"""
+
+            try:
+                future = self.producer.send('market-data-realtime', data)
+                await asyncio.wrap_future(future)
+
+            except KafkaError as e:
+                self.logger.error(f"Error enviando datos normalizados: {e}")
+
+        async def check_trading_signals(self, data: Dict[str, Any]):
+            """Verifica si los datos generan señales de trading"""
+
+            # Ejemplo de detección de gap
+            if data['price'] > 0:
+                # Aquí implementarías lógica de detección de señales
+                # Por ejemplo, gaps significativos, volumen anormal, etc.
+                pass
+
+    if __name__ == "__main__":
+        processor = MarketDataProcessor()
+        asyncio.run(processor.process_messages())
+
+  trading-signals-processor.py: |
+    """
+    Procesador de señales de trading
+    Agrega señales de múltiples estrategias y genera órdenes
+    """
+
+    import json
+    import asyncio
+    from kafka import KafkaConsumer, KafkaProducer
+    import logging
+    from datetime import datetime
+    from typing import Dict, Any, List
+
+    class TradingSignalsProcessor:
+        def __init__(self):
+            self.consumer = KafkaConsumer(
+                'trading-signals',
+                bootstrap_servers=['kafka:9092'],
+                value_deserializer=lambda m: json.loads(m.decode('utf-8')),
+                group_id='signals-processor',
+                enable_auto_commit=True
+            )
+
+            self.producer = KafkaProducer(
+                bootstrap_servers=['kafka:9092'],
+                value_serializer=lambda v: json.dumps(v).encode('utf-8'),
+                compression_type='snappy'
+            )
+
+            self.logger = logging.getLogger(__name__)
+            self.active_signals = {}  # Cache de señales activas
+
+        def aggregate_signals(self, new_signal: Dict[str, Any]) -> Dict[str, Any]:
+            """Agrega señales de múltiples estrategias para el mismo símbolo"""
+
+            symbol = new_signal['symbol']
+
+            if symbol not in self.active_signals:
+                self.active_signals[symbol] = []
+
+            # Agregar nueva señal
+            self.active_signals[symbol].append(new_signal)
+
+            # Limpiar señales antiguas (más de 5 minutos)
+            current_time = datetime.utcnow()
+            self.active_signals[symbol] = [
+                signal for signal in self.active_signals[symbol]
+                if (current_time - datetime.fromisoformat(signal['timestamp'])).seconds < 300
+            ]
+
+            # Calcular señal agregada
+            if len(self.active_signals[symbol]) >= 2:  # Mínimo 2 señales
+                return self.calculate_consensus_signal(symbol)
+
+            return None
+
+        def calculate_consensus_signal(self, symbol: str) -> Dict[str, Any]:
+            """Calcula señal de consenso basada en múltiples estrategias"""
+
+            signals = self.active_signals[symbol]
+
+            # Contar votos por dirección
+            long_votes = sum(1 for s in signals if s['direction'] == 'long')
+            short_votes = sum(1 for s in signals if s['direction'] == 'short')
+
+            # Calcular fuerza promedio
+            avg_strength = sum(s['strength'] for s in signals) / len(signals)
+
+            # Determinar consenso
+            if long_votes > short_votes and avg_strength > 0.7:
+                direction = 'long'
+                confidence = long_votes / len(signals)
+            elif short_votes > long_votes and avg_strength > 0.7:
+                direction = 'short'
+                confidence = short_votes / len(signals)
+            else:
+                return None  # No hay consenso claro
+
+            return {
+                'symbol': symbol,
+                'direction': direction,
+                'confidence': confidence,
+                'strength': avg_strength,
+                'contributing_strategies': [s['strategy'] for s in signals],
+                'timestamp': datetime.utcnow().isoformat(),
+                'type': 'consensus'
+            }
+
+        async def process_signals(self):
+            """Procesa señales de trading en tiempo real"""
+
+            try:
+                for message in self.consumer:
+                    signal = message.value
+
+                    # Agregar señal
+                    consensus_signal = self.aggregate_signals(signal)
+
+                    if consensus_signal:
+                        # Enviar señal de consenso para generación de orden
+                        await self.send_order_signal(consensus_signal)
+
+                        self.logger.info(f"Señal de consenso generada: {consensus_signal}")
+
+            except Exception as e:
+                self.logger.error(f"Error procesando señales: {e}")
+
+        async def send_order_signal(self, signal: Dict[str, Any]):
+            """Envía señal para generación de orden"""
+
+            try:
+                future = self.producer.send('orders', signal)
+                await asyncio.wrap_future(future)
+
+            except Exception as e:
+                self.logger.error(f"Error enviando señal de orden: {e}")
+
+  risk-monitor.py: |
+    """
+    Monitor de riesgo en tiempo real
+    Monitorea eventos de riesgo y bloquea órdenes peligrosas
+    """
+
+    import json
+    import asyncio
+    from kafka import KafkaConsumer, KafkaProducer
+    import redis
+    import logging
+    from datetime import datetime
+    from typing import Dict, Any
+
+    class RiskMonitor:
+        def __init__(self):
+            self.consumer = KafkaConsumer(
+                'orders', 'trades-executed',
+                bootstrap_servers=['kafka:9092'],
+                value_deserializer=lambda m: json.loads(m.decode('utf-8')),
+                group_id='risk-monitor',
+                enable_auto_commit=True
+            )
+
+            self.producer = KafkaProducer(
+                bootstrap_servers=['kafka:9092'],
+                value_serializer=lambda v: json.dumps(v).encode('utf-8')
+            )
+
+            self.redis_client = redis.Redis(host='redis', port=6379, db=0)
+            self.logger = logging.getLogger(__name__)
+
+            # Límites de riesgo
+            self.max_daily_loss = 1000
+            self.max_position_size = 10000
+            self.max_symbol_exposure = 5000
+
+        async def monitor_risk(self):
+            """Monitorea riesgo en tiempo real"""
+
+            try:
+                for message in self.consumer:
+                    data = message.value
+                    topic = message.topic
+
+                    if topic == 'orders':
+                        await self.validate_order(data)
+                    elif topic == 'trades-executed':
+                        await self.update_positions(data)
+
+            except Exception as e:
+                self.logger.error(f"Error en monitor de riesgo: {e}")
+
+        async def validate_order(self, order: Dict[str, Any]):
+            """Valida orden antes de ejecución"""
+
+            symbol = order['symbol']
+            quantity = order['quantity']
+            side = order['side']
+
+            # Validaciones
+            risk_violations = []
+
+            # 1. Verificar límite de posición por símbolo
+            current_position = await self.get_current_position(symbol)
+            new_position = current_position + (quantity if side == 'buy' else -quantity)
+
+            if abs(new_position) > self.max_symbol_exposure:
+                risk_violations.append(f"Excede límite de exposición por símbolo: {abs(new_position)}")
+
+            # 2. Verificar pérdida diaria
+            daily_pnl = await self.get_daily_pnl()
+            if daily_pnl < -self.max_daily_loss:
+                risk_violations.append(f"Excede límite de pérdida diaria: {daily_pnl}")
+
+            # 3. Verificar tamaño de posición total
+            total_exposure = await self.get_total_exposure()
+            if total_exposure > self.max_position_size:
+                risk_violations.append(f"Excede límite de exposición total: {total_exposure}")
+
+            # Enviar resultado
+            if risk_violations:
+                await self.block_order(order, risk_violations)
+            else:
+                await self.approve_order(order)
+
+        async def get_current_position(self, symbol: str) -> int:
+            """Obtiene posición actual de un símbolo"""
+            position = self.redis_client.get(f"position:{symbol}")
+            return int(position) if position else 0
+
+        async def get_daily_pnl(self) -> float:
+            """Obtiene P&L del día"""
+            pnl = self.redis_client.get("daily_pnl")
+            return float(pnl) if pnl else 0.0
+
+        async def get_total_exposure(self) -> float:
+            """Obtiene exposición total del portafolio"""
+            exposure = self.redis_client.get("total_exposure")
+            return float(exposure) if exposure else 0.0
+
+        async def block_order(self, order: Dict[str, Any], violations: List[str]):
+            """Bloquea orden por violaciones de riesgo"""
+
+            risk_event = {
+                'type': 'order_blocked',
+                'order_id': order.get('order_id'),
+                'symbol': order['symbol'],
+                'violations': violations,
+                'timestamp': datetime.utcnow().isoformat(),
+                'severity': 'high'
+            }
+
+            await self.send_risk_event(risk_event)
+            self.logger.warning(f"Orden bloqueada: {violations}")
+
+        async def approve_order(self, order: Dict[str, Any]):
+            """Aprueba orden para ejecución"""
+
+            # Actualizar orden con aprobación
+            order['risk_approved'] = True
+            order['risk_check_time'] = datetime.utcnow().isoformat()
+
+            # Enviar a ejecutor
+            future = self.producer.send('orders-approved', order)
+            await asyncio.wrap_future(future)
+
+        async def send_risk_event(self, event: Dict[str, Any]):
+            """Envía evento de riesgo"""
+
+            future = self.producer.send('risk-events', event)
+            await asyncio.wrap_future(future)
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-topics-setup
+  namespace: trading-system
+spec:
+  template:
+    spec:
+      containers:
+      - name: kafka-setup
+        image: confluentinc/cp-kafka:7.4.0
+        command: ["/bin/bash"]
+        args: ["/scripts/create-topics.sh"]
+        volumeMounts:
+        - name: scripts
+          mountPath: /scripts
+        env:
+        - name: KAFKA_BROKER
+          value: "kafka:9092"
+      volumes:
+      - name: scripts
+        configMap:
+          name: kafka-topics-config
+          defaultMode: 0755
+      restartPolicy: OnFailure
+  backoffLimit: 5

@@ -1,74 +1,150 @@
 ---
-layout: default
-title: Home
+layout: home
+title: "Start Your Quant - Academia de Trading Cuantitativo"
 ---
 
-# Empieza tu Quant
+# 🎓 Conviértete en Quant Trader
 
-Bienvenido a la guía completa para estrategias de trading cuantitativo e implementación.
+**De cero a profesional con módulos prácticos y progresivos.**
 
-Este repositorio está disponible en [GitHub](https://github.com/jefrnc/start-your-quant) y tiene como objetivo brindar información práctica y recursos para iniciarse en el trading cuantitativo. Si tienes sugerencias, mejoras o recomendaciones sobre qué temas cubrir, no dudes en contactarme a través de mi perfil de [GitHub](https://github.com/jefrnc).
+Aprende trading cuantitativo usando **matemáticas y programación** en lugar de intuición. Desde conceptos básicos hasta estrategias institucionales.
 
-## Secciones de Documentación
+## 🚀 Empieza Tu Aventura
 
-### Fundamentos
-- [¿Qué es el Trading Cuantitativo?](docs/fundamentals/what_is_quant.md)
-- [Trading Discrecional vs Cuantitativo](docs/fundamentals/discretionary_vs_quant.md)
-- [Tipos de Estrategias](docs/fundamentals/strategy_types.md)
-- [¿Por qué Programar?](docs/fundamentals/why_code.md)
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 30px 0;">
 
-### Datos y Análisis
-- [Fuentes de Datos](docs/data/data_sources.md)
-- [Tipos de Datos](docs/data/data_types.md)
-- [Limpieza de Datos](docs/data/data_cleaning.md)
-- [Datasets para Backtesting](docs/data/backtesting_datasets.md)
+<div style="border: 2px solid #28a745; border-radius: 10px; padding: 20px; text-align: center;">
+<h3>🟢 Total Principiante</h3>
+<p>Nunca programé ni hice trading</p>
+<a href="learning-path/fundamentos/f1-que-es-ser-quant/" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">¿Qué es ser Quant?</a>
+<p><small>⏱️ 2-4 meses</small></p>
+</div>
 
-### Indicadores Técnicos
-- [Medias Móviles](docs/indicators/moving_averages.md)
-- [VWAP](docs/indicators/vwap.md)
-- [Volumen RVOL](docs/indicators/volume_rvol.md)
-- [Gap Float](docs/indicators/gap_float.md)
-- [Spike HOD/LOD](docs/indicators/spike_hod_lod.md)
+<div style="border: 2px solid #ffc107; border-radius: 10px; padding: 20px; text-align: center;">
+<h3>🟡 Sé algo de Python</h3>
+<p>Tengo experiencia básica programando</p>
+<a href="learning-path/fundamentos/f2-python-trading-basico/" style="background: #ffc107; color: black; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Python Trading</a>
+<p><small>⏱️ 1-3 meses</small></p>
+</div>
 
-### Estrategias de Trading
-- [Gap and Go](docs/strategies/gap_and_go.md)
-- [Recuperación VWAP](docs/strategies/vwap_reclaim.md)
-- [Low Float Runners](docs/strategies/low_float_runners.md)
-- [Reversión Parabólica](docs/strategies/parabolic_reversal.md)
-- [Primer Día Verde/Rojo](docs/strategies/first_green_red_day.md)
-- [Ventas en Corto Avanzadas](docs/strategies/short_selling_advanced.md)
+<div style="border: 2px solid #fd7e14; border-radius: 10px; padding: 20px; text-align: center;">
+<h3>🟠 Ya tradeo manualmente</h3>
+<p>Conozco trading pero quiero automatizar</p>
+<a href="learning-path/estrategias/e1-momentum-trading/" style="background: #fd7e14; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Estrategias Quant</a>
+<p><small>⏱️ 1-2 meses</small></p>
+</div>
 
-### Backtesting
-- [¿Qué es el Backtesting?](docs/backtesting/what_is_backtest.md)
-- [Motor Simple de Backtesting](docs/backtesting/simple_engine.md)
-- [Métricas](docs/backtesting/metrics.md)
-- [Análisis Avanzado](docs/backtesting/advanced_analysis.md)
-- [Evitar Sobreajuste](docs/backtesting/overfitting.md)
+<div style="border: 2px solid #dc3545; border-radius: 10px; padding: 20px; text-align: center;">
+<h3>🔴 Desarrollador Avanzado</h3>
+<p>Quiero infraestructura profesional</p>
+<a href="infrastructure/" style="background: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Infraestructura</a>
+<p><small>⏱️ Inmediato</small></p>
+</div>
 
-### Gestión de Riesgo
-- [Dimensionamiento de Posiciones](docs/risk/position_sizing.md)
-- [Stop Losses](docs/risk/stops.md)
-- [Límites de Riesgo](docs/risk/risk_limits.md)
-- [Riesgo Asimétrico](docs/risk/asymmetric_risk.md)
+</div>
 
-### Configuración y Herramientas
-- [Primeros Pasos](docs/setup/getting_started.md)
-- [Integración con Brokers](docs/setup/broker_integration.md)
-- [Proveedores de Datos](docs/setup/data_providers.md)
-- [Integración DAS Trader](docs/setup/das_trader_integration.md)
-- [Librerías Esenciales](docs/tools/essential_libraries.md)
-- [Flujo de Desarrollo](docs/tools/development_workflow.md)
-- [Infraestructura Avanzada de Trading](docs/tools/advanced_trading_infrastructure.md)
-- [Configuración Flash Research](docs/tools/flash_research_config.md)
+## 📚 Ruta de Aprendizaje Completa
 
-### Análisis y Rendimiento
-- [Microestructura del Mercado](docs/analysis/market_microstructure.md)
-- [Seguimiento de Rendimiento](docs/analysis/performance_tracking.md)
-- [Validación de Trades](docs/analysis/trade_validation.md)
+### 🟢 [FUNDAMENTOS](learning-path/fundamentos/)
+**Aprende las bases del trading cuantitativo**
+- ¿Qué es ser Quant? (1h)
+- Python Trading Básico (3h)
+- Indicadores Técnicos (2h)
+- Primera Estrategia (2h)
 
-### Automatización
-- [Estrategias de Automatización](docs/automation/automation_strategies.md)
-- [Arquitectura del Sistema](docs/automation/system_architecture.md)
+### 🟡 [ESTRATEGIAS](learning-path/estrategias/)
+**Desarrolla estrategias rentables**
+- Momentum Trading (3h)
+- Mean Reversion (3h)
+- Backtesting Robusto (4h)
+- Optimización (3h)
+- Multi-Estrategia (5h)
 
-### Ejemplos
-- [Integración de Plataformas](docs/examples/platform_integration.md)
+### 🟠 [ANÁLISIS AVANZADO](learning-path/analisis/)
+**Herramientas profesionales**
+- Gestión de Riesgo (3h)
+- Performance Metrics (2h)
+- Datos Alternativos (4h)
+- Machine Learning (5h)
+
+### 🔴 [TRADING PROFESIONAL](learning-path/profesional/)
+**Del papel a la realidad**
+- Conexión con Broker (3h)
+- Automatización (4h)
+- Scaling Profesional (3h)
+
+## 🎯 Tu Primer Análisis (5 minutos)
+
+**¿Quieres ver el poder del trading cuantitativo?**
+
+Ve a [Google Colab](https://colab.research.google.com), crea un nuevo notebook y pega:
+
+```python
+# Instalar librerías
+!pip install yfinance matplotlib
+
+# Tu primer análisis cuantitativo
+import yfinance as yf
+import matplotlib.pyplot as plt
+
+# Descargar datos de Apple
+data = yf.download('AAPL', period='1y')
+
+# Estrategia simple: Media móvil
+data['MA20'] = data['Close'].rolling(20).mean()
+
+# Crear gráfico
+plt.figure(figsize=(12, 6))
+plt.plot(data.index, data['Close'], label='Precio AAPL')
+plt.plot(data.index, data['MA20'], label='Media Móvil 20')
+plt.title('Tu Primer Análisis Quant - Apple')
+plt.legend()
+plt.show()
+
+# Señal simple
+if data['Close'][-1] > data['MA20'][-1]:
+    print("🟢 SEÑAL DE COMPRA")
+else:
+    print("🔴 SEÑAL DE VENTA")
+
+print(f"Precio actual: ${data['Close'][-1]:.2f}")
+```
+
+**¡Felicitaciones! Ya usaste un método cuantitativo para generar una señal de trading.**
+
+## 🌟 ¿Por qué "Start Your Quant"?
+
+### ✅ **100% Gratis y Open Source**
+Todo el contenido es gratuito y está disponible en GitHub.
+
+### ✅ **Enfoque Práctico**
+80% práctica, 20% teoría. Aprendes haciendo.
+
+### ✅ **Progresión Estructurada**
+Desde conceptos básicos hasta niveles institucionales.
+
+### ✅ **Ejemplos Reales**
+Estrategias probadas con datos reales de mercado.
+
+### ✅ **Comunidad Activa**
+GitHub Issues para preguntas y Discord para chat.
+
+## 🚀 Empezar Ahora
+
+**¿No sabes por dónde empezar?**
+
+👉 **[Guía Completa de Inicio](GETTING-STARTED.md)** - Te ayudamos a elegir tu ruta perfecta
+
+**¿Ya sabes qué quieres aprender?**
+
+👉 **[Academia Quant](learning-path/)** - Directo a los módulos de aprendizaje
+
+---
+
+### 💡 Recuerda
+
+> **"El mejor momento para empezar fue ayer. El segundo mejor momento es ahora."**
+
+Los mercados generan nuevos datos cada segundo. Cada día que esperas es un día menos de datos para analizar y mejorar tus estrategias.
+
+**Tu aventura quant empieza con un click.**
