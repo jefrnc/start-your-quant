@@ -1,25 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="{{ site.lang | default: "es" }}">
+  <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% if page.title %}{{ page.title }} - {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
-    <meta name="description" content="{{ site.description }}">
-    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
-</head>
-<body>
-    <header>
-        <nav>
-            <h1><a href="{{ '/' | relative_url }}">{{ site.title }}</a></h1>
-        </nav>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+{% seo %}
+    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
+  </head>
+  <body>
+    <header class="page-header" role="banner">
+      <h1 class="project-name">{{ page.title | default: site.title | default: site.github.repository_name }}</h1>
+      <h2 class="project-tagline">{{ page.description | default: site.description | default: site.github.project_tagline }}</h2>
+      {% if site.github.is_project_page %}
+        <a href="{{ site.github.repository_url }}" class="btn">Ver en GitHub</a>
+      {% endif %}
+      <a href="{{ site.baseurl }}/" class="btn">Inicio</a>
+      <a href="{{ site.baseurl }}/GETTING-STARTED" class="btn">Empezar</a>
+      <a href="{{ site.baseurl }}/learning-path/" class="btn">Academia</a>
+      <a href="{{ site.baseurl }}/ROADMAP" class="btn">Roadmap</a>
     </header>
-    
-    <main>
-        {{ content }}
+
+    <main id="content" class="main-content" role="main">
+      {{ content }}
+
+      <footer class="site-footer">
+        {% if site.github.is_project_page %}
+          <span class="site-footer-owner"><a href="{{ site.github.repository_url }}">{{ site.github.repository_name }}</a> mantenido por <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a>.</span>
+        {% endif %}
+        <span class="site-footer-credits">Start Your Quant - Academia de Trading Cuantitativo</span>
+      </footer>
     </main>
-    
-    <footer>
-        <p>&copy; 2025 {{ site.title }}. Built with Jekyll.</p>
-    </footer>
-</body>
+  </body>
 </html>

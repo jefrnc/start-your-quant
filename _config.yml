@@ -1,23 +1,19 @@
 # GitHub Pages Configuration
 title: "Start Your Quant"
 description: "Academia de Trading Cuantitativo - De cero a quant trader profesional"
-baseurl: ""
-url: "https://tu-usuario.github.io/start-your-quant"
+baseurl: "/start-your-quant"
+url: "https://jefrnc.github.io"
 
 # Theme
-theme: minima
+remote_theme: pages-themes/cayman@v0.2.0
 plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-seo-tag
+  - jekyll-remote-theme
 
 # Navigation
-header_pages:
-  - learning-path/README.md
-  - GETTING-STARTED.md
-  - core-concepts/Introduction.md
-  - templates/README.md
-  - infrastructure/README.md
+show_downloads: false
 
 # Markdown settings
 markdown: kramdown
@@ -44,8 +40,8 @@ twitter:
   username: # Tu usuario de Twitter
 
 # Social links
-github_username: tu-usuario
-linkedin_username: tu-linkedin
+github_username: jefrnc
+linkedin_username: jefrnc
 
 # Exclude files
 exclude:

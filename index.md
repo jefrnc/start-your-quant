@@ -1,6 +1,7 @@
 ---
-layout: home
-title: "Start Your Quant - Academia de Trading Cuantitativo"
+layout: default
+title: "Start Your Quant"
+description: "Academia de Trading Cuantitativo - De cero a quant trader profesional"
 ---
 
 # 🎓 Conviértete en Quant Trader
@@ -16,28 +17,28 @@ Aprende trading cuantitativo usando **matemáticas y programación** en lugar de
 <div style="border: 2px solid #28a745; border-radius: 10px; padding: 20px; text-align: center;">
 <h3>🟢 Total Principiante</h3>
 <p>Nunca programé ni hice trading</p>
-<a href="learning-path/fundamentos/f1-que-es-ser-quant/" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">¿Qué es ser Quant?</a>
+<a href="{{ site.baseurl }}/learning-path/" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">¿Qué es ser Quant?</a>
 <p><small>⏱️ 2-4 meses</small></p>
 </div>
 
 <div style="border: 2px solid #ffc107; border-radius: 10px; padding: 20px; text-align: center;">
 <h3>🟡 Sé algo de Python</h3>
 <p>Tengo experiencia básica programando</p>
-<a href="learning-path/fundamentos/f2-python-trading-basico/" style="background: #ffc107; color: black; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Python Trading</a>
+<a href="{{ site.baseurl }}/learning-path/" style="background: #ffc107; color: black; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Python Trading</a>
 <p><small>⏱️ 1-3 meses</small></p>
 </div>
 
 <div style="border: 2px solid #fd7e14; border-radius: 10px; padding: 20px; text-align: center;">
 <h3>🟠 Ya tradeo manualmente</h3>
 <p>Conozco trading pero quiero automatizar</p>
-<a href="learning-path/estrategias/e1-momentum-trading/" style="background: #fd7e14; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Estrategias Quant</a>
+<a href="{{ site.baseurl }}/learning-path/" style="background: #fd7e14; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Estrategias Quant</a>
 <p><small>⏱️ 1-2 meses</small></p>
 </div>
 
 <div style="border: 2px solid #dc3545; border-radius: 10px; padding: 20px; text-align: center;">
 <h3>🔴 Desarrollador Avanzado</h3>
 <p>Quiero infraestructura profesional</p>
-<a href="infrastructure/" style="background: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Infraestructura</a>
+<a href="{{ site.baseurl }}/infrastructure/" style="background: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Infraestructura</a>
 <p><small>⏱️ Inmediato</small></p>
 </div>
 
@@ -45,14 +46,14 @@ Aprende trading cuantitativo usando **matemáticas y programación** en lugar de
 
 ## 📚 Ruta de Aprendizaje Completa
 
-### 🟢 [FUNDAMENTOS](learning-path/fundamentos/)
+### 🟢 [FUNDAMENTOS]({{ site.baseurl }}/learning-path/)
 **Aprende las bases del trading cuantitativo**
 - ¿Qué es ser Quant? (1h)
 - Python Trading Básico (3h)
 - Indicadores Técnicos (2h)
 - Primera Estrategia (2h)
 
-### 🟡 [ESTRATEGIAS](learning-path/estrategias/)
+### 🟡 [ESTRATEGIAS]({{ site.baseurl }}/learning-path/)
 **Desarrolla estrategias rentables**
 - Momentum Trading (3h)
 - Mean Reversion (3h)
@@ -60,14 +61,14 @@ Aprende trading cuantitativo usando **matemáticas y programación** en lugar de
 - Optimización (3h)
 - Multi-Estrategia (5h)
 
-### 🟠 [ANÁLISIS AVANZADO](learning-path/analisis/)
+### 🟠 [ANÁLISIS AVANZADO]({{ site.baseurl }}/learning-path/)
 **Herramientas profesionales**
 - Gestión de Riesgo (3h)
 - Performance Metrics (2h)
 - Datos Alternativos (4h)
 - Machine Learning (5h)
 
-### 🔴 [TRADING PROFESIONAL](learning-path/profesional/)
+### 🔴 [TRADING PROFESIONAL]({{ site.baseurl }}/learning-path/)
 **Del papel a la realidad**
 - Conexión con Broker (3h)
 - Automatización (4h)
@@ -133,11 +134,11 @@ GitHub Issues para preguntas y Discord para chat.
 
 **¿No sabes por dónde empezar?**
 
-👉 **[Guía Completa de Inicio](GETTING-STARTED.md)** - Te ayudamos a elegir tu ruta perfecta
+👉 **[Guía Completa de Inicio]({{ site.baseurl }}/GETTING-STARTED)** - Te ayudamos a elegir tu ruta perfecta
 
 **¿Ya sabes qué quieres aprender?**
 
-👉 **[Academia Quant](learning-path/)** - Directo a los módulos de aprendizaje
+👉 **[Academia Quant]({{ site.baseurl }}/learning-path/)** - Directo a los módulos de aprendizaje
 
 ---
 
