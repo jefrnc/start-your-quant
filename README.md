@@ -4,110 +4,137 @@
 
 Aprende trading cuantitativo de forma estructurada, a tu propio ritmo, con ejemplos reales y ejercicios hands-on. Desde conceptos básicos hasta estrategias institucionales.
 
-> 🌟 **Completamente gratis y open source** - Perfecto para GitHub Pages
+> 🌟 **Completamente gratis y open source** - Disponible como [GitHub Pages](https://jefrnc.github.io/start-your-quant)
 
-## 📚 Índice del Playbook
+---
 
-### Conceptos Fundamentales
-- [Introducción](./core-concepts/Introduction.md) - Qué es el trading cuantitativo y por qué funciona
-- [Microestructura de Mercado](./core-concepts/Market-Microstructure.md) - Entendiendo la mecánica del mercado
-- [Gestión de Riesgo](./core-concepts/Risk-Management.md) - Frameworks sistemáticos de control de riesgo
-- [Métricas de Performance](./core-concepts/Performance-Metrics.md) - Métricas clave para evaluación de estrategias
+## ⚠️ Disclaimer
 
-### Prácticas Técnicas
-- [Ingeniería de Datos](./technical-practices/Data-Engineering.md) - Pipelines de datos financieros y procesamiento
-- [Desarrollo de Estrategias](./technical-practices/Strategy-Development.md) - Enfoque sistemático para creación de estrategias
-- [Backtesting](./technical-practices/Backtesting.md) - Metodologías de backtesting realista
-- [Optimización de Parámetros](./technical-practices/Parameter-Optimization.md) - Optimización bayesiana y walk-forward
-- [Trading en Vivo](./technical-practices/Live-Trading.md) - Mejores prácticas para despliegue en producción
+Gran parte del contenido de este repositorio son **recopilaciones que fui haciendo de distintos cursos, seminarios, charlas y material público**. Es un punto de partida, no una verdad absoluta.
 
-### Arquitectura y Patrones
-- [Trading Dirigido por Eventos](./architecture-patterns/Event-Driven-Trading.md) - Arquitecturas de trading en tiempo real
-- [Microservicios para Finanzas](./architecture-patterns/Microservices-for-Finance.md) - Diseño escalable de sistemas de trading
-- [Arquitectura de Data Lake](./architecture-patterns/Data-Lake-Architecture.md) - Patrones de almacenamiento de datos financieros
-- [Integración Multi-Broker](./architecture-patterns/Multi-Broker-Integration.md) - Sistemas de trading agnósticos al broker
+Si encontrás alguna **mejora, corrección o ampliación** de algún tema, **no dudes en enviar un pull request**. Cuestioná el contenido — la idea es que esto sea útil como base y que crezca con los aportes de la comunidad.
 
-### Temas Avanzados
-- [Machine Learning en Trading](./advanced-topics/Machine-Learning-Trading.md) - Estrategias potenciadas por ML
-- [Datos Alternativos](./advanced-topics/Alternative-Data.md) - Fuentes de datos no tradicionales
-- [Optimización de Portafolios](./advanced-topics/Portfolio-Optimization.md) - Aplicación de teoría moderna de portafolios
-- [Trading de Alta Frecuencia](./advanced-topics/High-Frequency-Trading.md) - Sistemas de ultra-baja latencia
-- [Trading de Crypto](./advanced-topics/Crypto-Trading.md) - Estrategias para activos digitales
+Si este repo te sirvió y pensás que tu comentario, observación o aporte me podría ayudar a mí o a otros, **mandalo sin dudar**. Estaría más que agradecido.
 
-### Operaciones y Monitoreo
-- [Analytics de Trading](./operations-monitoring/Trading-Analytics.md) - Monitoreo de performance en tiempo real
-- [Manejo de Incidentes](./operations-monitoring/Incident-Management.md) - Respuesta a incidentes en sistemas de trading
-- [Compliance y Reportes](./operations-monitoring/Compliance-Reporting.md) - Requerimientos regulatorios
-- [Monitoreo de Performance de Estrategias](./operations-monitoring/Strategy-Performance-Monitoring.md) - Evaluación continua de estrategias
+---
 
-### Templates y Scripts
-- [Templates de Estrategias](./templates/strategies/) - Frameworks listos para usar
-- [Templates de Backtesting](./templates/backtesting/) - Configuraciones realistas de backtesting
-- [Templates de Infraestructura](./templates/infrastructure/) - Despliegues completos de stack de trading
-- [Dashboards de Monitoreo](./templates/monitoring/) - Dashboards de Grafana y alertas
-- [Calculadoras de Métricas](./scripts/strategy-metrics/) - Scripts de métricas de performance
-- [Recolección de Datos](./scripts/data-collection/) - Utilidades de ingesta de datos
-
-### Ejemplos del Mundo Real
-- [IBKR Premarket Trader](./examples/ibkr-premarket-trader/) - Sistema de gap trading para small caps
-- [Crypto Momentum](./examples/crypto-momentum/) - Estrategias de momentum para activos digitales
-- [Estrategias de Opciones](./examples/options-strategies/) - Trading sistemático de opciones
-- [Rebalanceo de Portafolios](./examples/portfolio-rebalancing/) - Gestión automatizada de portafolios
-
-## Documentación Legacy (En Migración)
-- [Guía de Setup Original](./docs/) - Documentación tradicional estilo tutorial
-- [Ejemplos de Estrategias](./docs/strategies/) - Implementaciones individuales de estrategias
-- [Integraciones de Herramientas](./docs/tools/) - Integraciones específicas de plataformas
-
-## 🚀 Quick Start
-
-### 🚀 ¡Empezar Ahora!
-
-**Sin instalaciones complejas - Todo en tu navegador:**
+## 🚀 ¿Por dónde empiezo?
 
 | Tu Nivel | Empieza Aquí | Tiempo |
 |----------|--------------|--------|
 | **Total principiante** | [🎯 ¿Qué es ser Quant?](learning-path/fundamentos/f1-que-es-ser-quant/) | 2-4 meses |
-| **Sé algo de Python** | [🐍 Python Trading](learning-path/fundamentos/f2-python-trading-basico/) | 1-3 meses |
-| **Ya tradeo manualmente** | [📈 Estrategias](learning-path/estrategias/e1-momentum-trading/) | 1-2 meses |
+| **Sé algo de Python** | [🐍 Python Trading Básico](learning-path/fundamentos/f2-python-trading-basico/) | 1-3 meses |
+| **Ya tradeo manualmente** | [📊 Indicadores Técnicos](learning-path/fundamentos/f3-indicadores-tecnicos/) | 1-2 meses |
+| **Quiero mi primera estrategia** | [🤖 Primera Estrategia](learning-path/fundamentos/f4-primera-estrategia/) | Inmediato |
 | **Desarrollador avanzado** | [🏗️ Infraestructura](infrastructure/) | Inmediato |
 
-### 📚 Ruta de Aprendizaje
+**¿No sabes por dónde empezar?** → [📖 Guía de Inicio](GETTING-STARTED.md) | [📚 Ruta de Aprendizaje](learning-path/)
 
-🟢 **[FUNDAMENTOS](learning-path/)** → 🟡 **ESTRATEGIAS** → 🟠 **ANÁLISIS** → 🔴 **PROFESIONAL**
+---
 
-**¿No sabes por dónde empezar?** → [📖 Guía de Inicio](GETTING-STARTED.md)
+## 📚 Índice del Contenido
 
-### 🏗️ Para Desarrolladores Avanzados
-1. **Configura tus fuentes de datos**
-   - [Yahoo Finance](docs/setup/data_providers.md) (gratuito para empezar)
-   - [Polygon.io](docs/setup/data_providers.md) (API key requerida)
-   - [IBKR TWS](docs/setup/broker_integration.md) (para trading institucional)
+### Conceptos Fundamentales
 
-2. **Explora estrategias avanzadas**
-   - [Gap & Go](docs/strategies/gap_and_go.md)
-   - [VWAP Reclaim](docs/strategies/vwap_reclaim.md)
+- [Introducción](core-concepts/Introduction.md) - Qué es el trading cuantitativo y por qué funciona
+- [Gestión de Riesgo](core-concepts/Risk-Management.md) - Frameworks sistemáticos de control de riesgo
+- [Métricas de Performance](core-concepts/Performance-Metrics.md) - Métricas clave para evaluación de estrategias
+- [Instrumentos Financieros](core-concepts/Financial-Instruments.md) - Tipos de instrumentos y sus características
+- [Historia del Algo Trading](core-concepts/History-of-Algo-Trading.md) - Evolución del trading algorítmico
+- [Sesgos Cognitivos en Algo Trading](core-concepts/Cognitive-Biases-Algo-Trading.md) - Cómo los sesgos afectan tus decisiones
+- [Crecimiento Compuesto y Riesgo](core-concepts/Compound-Growth-and-Risk.md) - Matemáticas del crecimiento sostenible
+- [Métricas de Crecimiento Esperado](core-concepts/Expected-Growth-Metrics-Hierarchy.md) - Jerarquía de métricas de rendimiento
+- [Framework de Plan de Trading](core-concepts/Trading-Plan-Framework.md) - Cómo estructurar tu plan de trading
+- [Anatomía de Sistemas de Trading](core-concepts/Trading-Systems-Anatomy.md) - Componentes de un sistema de trading
 
-3. **Usa la infraestructura profesional**
-   - [Templates de Infraestructura](infrastructure/) - Stack completo con Docker/Kubernetes
-   - [Sistemas Distribuidos](architecture-patterns/) - Microservicios para trading
+### Prácticas Técnicas
 
-## 📖 Cómo usar esta guía
+- [Desarrollo de Estrategias](technical-practices/Strategy-Development.md) - Enfoque sistemático para creación de estrategias
+- [Backtesting - Tres Niveles](technical-practices/Backtesting-Three-Levels.md) - Metodologías de backtesting por nivel de complejidad
+- [Errores Comunes de Backtesting](technical-practices/Backtesting-Common-Errors.md) - Trampas frecuentes y cómo evitarlas
+- [Calidad de Datos y Ajustes](technical-practices/Data-Quality-Adjustments.md) - Limpieza y preparación de datos financieros
+- [Filtros y Selección de Activos](technical-practices/Filters-Asset-Selection-Examples.md) - Ejemplos prácticos de filtrado
+- [Principios de Diseño KISS](technical-practices/KISS-Design-Principles.md) - Mantener las estrategias simples y efectivas
+- [Método Científico en Trading](technical-practices/Scientific-Method-System-Development.md) - Aplicar el método científico al desarrollo de sistemas
+- [Estructura de Entradas y Salidas](technical-practices/System-Structure-Entries-Exits.md) - Diseño de reglas de entrada y salida
 
-- Si eres **principiante**: Empieza por [Setup Inicial](docs/setup/) y [Fundamentos](docs/fundamentals/)
-- Si ya tienes **experiencia trading**: Ve directo a [Estrategias](docs/strategies/) y [Indicadores](docs/indicators/)
-- Si quieres **automatizar**: Revisa [Herramientas](docs/tools/) y [Automatización](docs/automation/)
-- Si buscas **integración multi-plataforma**: Consulta [Ejemplos Prácticos](docs/examples/)
+### Temas Avanzados
 
-## 🎯 Características Principales
+- [Datos Alternativos](advanced-topics/Alternative-Data.md) - Fuentes de datos no tradicionales
+- [Optimización de Portafolios](advanced-topics/Portfolio-Optimization.md) - Aplicación de teoría moderna de portafolios
+- [Position Sizing Dinámico](advanced-topics/Dynamic-Position-Sizing.md) - Ajuste dinámico del tamaño de posición
+- [Algoritmos de Ejecución](advanced-topics/Execution-Algorithms.md) - Optimización de ejecución de órdenes
+- [Detección de Regímenes](advanced-topics/Regime-Detection.md) - Identificar cambios de régimen en el mercado
 
-- ✅ **Estrategias probadas** específicas para small caps
-- ✅ **Código funcional** con ejemplos reales
-- ✅ **Integración completa** con brokers y data providers populares
-- ✅ **Sistema de backtesting** robusto con métricas avanzadas
-- ✅ **Gestión de riesgo** cuantitativa integrada
-- ✅ **Arquitectura escalable** para automatización
-- ✅ **Documentación en español** con tono personal
+### Documentación Detallada (docs/)
+
+| Categoría | Contenido |
+|-----------|-----------|
+| [Fundamentos](docs/fundamentals/) | Qué es quant, tipos de estrategias, discrecional vs cuantitativo |
+| [Setup](docs/setup/) | Configuración de brokers, data providers, getting started |
+| [Estrategias](docs/strategies/) | Gap & Go, VWAP Reclaim, Low Float Runners, First Green/Red Day, Short Selling |
+| [Indicadores](docs/indicators/) | Moving Averages, VWAP, Bollinger Bands, Parabolic SAR, Gap/Float, Volumen |
+| [Backtesting](docs/backtesting/) | Motor simple, métricas, overfitting, walk-forward analysis |
+| [Riesgo](docs/risk/) | Position sizing, stops, portfolio risk, riesgo asimétrico |
+| [Datos](docs/data/) | Fuentes de datos, limpieza, datos real-time, datasets de backtesting |
+| [Análisis](docs/analysis/) | ML, sentimiento, microestructura, análisis fundamental, transformers |
+| [Automatización](docs/automation/) | Arquitectura de sistemas, robo-advisors, estrategias de automatización |
+| [Herramientas](docs/tools/) | Librerías esenciales, infraestructura avanzada, deployment en producción |
+| [Compliance](docs/compliance/) | Frameworks regulatorios, AI ético en trading |
+| [Validación](docs/validation/) | Testing de estrategias, evaluación de modelos, consideraciones institucionales |
+| [Referencia Rápida](docs/QUICK_REFERENCE.md) | Cheat sheet de conceptos clave |
+
+### Templates y Scripts
+
+- [Templates de Estrategias](templates/strategies/) - Frameworks listos para usar (momentum, mean-reversion)
+- [Calculadoras de Métricas](scripts/strategy-metrics/) - Sharpe ratio, max drawdown, profit factor
+
+### Ejemplos del Mundo Real
+
+- [IBKR Premarket Trader](examples/ibkr-premarket-trader/) - Sistema de gap trading para small caps
+
+### Infraestructura
+
+- [Stack de Trading](infrastructure/) - Docker, Kubernetes, monitoreo, data pipelines
+
+### Código Fuente de Referencia (src/)
+
+```
+src/
+├── indicators/       # MovingAverages (SMA/EMA/WMA), VWAP con bandas
+├── strategies/       # Gap and Go strategy
+├── backtesting/      # Motor simple + export CSV (TraderVue/TradesViz)
+├── risk/             # Position sizing (fixed, Kelly, ATR, risk parity)
+├── data/             # Interfaces de datos (yfinance, Alpha Vantage)
+└── examples/         # Ejemplo integrado completo
+```
+
+## 🛠️ Quick Start para Desarrolladores
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/jefrnc/start-your-quant.git
+cd start-your-quant
+
+# Instalar dependencias mínimas para los ejemplos de src/
+pip install pandas numpy matplotlib requests
+
+# Ejecutar el ejemplo integrado
+cd src/examples && python complete_strategy_example.py
+
+# Calculadoras de métricas
+python scripts/strategy-metrics/sharpe-calculator/calculate_sharpe.py
+python scripts/strategy-metrics/max-drawdown/calculate_drawdown.py
+python scripts/strategy-metrics/profit-factor/calculate_profit_factor.py
+```
+
+### Vista previa local del sitio (Jekyll)
+
+```bash
+bundle install
+bundle exec jekyll serve
+# Sitio en http://localhost:4000/start-your-quant/
+```
 
 ## 🛠️ Stack Tecnológico
 
@@ -115,79 +142,49 @@ Aprende trading cuantitativo de forma estructurada, a tu propio ritmo, con ejemp
 - **Pandas/NumPy** para manipulación de datos
 - **Plotly/Matplotlib** para visualización
 - **yfinance/Polygon** para datos de mercado
-- **IBKR TWS/DAS Trader/Alpaca** para ejecución
-- **QuantConnect** para backtesting en la nube
-- **Streamlit** para dashboards
-- **Docker/Kubernetes** para deployment
+- **IBKR TWS** para ejecución
+- **Jekyll** para el sitio en GitHub Pages
+- **Docker/Kubernetes** para infraestructura
 
-## 📝 Notas Importantes
+## 🤝 Contribuciones
 
-- Esta documentación está enfocada en **small caps** (market cap < $2B) y **day trading**
-- El contenido asume conocimiento básico de **trading** y **Python**
-- Todas las estrategias incluyen **advertencias de riesgo** apropiadas
-- Los ejemplos usan **datos reales** de las plataformas mencionadas
-- **⚠️ Small caps son extremadamente volátiles** - requieren experiencia y gestión de riesgo estricta
+Cualquier mejora, corrección u observación es enormemente agradecida:
 
-## 🤝 Contribución y Desarrollo
+- 🐛 **Reportá errores** en implementaciones o documentación
+- 💡 **Sugerí mejoras** en estrategias o metodologías
+- 📚 **Proponé nuevo contenido** basado en tu experiencia
+- 🔧 **Optimizá código** existente o agregá nuevas funcionalidades
 
-Esta documentación es un proyecto en constante evolución, desarrollado con un enfoque riguroso en la validación técnica y optimización continua. El objetivo es mantener:
-
-- **Precisión técnica** en todas las fórmulas e implementaciones
-- **Código optimizado** y siguiendo mejores prácticas
-- **Metodologías actualizadas** con los últimos desarrollos del sector
-- **Contenido verificado** a través de backtesting y análisis cuantitativo
-
-### Contribuciones Bienvenidas
-
-Cualquier **mejora, corrección u observación es enormemente agradecida**:
-
-- 🐛 **Reporta errores** en implementaciones o documentación
-- 💡 **Sugiere mejoras** en estrategias o metodologías
-- 📚 **Propón nuevo contenido** basado en tu experiencia
-- 🔧 **Optimiza código** existente o agrega nuevas funcionalidades
-
-**Formas de contribuir:**
-- Abre un issue en GitHub con tu sugerencia
-- Propón cambios vía pull request
-- Comparte tu experiencia implementando las estrategias
-- Reporta resultados de backtesting en diferentes condiciones de mercado
-
-Tu experiencia práctica y feedback son fundamentales para mantener esta documentación actualizada y útil para la comunidad de traders cuantitativos.
+**¿Cómo contribuir?** Abrí un issue o mandá un pull request directamente.
 
 ## 📚 Recursos Adicionales Recomendados
 
-### 🎓 Cursos y Material Educativo
+### Cursos y Material Educativo
 
-**🔥 Altamente Recomendado:**
-- **[Trading Cuantitativo en Python](https://github.com/AxelMunguiaQuintero/Trading-Cuantitativo-en-Python)** - Curso completo con 15+ módulos prácticos que incluye:
-  - Integración con brokers (OANDA, FXCM, Interactive Brokers)
-  - Machine Learning aplicado a trading (HMM, XGBoost, Redes Neuronales)
-  - Análisis de sentimiento con VADER y web scraping
-  - Sistema de trading completo y unificado
-  - Optimización de portafolios con métodos cuantitativos
-  - **Material base que inspiró muchas implementaciones de este repositorio**
+- **[Trading Cuantitativo en Python](https://github.com/AxelMunguiaQuintero/Trading-Cuantitativo-en-Python)** - Curso completo con 15+ módulos prácticos (integración con brokers, ML aplicado, análisis de sentimiento). Material que inspiró varias implementaciones de este repositorio.
 
-### 🛠️ Herramientas y Plataformas
+### Herramientas y Plataformas
+
 - **[QuantConnect](https://www.quantconnect.com/)** - Backtesting en la nube con datos institucionales
-- **[Zipline](https://github.com/quantopian/zipline)** - Motor de backtesting open source
 - **[Backtrader](https://github.com/mementum/backtrader)** - Framework de backtesting en Python
 - **[TradingView](https://www.tradingview.com/)** - Análisis técnico y alertas
 
-### 📖 Libros Fundamentales
-- **"Quantitative Trading" - Ernest Chan** - Fundamentos del trading algorítmico
-- **"Algorithmic Trading" - Ernie Chan** - Estrategias prácticas
-- **"The Little Book of Common Sense Investing" - John Bogle** - Fundamentos de inversión
-- **"A Man for All Markets" - Edward Thorp** - Historia del trading cuantitativo
+### Libros Fundamentales
 
-### 🌐 Comunidades y Blogs
+- **"Quantitative Trading"** - Ernest Chan
+- **"Algorithmic Trading"** - Ernie Chan
+- **"A Man for All Markets"** - Edward Thorp
+
+### Comunidades
+
 - **[QuantStart](https://www.quantstart.com/)** - Artículos técnicos de trading cuantitativo
 - **[r/algotrading](https://reddit.com/r/algotrading)** - Comunidad activa de traders algorítmicos
-- **[Quantitative Finance Stack Exchange](https://quant.stackexchange.com/)** - Preguntas técnicas especializadas
 
-### 💡 APIs y Proveedores de Datos
-- **[Alpha Vantage](https://www.alphavantage.co/)** - API gratuita con límites
-- **[IEX Cloud](https://iexcloud.io/)** - Datos de mercado económicos
-- **[Quandl](https://www.quandl.com/)** - Datos económicos y alternativos
-- **[Polygon.io](https://polygon.io/)** - Datos en tiempo real y históricos
+### APIs y Proveedores de Datos
 
-**Nota**: El repositorio de **Trading Cuantitativo en Python** es especialmente valioso ya que proporciona implementaciones detalladas de muchos conceptos avanzados y sirvió como referencia técnica para el desarrollo de varias secciones de esta documentación.
+- **[Alpha Vantage](https://www.alphavantage.co/)** - API gratuita
+- **[Polygon.io](https://polygon.io/)** - Datos en tiempo real e históricos
+
+---
+
+> **⚠️ Disclaimer de riesgo:** Este contenido es puramente educativo. El trading implica riesgo de pérdida. Siempre operá con gestión de riesgo adecuada.
