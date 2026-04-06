@@ -1,22 +1,24 @@
-# Métricas de Performance para Trading Cuantitativo
+> 🇪🇸 [Leer en Español](Performance-Metrics.es.md) | 🇺🇸 **English**
 
-## Filosofía: Measurement-Driven Improvement
+# Performance Metrics for Quantitative Trading
 
-> "Lo que no se mide, no se puede mejorar" - Peter Drucker
+## Philosophy: Measurement-Driven Improvement
 
-En trading cuantitativo, las métricas son nuestro **sistema de navegación**. Nos dicen si vamos en la dirección correcta, qué tan rápido progresamos, y cuándo necesitamos ajustar el rumbo.
+> "What gets measured gets improved" - Peter Drucker
 
-### Principios de Medición Efectiva
+In quantitative trading, metrics are our **navigation system**. They tell us if we're heading in the right direction, how fast we're progressing, and when we need to adjust course.
 
-1. **Métricas Accionables**: Cada métrica debe guiar decisiones específicas
-2. **Risk-Adjusted**: Performance sin considerar riesgo es meaningless
-3. **Temporal Awareness**: Considerar different time horizons
-4. **Benchmark Relative**: Siempre comparar con alternativas relevantes
-5. **Robust to Outliers**: No dejar que pocos trades dominen las métricas
+### Principles of Effective Measurement
 
-## Métricas Fundamentales
+1. **Actionable Metrics**: Each metric must guide specific decisions
+2. **Risk-Adjusted**: Performance without considering risk is meaningless
+3. **Temporal Awareness**: Consider different time horizons
+4. **Benchmark Relative**: Always compare with relevant alternatives
+5. **Robust to Outliers**: Don't let a few trades dominate the metrics
 
-### 1. **Sharpe Ratio - La Métrica Reina**
+## Fundamental Metrics
+
+### 1. **Sharpe Ratio - The King Metric**
 
 ```python
 def calculate_sharpe_ratio(returns: pd.Series,
@@ -25,7 +27,7 @@ def calculate_sharpe_ratio(returns: pd.Series,
     """
     Sharpe = (Expected Return - Risk Free Rate) / Standard Deviation
 
-    Interpretación:
+    Interpretation:
     > 2.0  : Exceptional
     1.0-2.0: Very Good
     0.5-1.0: Good
@@ -36,40 +38,40 @@ def calculate_sharpe_ratio(returns: pd.Series,
     return excess_returns.mean() / returns.std() * np.sqrt(periods_per_year)
 ```
 
-**Why Sharpe Matters para Small Caps**:
-- Small caps son inherentemente más volátiles
-- Sharpe ratio "penaliza" volatilidad excessive
-- Fuerza focus en risk-adjusted returns
-- Permite comparación con other strategies
+**Why Sharpe Matters for Small Caps**:
+- Small caps are inherently more volatile
+- Sharpe ratio "penalizes" excessive volatility
+- Forces focus on risk-adjusted returns
+- Allows comparison with other strategies
 
-### 2. **Maximum Drawdown - Tu Worst-Case Scenario**
+### 2. **Maximum Drawdown - Your Worst-Case Scenario**
 
 ```python
 def calculate_max_drawdown(equity_curve: pd.Series) -> dict:
     """
-    Max DD = Máxima pérdida desde peak anterior
+    Max DD = Maximum loss from previous peak
 
-    Critical for small cap trading porque:
-    - Drawdowns pueden ser brutales (30%+ possible)
+    Critical for small cap trading because:
+    - Drawdowns can be brutal (30%+ possible)
     - Psychology impact is severe
     - Capital preservation is paramount
     """
-    # Calcular running maximum
+    # Calculate running maximum
     running_max = equity_curve.expanding().max()
 
-    # Calcular drawdown series
+    # Calculate drawdown series
     drawdown = (equity_curve - running_max) / running_max
 
-    # Encontrar maximum drawdown
+    # Find maximum drawdown
     max_dd = drawdown.min()
 
-    # Encontrar cuándo ocurrió
+    # Find when it occurred
     max_dd_date = drawdown.idxmin()
 
-    # Calcular duración del drawdown
+    # Calculate drawdown duration
     dd_start = running_max[running_max == running_max.loc[max_dd_date]].index[0]
 
-    # Recovery time (si aplica)
+    # Recovery time (if applicable)
     recovery_mask = equity_curve[max_dd_date:] >= running_max.loc[max_dd_date]
     if recovery_mask.any():
         recovery_date = recovery_mask[recovery_mask].index[0]
@@ -94,7 +96,7 @@ def calculate_win_metrics(trades_df: pd.DataFrame) -> dict:
     Win Rate = % of profitable trades
     Profit Factor = Gross Profit / Gross Loss
 
-    Para small caps, típicamente vemos:
+    For small caps, we typically see:
     - Win Rate: 50-70% (higher is better but not everything)
     - Profit Factor: 1.2-3.0 (>1.5 is good, >2.0 is excellent)
     """
@@ -123,22 +125,22 @@ def calculate_win_metrics(trades_df: pd.DataFrame) -> dict:
     }
 ```
 
-## Métricas Específicas para Small Caps
+## Small Cap-Specific Metrics
 
 ### 1. **Gap Efficiency Ratio**
 
 ```python
 def calculate_gap_efficiency(trades_df: pd.DataFrame) -> dict:
     """
-    Métrica específica para gap trading:
-    - Gap Capture Rate: % del gap inicial capturado
-    - Gap Fade Rate: % de gaps que revirtieron
-    - Optimal Gap Range: rango de gaps más profitable
+    Gap trading-specific metric:
+    - Gap Capture Rate: % of initial gap captured
+    - Gap Fade Rate: % of gaps that reversed
+    - Optimal Gap Range: most profitable gap range
     """
-    # Asumir que tenemos columna 'gap_percent' en trades
+    # Assume we have a 'gap_percent' column in trades
     gap_trades = trades_df[trades_df['gap_percent'].notna()]
 
-    # Gap capture (cuánto del gap capturamos como profit)
+    # Gap capture (how much of the gap we captured as profit)
     gap_trades['gap_capture'] = (gap_trades['pnl'] / gap_trades['entry_price']) / (gap_trades['gap_percent'] / 100)
 
     avg_gap_capture = gap_trades['gap_capture'].mean()
@@ -165,17 +167,17 @@ def calculate_gap_efficiency(trades_df: pd.DataFrame) -> dict:
 ```python
 def calculate_hold_time_metrics(trades_df: pd.DataFrame) -> dict:
     """
-    Para small caps, hold time es critical:
-    - Muy corto: Might miss the move
-    - Muy largo: Exposed to reversal risk
+    For small caps, hold time is critical:
+    - Too short: Might miss the move
+    - Too long: Exposed to reversal risk
     """
-    # Calcular hold time en minutos
+    # Calculate hold time in minutes
     trades_df['hold_time_minutes'] = (
         pd.to_datetime(trades_df['exit_time']) -
         pd.to_datetime(trades_df['entry_time'])
     ).dt.total_seconds() / 60
 
-    # Performance por rango de hold time
+    # Performance by hold time range
     hold_time_bins = [0, 15, 30, 60, 120, 1000]
     hold_time_labels = ['0-15min', '15-30min', '30-60min', '60-120min', '120min+']
 
@@ -189,7 +191,7 @@ def calculate_hold_time_metrics(trades_df: pd.DataFrame) -> dict:
         'mean', 'count', 'sum', 'std'
     ])
 
-    # Sharpe por hold time bucket
+    # Sharpe by hold time bucket
     sharpe_by_hold_time = {}
     for bucket in hold_time_labels:
         bucket_trades = trades_df[trades_df['hold_time_bucket'] == bucket]
@@ -210,8 +212,8 @@ def calculate_hold_time_metrics(trades_df: pd.DataFrame) -> dict:
 ```python
 def analyze_position_recycling(trades_df: pd.DataFrame) -> dict:
     """
-    Analiza effectiveness del position recycling approach
-    Multiple trades del mismo symbol el mismo día = campaign
+    Analyzes the effectiveness of the position recycling approach.
+    Multiple trades of the same symbol on the same day = campaign
     """
     # Group by symbol and date
     daily_campaigns = trades_df.groupby(['symbol', trades_df['entry_time'].dt.date])
@@ -221,7 +223,7 @@ def analyze_position_recycling(trades_df: pd.DataFrame) -> dict:
     for (symbol, date), campaign_trades in daily_campaigns:
         if len(campaign_trades) > 1:  # Multiple trades = recycling
 
-            # Calcular average price improvement
+            # Calculate average price improvement
             weighted_avg_entry = (
                 campaign_trades['entry_price'] * campaign_trades['quantity']
             ).sum() / campaign_trades['quantity'].sum()
@@ -255,7 +257,7 @@ def analyze_position_recycling(trades_df: pd.DataFrame) -> dict:
         return {'total_campaigns': 0}
 ```
 
-## Métricas Avanzadas
+## Advanced Metrics
 
 ### 1. **Sortino Ratio - Downside Focus**
 
@@ -266,9 +268,9 @@ def calculate_sortino_ratio(returns: pd.Series,
     """
     Sortino = (Expected Return - Target) / Downside Deviation
 
-    Better than Sharpe for asymmetric strategies porque:
-    - Solo penaliza downside volatility
-    - Upside volatility es good (we want big winners)
+    Better than Sharpe for asymmetric strategies because:
+    - Only penalizes downside volatility
+    - Upside volatility is good (we want big winners)
     - More relevant for gap trading
     """
     excess_returns = returns - target_return
@@ -312,7 +314,7 @@ def calculate_information_ratio(strategy_returns: pd.Series,
     """
     Information Ratio = Excess Return / Tracking Error
 
-    Para small cap strategies, benchmark might be:
+    For small cap strategies, benchmark might be:
     - IWM (Russell 2000)
     - IJR (iShares Core S&P Small-Cap)
     - VB (Vanguard Small-Cap)
@@ -338,7 +340,7 @@ def calculate_information_ratio(strategy_returns: pd.Series,
 ```python
 def analyze_performance_by_time(trades_df: pd.DataFrame) -> pd.DataFrame:
     """
-    Critical para premarket trading:
+    Critical for premarket trading:
     - 5:30-6:00 AM: Early gap reaction
     - 6:00-7:00 AM: Volume building
     - 7:00-8:00 AM: Institutional participation
@@ -379,7 +381,7 @@ def analyze_performance_by_time(trades_df: pd.DataFrame) -> pd.DataFrame:
 def calculate_rolling_metrics(trades_df: pd.DataFrame,
                              window_days: int = 30) -> pd.DataFrame:
     """
-    Track metrics over time para detect strategy degradation
+    Track metrics over time to detect strategy degradation
     """
     # Sort by date
     trades_df = trades_df.sort_values('entry_time')
@@ -405,9 +407,9 @@ def calculate_rolling_metrics(trades_df: pd.DataFrame,
     return rolling_metrics
 ```
 
-## Benchmarking y Comparación
+## Benchmarking and Comparison
 
-### Small Cap Benchmarks Relevantes
+### Relevant Small Cap Benchmarks
 
 ```python
 SMALL_CAP_BENCHMARKS = {
@@ -461,7 +463,7 @@ def benchmark_comparison(strategy_returns: pd.Series,
 ```python
 def generate_performance_dashboard(trades_df: pd.DataFrame) -> dict:
     """
-    One-stop shop para all key metrics
+    One-stop shop for all key metrics
     """
     # Basic setup
     equity_curve = trades_df['pnl'].cumsum()
@@ -518,11 +520,11 @@ def generate_performance_dashboard(trades_df: pd.DataFrame) -> dict:
     }
 ```
 
-## Interpretación y Action Items
+## Interpretation and Action Items
 
-### Performance Ranges para Small Cap Strategies
+### Performance Ranges for Small Cap Strategies
 
-| Métrica | Poor | Good | Excellent | Elite |
+| Metric | Poor | Good | Excellent | Elite |
 |---------|------|------|-----------|-------|
 | **Sharpe Ratio** | < 0.5 | 0.5-1.0 | 1.0-2.0 | > 2.0 |
 | **Max Drawdown** | > -20% | -10% to -20% | -5% to -10% | < -5% |
@@ -540,24 +542,24 @@ def performance_alerts(metrics: dict) -> list:
     alerts = []
 
     if metrics['risk_metrics']['sharpe_ratio'] < 0.5:
-        alerts.append("⚠️ LOW SHARPE: Review strategy parameters")
+        alerts.append("LOW SHARPE: Review strategy parameters")
 
     if metrics['risk_metrics']['max_drawdown'] < -0.15:
-        alerts.append("🛑 HIGH DRAWDOWN: Consider reducing position sizes")
+        alerts.append("HIGH DRAWDOWN: Consider reducing position sizes")
 
     if metrics['win_metrics']['win_rate'] < 0.45:
-        alerts.append("📉 LOW WIN RATE: Review entry criteria")
+        alerts.append("LOW WIN RATE: Review entry criteria")
 
     if metrics['win_metrics']['profit_factor'] < 1.1:
-        alerts.append("💸 LOW PROFIT FACTOR: Review exit strategy")
+        alerts.append("LOW PROFIT FACTOR: Review exit strategy")
 
     if metrics['recent_performance']['last_7_days'] < -50:
-        alerts.append("📊 RECENT UNDERPERFORMANCE: Consider pause")
+        alerts.append("RECENT UNDERPERFORMANCE: Consider pause")
 
     return alerts
 ```
 
-## Integration con Trading System
+## Integration with Trading System
 
 ### Real-Time Monitoring
 

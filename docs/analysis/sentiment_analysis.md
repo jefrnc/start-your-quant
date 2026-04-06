@@ -1,31 +1,33 @@
-# Análisis de Sentimiento en Mercados Financieros
+> 🇪🇸 [Leer en Español](sentiment_analysis.es.md) | 🇺🇸 **English**
 
-## Introducción
+# Sentiment Analysis in Financial Markets
 
-El análisis de sentimiento cuantifica las emociones y opiniones expresadas en texto, proporcionando una dimensión adicional para el análisis de mercados. En trading, el sentimiento puede anticipar movimientos de precios antes de que se reflejen en datos técnicos tradicionales.
+## Introduction
 
-## Conceptos Fundamentales
+Sentiment analysis quantifies the emotions and opinions expressed in text, providing an additional dimension for market analysis. In trading, sentiment can anticipate price movements before they are reflected in traditional technical data.
 
-### ¿Por Qué Funciona el Análisis de Sentimiento?
+## Core Concepts
 
-**Impacto Psicológico en Mercados:**
-- Las noticias influyen directamente en las decisiones de inversión
-- El sentimiento retail puede crear momentum en small caps
-- Las redes sociales amplifican el impacto del sentimiento
-- Los algoritmos institucionales ahora incorporan datos de sentimiento
+### Why Does Sentiment Analysis Work?
 
-**Fuentes de Datos de Sentimiento:**
-- Noticias financieras (Bloomberg, Reuters, FinViz)
-- Redes sociales (Twitter, Reddit, StockTwits)
-- Informes de analistas
-- Transcripciones de earnings calls
-- Foros de inversión especializados
+**Psychological Impact on Markets:**
+- News directly influences investment decisions
+- Retail sentiment can create momentum in small caps
+- Social media amplifies the impact of sentiment
+- Institutional algorithms now incorporate sentiment data
 
-## Implementación con VADER Sentiment
+**Sentiment Data Sources:**
+- Financial news (Bloomberg, Reuters, FinViz)
+- Social media (Twitter, Reddit, StockTwits)
+- Analyst reports
+- Earnings call transcripts
+- Specialized investment forums
 
-VADER (Valence Aware Dictionary and sEntiment Reasoner) está específicamente diseñado para analizar sentimiento en textos de redes sociales y noticias.
+## Implementation with VADER Sentiment
 
-### Framework Base de Análisis
+VADER (Valence Aware Dictionary and sEntiment Reasoner) is specifically designed to analyze sentiment in social media texts and news.
+
+### Base Analysis Framework
 
 ```python
 import pandas as pd
@@ -44,14 +46,14 @@ import yfinance as yf
 from warnings import filterwarnings
 filterwarnings("ignore")
 
-# Descargar recursos necesarios
+# Download required resources
 nltk.download('punkt', quiet=True)
 nltk.download('wordnet', quiet=True)
 nltk.download('stopwords', quiet=True)
 
 class SentimentAnalyzer:
     """
-    Analizador de sentimiento para mercados financieros
+    Sentiment analyzer for financial markets
     """
     
     def __init__(self):
@@ -60,7 +62,7 @@ class SentimentAnalyzer:
         self.lemmatizer = nltk.stem.WordNetLemmatizer()
         self.stemmer = nltk.stem.PorterStemmer()
         
-        # Palabras específicas de mercados financieros
+        # Financial market-specific words
         self.financial_keywords = {
             'bullish': ['bull', 'bullish', 'rally', 'moon', 'rocket', 'pump', 'surge', 'soar'],
             'bearish': ['bear', 'bearish', 'crash', 'dump', 'plunge', 'tank', 'drop', 'fall'],
@@ -69,58 +71,58 @@ class SentimentAnalyzer:
     
     def preprocess_text(self, text, advanced=True):
         """
-        Preprocesar texto para análisis de sentimiento
+        Preprocess text for sentiment analysis
         
-        Parámetros
+        Parameters
         ----------
         text : str
-            Texto original
+            Original text
         advanced : bool
-            Si aplicar preprocesamiento avanzado
+            Whether to apply advanced preprocessing
             
         Returns
         -------
         str
-            Texto procesado
+            Processed text
         """
         if not advanced:
             return text.lower().strip()
         
-        # 1. Tokenización
+        # 1. Tokenization
         tokens = nltk.tokenize.word_tokenize(text.lower())
         
-        # 2. Lematización (convertir a forma base)
+        # 2. Lemmatization (convert to base form)
         lemmatized_tokens = [self.lemmatizer.lemmatize(token) for token in tokens]
         
-        # 3. Stemming (reducir a raíz)
+        # 3. Stemming (reduce to root)
         stemmed_tokens = [self.stemmer.stem(token) for token in lemmatized_tokens]
         
-        # 4. Eliminar stop words
+        # 4. Remove stop words
         filtered_tokens = [token for token in stemmed_tokens if token not in self.stop_words]
         
-        # 5. Normalización (eliminar puntuación)
+        # 5. Normalization (remove punctuation)
         normalized_tokens = [token for token in filtered_tokens if token not in string.punctuation]
         
-        # 6. Reunir texto procesado
+        # 6. Reassemble processed text
         processed_text = " ".join(normalized_tokens)
         
         return processed_text
     
     def analyze_sentiment(self, text, method='vader'):
         """
-        Analizar sentimiento de un texto
+        Analyze sentiment of a text
         
-        Parámetros
+        Parameters
         ----------
         text : str
-            Texto a analizar
+            Text to analyze
         method : str
-            Método de análisis ('vader', 'textblob', 'both')
+            Analysis method ('vader', 'textblob', 'both')
             
         Returns
         -------
         dict
-            Scores de sentimiento
+            Sentiment scores
         """
         results = {}
         
@@ -151,7 +153,7 @@ class SentimentAnalyzer:
     
     def analyze_financial_keywords(self, text):
         """
-        Analizar palabras clave específicas de mercados financieros
+        Analyze financial market-specific keywords
         """
         text_lower = text.lower()
         
@@ -164,7 +166,7 @@ class SentimentAnalyzer:
         if total_keywords == 0:
             return {'score': 0, 'classification': 'neutral', 'keywords_found': 0}
         
-        # Score basado en proporción de palabras bullish vs bearish
+        # Score based on proportion of bullish vs bearish words
         score = (bullish_count - bearish_count) / total_keywords
         
         if score > 0.2:
@@ -184,7 +186,7 @@ class SentimentAnalyzer:
     
     def batch_analyze(self, texts, preprocess=True):
         """
-        Analizar sentimiento de múltiples textos
+        Analyze sentiment of multiple texts
         """
         results = []
         
@@ -211,7 +213,7 @@ class SentimentAnalyzer:
 
 class NewsScraperFinViz:
     """
-    Scraper de noticias de FinViz para análisis de sentimiento
+    FinViz news scraper for sentiment analysis
     """
     
     def __init__(self):
@@ -220,19 +222,19 @@ class NewsScraperFinViz:
     
     def scrape_news(self, tickers, max_retries=3):
         """
-        Extraer noticias de FinViz para múltiples tickers
+        Extract news from FinViz for multiple tickers
         
-        Parámetros
+        Parameters
         ----------
         tickers : list
-            Lista de símbolos de acciones
+            List of stock symbols
         max_retries : int
-            Número máximo de intentos por ticker
+            Maximum number of attempts per ticker
             
         Returns
         -------
         pd.DataFrame
-            DataFrame con noticias y sentimiento
+            DataFrame with news and sentiment
         """
         news_data = []
         
@@ -241,11 +243,11 @@ class NewsScraperFinViz:
             
             for attempt in range(max_retries):
                 try:
-                    # User agent aleatorio para evitar bloqueos
+                    # Random user agent to avoid blocks
                     ua = UserAgent()
                     headers = {"User-Agent": str(ua.chrome)}
                     
-                    # Realizar petición
+                    # Make request
                     response = requests.get(
                         self.base_url.format(ticker), 
                         headers=headers,
@@ -253,7 +255,7 @@ class NewsScraperFinViz:
                     )
                     response.raise_for_status()
                     
-                    # Parsear HTML
+                    # Parse HTML
                     soup = BeautifulSoup(response.content, "html.parser")
                     news_table = soup.find(id="news-table")
                     
@@ -261,43 +263,43 @@ class NewsScraperFinViz:
                         print(f"No news table found for {ticker}")
                         break
                     
-                    # Extraer noticias individuales
+                    # Extract individual news items
                     news_rows = news_table.findAll("tr")
                     
                     for row in news_rows:
                         try:
-                            # Extraer titular
+                            # Extract headline
                             news_link = row.find("a", class_="tab-link-news")
                             if news_link is None:
                                 continue
                             
                             headline = news_link.text.strip()
                             
-                            # Extraer fecha y hora
+                            # Extract date and time
                             time_data = row.find("td").text.replace("\\n", "").strip().split()
                             
                             if len(time_data) == 2:
                                 date_str = time_data[0]
                                 time_str = time_data[1]
                                 
-                                # Manejar "Today"
+                                # Handle "Today"
                                 if date_str.lower() == "today":
                                     date_str = datetime.now().strftime("%b-%d-%y")
                                     
                             elif len(time_data) == 1:
-                                # Solo hora, usar fecha actual
+                                # Time only, use current date
                                 time_str = time_data[0]
                                 date_str = datetime.now().strftime("%b-%d-%y")
                             else:
                                 continue
                             
-                            # Convertir fecha
+                            # Convert date
                             try:
                                 news_date = datetime.strptime(date_str, "%b-%d-%y")
                             except:
                                 news_date = datetime.now()
                             
-                            # Analizar sentimiento
+                            # Analyze sentiment
                             sentiment_result = self.sentiment_analyzer.analyze_sentiment(headline, method='both')
                             
                             news_data.append({
@@ -317,14 +319,14 @@ class NewsScraperFinViz:
                             print(f"Error processing news row for {ticker}: {e}")
                             continue
                     
-                    break  # Éxito, salir del loop de reintentos
+                    break  # Success, exit retry loop
                     
                 except Exception as e:
                     print(f"Attempt {attempt + 1} failed for {ticker}: {e}")
                     if attempt == max_retries - 1:
                         print(f"Failed to scrape {ticker} after {max_retries} attempts")
         
-        # Convertir a DataFrame
+        # Convert to DataFrame
         if news_data:
             df = pd.DataFrame(news_data)
             df['date'] = pd.to_datetime(df['date'])
@@ -336,27 +338,27 @@ def sentiment_trading_strategy(price_data, sentiment_data,
                              sentiment_threshold=0.1, 
                              lookback_days=3):
     """
-    Estrategia de trading basada en análisis de sentimiento
+    Trading strategy based on sentiment analysis
     
-    Parámetros
+    Parameters
     ----------
     price_data : pd.DataFrame
-        Datos de precios históricos
+        Historical price data
     sentiment_data : pd.DataFrame
-        Datos de sentimiento con fechas
+        Sentiment data with dates
     sentiment_threshold : float
-        Umbral para generar señales
+        Threshold for generating signals
     lookback_days : int
-        Días hacia atrás para agregar sentimiento
+        Days to look back for aggregating sentiment
     """
-    # Agregar sentimiento por día
+    # Aggregate sentiment by day
     daily_sentiment = sentiment_data.groupby('date').agg({
         'vader_compound': 'mean',
         'financial_sentiment': 'mean',
         'keywords_found': 'sum'
     }).reset_index()
     
-    # Crear señales de trading
+    # Create trading signals
     signals = pd.DataFrame(index=price_data.index)
     signals['price'] = price_data['Close']
     signals['signal'] = 0
@@ -364,7 +366,7 @@ def sentiment_trading_strategy(price_data, sentiment_data,
     signals['confidence'] = 0
     
     for i, date in enumerate(price_data.index):
-        # Buscar sentimiento en los últimos N días
+        # Look for sentiment in the last N days
         start_date = date - timedelta(days=lookback_days)
         end_date = date
         
@@ -374,43 +376,43 @@ def sentiment_trading_strategy(price_data, sentiment_data,
         ]
         
         if len(period_sentiment) > 0:
-            # Calcular score promedio ponderado (más peso a días recientes)
+            # Calculate weighted average score (more weight to recent days)
             weights = np.linspace(0.5, 1.0, len(period_sentiment))
             
             avg_vader = np.average(period_sentiment['vader_compound'], weights=weights)
             avg_financial = np.average(period_sentiment['financial_sentiment'], weights=weights)
             total_keywords = period_sentiment['keywords_found'].sum()
             
-            # Score combinado
+            # Combined score
             combined_score = (avg_vader * 0.6 + avg_financial * 0.4)
             
-            # Ajustar por cantidad de noticias (más noticias = más confianza)
-            confidence = min(total_keywords / 10.0, 1.0)  # Normalizar a 0-1
+            # Adjust by news volume (more news = more confidence)
+            confidence = min(total_keywords / 10.0, 1.0)  # Normalize to 0-1
             
             signals.loc[date, 'sentiment_score'] = combined_score
             signals.loc[date, 'confidence'] = confidence
             
-            # Generar señales solo con confianza mínima
+            # Generate signals only with minimum confidence
             if confidence > 0.3:
                 if combined_score > sentiment_threshold:
-                    signals.loc[date, 'signal'] = 1  # Comprar
+                    signals.loc[date, 'signal'] = 1  # Buy
                 elif combined_score < -sentiment_threshold:
-                    signals.loc[date, 'signal'] = -1  # Vender
+                    signals.loc[date, 'signal'] = -1  # Sell
     
     return signals
 
 def analyze_sentiment_correlation(price_data, sentiment_data, ticker):
     """
-    Analizar correlación entre sentimiento y movimientos de precios
+    Analyze correlation between sentiment and price movements
     """
-    # Preparar datos diarios
+    # Prepare daily data
     daily_sentiment = sentiment_data.groupby('date').agg({
         'vader_compound': 'mean',
         'financial_sentiment': 'mean',
         'keywords_found': 'count'
     }).reset_index()
     
-    # Agregar retornos de precios
+    # Add price returns
     price_returns = price_data['Close'].pct_change()
     daily_data = pd.DataFrame({
         'date': price_data.index,
@@ -418,31 +420,31 @@ def analyze_sentiment_correlation(price_data, sentiment_data, ticker):
         'price': price_data['Close'].values
     })
     
-    # Combinar datos
+    # Combine data
     combined_data = daily_data.merge(daily_sentiment, on='date', how='inner')
     
     if len(combined_data) == 0:
         return {'error': 'No matching dates between price and sentiment data'}
     
-    # Calcular correlaciones
+    # Calculate correlations
     correlations = {
         'vader_sentiment_correlation': combined_data['vader_compound'].corr(combined_data['return']),
         'financial_sentiment_correlation': combined_data['financial_sentiment'].corr(combined_data['return']),
         'news_volume_correlation': combined_data['keywords_found'].corr(abs(combined_data['return'])),
     }
     
-    # Análisis de lead/lag
+    # Lead/lag analysis
     lead_lag_analysis = {}
-    for lag in range(-3, 4):  # -3 a +3 días
+    for lag in range(-3, 4):  # -3 to +3 days
         if lag == 0:
             continue
         
         if lag > 0:
-            # Sentimiento predice retornos futuros
+            # Sentiment predicts future returns
             shifted_returns = combined_data['return'].shift(-lag)
             lead_lag_analysis[f'sentiment_leads_{lag}d'] = combined_data['vader_compound'].corr(shifted_returns)
         else:
-            # Retornos predicen sentimiento futuro
+            # Returns predict future sentiment
             shifted_sentiment = combined_data['vader_compound'].shift(lag)
             lead_lag_analysis[f'price_leads_{abs(lag)}d'] = combined_data['return'].corr(shifted_sentiment)
     
@@ -455,12 +457,12 @@ def analyze_sentiment_correlation(price_data, sentiment_data, ticker):
 
 def create_sentiment_dashboard(tickers, sentiment_data):
     """
-    Crear dashboard visual de análisis de sentimiento
+    Create visual sentiment analysis dashboard
     """
-    # Configurar subplot
+    # Configure subplot
     fig, axes = plt.subplots(2, 2, figsize=(16, 12))
     
-    # 1. Sentiment Score por Ticker
+    # 1. Sentiment Score by Ticker
     daily_sentiment = sentiment_data.groupby(['ticker', 'date']).agg({
         'vader_compound': 'mean',
         'financial_sentiment': 'mean'
@@ -477,7 +479,7 @@ def create_sentiment_dashboard(tickers, sentiment_data):
     axes[0, 0].grid(True, alpha=0.3)
     axes[0, 0].axhline(y=0, color='black', linestyle='--', alpha=0.5)
     
-    # 2. Distribución de Sentimiento
+    # 2. Sentiment Distribution
     axes[0, 1].hist(sentiment_data['vader_compound'], bins=30, alpha=0.7, edgecolor='black')
     axes[0, 1].set_title('Distribution of Sentiment Scores')
     axes[0, 1].set_xlabel('VADER Compound Score')
@@ -485,7 +487,7 @@ def create_sentiment_dashboard(tickers, sentiment_data):
     axes[0, 1].axvline(x=0, color='red', linestyle='--', alpha=0.7)
     axes[0, 1].grid(True, alpha=0.3)
     
-    # 3. Sentimiento por Ticker (Box plot)
+    # 3. Sentiment by Ticker (Box plot)
     sentiment_by_ticker = [sentiment_data[sentiment_data['ticker'] == ticker]['vader_compound'] 
                           for ticker in tickers]
     axes[1, 0].boxplot(sentiment_by_ticker, labels=tickers)
@@ -494,7 +496,7 @@ def create_sentiment_dashboard(tickers, sentiment_data):
     axes[1, 0].grid(True, alpha=0.3)
     axes[1, 0].axhline(y=0, color='red', linestyle='--', alpha=0.7)
     
-    # 4. Keywords encontradas por día
+    # 4. Keywords found per day
     keywords_by_date = sentiment_data.groupby('date')['keywords_found'].sum()
     axes[1, 1].plot(keywords_by_date.index, keywords_by_date.values, color='purple', linewidth=2)
     axes[1, 1].set_title('Financial Keywords Found Over Time')
@@ -507,29 +509,29 @@ def create_sentiment_dashboard(tickers, sentiment_data):
     
     return fig
 
-# Ejemplo de uso completo
+# Complete usage example
 def sentiment_analysis_example():
     """
-    Ejemplo completo de análisis de sentimiento para trading
+    Complete sentiment analysis example for trading
     """
-    # Tickers para analizar
+    # Tickers to analyze
     tickers = ["AAPL", "TSLA", "NVDA", "AMZN"]
     
-    print("=== ANÁLISIS DE SENTIMIENTO FINANCIERO ===\\n")
+    print("=== FINANCIAL SENTIMENT ANALYSIS ===\\n")
     
-    # 1. Scraping de noticias
-    print("📰 Extrayendo noticias...")
+    # 1. News scraping
+    print("Extracting news...")
     scraper = NewsScraperFinViz()
     news_data = scraper.scrape_news(tickers)
     
     if news_data.empty:
-        print("❌ No se pudieron extraer noticias")
+        print("Could not extract news")
         return
     
-    print(f"✅ Extraídas {len(news_data)} noticias")
+    print(f"Extracted {len(news_data)} news items")
     
-    # 2. Análisis estadístico
-    print(f"\\n📊 ESTADÍSTICAS GENERALES:")
+    # 2. Statistical analysis
+    print(f"\\nGENERAL STATISTICS:")
     for ticker in tickers:
         ticker_news = news_data[news_data['ticker'] == ticker]
         if len(ticker_news) > 0:
@@ -539,16 +541,16 @@ def sentiment_analysis_example():
             negative_news = (ticker_news['vader_compound'] < -0.05).sum()
             
             print(f"   {ticker}:")
-            print(f"      Total Noticias: {total_news}")
-            print(f"      Sentimiento Promedio: {avg_sentiment:.3f}")
-            print(f"      Noticias Positivas: {positive_news} ({positive_news/total_news:.1%})")
-            print(f"      Noticias Negativas: {negative_news} ({negative_news/total_news:.1%})")
+            print(f"      Total News: {total_news}")
+            print(f"      Average Sentiment: {avg_sentiment:.3f}")
+            print(f"      Positive News: {positive_news} ({positive_news/total_news:.1%})")
+            print(f"      Negative News: {negative_news} ({negative_news/total_news:.1%})")
     
-    # 3. Análisis de correlación con precios
-    print(f"\\n🔍 ANÁLISIS DE CORRELACIÓN:")
+    # 3. Correlation analysis with prices
+    print(f"\\nCORRELATION ANALYSIS:")
     for ticker in tickers:
         try:
-            # Obtener datos de precios
+            # Get price data
             end_date = datetime.now()
             start_date = end_date - timedelta(days=30)
             price_data = yf.download(ticker, start=start_date, end=end_date, interval="1d")
@@ -560,15 +562,15 @@ def sentiment_analysis_example():
                 
                 if 'error' not in correlation_analysis:
                     print(f"   {ticker}:")
-                    print(f"      Correlación Sentimiento-Retorno: {correlation_analysis['correlations']['vader_sentiment_correlation']:.3f}")
-                    print(f"      Puntos de Datos: {correlation_analysis['data_points']}")
+                    print(f"      Sentiment-Return Correlation: {correlation_analysis['correlations']['vader_sentiment_correlation']:.3f}")
+                    print(f"      Data Points: {correlation_analysis['data_points']}")
         
         except Exception as e:
-            print(f"   {ticker}: Error en análisis - {e}")
+            print(f"   {ticker}: Error in analysis - {e}")
     
-    # 4. Generar estrategia de ejemplo
-    print(f"\\n📈 EJEMPLO DE ESTRATEGIA:")
-    ticker = "AAPL"  # Usar Apple como ejemplo
+    # 4. Generate example strategy
+    print(f"\\nSTRATEGY EXAMPLE:")
+    ticker = "AAPL"  # Use Apple as example
     try:
         price_data = yf.download(ticker, start=start_date, end=end_date, interval="1d")
         ticker_sentiment = news_data[news_data['ticker'] == ticker]
@@ -582,53 +584,53 @@ def sentiment_analysis_example():
             avg_confidence = strategy_signals[strategy_signals['confidence'] > 0]['confidence'].mean()
             
             print(f"   Ticker: {ticker}")
-            print(f"   Total Señales: {total_signals}")
-            print(f"   Señales de Compra: {buy_signals}")
-            print(f"   Señales de Venta: {sell_signals}")
-            print(f"   Confianza Promedio: {avg_confidence:.1%}")
+            print(f"   Total Signals: {total_signals}")
+            print(f"   Buy Signals: {buy_signals}")
+            print(f"   Sell Signals: {sell_signals}")
+            print(f"   Average Confidence: {avg_confidence:.1%}")
     
     except Exception as e:
-        print(f"   Error generando estrategia: {e}")
+        print(f"   Error generating strategy: {e}")
     
-    # 5. Crear visualización
-    print(f"\\n📊 Generando dashboard...")
+    # 5. Create visualization
+    print(f"\\nGenerating dashboard...")
     try:
         create_sentiment_dashboard(tickers, news_data)
     except Exception as e:
-        print(f"Error creando dashboard: {e}")
+        print(f"Error creating dashboard: {e}")
     
     return news_data
 
-# Análisis de sentimiento para small caps
+# Sentiment analysis for small caps
 def small_cap_sentiment_strategy(ticker, sentiment_threshold=0.15):
     """
-    Estrategia específica de sentimiento para small caps
+    Small cap-specific sentiment strategy
     """
-    # Small caps son más sensibles al sentimiento
+    # Small caps are more sensitive to sentiment
     scraper = NewsScraperFinViz()
     sentiment_data = scraper.scrape_news([ticker])
     
     if sentiment_data.empty:
         return {'error': 'No sentiment data available'}
     
-    # Obtener datos de precio
+    # Get price data
     end_date = datetime.now()
     start_date = end_date - timedelta(days=30)
     price_data = yf.download(ticker, start=start_date, end=end_date)
     
-    # Parámetros ajustados para small caps
+    # Parameters adjusted for small caps
     signals = sentiment_trading_strategy(
         price_data, 
         sentiment_data,
-        sentiment_threshold=sentiment_threshold,  # Umbral más alto
-        lookback_days=1  # Reacción más rápida
+        sentiment_threshold=sentiment_threshold,  # Higher threshold
+        lookback_days=1  # Faster reaction
     )
     
-    # Agregar filtros específicos para small caps
+    # Add small cap-specific filters
     signals['volume_filter'] = price_data['Volume'] > price_data['Volume'].rolling(20).mean()
     signals['volatility_filter'] = price_data['Close'].pct_change().rolling(5).std() > 0.02
     
-    # Solo generar señales cuando hay volumen y volatilidad
+    # Only generate signals when there is volume and volatility
     signals['final_signal'] = np.where(
         signals['volume_filter'] & signals['volatility_filter'],
         signals['signal'],
@@ -645,15 +647,15 @@ if __name__ == "__main__":
     sentiment_analysis_example()
 ```
 
-## Integración con Estrategias de Trading
+## Integration with Trading Strategies
 
-### 1. Sentimiento + Gap & Go
+### 1. Sentiment + Gap & Go
 ```python
 def sentiment_gap_strategy(ticker, gap_threshold=0.03):
     """
-    Combinar análisis de sentimiento con estrategia Gap & Go
+    Combine sentiment analysis with Gap & Go strategy
     """
-    # Obtener datos
+    # Get data
     scraper = NewsScraperFinViz()
     sentiment_data = scraper.scrape_news([ticker])
     
@@ -667,11 +669,11 @@ def sentiment_gap_strategy(ticker, gap_threshold=0.03):
     signals['volume_ratio'] = price_data['Volume'] / price_data['Volume'].rolling(20).mean()
     signals['signal'] = 0
     
-    # Obtener sentimiento del día anterior
+    # Get previous day sentiment
     for i, date in enumerate(price_data.index[1:], 1):
         prev_date = price_data.index[i-1]
         
-        # Buscar sentimiento del día anterior
+        # Look for previous day sentiment
         day_sentiment = sentiment_data[
             sentiment_data['date'].dt.date == prev_date.date()
         ]
@@ -679,13 +681,13 @@ def sentiment_gap_strategy(ticker, gap_threshold=0.03):
         if len(day_sentiment) > 0:
             avg_sentiment = day_sentiment['vader_compound'].mean()
             
-            # Gap up con sentimiento positivo
+            # Gap up with positive sentiment
             if (signals.loc[date, 'gap_pct'] > gap_threshold and 
                 avg_sentiment > 0.1 and
                 signals.loc[date, 'volume_ratio'] > 2):
                 signals.loc[date, 'signal'] = 1
             
-            # Gap down con sentimiento muy negativo (potencial reversal)
+            # Gap down with very negative sentiment (potential reversal)
             elif (signals.loc[date, 'gap_pct'] < -gap_threshold and
                   avg_sentiment < -0.2 and
                   signals.loc[date, 'volume_ratio'] > 2):
@@ -694,29 +696,29 @@ def sentiment_gap_strategy(ticker, gap_threshold=0.03):
     return signals
 ```
 
-### 2. Sentimiento + VWAP
+### 2. Sentiment + VWAP
 ```python
 def sentiment_vwap_strategy(ticker):
     """
-    Combinar sentimiento con estrategia VWAP
+    Combine sentiment with VWAP strategy
     """
-    # Obtener datos intraday si es posible
+    # Get intraday data if possible
     price_data = yf.download(ticker, period="5d", interval="1h")
     
-    # Calcular VWAP
+    # Calculate VWAP
     price_data['vwap'] = (price_data['Close'] * price_data['Volume']).cumsum() / price_data['Volume'].cumsum()
     
-    # Obtener sentimiento
+    # Get sentiment
     scraper = NewsScraperFinViz()
     sentiment_data = scraper.scrape_news([ticker])
     
-    # Generar señales
+    # Generate signals
     signals = pd.DataFrame(index=price_data.index)
     signals['price'] = price_data['Close']
     signals['vwap'] = price_data['vwap']
     signals['signal'] = 0
     
-    # Sentimiento del día actual
+    # Current day sentiment
     current_date = datetime.now().date()
     today_sentiment = sentiment_data[
         sentiment_data['date'].dt.date == current_date
@@ -726,13 +728,13 @@ def sentiment_vwap_strategy(ticker):
         avg_sentiment = today_sentiment['vader_compound'].mean()
         
         for i, date in enumerate(price_data.index):
-            # Long: precio cerca de VWAP + sentimiento positivo
+            # Long: price near VWAP + positive sentiment
             if (signals.loc[date, 'price'] > signals.loc[date, 'vwap'] * 0.999 and
                 signals.loc[date, 'price'] < signals.loc[date, 'vwap'] * 1.001 and
                 avg_sentiment > 0.05):
                 signals.loc[date, 'signal'] = 1
             
-            # Short: precio rechaza VWAP + sentimiento negativo
+            # Short: price rejected at VWAP + negative sentiment
             elif (signals.loc[date, 'price'] < signals.loc[date, 'vwap'] and
                   avg_sentiment < -0.05):
                 signals.loc[date, 'signal'] = -1
@@ -740,13 +742,13 @@ def sentiment_vwap_strategy(ticker):
     return signals
 ```
 
-## Mejores Prácticas
+## Best Practices
 
-### 1. Validación de Datos de Sentimiento
+### 1. Sentiment Data Validation
 ```python
 def validate_sentiment_data(sentiment_df):
     """
-    Validar calidad de datos de sentimiento
+    Validate sentiment data quality
     """
     validation_results = {
         'total_articles': len(sentiment_df),
@@ -756,28 +758,28 @@ def validate_sentiment_data(sentiment_df):
         'duplicate_headlines': sentiment_df['headline'].duplicated().sum()
     }
     
-    # Detectar posibles problemas
+    # Detect potential issues
     warnings = []
     
     if validation_results['total_articles'] < 10:
-        warnings.append("Muy pocas noticias para análisis confiable")
+        warnings.append("Too few news items for reliable analysis")
     
     if abs(sentiment_df['vader_compound'].mean()) > 0.5:
-        warnings.append("Sentimiento extremadamente sesgado")
+        warnings.append("Extremely biased sentiment")
     
     if validation_results['duplicate_headlines'] > len(sentiment_df) * 0.1:
-        warnings.append("Muchas noticias duplicadas")
+        warnings.append("Many duplicate news items")
     
     validation_results['warnings'] = warnings
     
     return validation_results
 ```
 
-### 2. Normalización Temporal
+### 2. Temporal Normalization
 ```python
 def normalize_sentiment_by_time(sentiment_df, method='zscore'):
     """
-    Normalizar sentimiento por período de tiempo
+    Normalize sentiment by time period
     """
     sentiment_df = sentiment_df.copy()
     
@@ -788,7 +790,7 @@ def normalize_sentiment_by_time(sentiment_df, method='zscore'):
         ) / sentiment_df['vader_compound'].std()
     
     elif method == 'rolling_zscore':
-        # Rolling z-score (ventana de 30 días)
+        # Rolling z-score (30-day window)
         rolling_mean = sentiment_df['vader_compound'].rolling(30).mean()
         rolling_std = sentiment_df['vader_compound'].rolling(30).std()
         sentiment_df['normalized_sentiment'] = (
@@ -802,79 +804,79 @@ def normalize_sentiment_by_time(sentiment_df, method='zscore'):
     return sentiment_df
 ```
 
-### 3. Filtros de Calidad
+### 3. Quality Filters
 ```python
 def apply_quality_filters(sentiment_df, min_keywords=1, confidence_threshold=0.5):
     """
-    Aplicar filtros de calidad a datos de sentimiento
+    Apply quality filters to sentiment data
     """
     filtered_df = sentiment_df.copy()
     
-    # Filtrar por keywords financieras encontradas
+    # Filter by financial keywords found
     filtered_df = filtered_df[filtered_df['keywords_found'] >= min_keywords]
     
-    # Filtrar headlines muy cortas (probablemente no informativas)
+    # Filter very short headlines (probably not informative)
     filtered_df = filtered_df[filtered_df['headline'].str.len() > 20]
     
-    # Remover duplicados exactos
+    # Remove exact duplicates
     filtered_df = filtered_df.drop_duplicates(subset=['headline'])
     
-    # Filtrar por confianza en clasificación
+    # Filter by classification confidence
     abs_sentiment = abs(filtered_df['vader_compound'])
     filtered_df = filtered_df[abs_sentiment > confidence_threshold * abs_sentiment.std()]
     
     return filtered_df
 ```
 
-## Limitaciones y Consideraciones
+## Limitations and Considerations
 
-### 1. Limitaciones del Análisis de Sentimiento
-- **Sarcasmo y contexto**: Los modelos pueden no detectar sarcasmo
-- **Jerga financiera**: Palabras específicas del sector pueden ser malinterpretadas
-- **Volumen de noticias**: Small caps pueden tener pocas noticias
-- **Timing**: El impacto del sentimiento puede ser inmediato o retrasado
+### 1. Limitations of Sentiment Analysis
+- **Sarcasm and context**: Models may not detect sarcasm
+- **Financial jargon**: Sector-specific words may be misinterpreted
+- **News volume**: Small caps may have few news articles
+- **Timing**: The impact of sentiment can be immediate or delayed
 
-### 2. Mejores Prácticas de Implementación
+### 2. Implementation Best Practices
 ```python
 SENTIMENT_BEST_PRACTICES = {
     'data_quality': {
         'min_articles_per_day': 3,
-        'max_sentiment_abs': 0.8,  # Evitar sentimientos extremos sospechosos
+        'max_sentiment_abs': 0.8,  # Avoid suspiciously extreme sentiments
         'min_headline_length': 20,
         'duplicate_threshold': 0.1
     },
     'trading_integration': {
-        'sentiment_weight': 0.3,  # No más del 30% del peso en decisiones
-        'confirmation_required': True,  # Confirmar con indicadores técnicos
-        'volume_filter': True,  # Solo operar con volumen confirmatorio
-        'time_decay': 24  # Horas antes de que el sentimiento pierda relevancia
+        'sentiment_weight': 0.3,  # No more than 30% weight in decisions
+        'confirmation_required': True,  # Confirm with technical indicators
+        'volume_filter': True,  # Only trade with confirming volume
+        'time_decay': 24  # Hours before sentiment loses relevance
     },
     'risk_management': {
-        'max_position_sentiment': 0.05,  # Máximo 5% del capital en trades sentimiento
-        'stop_loss_tight': True,  # Stops más ajustados para trades sentimiento
-        'sentiment_correlation_limit': 0.7  # Evitar demasiada correlación con sentimiento
+        'max_position_sentiment': 0.05,  # Maximum 5% of capital in sentiment trades
+        'stop_loss_tight': True,  # Tighter stops for sentiment trades
+        'sentiment_correlation_limit': 0.7  # Avoid too much correlation with sentiment
     }
 }
 ```
 
-## Fuentes de Datos Alternativas
+## Alternative Data Sources
 
-### 1. Integración con Reddit/Twitter
+### 1. Reddit/Twitter Integration
 ```python
 def reddit_sentiment_analysis(ticker, subreddit='wallstreetbets'):
     """
-    Placeholder para análisis de sentimiento de Reddit
-    (Requiere API de Reddit)
+    Placeholder for Reddit sentiment analysis
+    (Requires Reddit API)
     """
-    # Implementación requiere praw library y API keys
+    # Implementation requires praw library and API keys
     pass
 
 def twitter_sentiment_analysis(ticker):
     """
-    Placeholder para análisis de sentimiento de Twitter
-    (Requiere Twitter API)
+    Placeholder for Twitter sentiment analysis
+    (Requires Twitter API)
     """
-    # Implementación requiere tweepy library y API keys
+    # Implementation requires tweepy library and API keys
     pass
 ```
 
@@ -882,12 +884,12 @@ def twitter_sentiment_analysis(ticker):
 ```python
 def stocktwits_sentiment(ticker):
     """
-    Placeholder para StockTwits sentiment
-    (Requiere StockTwits API)
+    Placeholder for StockTwits sentiment
+    (Requires StockTwits API)
     """
     pass
 ```
 
-## Siguiente Paso
+## Next Step
 
-Con Análisis de Sentimiento implementado, continuemos con [Análisis Fundamental](fundamental_analysis.md) para completar el arsenal de herramientas cuantitativas.
+With Sentiment Analysis implemented, let's continue with [Fundamental Analysis](fundamental_analysis.md) to complete the quantitative tools arsenal.

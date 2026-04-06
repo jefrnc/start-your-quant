@@ -1,185 +1,187 @@
-# Introducción al Trading Cuantitativo
+> 🇪🇸 [Leer en Español](Introduction.es.md) | 🇺🇸 **English**
 
-## ¿Qué es el Trading Cuantitativo?
+# Introduction to Quantitative Trading
 
-El trading cuantitativo es una metodología de inversión que utiliza modelos matemáticos, análisis estadístico y algoritmos para identificar oportunidades de trading y ejecutar operaciones de manera sistemática.
+## What is Quantitative Trading?
 
-### Características Principales
+Quantitative trading is an investment methodology that uses mathematical models, statistical analysis, and algorithms to identify trading opportunities and execute trades systematically.
 
-- **Basado en Datos**: Todas las decisiones están respaldadas por evidencia estadística
-- **Sistemático**: Procesos reproducibles y automatizables
-- **Objetivo**: Elimina emociones y sesgos cognitivos
-- **Escalable**: Puede manejar múltiples instrumentos simultáneamente
+### Key Characteristics
 
-## ¿Por qué Funciona?
+- **Data-Driven**: All decisions are backed by statistical evidence
+- **Systematic**: Reproducible and automatable processes
+- **Objective**: Eliminates emotions and cognitive biases
+- **Scalable**: Can handle multiple instruments simultaneously
 
-### 1. Eliminación de Sesgos Emocionales
-Los humanos son susceptibles a:
+## Why Does It Work?
+
+### 1. Elimination of Emotional Biases
+Humans are susceptible to:
 - FOMO (Fear of Missing Out)
 - Revenge trading
-- Confirmación bias
+- Confirmation bias
 - Overconfidence
 
-### 2. Procesamiento de Información Superior
-Los algoritmos pueden:
-- Analizar miles de datos simultáneamente
-- Detectar patrones complejos
-- Reaccionar en milisegundos
-- Operar 24/7 sin fatiga
+### 2. Superior Information Processing
+Algorithms can:
+- Analyze thousands of data points simultaneously
+- Detect complex patterns
+- React in milliseconds
+- Operate 24/7 without fatigue
 
-### 3. Gestión de Riesgo Sistemática
-- Position sizing matemático
-- Stop losses automáticos
-- Diversificación algorítmica
-- Límites de exposición dinámicos
+### 3. Systematic Risk Management
+- Mathematical position sizing
+- Automatic stop losses
+- Algorithmic diversification
+- Dynamic exposure limits
 
-## Nuestro Enfoque: Small Caps & Premarket
+## Our Focus: Small Caps & Premarket
 
-### ¿Por qué Small Caps?
+### Why Small Caps?
 
-**Ventajas**:
-- **Mayor volatilidad** = mayores oportunidades de profit
-- **Menor cobertura institucional** = ineficiencias de mercado
-- **Movimientos más pronunciados** en gaps y breakouts
-- **Menos arbitraje algorítmico** de HFT
+**Advantages**:
+- **Higher volatility** = greater profit opportunities
+- **Less institutional coverage** = market inefficiencies
+- **More pronounced movements** in gaps and breakouts
+- **Less algorithmic arbitrage** from HFT
 
-**Desafíos**:
-- **Mayor riesgo** de pérdidas sustanciales
-- **Menor liquidez** = mayor slippage
-- **Manipulación** y pump & dump schemes
-- **Halts y suspensiones** frecuentes
+**Challenges**:
+- **Higher risk** of substantial losses
+- **Lower liquidity** = greater slippage
+- **Manipulation** and pump & dump schemes
+- **Frequent halts and suspensions**
 
-### Ventana de Premarket (5:30 AM - 8:00 AM ET)
+### Premarket Window (5:30 AM - 8:00 AM ET)
 
-**Por qué es efectiva**:
-- **Baja liquidez** amplifica movimientos
-- **Reacción a noticias** overnight
-- **Gaps significativos** vs cierre anterior
-- **Menor competencia** algorítmica
+**Why it's effective**:
+- **Low liquidity** amplifies movements
+- **Reaction to overnight news**
+- **Significant gaps** vs previous close
+- **Less algorithmic competition**
 
-**Factores clave**:
-- Volumen premarket vs promedio
-- Magnitud del gap (3-25% ideal)
-- Float disponible para trading
-- Catalizador fundamental (noticias, earnings)
+**Key factors**:
+- Premarket volume vs average
+- Gap magnitude (3-25% ideal)
+- Available float for trading
+- Fundamental catalyst (news, earnings)
 
-## Metodología del Playbook
+## Playbook Methodology
 
 ### 1. Research-Driven Development
 ```
-Hipótesis → Backtesting → Validación → Paper Trading → Live Implementation
+Hypothesis -> Backtesting -> Validation -> Paper Trading -> Live Implementation
 ```
 
 ### 2. Position Recycling Strategy
-Nuestro enfoque único donde:
-- **Entrada inicial** con tamaño óptimo
-- **Toma de ganancias parciales** en fortaleza
-- **Re-entrada en pullbacks** para mejorar promedio
-- **Múltiples trades = UNA campaña** de trading
+Our unique approach where:
+- **Initial entry** with optimal size
+- **Partial profit taking** on strength
+- **Re-entry on pullbacks** to improve average
+- **Multiple trades = ONE trading campaign**
 
 ### 3. Risk-First Design
-- **Riesgo máximo por trade**: $10
-- **Posición máxima**: $70
-- **Stop loss sistemático**: 5-8%
-- **Tiempo máximo de hold**: 60 minutos
+- **Maximum risk per trade**: $10
+- **Maximum position**: $70
+- **Systematic stop loss**: 5-8%
+- **Maximum hold time**: 60 minutes
 
-## Herramientas y Stack Tecnológico
+## Tools and Technology Stack
 
 ### Core Technologies
-- **Python 3.13**: Lenguaje principal
-- **Pandas/NumPy**: Manipulación de datos
-- **Polygon.io**: Datos de mercado
-- **PostgreSQL**: Almacenamiento de trades
-- **IBKR TWS**: Ejecución de trades
+- **Python 3.13**: Primary language
+- **Pandas/NumPy**: Data manipulation
+- **Polygon.io**: Market data
+- **PostgreSQL**: Trade storage
+- **IBKR TWS**: Trade execution
 
-### Análisis y Backtesting
-- **Jupyter Notebooks**: Research interactivo
-- **Backtrader**: Motor de backtesting
-- **Plotly**: Visualizaciones
-- **Optuna**: Optimización bayesiana
+### Analysis and Backtesting
+- **Jupyter Notebooks**: Interactive research
+- **Backtrader**: Backtesting engine
+- **Plotly**: Visualizations
+- **Optuna**: Bayesian optimization
 
-### Monitoreo y Alertas
-- **Grafana**: Dashboards en tiempo real
-- **Prometheus**: Métricas del sistema
-- **Telegram**: Alertas de trading
-- **Discord**: Notificaciones de comunidad
+### Monitoring and Alerts
+- **Grafana**: Real-time dashboards
+- **Prometheus**: System metrics
+- **Telegram**: Trading alerts
+- **Discord**: Community notifications
 
-## Estrategias Principales
+## Main Strategies
 
-### 1. Gap & Go (Implementada)
-- **Setup**: Gap > 3% + volumen premarket elevado
-- **Entry**: Breakout sobre resistencia con confirmación
-- **Exit**: Trailing stop o target profit
+### 1. Gap & Go (Implemented)
+- **Setup**: Gap > 3% + elevated premarket volume
+- **Entry**: Breakout above resistance with confirmation
+- **Exit**: Trailing stop or profit target
 
-### 2. Early Runner Detection (En Desarrollo)
-- **ML Model**: Detecta penny stocks con potencial de runner
-- **Señales**: Dark pool activity, float rotation, technical setup
-- **Score**: 0-100 con clasificación HOT/WARM/COLD
+### 2. Early Runner Detection (In Development)
+- **ML Model**: Detects penny stocks with runner potential
+- **Signals**: Dark pool activity, float rotation, technical setup
+- **Score**: 0-100 with HOT/WARM/COLD classification
 
-### 3. VWAP Reclaim (Planeada)
-- **Setup**: Rechazo en VWAP seguido de reclaim
-- **Confirmación**: Volumen creciente + momentum
-- **Risk**: Stop bajo VWAP anterior
+### 3. VWAP Reclaim (Planned)
+- **Setup**: VWAP rejection followed by reclaim
+- **Confirmation**: Increasing volume + momentum
+- **Risk**: Stop below prior VWAP
 
-## Métricas de Éxito
+## Success Metrics
 
 ### Performance Targets
-- **Sharpe Ratio**: > 1.5 (objetivo: 2.0+)
-- **Max Drawdown**: < 10% (objetivo: < 5%)
-- **Win Rate**: > 60% (objetivo: 70%+)
-- **Profit Factor**: > 1.5 (objetivo: 2.0+)
+- **Sharpe Ratio**: > 1.5 (target: 2.0+)
+- **Max Drawdown**: < 10% (target: < 5%)
+- **Win Rate**: > 60% (target: 70%+)
+- **Profit Factor**: > 1.5 (target: 2.0+)
 
 ### Operational Metrics
-- **Trades por día**: 3-8 (calidad > cantidad)
-- **Tiempo promedio de hold**: < 45 minutos
-- **Slippage promedio**: < 0.5%
+- **Trades per day**: 3-8 (quality > quantity)
+- **Average hold time**: < 45 minutes
+- **Average slippage**: < 0.5%
 - **Fill rate**: > 95%
 
-## Filosofía de Trading
+## Trading Philosophy
 
-### Principios Fundamentales
+### Fundamental Principles
 
-1. **El mercado es probabilístico, no determinístico**
-   - Buscamos edges estadísticos
-   - Aceptamos que no todas las operaciones serán ganadoras
-   - Focus en expectativa matemática positiva
+1. **The market is probabilistic, not deterministic**
+   - We seek statistical edges
+   - We accept that not all trades will be winners
+   - Focus on positive mathematical expectancy
 
-2. **La consistencia supera a los home runs**
-   - Preferimos muchas ganancias pequeñas
-   - Evitamos grandes pérdidas a toda costa
+2. **Consistency beats home runs**
+   - We prefer many small gains
+   - We avoid large losses at all costs
    - Base hits > grand slams
 
-3. **Adaptabilidad constante**
-   - Los mercados evolucionan
-   - Nuestros modelos deben evolucionar
-   - Continuous learning y mejora
+3. **Constant adaptability**
+   - Markets evolve
+   - Our models must evolve
+   - Continuous learning and improvement
 
-### Gestión Psicológica
+### Psychological Management
 
-**Para traders algorítmicos**:
-- **Confía en el proceso**: Los drawdowns son normales
-- **No intervengas manualmente**: Salvo emergencias
-- **Analiza post-mortem**: Cada trade es una lección
-- **Mantén perspectiva**: Focus en métricas a largo plazo
+**For algorithmic traders**:
+- **Trust the process**: Drawdowns are normal
+- **Don't intervene manually**: Except in emergencies
+- **Analyze post-mortem**: Every trade is a lesson
+- **Keep perspective**: Focus on long-term metrics
 
-## Próximos Pasos
+## Next Steps
 
-### Para Principiantes
-1. Leer [Risk Management](./Risk-Management.md)
-2. Estudiar [Performance Metrics](./Performance-Metrics.md)
-3. Practicar con [Strategy Development](../technical-practices/Strategy-Development.md)
+### For Beginners
+1. Read [Risk Management](./Risk-Management.md)
+2. Study [Performance Metrics](./Performance-Metrics.md)
+3. Practice with [Strategy Development](../technical-practices/Strategy-Development.md)
 
-### Para Experimentados
-1. Implementar [Early Runner Detection](../advanced-topics/Machine-Learning-Trading.md)
-2. Optimizar [Parameter Optimization](../technical-practices/Parameter-Optimization.md)
-3. Escalar con [Multi-Broker Integration](../architecture-patterns/Multi-Broker-Integration.md)
+### For Experienced Traders
+1. Implement [Early Runner Detection](../advanced-topics/Machine-Learning-Trading.md)
+2. Optimize [Parameter Optimization](../technical-practices/Parameter-Optimization.md)
+3. Scale with [Multi-Broker Integration](../architecture-patterns/Multi-Broker-Integration.md)
 
 ---
 
-**Recuerda**: El trading cuantitativo no es una fórmula mágica para ganar dinero fácil. Es una disciplina que requiere:
-- Conocimiento técnico sólido
-- Disciplina emocional
-- Mejora continua
-- Gestión de riesgo estricta
+**Remember**: Quantitative trading is not a magic formula for easy money. It's a discipline that requires:
+- Solid technical knowledge
+- Emotional discipline
+- Continuous improvement
+- Strict risk management
 
-¡Pero cuando se hace correctamente, puede proporcionar una ventaja sistemática y sustentable en los mercados! 🚀
+But when done correctly, it can provide a systematic and sustainable edge in the markets!

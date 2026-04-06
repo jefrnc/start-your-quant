@@ -1,21 +1,23 @@
-# Creación de Datasets para Backtesting
+> 🇪🇸 [Leer en Español](backtesting_datasets.es.md) | 🇺🇸 **English**
 
-## El Framework Mental
+# Creating Datasets for Backtesting
 
-Un buen dataset de backtesting no es solo data histórica. Es una representación realista del ambiente de trading, incluyendo todas las limitaciones y fricciones que enfrentarás en vivo.
+## The Mental Framework
 
-## Estructura Base
+A good backtesting dataset is not just historical data. It's a realistic representation of the trading environment, including all the limitations and frictions you'll face in live trading.
+
+## Base Structure
 
 ```python
 class BacktestDataset:
     def __init__(self):
         self.price_data = {}      # OHLCV data
         self.fundamental_data = {} # Float, sector, etc
-        self.universe = []        # Tickers tradeable cada día
-        self.metadata = {}        # Info adicional
+        self.universe = []        # Tradeable tickers each day
+        self.metadata = {}        # Additional info
         
     def add_ticker(self, ticker, data, metadata=None):
-        # Validar data
+        # Validate data
         if not self._validate_data(data):
             raise ValueError(f"Invalid data for {ticker}")
             
@@ -24,51 +26,51 @@ class BacktestDataset:
             self.metadata[ticker] = metadata
             
     def get_universe(self, date):
-        """Obtener tickers tradeables en una fecha"""
+        """Get tradeable tickers on a date"""
         available = []
         for ticker, data in self.price_data.items():
             if date in data.index:
-                # Verificar liquidez mínima
+                # Check minimum liquidity
                 volume = data.loc[date, 'volume']
                 price = data.loc[date, 'close']
                 dollar_volume = volume * price
                 
-                if dollar_volume > 1_000_000:  # $1M mínimo
+                if dollar_volume > 1_000_000:  # $1M minimum
                     available.append(ticker)
         
         return available
 ```
 
-## Datasets por Tipo de Estrategia
+## Datasets by Strategy Type
 
-### 1. Dataset para Gap Trading
+### 1. Gap Trading Dataset
 ```python
 def create_gap_trading_dataset(start_date, end_date):
     dataset = BacktestDataset()
     
-    # Universo: Small caps con volumen
+    # Universe: Small caps with volume
     universe_criteria = {
         'market_cap': (10_000_000, 500_000_000),
         'avg_volume': 500_000,
         'price': (1, 50)
     }
     
-    # Obtener tickers que cumplan criterios
+    # Get tickers that meet criteria
     tickers = screen_universe(universe_criteria)
     
     for ticker in tickers:
-        # Necesitamos pre-market data
+        # We need pre-market data
         data = fetch_extended_hours_data(ticker, start_date, end_date)
         
-        # Calcular gaps
+        # Calculate gaps
         data['gap_pct'] = (data['open'] / data['close'].shift(1) - 1) * 100
         data['gap_type'] = data['gap_pct'].apply(classify_gap)
         
-        # Agregar indicadores relevantes
+        # Add relevant indicators
         data['premarket_volume'] = calculate_premarket_volume(data)
         data['rvol'] = data['volume'] / data['volume'].rolling(20).mean()
         
-        # Metadata importante
+        # Important metadata
         metadata = {
             'float': get_float(ticker),
             'sector': get_sector(ticker),
@@ -90,16 +92,16 @@ def classify_gap(gap_pct):
         return 'small_gap'
 ```
 
-### 2. Dataset para Mean Reversion
+### 2. Mean Reversion Dataset
 ```python
 def create_mean_reversion_dataset(start_date, end_date):
     dataset = BacktestDataset()
     
-    # Para mean reversion queremos stocks líquidos y estables
+    # For mean reversion we want liquid and stable stocks
     universe_criteria = {
         'market_cap': (1_000_000_000, None),  # Large caps
         'avg_volume': 5_000_000,
-        'volatility': (0.01, 0.05)  # Volatilidad moderada
+        'volatility': (0.01, 0.05)  # Moderate volatility
     }
     
     tickers = screen_universe(universe_criteria)
@@ -107,7 +109,7 @@ def create_mean_reversion_dataset(start_date, end_date):
     for ticker in tickers:
         data = fetch_data(ticker, start_date, end_date)
         
-        # Indicadores de mean reversion
+        # Mean reversion indicators
         data['sma_20'] = data['close'].rolling(20).mean()
         data['distance_from_mean'] = (data['close'] - data['sma_20']) / data['sma_20']
         
@@ -126,12 +128,12 @@ def create_mean_reversion_dataset(start_date, end_date):
     return dataset
 ```
 
-### 3. Dataset para Pairs Trading
+### 3. Pairs Trading Dataset
 ```python
 def create_pairs_trading_dataset(start_date, end_date):
     dataset = BacktestDataset()
     
-    # Obtener pares correlacionados
+    # Get correlated pairs
     sectors = ['XLK', 'XLF', 'XLE', 'XLV']  # Tech, Financial, Energy, Healthcare
     pairs = []
     
@@ -139,21 +141,21 @@ def create_pairs_trading_dataset(start_date, end_date):
         stocks = get_sector_stocks(sector)
         correlation_matrix = calculate_correlation_matrix(stocks, start_date, end_date)
         
-        # Encontrar pares con alta correlación
+        # Find highly correlated pairs
         high_corr_pairs = find_high_correlation_pairs(correlation_matrix, threshold=0.8)
         pairs.extend(high_corr_pairs)
     
-    # Crear spreads para cada par
+    # Create spreads for each pair
     for stock1, stock2 in pairs:
         data1 = fetch_data(stock1, start_date, end_date)
         data2 = fetch_data(stock2, start_date, end_date)
         
-        # Alinear datos
+        # Align data
         spread_data = pd.DataFrame(index=data1.index)
         spread_data['price1'] = data1['close']
         spread_data['price2'] = data2['close']
         
-        # Calcular ratio y z-score
+        # Calculate ratio and z-score
         spread_data['ratio'] = spread_data['price1'] / spread_data['price2']
         spread_data['ratio_mean'] = spread_data['ratio'].rolling(20).mean()
         spread_data['ratio_std'] = spread_data['ratio'].rolling(20).std()
@@ -167,11 +169,11 @@ def create_pairs_trading_dataset(start_date, end_date):
     return dataset
 ```
 
-## Agregar Datos Fundamentales
+## Adding Fundamental Data
 
 ```python
 def enrich_with_fundamentals(dataset):
-    """Agregar datos fundamentales al dataset"""
+    """Add fundamental data to the dataset"""
     
     for ticker in dataset.price_data.keys():
         # Float data
@@ -186,7 +188,7 @@ def enrich_with_fundamentals(dataset):
         # News sentiment
         news_sentiment = get_news_sentiment(ticker)
         
-        # Agregar al dataset
+        # Add to dataset
         dataset.metadata[ticker].update({
             'float_history': float_data,
             'short_interest': short_data,
@@ -197,7 +199,7 @@ def enrich_with_fundamentals(dataset):
     return dataset
 ```
 
-## Considerar Costos y Fricciones
+## Considering Costs and Frictions
 
 ```python
 class RealisticBacktestData:
@@ -206,11 +208,11 @@ class RealisticBacktestData:
         self.cost_model = CostModel()
         
     def add_market_impact(self, ticker, date, size):
-        """Estimar impacto en precio por tamaño de orden"""
+        """Estimate price impact by order size"""
         daily_volume = self.data.price_data[ticker].loc[date, 'volume']
         participation_rate = size / daily_volume
         
-        # Modelo simple de impacto
+        # Simple impact model
         if participation_rate < 0.01:
             impact = 0.0001  # 1 basis point
         elif participation_rate < 0.05:
@@ -221,35 +223,35 @@ class RealisticBacktestData:
         return impact
     
     def calculate_realistic_fill(self, ticker, date, side, size):
-        """Calcular precio de fill realista"""
+        """Calculate realistic fill price"""
         bar = self.data.price_data[ticker].loc[date]
         
         if side == 'buy':
-            # Comprar cerca del ask
+            # Buy near the ask
             base_price = bar['close'] * 1.0001  # Slight premium
             impact = self.add_market_impact(ticker, date, size)
             fill_price = base_price * (1 + impact)
         else:
-            # Vender cerca del bid
+            # Sell near the bid
             base_price = bar['close'] * 0.9999  # Slight discount
             impact = self.add_market_impact(ticker, date, size)
             fill_price = base_price * (1 - impact)
             
-        # Agregar slippage aleatorio
+        # Add random slippage
         slippage = np.random.normal(0, 0.0001)  # 1bp std dev
         fill_price *= (1 + slippage)
         
         return fill_price
 ```
 
-## Splits y Corporate Actions
+## Splits and Corporate Actions
 
 ```python
 def handle_corporate_actions(dataset):
-    """Manejar splits, dividendos, etc."""
+    """Handle splits, dividends, etc."""
     
     for ticker in dataset.price_data.keys():
-        # Obtener corporate actions
+        # Get corporate actions
         actions = get_corporate_actions(ticker)
         
         for action in actions:
@@ -257,36 +259,36 @@ def handle_corporate_actions(dataset):
                 ratio = action['ratio']
                 date = action['date']
                 
-                # Ajustar precios históricos
+                # Adjust historical prices
                 mask = dataset.price_data[ticker].index < date
                 dataset.price_data[ticker].loc[mask, ['open', 'high', 'low', 'close']] /= ratio
                 dataset.price_data[ticker].loc[mask, 'volume'] *= ratio
                 
             elif action['type'] == 'dividend':
-                # Ajustar por dividendos si es necesario
+                # Adjust for dividends if needed
                 div_amount = action['amount']
                 date = action['date']
                 
-                # Algunos backtests ajustan, otros no
-                # Depende de tu estrategia
+                # Some backtests adjust, others don't
+                # Depends on your strategy
 ```
 
 ## Survivorship Bias
 
 ```python
 def create_survivorship_bias_free_dataset(start_date, end_date):
-    """Incluir empresas que quebraron o fueron delistadas"""
+    """Include companies that went bankrupt or were delisted"""
     
     dataset = BacktestDataset()
     
-    # Obtener lista histórica de tickers
+    # Get historical list of tickers
     historical_universe = get_historical_constituents('Russell3000', start_date)
     
     for ticker in historical_universe:
         try:
             data = fetch_data(ticker, start_date, end_date)
             
-            # Marcar si fue delistado
+            # Mark if delisted
             if ticker in get_delisted_tickers():
                 data['is_delisted'] = True
                 data['delisting_date'] = get_delisting_date(ticker)
@@ -294,11 +296,11 @@ def create_survivorship_bias_free_dataset(start_date, end_date):
             dataset.add_ticker(ticker, data)
             
         except DataNotAvailable:
-            # Importante: incluir incluso si no hay data completa
+            # Important: include even if data is incomplete
             print(f"Warning: Limited data for {ticker}")
 ```
 
-## Optimización para Velocidad
+## Optimization for Speed
 
 ```python
 class OptimizedBacktestData:
@@ -307,8 +309,8 @@ class OptimizedBacktestData:
         self._create_indexes()
         
     def _create_indexes(self):
-        """Pre-calcular índices para lookups rápidos"""
-        # Crear MultiIndex para acceso rápido
+        """Pre-calculate indexes for fast lookups"""
+        # Create MultiIndex for fast access
         all_data = []
         
         for ticker, df in self.dataset.price_data.items():
@@ -318,62 +320,62 @@ class OptimizedBacktestData:
         self.combined_df = pd.concat(all_data)
         self.combined_df.set_index(['ticker', self.combined_df.index], inplace=True)
         
-        # Pre-calcular universos por fecha
+        # Pre-calculate universes by date
         self.daily_universes = {}
         for date in self.combined_df.index.get_level_values(1).unique():
             self.daily_universes[date] = self.dataset.get_universe(date)
     
     def get_bar(self, ticker, date):
-        """Acceso ultra-rápido a una barra"""
+        """Ultra-fast access to a bar"""
         return self.combined_df.loc[(ticker, date)]
     
     def get_multiple_bars(self, tickers, date):
-        """Obtener múltiples tickers eficientemente"""
+        """Get multiple tickers efficiently"""
         return self.combined_df.loc[(tickers, date)]
 ```
 
-## Validación Final del Dataset
+## Final Dataset Validation
 
 ```python
 def validate_backtest_dataset(dataset):
-    """Validaciones cruciales antes de backtest"""
+    """Crucial validations before backtest"""
     
     issues = []
     
-    # 1. Verificar look-ahead bias
+    # 1. Check for look-ahead bias
     for ticker, data in dataset.price_data.items():
-        # Buscar indicadores que usan datos futuros
+        # Look for indicators that use future data
         for col in data.columns:
             if 'shift(-' in str(data[col]):
                 issues.append(f"Possible look-ahead bias in {ticker}:{col}")
     
-    # 2. Verificar consistencia temporal
+    # 2. Check temporal consistency
     dates = set()
     for ticker, data in dataset.price_data.items():
         dates.update(data.index)
     
-    # Todos los tickers deben tener fechas similares
+    # All tickers should have similar dates
     date_coverage = {}
     for ticker, data in dataset.price_data.items():
         coverage = len(data) / len(dates)
-        if coverage < 0.8:  # Menos del 80% de cobertura
+        if coverage < 0.8:  # Less than 80% coverage
             issues.append(f"{ticker} has only {coverage:.1%} date coverage")
     
-    # 3. Verificar datos extremos
+    # 3. Check for extreme data
     for ticker, data in dataset.price_data.items():
         returns = data['close'].pct_change()
-        if (returns > 5).any():  # +500% en un día
+        if (returns > 5).any():  # +500% in a single day
             issues.append(f"{ticker} has suspicious returns > 500%")
     
     return issues
 ```
 
-## Mi Setup Personal
+## My Personal Setup
 
 ```python
 # create_my_dataset.py
 def create_my_trading_dataset():
-    # Configuración base
+    # Base configuration
     config = {
         'start_date': '2022-01-01',
         'end_date': '2024-01-01',
@@ -383,19 +385,19 @@ def create_my_trading_dataset():
         'max_price': 50
     }
     
-    # Crear datasets para cada estrategia
+    # Create datasets for each strategy
     datasets = {
         'gap_trading': create_gap_trading_dataset(**config),
         'vwap_bounce': create_mean_reversion_dataset(**config),
         'momentum': create_momentum_dataset(**config)
     }
     
-    # Enriquecer con fundamentales
+    # Enrich with fundamentals
     for name, dataset in datasets.items():
         enrich_with_fundamentals(dataset)
         handle_corporate_actions(dataset)
     
-    # Optimizar para velocidad
+    # Optimize for speed
     optimized = {
         name: OptimizedBacktestData(dataset) 
         for name, dataset in datasets.items()
@@ -404,6 +406,6 @@ def create_my_trading_dataset():
     return optimized
 ```
 
-## Siguiente Paso
+## Next Step
 
-Con datasets robustos listos, pasemos a los [Indicadores Técnicos](../indicators/vwap.md) específicos para small caps.
+With robust datasets ready, let's move on to the [Technical Indicators](../indicators/vwap.md) specific to small caps.

@@ -1,36 +1,38 @@
+> 🇪🇸 [Leer en Español](first_green_red_day.es.md) | 🇺🇸 **English**
+
 # First Green Day & First Red Day Patterns
 
-## Concepto Base
+## Core Concept
 
-Las estrategias First Green Day y First Red Day se basan en los cambios de momentum direccional después de tendencias sostenidas. Estas reversiones suelen marcar puntos de inflexión importantes en small caps debido a la psicología retail y el flujo institucional.
+The First Green Day and First Red Day strategies are based on directional momentum shifts after sustained trends. These reversals often mark important inflection points in small caps due to retail psychology and institutional flow.
 
 ## First Green Day Strategy
 
-### Fundamentos
-Después de una serie de días rojos consecutivos, el primer día verde suele atraer buying interest renovado, especialmente si viene acompañado de volumen.
+### Fundamentals
+After a series of consecutive red days, the first green day tends to attract renewed buying interest, especially when accompanied by volume.
 
 ```python
 class FirstGreenDayPattern:
     def __init__(self):
         self.pattern_type = "trend_reversal"
         self.min_red_days = 3
-        self.max_red_days = 8  # Más de 8 días puede indicar problemas fundamentales
+        self.max_red_days = 8  # More than 8 days may indicate fundamental issues
         
     def identify_pattern(self, price_history):
-        """Identificar patrón de First Green Day"""
+        """Identify First Green Day pattern"""
         
-        # Verificar días rojos consecutivos
+        # Check consecutive red days
         consecutive_red = self.count_consecutive_red_days(price_history)
         
         if not (self.min_red_days <= consecutive_red <= self.max_red_days):
             return None
         
-        # Verificar que hoy sea green
+        # Verify today is green
         today = price_history.iloc[-1]
         if today['close'] <= today['open']:
             return None
         
-        # Calcular métricas del patrón
+        # Calculate pattern metrics
         pattern_metrics = self.calculate_pattern_metrics(price_history, consecutive_red)
         
         return {
@@ -42,14 +44,14 @@ class FirstGreenDayPattern:
         }
     
     def calculate_pattern_metrics(self, price_history, red_days):
-        """Calcular métricas del patrón"""
+        """Calculate pattern metrics"""
         
-        # Decline magnitude durante red days
+        # Decline magnitude during red days
         start_price = price_history.iloc[-(red_days + 1)]['close']
         low_price = price_history.tail(red_days)['low'].min()
         total_decline = (start_price - low_price) / start_price
         
-        # Volume durante decline vs recovery
+        # Volume during decline vs recovery
         decline_avg_volume = price_history.tail(red_days)['volume'].mean()
         today_volume = price_history.iloc[-1]['volume']
         volume_ratio = today_volume / decline_avg_volume if decline_avg_volume > 0 else 1
@@ -79,7 +81,7 @@ class FirstGreenDayPattern:
         }
 
 def count_consecutive_red_days(price_data):
-    """Contar días rojos consecutivos"""
+    """Count consecutive red days"""
     consecutive = 0
     
     for i in range(len(price_data) - 2, -1, -1):  # Start from yesterday
@@ -104,13 +106,13 @@ class FirstGreenDayEntry:
         }
     
     def calculate_entry_plan(self, stock_data, pattern_data):
-        """Calcular plan de entrada"""
+        """Calculate entry plan"""
         
         strategy_func = self.entry_strategies.get(self.risk_tolerance, self.conservative_entry)
         return strategy_func(stock_data, pattern_data)
     
     def conservative_entry(self, stock_data, pattern_data):
-        """Entrada conservadora - esperar confirmación"""
+        """Conservative entry - wait for confirmation"""
         
         current_price = stock_data.price
         today_open = stock_data.open
@@ -143,7 +145,7 @@ class FirstGreenDayEntry:
         }
     
     def aggressive_entry(self, stock_data, pattern_data):
-        """Entrada agresiva - temprano en el momentum"""
+        """Aggressive entry - early in the momentum"""
         
         current_price = stock_data.price
         today_open = stock_data.open
@@ -176,8 +178,8 @@ class FirstGreenDayEntry:
 
 ## First Red Day Strategy (Short Bias)
 
-### Fundamentos
-Después de una serie de días verdes consecutivos, el primer día rojo suele indicar que el momentum alcista se está agotando y puede ser el inicio de una corrección.
+### Fundamentals
+After a series of consecutive green days, the first red day usually indicates that bullish momentum is fading and may mark the beginning of a correction.
 
 ```python
 class FirstRedDayPattern:
@@ -187,19 +189,19 @@ class FirstRedDayPattern:
         self.max_green_days = 10
         
     def identify_short_setup(self, price_history):
-        """Identificar setup para short en First Red Day"""
+        """Identify short setup on First Red Day"""
         
         consecutive_green = self.count_consecutive_green_days(price_history)
         
         if not (self.min_green_days <= consecutive_green <= self.max_green_days):
             return None
         
-        # Verificar que hoy sea red day
+        # Verify today is a red day
         today = price_history.iloc[-1]
         if today['close'] >= today['open']:
             return None
         
-        # Analizar calidad del setup
+        # Analyze setup quality
         setup_analysis = self.analyze_short_setup_quality(price_history, consecutive_green)
         
         return {
@@ -212,14 +214,14 @@ class FirstRedDayPattern:
         }
     
     def analyze_short_setup_quality(self, price_history, green_days):
-        """Analizar calidad para short setup"""
+        """Analyze quality for short setup"""
         
-        # Extensión del rally
+        # Rally extension
         rally_start = price_history.iloc[-(green_days + 1)]['close']
         rally_high = price_history.tail(green_days)['high'].max()
         rally_magnitude = (rally_high - rally_start) / rally_start
         
-        # Volume analysis durante rally
+        # Volume analysis during rally
         rally_volume = price_history.tail(green_days)['volume'].mean()
         today_volume = price_history.iloc[-1]['volume']
         volume_ratio = today_volume / rally_volume if rally_volume > 0 else 1
@@ -257,16 +259,16 @@ class FirstRedDayPattern:
         }
     
     def detect_distribution_signs(self, recent_data):
-        """Detectar signos de distribución"""
+        """Detect distribution signs"""
         score = 0
         
-        # Lower highs en días recientes
+        # Lower highs in recent days
         highs = recent_data['high'].values
         if len(highs) >= 3:
             if highs[-1] < highs[-2] < highs[-3]:
                 score += 30
         
-        # Volume en red days vs green days
+        # Volume on red days vs green days
         green_days = recent_data[recent_data['close'] > recent_data['open']]
         red_days = recent_data[recent_data['close'] < recent_data['open']]
         
@@ -284,7 +286,7 @@ class FirstRedDayPattern:
         return score
 
 def count_consecutive_green_days(price_data):
-    """Contar días verdes consecutivos"""
+    """Count consecutive green days"""
     consecutive = 0
     
     for i in range(len(price_data) - 2, -1, -1):  # Start from yesterday
@@ -308,9 +310,9 @@ class FirstRedDayShortEntry:
         }
     
     def calculate_short_entry_plan(self, stock_data, pattern_data):
-        """Calcular plan de entrada para short"""
+        """Calculate short entry plan"""
         
-        # Determinar mejor estrategia basada en price action
+        # Determine best strategy based on price action
         if stock_data.gap_percent < -0.03:  # Gap down >3%
             strategy = 'gap_down'
         elif stock_data.price < stock_data.previous_support:
@@ -321,7 +323,7 @@ class FirstRedDayShortEntry:
         return self.short_strategies[strategy](stock_data, pattern_data)
     
     def gap_down_entry(self, stock_data, pattern_data):
-        """Short en gap down después de rally"""
+        """Short on gap down after rally"""
         
         gap_size = abs(stock_data.gap_percent)
         premarket_high = stock_data.premarket_high
@@ -356,7 +358,7 @@ class FirstRedDayShortEntry:
         }
     
     def breakdown_entry(self, stock_data, pattern_data):
-        """Short en breakdown de soporte"""
+        """Short on support breakdown"""
         
         support_level = stock_data.support_level
         
@@ -381,9 +383,9 @@ class FirstRedDayShortEntry:
         }
 ```
 
-## Risk Management Específico
+## Pattern-Specific Risk Management
 
-### Position Sizing Dinámico
+### Dynamic Position Sizing
 ```python
 class PatternPositionSizer:
     def __init__(self, account_size, base_risk=0.015):
@@ -391,7 +393,7 @@ class PatternPositionSizer:
         self.base_risk = base_risk
         
     def calculate_pattern_position_size(self, stock_data, pattern_data, entry_plan):
-        """Calcular tamaño basado en patrón específico"""
+        """Calculate size based on specific pattern"""
         
         # Base risk amount
         base_risk_amount = self.account_size * self.base_risk
@@ -422,7 +424,7 @@ class PatternPositionSizer:
         }
     
     def get_pattern_adjustments(self, pattern_data):
-        """Ajustes específicos del patrón"""
+        """Pattern-specific adjustments"""
         
         base_multiplier = 1.0
         
@@ -456,7 +458,7 @@ class PatternTimeManager:
         }
     
     def green_day_time_rules(self, entry_time, current_time, pnl):
-        """Reglas de tiempo para First Green Day"""
+        """Time rules for First Green Day"""
         
         time_in_trade = (current_time - entry_time).seconds / 60  # minutes
         
@@ -489,7 +491,7 @@ class PatternTimeManager:
         return rules
     
     def red_day_time_rules(self, entry_time, current_time, pnl):
-        """Reglas de tiempo para First Red Day shorts"""
+        """Time rules for First Red Day shorts"""
         
         time_in_trade = (current_time - entry_time).seconds / 60
         
@@ -523,7 +525,7 @@ class PatternPerformanceAnalyzer:
         self.pattern_metrics = {}
         
     def analyze_pattern_performance(self, trades_df, pattern_type):
-        """Analizar performance específica del patrón"""
+        """Analyze pattern-specific performance"""
         
         pattern_trades = trades_df[trades_df['pattern_type'] == pattern_type]
         
@@ -554,7 +556,7 @@ class PatternPerformanceAnalyzer:
         }
     
     def analyze_green_day_performance(self, green_trades):
-        """Análisis específico para First Green Day"""
+        """First Green Day specific analysis"""
         
         # Performance by consecutive red days
         red_days_performance = green_trades.groupby('consecutive_red_days')['pnl'].agg(['mean', 'count', 'sum'])
@@ -574,4 +576,4 @@ class PatternPerformanceAnalyzer:
         }
 ```
 
-Esta documentación proporciona un framework completo para implementar estrategias First Green Day y First Red Day, con énfasis en la gestión de riesgo y análisis de performance específico para cada patrón.
+This documentation provides a complete framework for implementing First Green Day and First Red Day strategies, with emphasis on risk management and pattern-specific performance analysis.

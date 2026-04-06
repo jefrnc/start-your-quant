@@ -1,36 +1,38 @@
-# Integración con Brokers
+> 🇪🇸 [Leer en Español](broker_integration.es.md) | 🇺🇸 **English**
 
-Comparativa de brokers recomendados para trading cuantitativo y sus casos de uso específicos.
+# Broker Integration
 
-## 📊 Comparativa de Brokers
+Comparison of recommended brokers for quantitative trading and their specific use cases.
 
-| Broker | Mejor Para | API Quality | Comisiones | Data Quality |
-|--------|------------|-------------|------------|--------------|
-| **IBKR** | All-around, institucional | ⭐⭐⭐⭐⭐ | Muy bajas | ⭐⭐⭐⭐⭐ |
-| **Alpaca** | Desarrollo, algoritmos | ⭐⭐⭐⭐⭐ | Sin comisiones | ⭐⭐⭐⭐ |
-| **Charles Schwab** | Retail, 401k | ⭐⭐⭐ | Sin comisiones | ⭐⭐⭐⭐ |
-| **TD Ameritrade** | Retail avanzado | ⭐⭐⭐⭐ | Sin comisiones | ⭐⭐⭐⭐ |
+## Broker Comparison
 
-## 💻 Plataformas de Trading
+| Broker | Best For | API Quality | Commissions | Data Quality |
+|--------|----------|-------------|-------------|--------------|
+| **IBKR** | All-around, institutional | ⭐⭐⭐⭐⭐ | Very low | ⭐⭐⭐⭐⭐ |
+| **Alpaca** | Development, algorithms | ⭐⭐⭐⭐⭐ | Commission-free | ⭐⭐⭐⭐ |
+| **Charles Schwab** | Retail, 401k | ⭐⭐⭐ | Commission-free | ⭐⭐⭐⭐ |
+| **TD Ameritrade** | Advanced retail | ⭐⭐⭐⭐ | Commission-free | ⭐⭐⭐⭐ |
 
-| Plataforma | Compatible con | Mejor Para | Características Clave |
-|------------|----------------|------------|----------------------|
-| **DAS Trader Pro** | Charles Schwab, Zimtra, otros | Day trading, small caps | Level 2, routing avanzado, hotkeys |
-| **TWS (IBKR)** | Interactive Brokers | Trading institucional | API robusta, datos globales |
-| **Think or Swim** | TD Ameritrade | Análisis técnico | Charting avanzado, paper trading |
-| **Webull Desktop** | Webull | Trading retail | Gratis, análisis básico |
+## Trading Platforms
 
-## Interactive Brokers (IBKR) - Recomendado Principal
+| Platform | Compatible With | Best For | Key Features |
+|----------|----------------|----------|--------------|
+| **DAS Trader Pro** | Charles Schwab, Zimtra, others | Day trading, small caps | Level 2, advanced routing, hotkeys |
+| **TWS (IBKR)** | Interactive Brokers | Institutional trading | Robust API, global data |
+| **Think or Swim** | TD Ameritrade | Technical analysis | Advanced charting, paper trading |
+| **Webull Desktop** | Webull | Retail trading | Free, basic analysis |
 
-### Ventajas de IBKR
-- **Comisiones bajas**: $0.005 por acción, mínimo $1 por trade
-- **API robusta**: TWS API con múltiples lenguajes
-- **Datos en tiempo real**: Level 1 y Level 2 market data
-- **Short selling**: Amplio inventario para locates
+## Interactive Brokers (IBKR) - Primary Recommendation
+
+### IBKR Advantages
+- **Low commissions**: $0.005 per share, $1 minimum per trade
+- **Robust API**: TWS API with multiple language support
+- **Real-time data**: Level 1 and Level 2 market data
+- **Short selling**: Large inventory for locates
 - **Margin requirements**: Competitive margin rates
-- **Global access**: Acceso a múltiples mercados
+- **Global access**: Access to multiple markets
 
-### Setup de TWS (Trader Workstation)
+### TWS (Trader Workstation) Setup
 
 ```python
 # config/ibkr_setup.py
@@ -47,25 +49,25 @@ class IBKRConnection:
         self.connected = False
         
     def connect(self):
-        """Conectar a TWS"""
+        """Connect to TWS"""
         try:
             self.ib.connect(self.host, self.port, clientId=self.client_id)
             self.connected = True
-            logging.info(f"✅ Conectado a IBKR TWS en {self.host}:{self.port}")
+            logging.info(f"Connected to IBKR TWS at {self.host}:{self.port}")
             return True
         except Exception as e:
-            logging.error(f"❌ Error conectando a IBKR: {e}")
+            logging.error(f"Error connecting to IBKR: {e}")
             return False
     
     def disconnect(self):
-        """Desconectar de TWS"""
+        """Disconnect from TWS"""
         if self.connected:
             self.ib.disconnect()
             self.connected = False
-            logging.info("🔌 Desconectado de IBKR TWS")
+            logging.info("Disconnected from IBKR TWS")
     
     def get_account_info(self):
-        """Obtener información de cuenta"""
+        """Get account information"""
         if not self.connected:
             return None
             
@@ -82,7 +84,7 @@ class IBKRConnection:
         }
     
     def get_buying_power(self):
-        """Obtener buying power disponible"""
+        """Get available buying power"""
         account_values = self.ib.accountValues()
         for item in account_values:
             if item.tag == 'BuyingPower':
@@ -90,7 +92,7 @@ class IBKRConnection:
         return 0
     
     def get_total_liquidity(self):
-        """Obtener liquidez total"""
+        """Get total liquidity"""
         account_values = self.ib.accountValues()
         for item in account_values:
             if item.tag == 'TotalCashValue':
@@ -98,11 +100,11 @@ class IBKRConnection:
         return 0
     
     def get_market_data(self, symbol, exchange='SMART'):
-        """Obtener market data en tiempo real"""
+        """Get real-time market data"""
         contract = Stock(symbol, exchange)
         self.ib.reqMktData(contract)
         
-        # Esperar a que lleguen los datos
+        # Wait for data to arrive
         self.ib.sleep(2)
         
         ticker = self.ib.ticker(contract)
@@ -118,7 +120,7 @@ class IBKRConnection:
         }
     
     def place_market_order(self, symbol, quantity, action='BUY'):
-        """Colocar orden de mercado"""
+        """Place a market order"""
         contract = Stock(symbol, 'SMART')
         order = MarketOrder(action, abs(quantity))
         
@@ -131,7 +133,7 @@ class IBKRConnection:
         }
     
     def place_limit_order(self, symbol, quantity, price, action='BUY'):
-        """Colocar orden límite"""
+        """Place a limit order"""
         contract = Stock(symbol, 'SMART')
         order = LimitOrder(action, abs(quantity), price)
         
@@ -144,16 +146,16 @@ class IBKRConnection:
         }
     
     def cancel_order(self, order_id):
-        """Cancelar orden"""
+        """Cancel an order"""
         try:
             self.ib.cancelOrder(order_id)
             return True
         except Exception as e:
-            logging.error(f"Error cancelando orden {order_id}: {e}")
+            logging.error(f"Error cancelling order {order_id}: {e}")
             return False
     
     def get_historical_data(self, symbol, duration='1 Y', bar_size='1 day'):
-        """Obtener datos históricos"""
+        """Get historical data"""
         contract = Stock(symbol, 'SMART')
         
         bars = self.ib.reqHistoricalData(
@@ -165,7 +167,7 @@ class IBKRConnection:
             useRTH=True
         )
         
-        # Convertir a DataFrame
+        # Convert to DataFrame
         if bars:
             df = pd.DataFrame([{
                 'date': bar.date,
@@ -181,23 +183,23 @@ class IBKRConnection:
         else:
             return pd.DataFrame()  # Return empty DataFrame if no data
 
-# Ejemplo de uso
+# Usage example
 def test_ibkr_connection():
-    """Test de conexión IBKR"""
+    """IBKR connection test"""
     ibkr = IBKRConnection()
     
     if ibkr.connect():
         # Test account info
         account_info = ibkr.get_account_info()
-        print(f"💰 Buying Power: ${account_info['buying_power']:,.2f}")
+        print(f"Buying Power: ${account_info['buying_power']:,.2f}")
         
         # Test market data
         spy_data = ibkr.get_market_data('SPY')
-        print(f"📊 SPY: Bid={spy_data['bid']}, Ask={spy_data['ask']}")
+        print(f"SPY: Bid={spy_data['bid']}, Ask={spy_data['ask']}")
         
         # Test historical data
         historical = ibkr.get_historical_data('SPY', '1 M', '1 hour')
-        print(f"📈 Historical data: {len(historical)} bars")
+        print(f"Historical data: {len(historical)} bars")
         
         ibkr.disconnect()
         return True
@@ -205,29 +207,29 @@ def test_ibkr_connection():
     return False
 ```
 
-## DAS Trader Pro - Plataforma para Day Trading
+## DAS Trader Pro - Day Trading Platform
 
-> **🔥 Nuevo:** Integración disponible a través del [das-bridge](https://github.com/jefrnc/das-bridge)
+> **New:** Integration available through the [das-bridge](https://github.com/jefrnc/das-bridge)
 
-**Nota importante:** DAS Trader Pro es una **plataforma de trading**, no un broker. Se conecta a brokers como Charles Schwab, Zimtra, Lightspeed, y otros que ofrecen compatibilidad con DAS.
+**Important note:** DAS Trader Pro is a **trading platform**, not a broker. It connects to brokers like Charles Schwab, Zimtra, Lightspeed, and others that offer DAS compatibility.
 
-### ¿Por Qué Usar DAS como Plataforma?
-- **Borrows amplios** para short selling de small caps
-- **Routing avanzado** (ARCA, EDGX, BATS) para mejor fill
-- **Level 2 premium** con Times & Sales profundo
-- **Hotkeys configurables** para ejecución ultra-rápida
-- **Comunidad activa** de day traders profesionales
+### Why Use DAS as a Platform?
+- **Extensive borrows** for short selling small caps
+- **Advanced routing** (ARCA, EDGX, BATS) for better fills
+- **Premium Level 2** with deep Times & Sales
+- **Configurable hotkeys** for ultra-fast execution
+- **Active community** of professional day traders
 
-### Casos de Uso Ideales
-- Day trading agresivo en small caps
-- Short selling de pump & dumps
-- Scalping con volumen alto
-- Trading con buying power 4:1 o 6:1
+### Ideal Use Cases
+- Aggressive day trading in small caps
+- Short selling pump & dumps
+- High-volume scalping
+- Trading with 4:1 or 6:1 buying power
 
-### Setup Básico DAS Bridge
+### Basic DAS Bridge Setup
 
 ```bash
-# Instalar el bridge
+# Install the bridge
 git clone https://github.com/jefrnc/das-bridge.git
 cd das-bridge
 pip install -r requirements.txt
@@ -244,19 +246,19 @@ DAS_CONFIG = {
     'username': os.getenv('DAS_USERNAME'),
     'password': os.getenv('DAS_PASSWORD'),
     'account': os.getenv('DAS_ACCOUNT'),
-    'paper_trading': True  # Cambiar a False para live trading
+    'paper_trading': True  # Change to False for live trading
 }
 
-# Límites de riesgo específicos para DAS
+# DAS-specific risk limits
 DAS_RISK_LIMITS = {
-    'max_position_size': 10000,      # $10k máximo por posición
-    'max_daily_loss': 1000,          # $1k pérdida máxima diaria
-    'max_buying_power_usage': 0.8,   # 80% del buying power máximo
-    'max_trades_per_minute': 5       # Límite de velocidad
+    'max_position_size': 10000,      # $10k max per position
+    'max_daily_loss': 1000,          # $1k max daily loss
+    'max_buying_power_usage': 0.8,   # 80% max buying power usage
+    'max_trades_per_minute': 5       # Rate limit
 }
 ```
 
-### Ejemplo de Integración
+### Integration Example
 
 ```python
 # examples/das_trading_basic.py
@@ -264,29 +266,29 @@ import asyncio
 from das_trader import DASTraderClient
 
 async def das_example():
-    """Ejemplo básico con DAS"""
+    """Basic DAS example"""
     
     client = DASTraderClient(host="localhost", port=9910)
     
     try:
-        # Conectar
-        success = await client.connect("usuario", "password", "cuenta")
+        # Connect
+        success = await client.connect("username", "password", "account")
         if not success:
-            print("❌ Error conectando a DAS")
+            print("Error connecting to DAS")
             return
         
-        print("✅ Conectado a DAS Trader")
+        print("Connected to DAS Trader")
         
-        # Obtener buying power
+        # Get buying power
         bp = await client.get_buying_power()
-        print(f"💰 Buying Power: ${bp:,.2f}")
+        print(f"Buying Power: ${bp:,.2f}")
         
-        # Suscribirse a quote
+        # Subscribe to quote
         await client.subscribe_quote("AAPL")
         
-        # Ejemplo de orden (comentado para seguridad)
+        # Order example (commented out for safety)
         # order = await client.send_order("AAPL", "BUY", 100, "MARKET")
-        # print(f"📝 Orden enviada: {order.order_id}")
+        # print(f"Order sent: {order.order_id}")
         
     finally:
         await client.disconnect()
@@ -295,52 +297,52 @@ if __name__ == "__main__":
     asyncio.run(das_example())
 ```
 
-> **📖 Documentación completa:** Ver [DAS Trader Integration](das_trader_integration.md) para setup avanzado.
+> **Full documentation:** See [DAS Trader Integration](das_trader_integration.md) for advanced setup.
 
-### Configuración TWS
+### TWS Configuration
 
 ```python
 # scripts/setup_tws.py
 """
-Script para configurar TWS para API trading
+Script to configure TWS for API trading
 """
 
 TWS_CONFIGURATION = """
-⚙️  Configuración Manual de TWS:
+Manual TWS Configuration:
 
-1. 📥 Descargar TWS:
-   - Ir a https://www.interactivebrokers.com/en/trading/tws.php
-   - Descargar Trader Workstation
+1. Download TWS:
+   - Go to https://www.interactivebrokers.com/en/trading/tws.php
+   - Download Trader Workstation
 
-2. 🔧 Configurar API:
-   - Abrir TWS
-   - Ir a Configure → API → Settings
-   - ✅ Enable ActiveX and Socket Clients
-   - ✅ Read-Only API
+2. Configure API:
+   - Open TWS
+   - Go to Configure -> API -> Settings
+   - Enable ActiveX and Socket Clients
+   - Read-Only API
    - Socket port: 7497 (paper) / 7496 (live)
    - Master API client ID: 0
-   - ✅ Download open orders on connection
+   - Download open orders on connection
 
-3. 🔐 Configurar Paper Trading:
-   - Ir a Configure → API → Settings
-   - ✅ Enable API
-   - Puerto: 7497
-   - IP permitidas: 127.0.0.1
+3. Configure Paper Trading:
+   - Go to Configure -> API -> Settings
+   - Enable API
+   - Port: 7497
+   - Allowed IPs: 127.0.0.1
 
-4. ⚡ Market Data:
-   - Ir a Configure → Market Data Subscriptions
-   - Activar US Securities Snapshot and Futures Value Bundle (gratis)
-   - Para Level 2: US Equity and Options Add-On Streaming Bundle
+4. Market Data:
+   - Go to Configure -> Market Data Subscriptions
+   - Enable US Securities Snapshot and Futures Value Bundle (free)
+   - For Level 2: US Equity and Options Add-On Streaming Bundle
 
-5. 🚨 Configurar Alertas:
-   - Configure → Alerts
-   - ✅ Enable Popup alerts
-   - ✅ Email alerts (opcional)
+5. Configure Alerts:
+   - Configure -> Alerts
+   - Enable Popup alerts
+   - Email alerts (optional)
 
-⚠️  IMPORTANTE:
-- Usar Paper Trading account inicialmente
-- TWS debe estar abierto y conectado para usar API
-- Verificar que el puerto esté correcto (7497 paper / 7496 live)
+IMPORTANT:
+- Use Paper Trading account initially
+- TWS must be open and connected to use the API
+- Verify the port is correct (7497 paper / 7496 live)
 """
 
 print(TWS_CONFIGURATION)
@@ -348,14 +350,14 @@ print(TWS_CONFIGURATION)
 
 ## Alpaca - Alternative Broker
 
-### Ventajas de Alpaca
-- **Commission-free**: Sin comisiones en stocks
-- **API-first**: Diseñado para trading algorítmico
-- **Paper trading**: Sandbox environment robusto
-- **Modern REST API**: Fácil de usar
+### Alpaca Advantages
+- **Commission-free**: No commissions on stocks
+- **API-first**: Designed for algorithmic trading
+- **Paper trading**: Robust sandbox environment
+- **Modern REST API**: Easy to use
 - **Real-time data**: WebSocket feeds
 
-### Setup Alpaca
+### Alpaca Setup
 
 ```python
 # config/alpaca_setup.py
@@ -369,7 +371,7 @@ class AlpacaConnection:
         self.base_url = base_url
         
     def get_account(self):
-        """Obtener información de cuenta"""
+        """Get account information"""
         account = self.api.get_account()
         
         return {
@@ -383,7 +385,7 @@ class AlpacaConnection:
         }
     
     def get_positions(self):
-        """Obtener posiciones actuales"""
+        """Get current positions"""
         positions = self.api.list_positions()
         
         position_data = []
@@ -402,7 +404,7 @@ class AlpacaConnection:
         return position_data
     
     def get_orders(self, status='all', limit=100):
-        """Obtener órdenes"""
+        """Get orders"""
         orders = self.api.list_orders(status=status, limit=limit)
         
         order_data = []
@@ -425,7 +427,7 @@ class AlpacaConnection:
     
     def place_order(self, symbol, qty, side, order_type='market', 
                    limit_price=None, stop_price=None, time_in_force='day'):
-        """Colocar orden"""
+        """Place an order"""
         
         order_params = {
             'symbol': symbol,
@@ -460,22 +462,22 @@ class AlpacaConnection:
             }
     
     def cancel_order(self, order_id):
-        """Cancelar orden"""
+        """Cancel an order"""
         try:
             self.api.cancel_order(order_id)
             return True
         except Exception as e:
-            print(f"Error cancelando orden: {e}")
+            print(f"Error cancelling order: {e}")
             return False
     
     def get_historical_data(self, symbol, timeframe='1Day', start=None, end=None):
-        """Obtener datos históricos"""
+        """Get historical data"""
         if not start:
             start = datetime.now() - timedelta(days=365)
         if not end:
             end = datetime.now()
         
-        # Convertir a formato Alpaca
+        # Convert to Alpaca format
         start_str = start.strftime('%Y-%m-%d')
         end_str = end.strftime('%Y-%m-%d')
         
@@ -487,7 +489,7 @@ class AlpacaConnection:
             adjustment='raw'
         )
         
-        # Convertir a DataFrame
+        # Convert to DataFrame
         data = []
         for bar in barset:
             data.append({
@@ -504,7 +506,7 @@ class AlpacaConnection:
         return df
     
     def get_quote(self, symbol):
-        """Obtener quote actual"""
+        """Get current quote"""
         try:
             quote = self.api.get_latest_quote(symbol)
             return {
@@ -516,16 +518,16 @@ class AlpacaConnection:
                 'timestamp': quote.timestamp
             }
         except Exception as e:
-            print(f"Error obteniendo quote para {symbol}: {e}")
+            print(f"Error getting quote for {symbol}: {e}")
             return None
 
-# Test de conexión Alpaca
+# Alpaca connection test
 def test_alpaca_connection():
-    """Test de conexión Alpaca"""
+    """Alpaca connection test"""
     from config.api_keys import APIKeys
     
     if not APIKeys.ALPACA_API_KEY or not APIKeys.ALPACA_SECRET_KEY:
-        print("❌ API Keys de Alpaca no configuradas")
+        print("Alpaca API Keys not configured")
         return False
     
     alpaca = AlpacaConnection(
@@ -537,29 +539,29 @@ def test_alpaca_connection():
     try:
         # Test account
         account = alpaca.get_account()
-        print(f"✅ Cuenta Alpaca conectada")
-        print(f"💰 Buying Power: ${account['buying_power']:,.2f}")
-        print(f"📊 Portfolio Value: ${account['portfolio_value']:,.2f}")
+        print(f"Alpaca account connected")
+        print(f"Buying Power: ${account['buying_power']:,.2f}")
+        print(f"Portfolio Value: ${account['portfolio_value']:,.2f}")
         
         # Test quote
         quote = alpaca.get_quote('SPY')
         if quote:
-            print(f"📈 SPY Quote: ${quote['bid']} x ${quote['ask']}")
+            print(f"SPY Quote: ${quote['bid']} x ${quote['ask']}")
         
         # Test historical data
         historical = alpaca.get_historical_data('SPY', '1Day')
-        print(f"📊 Historical data: {len(historical)} days")
+        print(f"Historical data: {len(historical)} days")
         
         return True
         
     except Exception as e:
-        print(f"❌ Error en conexión Alpaca: {e}")
+        print(f"Error in Alpaca connection: {e}")
         return False
 ```
 
 ## TD Ameritrade - Backup Option
 
-### Setup TD Ameritrade
+### TD Ameritrade Setup
 
 ```python
 # config/td_setup.py
@@ -575,15 +577,15 @@ class TDAConnection:
         self.base_url = 'https://api.tdameritrade.com/v1'
         
     def authenticate(self):
-        """Autenticar con TD Ameritrade"""
+        """Authenticate with TD Ameritrade"""
         if self.refresh_token:
             return self._refresh_access_token()
         else:
-            print("⚠️  Necesitas configurar OAuth flow para TD Ameritrade")
+            print("You need to configure the OAuth flow for TD Ameritrade")
             return False
     
     def _refresh_access_token(self):
-        """Renovar access token"""
+        """Refresh the access token"""
         url = f"{self.base_url}/oauth2/token"
         
         data = {
@@ -599,11 +601,11 @@ class TDAConnection:
             self.access_token = token_data['access_token']
             return True
         else:
-            print(f"❌ Error renovando token: {response.status_code}")
+            print(f"Error refreshing token: {response.status_code}")
             return False
     
     def get_quote(self, symbol):
-        """Obtener quote"""
+        """Get quote"""
         if not self.access_token:
             return None
         
@@ -627,7 +629,7 @@ class TDAConnection:
     
     def get_historical_data(self, symbol, period_type='year', period=1, 
                           frequency_type='daily', frequency=1):
-        """Obtener datos históricos"""
+        """Get historical data"""
         if not self.access_token:
             return None
         
@@ -647,7 +649,7 @@ class TDAConnection:
             data = response.json()
             candles = data['candles']
             
-            # Convertir a DataFrame
+            # Convert to DataFrame
             df_data = []
             for candle in candles:
                 df_data.append({
@@ -678,7 +680,7 @@ from dataclasses import dataclass
 
 @dataclass
 class OrderRequest:
-    """Estructura de orden unificada"""
+    """Unified order structure"""
     symbol: str
     quantity: int
     side: str  # 'buy' or 'sell'
@@ -689,7 +691,7 @@ class OrderRequest:
 
 @dataclass
 class Position:
-    """Estructura de posición unificada"""
+    """Unified position structure"""
     symbol: str
     quantity: int
     avg_price: float
@@ -697,68 +699,68 @@ class Position:
     unrealized_pnl: float
 
 class BrokerInterface(ABC):
-    """Interface abstracta para brokers"""
+    """Abstract broker interface"""
     
     @abstractmethod
     def connect(self) -> bool:
-        """Conectar al broker"""
+        """Connect to the broker"""
         pass
     
     @abstractmethod
     def disconnect(self):
-        """Desconectar del broker"""
+        """Disconnect from the broker"""
         pass
     
     @abstractmethod
     def get_account_info(self) -> Dict:
-        """Obtener información de cuenta"""
+        """Get account information"""
         pass
     
     @abstractmethod
     def get_positions(self) -> List[Position]:
-        """Obtener posiciones actuales"""
+        """Get current positions"""
         pass
     
     @abstractmethod
     def place_order(self, order: OrderRequest) -> Dict:
-        """Colocar orden"""
+        """Place an order"""
         pass
     
     @abstractmethod
     def cancel_order(self, order_id: str) -> bool:
-        """Cancelar orden"""
+        """Cancel an order"""
         pass
     
     @abstractmethod
     def get_market_data(self, symbol: str) -> Dict:
-        """Obtener market data"""
+        """Get market data"""
         pass
 
 class UnifiedBroker:
-    """Broker unificado que maneja múltiples brokers"""
+    """Unified broker that manages multiple brokers"""
     
     def __init__(self):
         self.brokers = {}
         self.primary_broker = None
         
     def add_broker(self, name: str, broker: BrokerInterface, is_primary=False):
-        """Agregar broker"""
+        """Add a broker"""
         self.brokers[name] = broker
         if is_primary:
             self.primary_broker = name
     
     def execute_order(self, order: OrderRequest, broker_name=None):
-        """Ejecutar orden en broker específico o primario"""
+        """Execute order on a specific or primary broker"""
         broker_name = broker_name or self.primary_broker
         
         if broker_name not in self.brokers:
-            return {'success': False, 'error': f'Broker {broker_name} no encontrado'}
+            return {'success': False, 'error': f'Broker {broker_name} not found'}
         
         try:
             result = self.brokers[broker_name].place_order(order)
             return result
         except Exception as e:
-            # Fallback a otro broker si falla
+            # Fallback to another broker if it fails
             for backup_name, backup_broker in self.brokers.items():
                 if backup_name != broker_name:
                     try:
@@ -771,7 +773,7 @@ class UnifiedBroker:
             return {'success': False, 'error': str(e)}
     
     def get_consolidated_positions(self):
-        """Obtener posiciones consolidadas de todos los brokers"""
+        """Get consolidated positions from all brokers"""
         all_positions = {}
         
         for broker_name, broker in self.brokers.items():
@@ -779,9 +781,9 @@ class UnifiedBroker:
                 positions = broker.get_positions()
                 all_positions[broker_name] = positions
             except Exception as e:
-                print(f"Error obteniendo posiciones de {broker_name}: {e}")
+                print(f"Error getting positions from {broker_name}: {e}")
         
         return all_positions
 ```
 
-Esta infraestructura de brokers te permitirá comenzar con paper trading en IBKR o Alpaca, y luego expandir a trading real con múltiples brokers según tus necesidades.
+This broker infrastructure will allow you to start with paper trading on IBKR or Alpaca, and then expand to live trading with multiple brokers as your needs grow.

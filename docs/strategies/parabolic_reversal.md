@@ -1,12 +1,14 @@
+> 🇪🇸 [Leer en Español](parabolic_reversal.es.md) | 🇺🇸 **English**
+
 # Parabolic Reversal Strategy
 
-## Concepto Base
+## Core Concept
 
-La estrategia Parabolic Reversal se enfoca en identificar y capitalizar reversiones en stocks que han experimentado movimientos parabólicos extremos. Estos setups ofrecen algunas de las mejores oportunidades risk/reward cuando se ejecutan correctamente.
+The Parabolic Reversal strategy focuses on identifying and capitalizing on reversals in stocks that have experienced extreme parabolic moves. These setups offer some of the best risk/reward opportunities when executed correctly.
 
-## Anatomía de un Movimiento Parabólico
+## Anatomy of a Parabolic Move
 
-### Características de Movimientos Parabólicos
+### Characteristics of Parabolic Moves
 ```python
 class ParabolicMovementAnalyzer:
     def __init__(self):
@@ -18,7 +20,7 @@ class ParabolicMovementAnalyzer:
         }
         
     def identify_parabolic_move(self, price_data):
-        """Identificar si un stock está en movimiento parabólico"""
+        """Identify if a stock is in a parabolic move"""
         
         # Calculate move from base
         lookback_period = 30
@@ -57,7 +59,7 @@ class ParabolicMovementAnalyzer:
         }
     
     def calculate_acceleration(self, recent_data):
-        """Calcular score de aceleración del momentum"""
+        """Calculate momentum acceleration score"""
         
         daily_returns = recent_data['close'].pct_change().fillna(0)
         
@@ -78,7 +80,7 @@ class ParabolicMovementAnalyzer:
         return acceleration_score
     
     def analyze_volume_profile(self, volume_data):
-        """Analizar perfil de volumen durante movimiento parabólico"""
+        """Analyze volume profile during parabolic move"""
         
         early_volume = volume_data.head(7)['volume'].mean()
         middle_volume = volume_data.iloc[4:11]['volume'].mean()
@@ -106,7 +108,7 @@ class ParabolicMovementAnalyzer:
         return volume_pattern
     
     def detect_exhaustion_signals(self, price_data):
-        """Detectar señales de agotamiento"""
+        """Detect exhaustion signals"""
         
         signals = {}
         recent_data = price_data.tail(5)
@@ -145,7 +147,7 @@ class ParabolicMovementAnalyzer:
         return signals
 ```
 
-## Entry Strategies para Reversals
+## Entry Strategies for Reversals
 
 ### Long Setup (Bounce from Oversold)
 ```python
@@ -155,7 +157,7 @@ class ParabolicBounceStrategy:
         self.min_decline = 0.30  # 30% decline from high
         
     def identify_bounce_setup(self, stock_data, parabolic_data):
-        """Identificar setup para bounce después de crash parabólico"""
+        """Identify bounce setup after parabolic crash"""
         
         # Verify parabolic crash
         recent_high = stock_data.tail(10)['high'].max()
@@ -174,7 +176,7 @@ class ParabolicBounceStrategy:
         return None
     
     def detect_bounce_signals(self, stock_data):
-        """Detectar señales de bounce potencial"""
+        """Detect potential bounce signals"""
         
         signals = {}
         recent_data = stock_data.tail(5)
@@ -206,7 +208,7 @@ class ParabolicBounceStrategy:
         return signals
     
     def calculate_bounce_entry_levels(self, stock_data, signals):
-        """Calcular niveles de entrada para bounce"""
+        """Calculate entry levels for bounce"""
         
         current_price = stock_data.iloc[-1]['close']
         recent_low = stock_data.tail(5)['low'].min()
@@ -251,7 +253,7 @@ class ParabolicTopStrategy:
         self.min_exhaustion_score = 70
         
     def identify_top_setup(self, stock_data, parabolic_data):
-        """Identificar setup para short en top parabólico"""
+        """Identify short setup at parabolic top"""
         
         exhaustion_signals = parabolic_data['exhaustion_signals']
         
@@ -267,7 +269,7 @@ class ParabolicTopStrategy:
         return None
     
     def analyze_top_formation(self, stock_data):
-        """Analizar formación de top"""
+        """Analyze top formation"""
         
         recent_data = stock_data.tail(10)
         
@@ -303,7 +305,7 @@ class ParabolicTopStrategy:
         return analysis
     
     def calculate_short_entry_levels(self, stock_data, exhaustion_signals):
-        """Calcular niveles de entrada para short"""
+        """Calculate short entry levels"""
         
         current_price = stock_data.iloc[-1]['close']
         recent_high = stock_data.tail(5)['high'].max()
@@ -341,7 +343,7 @@ class ParabolicTopStrategy:
 
 ## Pattern Recognition System
 
-### Machine Learning para Pattern Detection
+### Machine Learning for Pattern Detection
 ```python
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
@@ -354,7 +356,7 @@ class ParabolicPatternRecognizer:
         self.is_trained = False
         
     def create_features(self, price_data):
-        """Crear features para ML pattern recognition"""
+        """Create features for ML pattern recognition"""
         
         features = {}
         
@@ -386,7 +388,7 @@ class ParabolicPatternRecognizer:
         return features
     
     def train_model(self, historical_data, labels):
-        """Entrenar modelo de reconocimiento de patrones"""
+        """Train pattern recognition model"""
         
         # Create feature matrix
         X = []
@@ -429,7 +431,7 @@ class ParabolicPatternRecognizer:
         }
     
     def predict_reversal_probability(self, current_data):
-        """Predecir probabilidad de reversal"""
+        """Predict reversal probability"""
         
         if not self.is_trained:
             raise ValueError("Model must be trained first")
@@ -453,9 +455,9 @@ class ParabolicPatternRecognizer:
         }
 ```
 
-## Risk Management Específico
+## Specific Risk Management
 
-### Gestión de Volatilidad Extrema
+### Extreme Volatility Management
 ```python
 class ParabolicRiskManager:
     def __init__(self, account_size):
@@ -463,7 +465,7 @@ class ParabolicRiskManager:
         self.max_parabolic_exposure = 0.10  # Max 10% in parabolic plays
         
     def calculate_parabolic_position_size(self, stock_data, strategy_type, confidence_score):
-        """Cálculo de position size para trades parabólicos"""
+        """Position size calculation for parabolic trades"""
         
         # Base risk is lower for parabolic trades due to volatility
         base_risk_pct = 0.015  # 1.5% base risk
@@ -499,7 +501,7 @@ class ParabolicRiskManager:
         }
     
     def manage_parabolic_stops(self, position, current_data, strategy_type):
-        """Gestión especializada de stops para trades parabólicos"""
+        """Specialized stop management for parabolic trades"""
         
         if strategy_type == 'parabolic_bounce':
             return self.manage_bounce_stops(position, current_data)
@@ -507,7 +509,7 @@ class ParabolicRiskManager:
             return self.manage_short_stops(position, current_data)
     
     def manage_bounce_stops(self, position, current_data):
-        """Stops para bounce trades"""
+        """Stops for bounce trades"""
         
         entry_price = position['entry_price']
         current_price = current_data['price']
@@ -528,7 +530,7 @@ class ParabolicRiskManager:
             return initial_stop
     
     def manage_short_stops(self, position, current_data):
-        """Stops para short trades en parabolic tops"""
+        """Stops for short trades on parabolic tops"""
         
         entry_price = position['entry_price']
         current_price = current_data['price']
@@ -560,7 +562,7 @@ class ParabolicBacktester:
         self.parabolic_recognizer = ParabolicPatternRecognizer()
         
     def run_parabolic_backtest(self, stock_universe):
-        """Ejecutar backtest específico para patrones parabólicos"""
+        """Run backtest specific to parabolic patterns"""
         
         results = {
             'bounce_trades': [],
@@ -581,7 +583,7 @@ class ParabolicBacktester:
         return results
     
     def backtest_symbol(self, symbol):
-        """Backtest para un símbolo específico"""
+        """Backtest for a specific symbol"""
         
         # Get historical data
         historical_data = self.get_historical_data(symbol, self.start_date, self.end_date)
@@ -627,7 +629,7 @@ class ParabolicBacktester:
         return symbol_results
     
     def analyze_parabolic_performance(self, results):
-        """Analizar performance específica de trades parabólicos"""
+        """Analyze parabolic trade performance"""
         
         bounce_df = pd.DataFrame(results['bounce_trades'])
         short_df = pd.DataFrame(results['short_trades'])
@@ -669,4 +671,4 @@ class ParabolicBacktester:
         return analysis
 ```
 
-La estrategia Parabolic Reversal requiere timing extremadamente preciso y gestión de riesgo agresiva, pero puede ofrecer algunas de las mejores oportunidades risk/reward en small cap trading cuando se ejecuta correctamente.
+The Parabolic Reversal strategy requires extremely precise timing and aggressive risk management, but can offer some of the best risk/reward opportunities in small cap trading when executed correctly.

@@ -1,16 +1,18 @@
-# Detección de Regímenes de Mercado
+> 🇪🇸 [Leer en Español](Regime-Detection.es.md) | 🇺🇸 **English**
 
-## ¿Por qué los Regímenes de Mercado Importan?
+# Market Regime Detection
 
-Los mercados no se comportan de manera constante. Alternan entre **regímenes distintos** donde las dinámicas de precio, volatilidad y correlaciones cambian dramáticamente. Una estrategia que funciona excelentemente en un régimen trending puede ser desastrosa en un régimen mean-reverting.
+## Why Do Market Regimes Matter?
 
-Para small caps, esto es especialmente crítico porque:
-- **Volatility clustering**: Períodos de alta/baja volatilidad se agrupan
-- **Correlation shifts**: Small caps se desacoplan/acoplan con el mercado
-- **Liquidity regimes**: Availability de liquidez varía dramáticamente
-- **Risk appetite cycles**: Institutional flows hacia/desde small caps
+Markets do not behave consistently. They alternate between **distinct regimes** where price dynamics, volatility, and correlations change dramatically. A strategy that works excellently in a trending regime can be disastrous in a mean-reverting regime.
 
-### Tipos de Regímenes Relevantes
+For small caps, this is especially critical because:
+- **Volatility clustering**: Periods of high/low volatility tend to cluster together
+- **Correlation shifts**: Small caps decouple/couple with the broader market
+- **Liquidity regimes**: Liquidity availability varies dramatically
+- **Risk appetite cycles**: Institutional flows into/out of small caps
+
+### Relevant Regime Types
 
 ```python
 REGIME_TYPES = {
@@ -22,15 +24,15 @@ REGIME_TYPES = {
 }
 ```
 
-## Framework de Detección de Regímenes
+## Regime Detection Framework
 
-### 1. Hidden Markov Models (HMM) - Enfoque Principal
+### 1. Hidden Markov Models (HMM) - Primary Approach
 
-Los HMM son ideales para regime detection porque:
-- Capturan states no observables del mercado
-- Permiten probabilistic transitions entre regímenes
-- Se adaptan automáticamente a cambios estructurales
-- Proporcionan confidence levels para cada regime
+HMMs are ideal for regime detection because:
+- They capture unobservable market states
+- They allow probabilistic transitions between regimes
+- They automatically adapt to structural changes
+- They provide confidence levels for each regime
 
 ```python
 import numpy as np
@@ -42,9 +44,9 @@ warnings.filterwarnings('ignore')
 
 class MarketRegimeDetector:
     """
-    Detector de regímenes usando Hidden Markov Models
+    Regime detector using Hidden Markov Models
 
-    Identifica regímenes basados en:
+    Identifies regimes based on:
     - Returns patterns
     - Volatility clustering
     - Volume characteristics
@@ -54,7 +56,7 @@ class MarketRegimeDetector:
     def __init__(self, n_regimes: int = 3):
         """
         Args:
-            n_regimes: Número de regímenes a detectar (típicamente 2-4)
+            n_regimes: Number of regimes to detect (typically 2-4)
         """
         self.n_regimes = n_regimes
         self.model = hmm.GaussianHMM(
@@ -69,13 +71,13 @@ class MarketRegimeDetector:
 
     def prepare_features(self, price_data: pd.DataFrame) -> pd.DataFrame:
         """
-        Prepara features para regime detection
+        Prepares features for regime detection
 
         Args:
-            price_data: DataFrame con OHLCV data
+            price_data: DataFrame with OHLCV data
 
         Returns:
-            DataFrame con features engineered
+            DataFrame with engineered features
         """
         features = pd.DataFrame(index=price_data.index)
 
@@ -108,7 +110,7 @@ class MarketRegimeDetector:
             (price_data['high'] - price_data['low'])
         )
 
-        # 6. Lag features para capture autocorrelations
+        # 6. Lag features to capture autocorrelations
         features['returns_lag1'] = features['returns'].shift(1)
         features['vol_lag1'] = features['realized_vol_5'].shift(1)
 
@@ -116,7 +118,7 @@ class MarketRegimeDetector:
 
     def fit(self, features: pd.DataFrame) -> 'MarketRegimeDetector':
         """
-        Fit HMM model a los features
+        Fit the HMM model to the features
         """
         # Normalize features
         features_scaled = self.scaler.fit_transform(features)
@@ -124,10 +126,10 @@ class MarketRegimeDetector:
         # Fit HMM
         self.model.fit(features_scaled)
 
-        # Predict regimes para labeling
+        # Predict regimes for labeling
         regimes = self.model.predict(features_scaled)
 
-        # Label regimes basado en características
+        # Label regimes based on characteristics
         self.regime_labels = self._label_regimes(features, regimes)
 
         self.is_fitted = True
@@ -135,7 +137,7 @@ class MarketRegimeDetector:
 
     def predict_regime(self, features: pd.DataFrame) -> Dict:
         """
-        Predice régimen actual y probabilidades
+        Predicts the current regime and probabilities
         """
         if not self.is_fitted:
             raise ValueError("Model must be fitted before prediction")
@@ -160,7 +162,7 @@ class MarketRegimeDetector:
 
     def _label_regimes(self, features: pd.DataFrame, regimes: np.array) -> Dict:
         """
-        Label regimes basado en sus características estadísticas
+        Label regimes based on their statistical characteristics
         """
         regime_stats = {}
 
@@ -198,7 +200,7 @@ class MarketRegimeDetector:
 
     def get_regime_history(self, features: pd.DataFrame) -> pd.DataFrame:
         """
-        Obtiene historical regimes para todo el dataset
+        Gets historical regimes for the entire dataset
         """
         features_scaled = self.scaler.transform(features)
         regimes = self.model.predict(features_scaled)
@@ -217,13 +219,13 @@ class MarketRegimeDetector:
         return result
 
 
-# Ejemplo de uso
+# Usage example
 def example_regime_detection():
     """
-    Ejemplo completo de regime detection para small caps
+    Complete regime detection example for small caps
     """
 
-    # 1. Load data (ejemplo con datos sintéticos)
+    # 1. Load data (example with synthetic data)
     dates = pd.date_range('2020-01-01', '2024-01-01', freq='D')
 
     # Simulate regime-changing data
@@ -239,7 +241,7 @@ def example_regime_detection():
 
     # Generate price data with regime-dependent characteristics
     returns = []
-    vol_base = [0.01, 0.02, 0.04]  # Volatility por regime
+    vol_base = [0.01, 0.02, 0.04]  # Volatility per regime
 
     for i, regime in enumerate(regimes_true):
         if i == 0:
@@ -297,8 +299,8 @@ if __name__ == "__main__":
 ```python
 class VolatilityRegimeDetector:
     """
-    Detector específico para regímenes de volatilidad
-    Usa GARCH models y threshold detection
+    Volatility-specific regime detector
+    Uses GARCH models and threshold detection
     """
 
     def __init__(self, lookback_window: int = 252):
@@ -307,16 +309,16 @@ class VolatilityRegimeDetector:
 
     def detect_vol_regime(self, returns: pd.Series) -> Dict:
         """
-        Detecta régimen de volatilidad actual
+        Detects the current volatility regime
         """
-        # Calcular realized volatility
+        # Calculate realized volatility
         current_vol = returns.rolling(20).std().iloc[-1] * np.sqrt(252)
 
         # Historical volatility distribution
         hist_vol = returns.rolling(20).std() * np.sqrt(252)
         hist_vol = hist_vol.dropna()
 
-        # Define thresholds basado en percentiles
+        # Define thresholds based on percentiles
         if len(hist_vol) >= self.lookback_window:
             self.thresholds = {
                 'low': hist_vol.quantile(0.25),
@@ -356,8 +358,8 @@ class VolatilityRegimeDetector:
 ```python
 class CorrelationRegimeDetector:
     """
-    Detecta shifts en correlation structures
-    Critical para small caps que alternan entre correlation with market
+    Detects shifts in correlation structures
+    Critical for small caps that alternate between correlation with the market
     """
 
     def __init__(self, benchmark_symbols: List[str] = ['SPY', 'IWM']):
@@ -369,7 +371,7 @@ class CorrelationRegimeDetector:
                                  benchmark_returns: pd.DataFrame,
                                  window: int = 60) -> Dict:
         """
-        Detecta correlation regime usando rolling correlations
+        Detects the correlation regime using rolling correlations
         """
 
         correlation_results = {}
@@ -421,14 +423,14 @@ class CorrelationRegimeDetector:
         }
 ```
 
-## Integration con Estrategias de Trading
+## Integration with Trading Strategies
 
 ### Adaptive Strategy Framework
 
 ```python
 class RegimeAdaptiveStrategy:
     """
-    Strategy que adapta parameters basado en regime detection
+    Strategy that adapts parameters based on regime detection
     """
 
     def __init__(self, base_strategy, regime_detector):
@@ -438,7 +440,7 @@ class RegimeAdaptiveStrategy:
 
     def _define_regime_configs(self) -> Dict:
         """
-        Define strategy parameters para cada régimen
+        Define strategy parameters for each regime
         """
         return {
             'Low_Volatility': {
@@ -463,7 +465,7 @@ class RegimeAdaptiveStrategy:
 
     def generate_signal(self, market_data: Dict) -> Optional[Dict]:
         """
-        Generate signal adaptado al régimen actual
+        Generate signal adapted to the current regime
         """
         # Detect current regime
         features = self.regime_detector.prepare_features(
@@ -503,7 +505,7 @@ class RegimeAdaptiveStrategy:
                                regime_config: Dict,
                                confidence: float) -> Dict:
         """
-        Adjust strategy config basado en regime, weighted by confidence
+        Adjust strategy config based on regime, weighted by confidence
         """
         adjusted_config = base_config.copy()
 
@@ -521,7 +523,7 @@ class RegimeAdaptiveStrategy:
 ```python
 class RegimeAwareRiskManager:
     """
-    Risk management que adapta limits basado en regímenes
+    Risk management that adapts limits based on regimes
     """
 
     def __init__(self):
@@ -533,12 +535,12 @@ class RegimeAwareRiskManager:
 
     def get_adjusted_limits(self, regime_info: Dict) -> Dict:
         """
-        Adjust risk limits basado en régimen actual
+        Adjust risk limits based on the current regime
         """
         regime = regime_info['regime']
         confidence = regime_info['confidence']
 
-        # Base adjustments por regime
+        # Base adjustments per regime
         regime_adjustments = {
             'Low_Volatility': {
                 'max_position_size': 1.3,
@@ -602,7 +604,7 @@ DATA_REQUIREMENTS = {
 # Daily regime detection workflow
 def daily_regime_update():
     """
-    Daily process para update regime detection
+    Daily process to update regime detection
     """
 
     # 1. Fetch latest market data
@@ -631,7 +633,7 @@ def daily_regime_update():
 ```python
 def monitor_regime_detection_performance():
     """
-    Monitor la effectiveness of regime detection
+    Monitor the effectiveness of regime detection
     """
 
     # Track regime transition accuracy
@@ -650,12 +652,12 @@ def monitor_regime_detection_performance():
     }
 ```
 
-## Integration con el Quant Playbook
+## Integration with the Quant Playbook
 
 ### Next Steps:
-1. **Implement Basic Regime Detection**: Empezar con volatility regimes
-2. **Adapt Existing Strategies**: Modify Gap & Go y VWAP templates
-3. **Create Regime Dashboard**: Monitor current regime en real-time
+1. **Implement Basic Regime Detection**: Start with volatility regimes
+2. **Adapt Existing Strategies**: Modify Gap & Go and VWAP templates
+3. **Create Regime Dashboard**: Monitor current regime in real-time
 4. **Backtest Adaptive Strategies**: Compare regime-aware vs static approaches
 
 ### Related Concepts:

@@ -1,36 +1,38 @@
+> 🇪🇸 [Leer en Español](vwap_reclaim.es.md) | 🇺🇸 **English**
+
 # VWAP Reclaim Strategy
 
-## Concepto Base
+## Core Concept
 
-La estrategia VWAP Reclaim se basa en el comportamiento predecible de small caps que han estado traded por debajo del VWAP (Volume Weighted Average Price) y logran reclamarlo con volumen significativo. Este reclaim suele indicar un cambio de momentum institucional.
+The VWAP Reclaim strategy is based on the predictable behavior of small caps that have been trading below VWAP (Volume Weighted Average Price) and manage to reclaim it with significant volume. This reclaim usually indicates an institutional momentum shift.
 
-> **⚠️ DISCLAIMER**: Small caps requieren experiencia avanzada. Esta estrategia involucra timing preciso y gestión de riesgo estricta. Solo para cuentas con $25k+ y conocimiento sólido de market microstructure.
+> **⚠️ DISCLAIMER**: Small caps require advanced experience. This strategy involves precise timing and strict risk management. Only for accounts with $25k+ and solid knowledge of market microstructure.
 
-## Fundamentos Teóricos
+## Theoretical Foundations
 
-### ¿Por Qué Funciona?
+### Why Does It Work?
 
-1. **Algoritmos Institucionales**: Muchos algos usan VWAP como benchmark
-2. **Psychological Support**: Traders retail respetan el VWAP como soporte/resistencia  
-3. **Volume Confirmation**: El volumen confirma la legitimidad del movimiento
-4. **Small Cap Momentum**: En small caps, el momentum tiende a persistir más tiempo
+1. **Institutional Algorithms**: Many algos use VWAP as a benchmark
+2. **Psychological Support**: Retail traders respect VWAP as support/resistance  
+3. **Volume Confirmation**: Volume confirms the legitimacy of the move
+4. **Small Cap Momentum**: In small caps, momentum tends to persist longer
 
-### Anatomía del VWAP Reclaim
+### Anatomy of the VWAP Reclaim
 ```python
 class VWAPReclaimPattern:
     def __init__(self):
         self.phases = {
             'accumulation_below': {
                 'duration_minutes': (30, 120),
-                'price_action': 'Consolidación debajo VWAP',
-                'volume_pattern': 'Volumen decreciente',
+                'price_action': 'Consolidation below VWAP',
+                'volume_pattern': 'Decreasing volume',
                 'characteristics': 'Compression, low volatility'
             },
             'reclaim_attempt': {
                 'duration_minutes': (5, 30),
                 'price_action': 'Push through VWAP',
                 'volume_pattern': 'Volume spike 2-5x',
-                'characteristics': 'Decisive move con volume'
+                'characteristics': 'Decisive move with volume'
             },
             'confirmation': {
                 'duration_minutes': (15, 60),
@@ -49,23 +51,23 @@ class VWAPReclaimPattern:
 
 ## Screening Criteria
 
-### Filtros Primarios
+### Primary Filters
 ```python
 def vwap_reclaim_screener(market_data):
-    """Screen para VWAP Reclaim opportunities"""
+    """Screen for VWAP Reclaim opportunities"""
     
     primary_filters = {
         'price_range': (2.00, 50.00),  # Avoid penny stocks
         'avg_volume_20d': 1_000_000,   # Minimum liquidity
         'market_cap': (50_000_000, 2_000_000_000),  # Small to mid cap
         'float_shares': (5_000_000, 100_000_000),
-        'time_below_vwap': 30,  # Al menos 30 min bajo VWAP
+        'time_below_vwap': 30,  # At least 30 min below VWAP
     }
     
     # Technical filters
     technical_filters = {
         'currently_below_vwap': True,
-        'distance_from_vwap': (-0.03, -0.001),  # 0.1% a 3% below
+        'distance_from_vwap': (-0.03, -0.001),  # 0.1% to 3% below
         'volume_last_5min': lambda v: v > market_data['avg_volume_5min'] * 2,
         'price_compression': True,  # ATR decreasing
         'no_major_resistance_above': True
@@ -74,13 +76,13 @@ def vwap_reclaim_screener(market_data):
     return primary_filters, technical_filters
 
 def calculate_compression_score(price_data, periods=20):
-    """Calcular score de compression"""
+    """Calculate compression score"""
     atr_current = calculate_atr(price_data, 5)
     atr_baseline = calculate_atr(price_data, periods)
     
     compression_ratio = atr_current / atr_baseline if atr_baseline > 0 else 1
     
-    # Score: 0-100, donde 100 = máxima compression
+    # Score: 0-100, where 100 = maximum compression
     compression_score = max(0, (1 - compression_ratio) * 100)
     
     return {
@@ -104,7 +106,7 @@ class VWAPReclaimScorer:
         }
     
     def score_setup(self, stock_data):
-        """Score del setup (0-100)"""
+        """Setup score (0-100)"""
         
         # 1. Compression Score (25%)
         compression = calculate_compression_score(stock_data.price_history)
@@ -145,12 +147,12 @@ class VWAPReclaimScorer:
         }
     
     def score_volume_profile(self, stock_data):
-        """Score del perfil de volumen"""
+        """Volume profile score"""
         score = 0
         
         # Volume during compression
         if stock_data.volume_during_compression < stock_data.avg_volume * 0.8:
-            score += 30  # Low volume durante compression es bueno
+            score += 30  # Low volume during compression is good
         
         # Recent volume spike
         recent_volume_ratio = stock_data.current_volume / stock_data.avg_volume_5min
@@ -170,7 +172,7 @@ class VWAPReclaimScorer:
         return min(score, 100)
     
     def score_price_structure(self, stock_data):
-        """Score de estructura de precio"""
+        """Price structure score"""
         score = 0
         
         # Higher lows pattern
@@ -209,7 +211,7 @@ class ConservativeVWAPEntry:
         self.risk_tolerance = "low"
         
     def calculate_entry_levels(self, stock_data):
-        """Calcular niveles de entrada conservadores"""
+        """Calculate conservative entry levels"""
         
         vwap = stock_data.vwap
         current_price = stock_data.price
@@ -240,7 +242,7 @@ class ConservativeVWAPEntry:
         }
 
     def entry_confirmation_signals(self, real_time_data):
-        """Señales de confirmación para entry"""
+        """Entry confirmation signals"""
         signals = []
         
         # Volume confirmation
@@ -275,7 +277,7 @@ class AggressiveVWAPEntry:
         self.risk_tolerance = "medium"
         
     def calculate_entry_levels(self, stock_data):
-        """Entrada agresiva en anticipación al reclaim"""
+        """Aggressive entry anticipating the reclaim"""
         
         vwap = stock_data.vwap
         current_price = stock_data.price
@@ -316,7 +318,7 @@ class VWAPReclaimPositionManager:
         self.base_risk = risk_per_trade
         
     def calculate_position_size(self, stock_data, setup_score, entry_price, stop_price):
-        """Calcular tamaño basado en múltiples factores"""
+        """Calculate size based on multiple factors"""
         
         # Base risk amount
         base_risk_amount = self.account_size * self.base_risk
@@ -343,7 +345,7 @@ class VWAPReclaimPositionManager:
         }
     
     def calculate_size_adjustments(self, stock_data, setup_score):
-        """Ajustes al tamaño base"""
+        """Base size adjustments"""
         
         # Setup quality multiplier
         if setup_score >= 85:
@@ -403,7 +405,7 @@ class VWAPProfitManager:
         self.position_reduction = [0.25, 0.25, 0.30, 0.20]  # How much to sell
         
     def calculate_profit_taking_plan(self, entry_price, position_size):
-        """Plan de toma de ganancias escalonado"""
+        """Scaled profit taking plan"""
         
         plan = []
         remaining_shares = position_size
@@ -426,7 +428,7 @@ class VWAPProfitManager:
         return plan
     
     def dynamic_profit_adjustment(self, current_price, entry_price, time_in_trade, volume_profile):
-        """Ajustar profit taking basado en condiciones dinámicas"""
+        """Adjust profit taking based on dynamic conditions"""
         
         current_profit = (current_price - entry_price) / entry_price
         
@@ -460,16 +462,16 @@ class VWAPProfitManager:
         return adjustments
 ```
 
-## Risk Management Específico
+## Specific Risk Management
 
-### Stop Loss Dinámico
+### Dynamic Stop Loss
 ```python
 class VWAPStopManager:
     def __init__(self):
         self.stop_types = ['fixed', 'trailing', 'time_based', 'technical']
         
     def calculate_stop_levels(self, entry_price, stock_data, strategy_type='conservative'):
-        """Calcular niveles de stop multiples"""
+        """Calculate multiple stop levels"""
         
         vwap = stock_data.vwap
         
@@ -490,7 +492,7 @@ class VWAPStopManager:
         return stops
     
     def manage_trailing_stop(self, current_price, entry_price, highest_price, current_stop):
-        """Gestión de trailing stop"""
+        """Trailing stop management"""
         
         current_profit = (current_price - entry_price) / entry_price
         
@@ -508,7 +510,7 @@ class VWAPStopManager:
         return current_stop
     
     def check_emergency_exit_conditions(self, stock_data):
-        """Condiciones para exit de emergencia"""
+        """Emergency exit conditions"""
         
         emergency_conditions = []
         
@@ -546,7 +548,7 @@ class VWAPReclaimBacktest:
         self.results = []
         
     def run_backtest(self, stock_universe, entry_strategy='conservative'):
-        """Ejecutar backtest de la estrategia"""
+        """Run strategy backtest"""
         
         for date in pd.date_range(self.start_date, self.end_date):
             daily_opportunities = self.scan_daily_opportunities(date, stock_universe)
@@ -559,7 +561,7 @@ class VWAPReclaimBacktest:
         return self.analyze_results()
     
     def simulate_trade(self, opportunity, strategy_type):
-        """Simular un trade individual"""
+        """Simulate an individual trade"""
         
         entry_data = opportunity['entry_data']
         intraday_data = opportunity['intraday_data']
@@ -583,7 +585,7 @@ class VWAPReclaimBacktest:
         return trade_result
     
     def analyze_results(self):
-        """Analizar resultados del backtest"""
+        """Analyze backtest results"""
         
         if not self.results:
             return {'error': 'No trades executed'}
@@ -625,4 +627,4 @@ class VWAPReclaimBacktest:
         }
 ```
 
-Esta estrategia VWAP Reclaim ofrece una aproximación sistemática para aprovechar los movimientos predictivos cuando small caps reclaiman su VWAP con volumen confirmatorio.
+This VWAP Reclaim strategy offers a systematic approach to capitalize on predictable moves when small caps reclaim their VWAP with confirmatory volume.

@@ -1,123 +1,125 @@
-# Guía de Seguridad - Infraestructura Trading
+> 🇪🇸 [Leer en Español](SECURITY.es.md) | 🇺🇸 **English**
 
-## ⚠️ IMPORTANTE: Configuración de Seguridad
+# Security Guide - Trading Infrastructure
 
-Este directorio contiene templates de infraestructura que **REQUIEREN configuración de seguridad** antes del uso en producción.
+## IMPORTANT: Security Configuration
 
-## 🔐 Archivos que DEBES Personalizar
+This directory contains infrastructure templates that **REQUIRE security configuration** before use in production.
 
-### 1. Variables de Entorno
+## Files You MUST Customize
+
+### 1. Environment Variables
 ```bash
-# Copiar template de ejemplo
+# Copy the example template
 cp .env.example .env
 
-# Editar con tus credenciales reales
+# Edit with your real credentials
 nano .env
 ```
 
-**NUNCA commits archivos .env reales al repositorio**
+**NEVER commit real .env files to the repository**
 
-### 2. Passwords y Secrets
-Cambiar TODOS los passwords por defecto en:
+### 2. Passwords and Secrets
+Change ALL default passwords in:
 
 - **PostgreSQL**: `POSTGRES_PASSWORD`
-- **Redis**: `requirepass` en `redis.conf`
-- **MinIO**: `MINIO_ROOT_USER` y `MINIO_ROOT_PASSWORD`
+- **Redis**: `requirepass` in `redis.conf`
+- **MinIO**: `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD`
 - **Grafana**: `GRAFANA_PASSWORD`
 
 ### 3. API Keys
-Configurar tus propias API keys:
+Configure your own API keys:
 
-- **Polygon.io**: Para datos de mercado
-- **Alpha Vantage**: Datos financieros alternativos
-- **IEX Cloud**: Datos adicionales
-- **Telegram Bot**: Para alertas
+- **Polygon.io**: For market data
+- **Alpha Vantage**: Alternative financial data
+- **IEX Cloud**: Additional data
+- **Telegram Bot**: For alerts
 
 ### 4. Kubernetes Secrets
-Los secrets en Kubernetes están en **base64** pero NO son encriptación:
+Secrets in Kubernetes are in **base64** but are NOT encryption:
 
 ```bash
-# Generar nuevos secrets
-echo -n "tu_password_real" | base64
+# Generate new secrets
+echo -n "your_real_password" | base64
 
-# Actualizar en postgres.yaml y trading-engine.yaml
+# Update in postgres.yaml and trading-engine.yaml
 ```
 
-## 🛡️ Mejores Prácticas de Seguridad
+## Security Best Practices
 
-### Producción
-1. **Usar un vault de secrets** (HashiCorp Vault, AWS Secrets Manager)
-2. **Habilitar TLS/SSL** en todas las comunicaciones
-3. **Configurar firewalls** y network policies
-4. **Auditar accesos** y logs de seguridad
-5. **Rotar passwords** periódicamente
+### Production
+1. **Use a secrets vault** (HashiCorp Vault, AWS Secrets Manager)
+2. **Enable TLS/SSL** on all communications
+3. **Configure firewalls** and network policies
+4. **Audit access** and security logs
+5. **Rotate passwords** periodically
 
-### Desarrollo
-1. **Usar passwords únicos** (no reutilizar)
-2. **Mantener .env fuera del repo**
-3. **Usar paper trading** en desarrollo
-4. **Limitar acceso a red** (VPN/firewall)
+### Development
+1. **Use unique passwords** (don't reuse)
+2. **Keep .env out of the repo**
+3. **Use paper trading** in development
+4. **Limit network access** (VPN/firewall)
 
-## 🚨 Datos que NUNCA Debes Commitear
+## Data You Should NEVER Commit
 
-- ❌ Passwords reales
-- ❌ API keys reales
-- ❌ Certificados privados
-- ❌ Archivos .env con datos reales
-- ❌ Backups de base de datos
-- ❌ Logs que contengan credenciales
+- Real passwords
+- Real API keys
+- Private certificates
+- .env files with real data
+- Database backups
+- Logs containing credentials
 
-## ✅ Lo que SÍ es Seguro Commitear
+## What IS Safe to Commit
 
-- ✅ Templates (.env.example)
-- ✅ Configuraciones con placeholders
-- ✅ Scripts de setup
-- ✅ Documentación
-- ✅ Configuraciones de Kubernetes (sin secrets reales)
+- Templates (.env.example)
+- Configurations with placeholders
+- Setup scripts
+- Documentation
+- Kubernetes configurations (without real secrets)
 
-## 🔧 Setup Rápido y Seguro
+## Quick and Secure Setup
 
 ```bash
-# 1. Clonar configuraciones
+# 1. Clone configurations
 git clone <repo>
 cd infrastructure/
 
-# 2. Crear archivo de entorno
+# 2. Create environment file
 cp .env.example .env
 
-# 3. Generar passwords seguros
-openssl rand -base64 32  # Para cada password
+# 3. Generate secure passwords
+openssl rand -base64 32  # For each password
 
-# 4. Editar .env con valores reales
+# 4. Edit .env with real values
 vim .env
 
-# 5. Verificar que .env está en .gitignore
-git status  # No debe mostrar .env
+# 5. Verify .env is in .gitignore
+git status  # Should not show .env
 
-# 6. Deploy seguro
+# 6. Secure deploy
 docker-compose up -d
 ```
 
-## 📞 Contacto para Problemas de Seguridad
+## Contact for Security Issues
 
-Si encuentras vulnerabilidades de seguridad, repórtalas de forma responsable:
+If you find security vulnerabilities, report them responsibly:
 
-1. **NO** abras issues públicos
-2. Contacta directamente al mantenedor
-3. Proporciona detalles del problema
-4. Espera confirmación antes de disclosure público
+1. **DO NOT** open public issues
+2. Contact the maintainer directly
+3. Provide details of the issue
+4. Wait for confirmation before public disclosure
 
-## 🔄 Rotación de Credenciales
+## Credential Rotation
 
-### Frecuencia Recomendada
-- **Passwords de DB**: Cada 90 días
-- **API Keys**: Según política del proveedor
-- **Certificates**: Antes de expiración
-- **Tokens de acceso**: Cada 30 días
+### Recommended Frequency
+- **DB Passwords**: Every 90 days
+- **API Keys**: Per provider policy
+- **Certificates**: Before expiration
+- **Access Tokens**: Every 30 days
 
-### Proceso de Rotación
-1. Generar nuevas credenciales
-2. Actualizar en vault/config
-3. Restart servicios
-4. Revocar credenciales antiguas
-5. Verificar funcionamiento
+### Rotation Process
+1. Generate new credentials
+2. Update in vault/config
+3. Restart services
+4. Revoke old credentials
+5. Verify functionality

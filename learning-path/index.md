@@ -1,134 +1,136 @@
+> 🇪🇸 [Leer en Español](index.es.md) | 🇺🇸 **English**
+
 ---
 layout: default
-title: "Academia de Trading Cuantitativo"
-description: "Rutas de aprendizaje estructuradas para convertirte en Quant Trader"
+title: "Quantitative Trading Academy"
+description: "Structured learning paths to become a Quant Trader"
 ---
 
-# 🎓 Academia de Trading Cuantitativo
+# Quantitative Trading Academy
 
-## 📚 Rutas de Aprendizaje
+## Learning Paths
 
-### 🟢 Fundamentos (Principiante)
-**Para quienes empiezan desde cero en trading cuantitativo**
+### Fundamentals (Beginner)
+**For those starting from scratch in quantitative trading**
 
-#### Módulo 1: Introducción al Trading Cuantitativo
-- **¿Qué es ser Quant?** - Conceptos básicos y filosofía
-- **Matemáticas esenciales** - Estadística y probabilidad básica
-- **Python para traders** - Configuración y primeros pasos
-- **Datos de mercado** - Cómo obtener y manejar datos
+#### Module 1: Introduction to Quantitative Trading
+- **What Is Being a Quant?** - Basic concepts and philosophy
+- **Essential mathematics** - Basic statistics and probability
+- **Python for traders** - Setup and first steps
+- **Market data** - How to obtain and handle data
 
-#### Módulo 2: Análisis Técnico con Python
-- **Indicadores técnicos** - RSI, MACD, Medias Móviles
-- **Patrones de precio** - Detección automática
-- **Visualización de datos** - Gráficos profesionales
-- **Primera estrategia** - Sistema simple de cruces
+#### Module 2: Technical Analysis with Python
+- **Technical indicators** - RSI, MACD, Moving Averages
+- **Price patterns** - Automatic detection
+- **Data visualization** - Professional charts
+- **First strategy** - Simple crossover system
 
-### 🟡 Estrategias (Intermedio)
-**Desarrollo de estrategias rentables**
+### Strategies (Intermediate)
+**Developing profitable strategies**
 
-#### Módulo 3: Estrategias Clásicas
-- **Momentum Trading** - Seguimiento de tendencia
-- **Mean Reversion** - Trading de rangos
-- **Pairs Trading** - Arbitraje estadístico
-- **Market Making** - Provisión de liquidez
+#### Module 3: Classic Strategies
+- **Momentum Trading** - Trend following
+- **Mean Reversion** - Range trading
+- **Pairs Trading** - Statistical arbitrage
+- **Market Making** - Liquidity provision
 
-#### Módulo 4: Backtesting Profesional
-- **Framework de backtesting** - Construcción robusta
-- **Métricas de performance** - Sharpe, Sortino, Calmar
-- **Walk-forward analysis** - Validación temporal
-- **Monte Carlo simulation** - Análisis de robustez
+#### Module 4: Professional Backtesting
+- **Backtesting framework** - Robust construction
+- **Performance metrics** - Sharpe, Sortino, Calmar
+- **Walk-forward analysis** - Temporal validation
+- **Monte Carlo simulation** - Robustness analysis
 
-### 🟠 Análisis Avanzado (Avanzado)
-**Técnicas profesionales y machine learning**
+### Advanced Analysis (Advanced)
+**Professional techniques and machine learning**
 
-#### Módulo 5: Machine Learning para Trading
-- **Feature engineering** - Creación de variables predictivas
-- **Modelos supervisados** - Random Forest, XGBoost
-- **Deep Learning** - LSTM para series temporales
-- **Reinforcement Learning** - Agentes de trading
+#### Module 5: Machine Learning for Trading
+- **Feature engineering** - Creating predictive variables
+- **Supervised models** - Random Forest, XGBoost
+- **Deep Learning** - LSTM for time series
+- **Reinforcement Learning** - Trading agents
 
-#### Módulo 6: Gestión de Riesgo
-- **Value at Risk (VaR)** - Medición de riesgo
-- **Kelly Criterion** - Sizing óptimo de posiciones
-- **Portfolio optimization** - Markowitz y Black-Litterman
-- **Stress testing** - Análisis de escenarios
+#### Module 6: Risk Management
+- **Value at Risk (VaR)** - Risk measurement
+- **Kelly Criterion** - Optimal position sizing
+- **Portfolio optimization** - Markowitz and Black-Litterman
+- **Stress testing** - Scenario analysis
 
-### 🔴 Trading Profesional (Experto)
-**Implementación en producción**
+### Professional Trading (Expert)
+**Production implementation**
 
-#### Módulo 7: Infraestructura de Trading
-- **Arquitectura de sistemas** - Diseño escalable
-- **Conexión con brokers** - APIs de IBKR, Alpaca
-- **Ejecución de órdenes** - Smart order routing
-- **Monitoreo en tiempo real** - Dashboards y alertas
+#### Module 7: Trading Infrastructure
+- **System architecture** - Scalable design
+- **Broker connections** - IBKR, Alpaca APIs
+- **Order execution** - Smart order routing
+- **Real-time monitoring** - Dashboards and alerts
 
-#### Módulo 8: Trading Institucional
-- **Market microstructure** - Mecánica del mercado
-- **High-frequency trading** - Conceptos y estrategias
-- **Regulatory compliance** - Normativas y reportes
-- **Fund management** - Gestión de capital profesional
+#### Module 8: Institutional Trading
+- **Market microstructure** - Market mechanics
+- **High-frequency trading** - Concepts and strategies
+- **Regulatory compliance** - Regulations and reporting
+- **Fund management** - Professional capital management
 
-## 🚀 Proyectos Prácticos
+## Practical Projects
 
-### Proyectos por Nivel
+### Projects by Level
 
-#### Principiante
-1. **Scanner de Acciones** - Encuentra oportunidades automáticamente
-2. **Bot de Alertas** - Notificaciones de señales de trading
-3. **Dashboard de Portfolio** - Visualiza tu rendimiento
+#### Beginner
+1. **Stock Scanner** - Find opportunities automatically
+2. **Alert Bot** - Trading signal notifications
+3. **Portfolio Dashboard** - Visualize your performance
 
-#### Intermedio
-4. **Sistema de Trading Completo** - End-to-end con backtesting
-5. **Optimizador de Parámetros** - Ajuste automático de estrategias
-6. **Paper Trading Bot** - Prueba estrategias sin riesgo
+#### Intermediate
+4. **Complete Trading System** - End-to-end with backtesting
+5. **Parameter Optimizer** - Automatic strategy tuning
+6. **Paper Trading Bot** - Test strategies risk-free
 
-#### Avanzado
-7. **Crypto Arbitrage Bot** - Trading entre exchanges
-8. **Options Market Maker** - Provisión de liquidez en opciones
-9. **Multi-Strategy System** - Portfolio de estrategias
+#### Advanced
+7. **Crypto Arbitrage Bot** - Trading between exchanges
+8. **Options Market Maker** - Options liquidity provision
+9. **Multi-Strategy System** - Strategy portfolio
 
-#### Experto
-10. **HFT Simulator** - Simula trading de alta frecuencia
-11. **Risk Management System** - Sistema profesional de riesgo
-12. **Full Trading Platform** - Plataforma completa de trading
+#### Expert
+10. **HFT Simulator** - Simulate high-frequency trading
+11. **Risk Management System** - Professional risk system
+12. **Full Trading Platform** - Complete trading platform
 
-## 📖 Recursos Adicionales
+## Additional Resources
 
-### Libros Recomendados
+### Recommended Books
 - "Quantitative Trading" - Ernest Chan
-- "Advances in Financial Machine Learning" - Marcos López de Prado
+- "Advances in Financial Machine Learning" - Marcos Lopez de Prado
 - "Trading Systems" - Emilio Tomasini
 - "Inside the Black Box" - Rishi Narang
 
-### Datasets Gratuitos
-- Yahoo Finance - Datos históricos
-- Alpha Vantage - API gratuita
-- Quandl - Datos económicos
-- Polygon.io - Datos en tiempo real
+### Free Datasets
+- Yahoo Finance - Historical data
+- Alpha Vantage - Free API
+- Quandl - Economic data
+- Polygon.io - Real-time data
 
-### Herramientas Esenciales
+### Essential Tools
 - **Python**: pandas, numpy, matplotlib
 - **Backtesting**: backtrader, zipline, vectorbt
 - **Machine Learning**: scikit-learn, tensorflow
-- **Brokers API**: ib_insync, alpaca-trade-api
+- **Broker APIs**: ib_insync, alpaca-trade-api
 
-## 🎯 Certificación y Evaluación
+## Certification and Assessment
 
-### Auto-Evaluación por Nivel
-- **Principiante**: Quiz de conceptos básicos
-- **Intermedio**: Implementa una estrategia rentable
-- **Avanzado**: Desarrolla un sistema completo
-- **Experto**: Gestiona un portfolio en paper trading
+### Self-Assessment by Level
+- **Beginner**: Basic concepts quiz
+- **Intermediate**: Implement a profitable strategy
+- **Advanced**: Develop a complete system
+- **Expert**: Manage a portfolio in paper trading
 
-### Siguiente Paso
-¿Listo para empezar? Selecciona tu nivel y comienza tu viaje:
+### Next Step
+Ready to begin? Select your level and start your journey:
 
-- [**Empezar desde Cero**]({{ site.baseurl }}/GETTING-STARTED)
-- [**Ver Roadmap Completo**]({{ site.baseurl }}/ROADMAP)
-- [**Explorar Ejemplos**]({{ site.baseurl }}/examples/)
+- [**Start from Zero**]({{ site.baseurl }}/GETTING-STARTED)
+- [**View Complete Roadmap**]({{ site.baseurl }}/ROADMAP)
+- [**Explore Examples**]({{ site.baseurl }}/examples/)
 
 ---
 
-> "El mercado es un dispositivo para transferir dinero del impaciente al paciente." - Warren Buffett
+> "The stock market is a device for transferring money from the impatient to the patient." - Warren Buffett
 
-**Start Your Quant** - Tu camino hacia el trading algorítmico profesional.
+**Start Your Quant** - Your path to professional algorithmic trading.

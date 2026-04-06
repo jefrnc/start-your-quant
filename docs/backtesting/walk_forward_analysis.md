@@ -1,35 +1,37 @@
-# Walk-Forward Analysis: Validación Dinámica de Estrategias
+> 🇪🇸 [Leer en Español](walk_forward_analysis.es.md) | 🇺🇸 **English**
 
-## Introducción: Más Allá del Backtesting Estático
+# Walk-Forward Analysis: Dynamic Strategy Validation
 
-El walk-forward analysis es una metodología avanzada de validación que simula cómo una estrategia se habría adaptado a condiciones de mercado cambiantes en tiempo real. A diferencia del backtesting tradicional, que optimiza parámetros en todo el período histórico, el walk-forward utiliza ventanas móviles para reoptimizar periódicamente, proporcionando una evaluación más realista del rendimiento futuro.
+## Introduction: Beyond Static Backtesting
 
-## ¿Por Qué Es Crítico el Walk-Forward?
+Walk-forward analysis is an advanced validation methodology that simulates how a strategy would have adapted to changing market conditions in real time. Unlike traditional backtesting, which optimizes parameters across the entire historical period, walk-forward uses rolling windows to periodically re-optimize, providing a more realistic evaluation of future performance.
 
-### Problemas del Backtesting Tradicional
+## Why Is Walk-Forward Critical?
+
+### Problems with Traditional Backtesting
 
 **Look-Ahead Bias:**
 ```python
-# INCORRECTO: Usar datos futuros para optimización
+# INCORRECT: Using future data for optimization
 def bad_backtest(data):
-    # Optimiza parámetros usando TODOS los datos históricos
+    # Optimizes parameters using ALL historical data
     best_params = optimize_parameters(data['2020':'2023'])
     
-    # Evalúa rendimiento en el mismo período
+    # Evaluates performance in the same period
     results = backtest_strategy(data['2020':'2023'], best_params)
-    return results  # Resultados inflados por look-ahead bias
+    return results  # Results inflated by look-ahead bias
 
-# CORRECTO: Walk-forward approach
+# CORRECT: Walk-forward approach
 def good_walkforward(data):
     results = []
     for window_start in date_range:
-        # Solo usa datos hasta la fecha actual
+        # Only uses data up to the current date
         training_data = data[window_start:current_date]
         
-        # Optimiza parámetros solo con datos pasados
+        # Optimizes parameters only with past data
         params = optimize_parameters(training_data)
         
-        # Evalúa en período futuro (out-of-sample)
+        # Evaluates in future period (out-of-sample)
         future_data = data[current_date:next_date]
         period_result = backtest_strategy(future_data, params)
         results.append(period_result)
@@ -37,12 +39,12 @@ def good_walkforward(data):
     return combine_results(results)
 ```
 
-**Régimen de Mercado Estático:**
-- Parámetros optimizados para condiciones específicas
-- No adaptación a cambios estructurales del mercado
-- Degradación de performance en nuevos regímenes
+**Static Market Regime:**
+- Parameters optimized for specific conditions
+- No adaptation to structural market changes
+- Performance degradation in new regimes
 
-## Implementación de Walk-Forward Analysis
+## Walk-Forward Analysis Implementation
 
 ### Architecture Base
 
@@ -57,9 +59,9 @@ class WalkForwardAnalyzer:
                  strategy_function,
                  optimization_function,
                  parameter_space: Dict[str, List],
-                 in_sample_period: int = 252,  # 1 año
-                 out_sample_period: int = 63,  # 3 meses
-                 reoptimization_frequency: int = 21):  # Mensual
+                 in_sample_period: int = 252,  # 1 year
+                 out_sample_period: int = 63,  # 3 months
+                 reoptimization_frequency: int = 21):  # Monthly
         
         self.strategy_function = strategy_function
         self.optimization_function = optimization_function
@@ -75,33 +77,33 @@ class WalkForwardAnalyzer:
     
     def run_walk_forward(self, data: pd.DataFrame) -> Dict[str, Any]:
         """
-        Ejecuta análisis walk-forward completo
+        Executes complete walk-forward analysis
         """
-        print("Iniciando Walk-Forward Analysis...")
+        print("Starting Walk-Forward Analysis...")
         
-        # Configurar ventanas de análisis
+        # Configure analysis windows
         analysis_windows = self._create_analysis_windows(data)
         
         all_trades = []
         all_returns = []
         
         for i, window in enumerate(analysis_windows):
-            print(f"Procesando ventana {i+1}/{len(analysis_windows)}")
+            print(f"Processing window {i+1}/{len(analysis_windows)}")
             
-            # Extraer datos de entrenamiento y testing
+            # Extract training and testing data
             training_data = data[window['train_start']:window['train_end']]
             testing_data = data[window['test_start']:window['test_end']]
             
             if len(training_data) < self.in_sample_period or len(testing_data) == 0:
                 continue
             
-            # Optimizar parámetros en datos de entrenamiento
+            # Optimize parameters on training data
             optimal_params = self._optimize_parameters(training_data)
             
-            # Ejecutar estrategia en datos de testing
+            # Execute strategy on testing data
             window_results = self._execute_strategy(testing_data, optimal_params)
             
-            # Almacenar resultados
+            # Store results
             window_info = {
                 'window_id': i,
                 'train_period': f"{window['train_start']} to {window['train_end']}",
@@ -121,7 +123,7 @@ class WalkForwardAnalyzer:
             all_trades.extend(window_results['trades'])
             all_returns.extend(window_results['returns'])
         
-        # Calcular métricas agregadas
+        # Calculate aggregate metrics
         self.performance_metrics = self._calculate_aggregate_metrics(all_trades, all_returns)
         
         return {
@@ -132,7 +134,7 @@ class WalkForwardAnalyzer:
     
     def _create_analysis_windows(self, data: pd.DataFrame) -> List[Dict]:
         """
-        Crea ventanas de análisis para walk-forward
+        Creates analysis windows for walk-forward
         """
         windows = []
         dates = data.index
@@ -159,13 +161,13 @@ class WalkForwardAnalyzer:
     
     def _optimize_parameters(self, training_data: pd.DataFrame) -> Dict[str, Any]:
         """
-        Optimiza parámetros usando solo datos de entrenamiento
+        Optimizes parameters using only training data
         """
         return self.optimization_function(training_data, self.parameter_space)
     
     def _execute_strategy(self, testing_data: pd.DataFrame, params: Dict) -> Dict[str, Any]:
         """
-        Ejecuta estrategia con parámetros optimizados en datos de testing
+        Executes strategy with optimized parameters on testing data
         """
         trades, returns = self.strategy_function(testing_data, params)
         
@@ -190,11 +192,11 @@ class ParameterOptimizer:
                                 strategy_function, 
                                 parameter_space: Dict[str, List]) -> Dict[str, Any]:
         """
-        Optimización por grid search
+        Grid search optimization
         """
         from itertools import product
         
-        # Generar todas las combinaciones de parámetros
+        # Generate all parameter combinations
         param_combinations = list(product(*parameter_space.values()))
         param_names = list(parameter_space.keys())
         
@@ -206,10 +208,10 @@ class ParameterOptimizer:
             params = dict(zip(param_names, combination))
             
             try:
-                # Ejecutar estrategia con estos parámetros
+                # Execute strategy with these parameters
                 trades, returns = strategy_function(data, params)
                 
-                # Calcular métricas
+                # Calculate metrics
                 metrics = self._calculate_optimization_metrics(trades, returns)
                 score = metrics[self.optimization_metric]
                 
@@ -219,13 +221,13 @@ class ParameterOptimizer:
                     'metrics': metrics
                 })
                 
-                # Actualizar mejor resultado
+                # Update best result
                 if score > best_score:
                     best_score = score
                     best_params = params
                     
             except Exception as e:
-                print(f"Error con parámetros {params}: {e}")
+                print(f"Error with parameters {params}: {e}")
                 continue
         
         self.optimization_history.append({
@@ -243,15 +245,15 @@ class ParameterOptimizer:
                                      population_size: int = 50,
                                      generations: int = 100) -> Dict[str, Any]:
         """
-        Optimización usando algoritmo genético
+        Optimization using genetic algorithm
         """
         import random
         
-        # Inicializar población
+        # Initialize population
         population = self._initialize_population(parameter_space, population_size)
         
         for generation in range(generations):
-            # Evaluar fitness de cada individuo
+            # Evaluate fitness of each individual
             fitness_scores = []
             for individual in population:
                 try:
@@ -262,10 +264,10 @@ class ParameterOptimizer:
                 except:
                     fitness_scores.append(float('-inf'))
             
-            # Selección, crossover y mutación
+            # Selection, crossover and mutation
             population = self._evolve_population(population, fitness_scores, parameter_space)
         
-        # Retornar mejor individuo
+        # Return best individual
         best_idx = np.argmax(fitness_scores)
         return population[best_idx]
     
@@ -274,12 +276,12 @@ class ParameterOptimizer:
                             parameter_space: Dict[str, List],
                             n_iterations: int = 50) -> Dict[str, Any]:
         """
-        Optimización bayesiana para búsqueda eficiente de parámetros
+        Bayesian optimization for efficient parameter search
         """
         from skopt import gp_minimize
         from skopt.space import Real, Integer
         
-        # Convertir parameter_space a formato skopt
+        # Convert parameter_space to skopt format
         dimensions = []
         param_names = []
         
@@ -295,12 +297,12 @@ class ParameterOptimizer:
             try:
                 trades, returns = strategy_function(data, params)
                 metrics = self._calculate_optimization_metrics(trades, returns)
-                # Negativo porque skopt minimiza
+                # Negative because skopt minimizes
                 return -metrics[self.optimization_metric]
             except:
                 return 1000  # Penalty for invalid parameters
         
-        # Ejecutar optimización bayesiana
+        # Execute bayesian optimization
         result = gp_minimize(
             func=objective,
             dimensions=dimensions,
@@ -308,7 +310,7 @@ class ParameterOptimizer:
             random_state=42
         )
         
-        # Convertir resultado a dict
+        # Convert result to dict
         best_params = dict(zip(param_names, result.x))
         return best_params
 ```
@@ -322,12 +324,12 @@ class WalkForwardStabilityAnalyzer:
     
     def analyze_parameter_stability(self, parameter_evolution: List[Dict]) -> Dict[str, Any]:
         """
-        Analiza estabilidad de parámetros a lo largo del tiempo
+        Analyzes parameter stability over time
         """
         if not parameter_evolution:
             return {}
         
-        # Extraer series temporales de cada parámetro
+        # Extract time series for each parameter
         param_series = {}
         dates = []
         
@@ -340,7 +342,7 @@ class WalkForwardStabilityAnalyzer:
                     param_series[param_name] = []
                 param_series[param_name].append(param_value)
         
-        # Calcular métricas de estabilidad
+        # Calculate stability metrics
         stability_analysis = {}
         
         for param_name, values in param_series.items():
@@ -359,7 +361,7 @@ class WalkForwardStabilityAnalyzer:
     
     def analyze_performance_consistency(self, walk_forward_results: List[Dict]) -> Dict[str, Any]:
         """
-        Analiza consistencia de performance a través de las ventanas
+        Analyzes performance consistency across windows
         """
         window_metrics = []
         
@@ -367,7 +369,7 @@ class WalkForwardStabilityAnalyzer:
             metrics = window['metrics']
             window_metrics.append(metrics)
         
-        # Agregar métricas por ventana
+        # Aggregate metrics by window
         metric_names = window_metrics[0].keys() if window_metrics else []
         consistency_analysis = {}
         
@@ -393,7 +395,7 @@ class WalkForwardStabilityAnalyzer:
     
     def calculate_degradation_analysis(self, walk_forward_results: List[Dict]) -> Dict[str, Any]:
         """
-        Analiza degradación de performance a lo largo del tiempo
+        Analyzes performance degradation over time
         """
         dates = []
         returns = []
@@ -407,14 +409,14 @@ class WalkForwardStabilityAnalyzer:
         if not dates:
             return {}
         
-        # Crear series temporales
+        # Create time series
         performance_df = pd.DataFrame({
             'date': dates,
             'returns': returns,
             'sharpe_ratio': sharpe_ratios
         }).set_index('date').sort_index()
         
-        # Calcular tendencias
+        # Calculate trends
         degradation_analysis = {
             'returns_trend': self._calculate_trend(performance_df['returns'].values),
             'sharpe_trend': self._calculate_trend(performance_df['sharpe_ratio'].values),
@@ -442,12 +444,12 @@ class GapAndGoWalkForward:
     
     def gap_and_go_strategy(self, data: pd.DataFrame, params: Dict) -> Tuple[List, List]:
         """
-        Implementación de estrategia Gap and Go
+        Gap and Go strategy implementation
         """
         trades = []
         returns = []
         
-        # Calcular indicadores
+        # Calculate indicators
         data['gap'] = data['open'] / data['close'].shift(1) - 1
         data['volume_ratio'] = data['volume'] / data['volume'].rolling(20).mean()
         data['vwap'] = (data['close'] * data['volume']).cumsum() / data['volume'].cumsum()
@@ -519,7 +521,7 @@ class GapAndGoWalkForward:
     
     def run_gap_and_go_walkforward(self, data: pd.DataFrame) -> Dict[str, Any]:
         """
-        Ejecuta walk-forward analysis para Gap and Go
+        Executes walk-forward analysis for Gap and Go
         """
         # Initialize walk-forward analyzer
         wfa = WalkForwardAnalyzer(
@@ -567,7 +569,7 @@ class WalkForwardVisualizer:
     
     def plot_parameter_evolution(self, parameter_evolution: List[Dict]):
         """
-        Visualiza evolución de parámetros a lo largo del tiempo
+        Visualizes parameter evolution over time
         """
         import matplotlib.pyplot as plt
         
@@ -601,7 +603,7 @@ class WalkForwardVisualizer:
     
     def plot_rolling_performance(self, walk_forward_results: List[Dict]):
         """
-        Visualiza performance rolling de las ventanas
+        Visualizes rolling performance of windows
         """
         import matplotlib.pyplot as plt
         
@@ -650,7 +652,7 @@ class WalkForwardVisualizer:
     
     def create_walk_forward_report(self, analysis_results: Dict) -> str:
         """
-        Genera reporte comprehensive de walk-forward analysis
+        Generates comprehensive walk-forward analysis report
         """
         report = """
 # Walk-Forward Analysis Report
@@ -712,38 +714,38 @@ Based on the walk-forward analysis:
         return report
 ```
 
-## Best Practices y Consideraciones
+## Best Practices and Considerations
 
-### 1. Configuración de Ventanas
+### 1. Window Configuration
 
 ```python
 def configure_walk_forward_windows(market_type: str, strategy_frequency: str) -> Dict:
     """
-    Configuración recomendada de ventanas según tipo de mercado y estrategia
+    Recommended window configuration based on market type and strategy
     """
     configurations = {
         'day_trading_stocks': {
-            'in_sample_period': 126,  # 6 meses
-            'out_sample_period': 21,  # 1 mes
-            'reopt_frequency': 7,     # Semanal
+            'in_sample_period': 126,  # 6 months
+            'out_sample_period': 21,  # 1 month
+            'reopt_frequency': 7,     # Weekly
             'min_trades_required': 30
         },
         'swing_trading_stocks': {
-            'in_sample_period': 252,  # 1 año
-            'out_sample_period': 63,  # 3 meses
-            'reopt_frequency': 21,    # Mensual
+            'in_sample_period': 252,  # 1 year
+            'out_sample_period': 63,  # 3 months
+            'reopt_frequency': 21,    # Monthly
             'min_trades_required': 50
         },
         'crypto_trading': {
-            'in_sample_period': 90,   # 3 meses (mercado 24/7)
-            'out_sample_period': 30,  # 1 mes
-            'reopt_frequency': 7,     # Semanal
+            'in_sample_period': 90,   # 3 months (24/7 market)
+            'out_sample_period': 30,  # 1 month
+            'reopt_frequency': 7,     # Weekly
             'min_trades_required': 20
         },
         'forex_scalping': {
-            'in_sample_period': 30,   # 1 mes
-            'out_sample_period': 7,   # 1 semana
-            'reopt_frequency': 2,     # Cada 2 días
+            'in_sample_period': 30,   # 1 month
+            'out_sample_period': 7,   # 1 week
+            'reopt_frequency': 2,     # Every 2 days
             'min_trades_required': 100
         }
     }
@@ -757,7 +759,7 @@ def configure_walk_forward_windows(market_type: str, strategy_frequency: str) ->
 ```python
 def validate_walk_forward_results(results: Dict) -> Dict[str, bool]:
     """
-    Valida resultados de walk-forward según criterios profesionales
+    Validates walk-forward results according to professional criteria
     """
     validation_criteria = {
         'sufficient_windows': len(results['window_results']) >= 10,
@@ -787,4 +789,4 @@ def validate_walk_forward_results(results: Dict) -> Dict[str, bool]:
 
 ---
 
-*El walk-forward analysis es la metodología gold standard para validación robusta de estrategias de trading. Proporciona una evaluación realista de cómo se comportaría una estrategia en condiciones de mercado reales, incluyendo la adaptación continua de parámetros y la degradación natural del rendimiento a lo largo del tiempo.*
+*Walk-forward analysis is the gold standard methodology for robust trading strategy validation. It provides a realistic evaluation of how a strategy would behave under real market conditions, including continuous parameter adaptation and natural performance degradation over time.*

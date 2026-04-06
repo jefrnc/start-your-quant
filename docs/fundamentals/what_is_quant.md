@@ -1,48 +1,50 @@
-# ¿Qué es el Trading Cuantitativo?
+> 🇪🇸 [Leer en Español](what_is_quant.es.md) | 🇺🇸 **English**
 
-## Definición
+# What is Quantitative Trading?
 
-El trading cuantitativo es un enfoque sistemático para operar en los mercados financieros que se basa en modelos matemáticos, análisis estadístico y algoritmos computacionales para identificar oportunidades de trading y ejecutar operaciones.
+## Definition
 
-> **📊 Enfoque de esta guía**: Nos especializamos en **small caps** (capitalización < $2B), que ofrecen mayor volatilidad y oportunidades que large caps, pero requieren técnicas específicas de gestión de riesgo.
+Quantitative trading is a systematic approach to operating in financial markets that relies on mathematical models, statistical analysis, and computational algorithms to identify trading opportunities and execute trades.
 
-## Características Principales
+> **Focus of this guide**: We specialize in **small caps** (market cap < $2B), which offer greater volatility and opportunities than large caps, but require specific risk management techniques.
 
-### 1. **Basado en Datos**
-- Decisiones fundamentadas en análisis histórico y en tiempo real
-- Eliminación de sesgos emocionales
-- Backtesting riguroso antes de implementar estrategias
+## Key Characteristics
 
-### 2. **Sistemático y Reproducible**
-- Reglas claras y definidas
-- Resultados consistentes y predecibles
-- Capacidad de escalar operaciones
+### 1. **Data-Driven**
+- Decisions grounded in historical and real-time analysis
+- Elimination of emotional biases
+- Rigorous backtesting before implementing strategies
 
-### 3. **Automatizable**
-- Ejecución automática de órdenes
-- Monitoreo 24/7 del mercado
-- Respuesta inmediata a señales
+### 2. **Systematic and Reproducible**
+- Clear, defined rules
+- Consistent and predictable results
+- Ability to scale operations
 
-## Ventajas del Trading Cuantitativo
+### 3. **Automatable**
+- Automatic order execution
+- 24/7 market monitoring
+- Immediate response to signals
 
-1. **Objetividad**: Las decisiones se basan en datos, no en emociones
-2. **Velocidad**: Capacidad de analizar miles de activos simultáneamente
-3. **Disciplina**: El sistema sigue las reglas sin excepción
-4. **Escalabilidad**: Una estrategia puede aplicarse a múltiples mercados
-5. **Mejora Continua**: Los resultados son medibles y optimizables
+## Advantages of Quantitative Trading
 
-## Componentes Esenciales
+1. **Objectivity**: Decisions are based on data, not emotions
+2. **Speed**: Ability to analyze thousands of assets simultaneously
+3. **Discipline**: The system follows rules without exception
+4. **Scalability**: A strategy can be applied across multiple markets
+5. **Continuous Improvement**: Results are measurable and optimizable
 
-### 1. **Datos**
+## Essential Components
+
+### 1. **Data**
 ```python
-# Ejemplo: Obtener datos históricos
+# Example: Get historical data
 import yfinance as yf
 data = yf.download('AAPL', start='2023-01-01', end='2023-12-31')
 ```
 
-### 2. **Estrategia**
+### 2. **Strategy**
 ```python
-# Ejemplo: Estrategia simple de cruce de medias
+# Example: Simple moving average crossover strategy
 def moving_average_strategy(data, short_window=20, long_window=50):
     data['SMA20'] = data['Close'].rolling(window=short_window).mean()
     data['SMA50'] = data['Close'].rolling(window=long_window).mean()
@@ -52,86 +54,86 @@ def moving_average_strategy(data, short_window=20, long_window=50):
     return data
 ```
 
-### 3. **Gestión de Riesgo**
+### 3. **Risk Management**
 ```python
-# Ejemplo: Cálculo de tamaño de posición
+# Example: Position size calculation
 def calculate_position_size(capital, risk_per_trade, stop_loss_pct):
     risk_amount = capital * risk_per_trade
     position_size = risk_amount / stop_loss_pct
     return position_size
 ```
 
-### 4. **Ejecución**
+### 4. **Execution**
 ```python
-# Ejemplo: Framework de ejecución básico
+# Example: Basic execution framework
 def execute_trade(signal, ticker, quantity):
     if signal == 1:
-        # Comprar
+        # Buy
         order = broker.buy(ticker, quantity)
     elif signal == -1:
-        # Vender
+        # Sell
         order = broker.sell(ticker, quantity)
     return order
 ```
 
-## Mitos Comunes
+## Common Myths
 
-### ❌ "Es solo para matemáticos"
-**Realidad**: Con las herramientas actuales, cualquier trader puede empezar con conceptos básicos
+### "It's only for mathematicians"
+**Reality**: With today's tools, any trader can get started with basic concepts
 
-### ❌ "Garantiza ganancias"
-**Realidad**: Como cualquier forma de trading, conlleva riesgos y requiere gestión adecuada
+### "It guarantees profits"
+**Reality**: Like any form of trading, it carries risks and requires proper management
 
-### ❌ "Reemplaza completamente al trader"
-**Realidad**: El trader diseña, supervisa y mejora los sistemas
+### "It completely replaces the trader"
+**Reality**: The trader designs, supervises, and improves the systems
 
-## Primeros Pasos
+## Getting Started
 
-1. **Aprende Python básico**: Es el lenguaje más usado en quant trading
-2. **Entiende estadística básica**: Media, desviación estándar, correlación
-3. **Practica con paper trading**: Prueba estrategias sin riesgo real
-4. **Empieza simple**: Una estrategia básica bien ejecutada es mejor que una compleja mal implementada
+1. **Learn basic Python**: It's the most widely used language in quant trading
+2. **Understand basic statistics**: Mean, standard deviation, correlation
+3. **Practice with paper trading**: Test strategies without real risk
+4. **Start simple**: A basic strategy well executed is better than a complex one poorly implemented
 
-## Ejemplo Completo: Mi Primera Estrategia Quant
+## Complete Example: My First Quant Strategy
 
 ```python
 import pandas as pd
 import numpy as np
 import yfinance as yf
 
-# 1. Obtener datos
+# 1. Get data
 ticker = 'SPY'
 data = yf.download(ticker, start='2023-01-01', end='2023-12-31')
 
-# 2. Calcular indicadores
+# 2. Calculate indicators
 data['Returns'] = data['Close'].pct_change()
 data['SMA20'] = data['Close'].rolling(window=20).mean()
 data['Upper_Band'] = data['SMA20'] + (data['Close'].rolling(window=20).std() * 2)
 data['Lower_Band'] = data['SMA20'] - (data['Close'].rolling(window=20).std() * 2)
 
-# 3. Generar señales
+# 3. Generate signals
 data['Signal'] = 0
-data.loc[data['Close'] < data['Lower_Band'], 'Signal'] = 1  # Comprar
-data.loc[data['Close'] > data['Upper_Band'], 'Signal'] = -1  # Vender
+data.loc[data['Close'] < data['Lower_Band'], 'Signal'] = 1  # Buy
+data.loc[data['Close'] > data['Upper_Band'], 'Signal'] = -1  # Sell
 
-# 4. Calcular returns de la estrategia
+# 4. Calculate strategy returns
 data['Strategy_Returns'] = data['Signal'].shift(1) * data['Returns']
 
-# 5. Métricas de performance
+# 5. Performance metrics
 total_return = (1 + data['Strategy_Returns']).cumprod()[-1] - 1
 sharpe_ratio = data['Strategy_Returns'].mean() / data['Strategy_Returns'].std() * np.sqrt(252)
 
-print(f"Return Total: {total_return:.2%}")
+print(f"Total Return: {total_return:.2%}")
 print(f"Sharpe Ratio: {sharpe_ratio:.2f}")
 ```
 
-## Recursos Recomendados
+## Recommended Resources
 
-- **Libros**: "Algorithmic Trading" de Ernest Chan
-- **Cursos**: QuantConnect Learning, Coursera Financial Engineering
-- **Práctica**: Kaggle competitions de trading
-- **Comunidades**: r/algotrading, QuantConnect forums
+- **Books**: "Algorithmic Trading" by Ernest Chan
+- **Courses**: QuantConnect Learning, Coursera Financial Engineering
+- **Practice**: Kaggle trading competitions
+- **Communities**: r/algotrading, QuantConnect forums
 
-## Siguiente Paso
+## Next Step
 
-Continúa con [Diferencias entre Discretionary y Quant](discretionary_vs_quant.md) para entender mejor las ventajas del enfoque cuantitativo.
+Continue with [Differences Between Discretionary and Quant](discretionary_vs_quant.md) to better understand the advantages of the quantitative approach.

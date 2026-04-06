@@ -1,84 +1,86 @@
-# El Plan de Trading: Framework Profesional
+> 🇪🇸 [Leer en Español](Trading-Plan-Framework.es.md) | 🇺🇸 **English**
 
-Si no tenés un plan de trading escrito, no tenés un negocio — tenés un hobby caro. El plan de trading es el documento que define quién sos como trader, cómo operás, y qué hacés cuando las cosas salen mal. Lo escribís cuando estás tranquilo, y lo seguís cuando no lo estás.
+# The Trading Plan: A Professional Framework
 
-## Por Qué un Plan Escrito
+If you don't have a written trading plan, you don't have a business -- you have an expensive hobby. The trading plan is the document that defines who you are as a trader, how you operate, and what you do when things go wrong. You write it when you're calm, and you follow it when you're not.
 
-Cuando no estás operando, pensás con claridad. Definís reglas racionales, evaluás riesgo objetivamente, y tomás decisiones basadas en datos.
+## Why a Written Plan
 
-Cuando estás en medio de un drawdown del 12%, tu mente cambia. Las reglas que parecían obvias ahora parecen cuestionables. El stop loss que definiste te parece demasiado ajustado. El sistema que validaste con 3 años de datos "quizás no sirve para este mercado."
+When you're not trading, you think clearly. You define rational rules, evaluate risk objectively, and make data-driven decisions.
 
-**El plan escrito es tu ancla.** No se modifica en caliente. Se revisa periódicamente, en frío, con datos — nunca durante una racha mala.
+When you're in the middle of a 12% drawdown, your mind changes. Rules that seemed obvious now seem questionable. The stop loss you defined feels too tight. The system you validated with 3 years of data "maybe doesn't work for this market."
 
-Dato real: traders que llevan un diario de decisiones descubren, al releerlo semanas después, que su perspectiva cambió significativamente sin que fueran conscientes. El papel no miente.
+**The written plan is your anchor.** It's not modified on the fly. It's reviewed periodically, with a cool head, using data -- never during a losing streak.
 
-## Las 6 Secciones del Plan
+Real fact: traders who keep a decision journal discover, when re-reading it weeks later, that their perspective changed significantly without them being aware of it. Paper doesn't lie.
 
-### 1. Filosofía de Trading
+## The 6 Sections of the Plan
 
-Es tu misión y visión como trader. No es filosófico en el sentido abstracto — es concreto:
+### 1. Trading Philosophy
 
-**Qué definir:**
-- **Dedicación**: ¿Tiempo completo o parcial? Si es parcial, ¿cuántas horas semanales realistas?
-- **Capital disponible**: ¿Cuánto capital tenés para operar? Esto condiciona todo — instrumentos, estrategias, expectativas
-- **Origen del capital**: ¿Propio o de terceros? Operar con dinero ajeno cambia completamente la presión psicológica
-- **Objetivos económicos necesarios vs deseados**: "Necesito $2,000/mes para vivir" es muy distinto de "quiero ganar $10,000/mes"
-- **Mercados**: ¿Acciones US? ¿Futuros? ¿Forex? La elección depende de tu capital, horario y perfil
+This is your mission and vision as a trader. It's not philosophical in the abstract sense -- it's concrete:
 
-**La trampa de la necesidad**: si dependés económicamente de tu trading desde el día 1, la presión emocional compromete tus decisiones. La recomendación, siempre que sea posible, es empezar como actividad complementaria hasta que el track record y el capital justifiquen la transición.
+**What to define:**
+- **Dedication**: Full-time or part-time? If part-time, how many realistic weekly hours?
+- **Available capital**: How much capital do you have to trade? This conditions everything -- instruments, strategies, expectations
+- **Source of capital**: Your own or third-party? Trading with other people's money completely changes the psychological pressure
+- **Required vs desired financial goals**: "I need $2,000/month to live" is very different from "I want to earn $10,000/month"
+- **Markets**: US stocks? Futures? Forex? The choice depends on your capital, schedule, and profile
+
+**The necessity trap**: if you depend financially on your trading from day 1, the emotional pressure compromises your decisions. The recommendation, whenever possible, is to start as a supplementary activity until your track record and capital justify the transition.
 
 ```yaml
-# Ejemplo de filosofía documentada
-filosofia:
-  dedicacion: parcial  # 2h/dia, mañanas antes del trabajo
-  capital_inicial: 15000
-  origen: propio
-  objetivo_necesario: 0  # no dependo de esto para vivir
-  objetivo_deseado: 500_mensual  # primer año
-  mercados: [acciones_us_smallcap, futuros_indices]
-  horizonte: largo_plazo  # mínimo 3 años para evaluar
-  timeframes_preferidos: [diario, semanal]
-  # Si mi dedicación es parcial, NO opero intradiario agresivo
-  # porque no puedo monitorear constantemente
+# Example of documented philosophy
+philosophy:
+  dedication: part_time  # 2h/day, mornings before work
+  initial_capital: 15000
+  source: own
+  required_goal: 0  # I don't depend on this for a living
+  desired_goal: 500_monthly  # first year
+  markets: [us_smallcap_stocks, index_futures]
+  horizon: long_term  # minimum 3 years to evaluate
+  preferred_timeframes: [daily, weekly]
+  # If my dedication is part-time, I do NOT trade aggressive intraday
+  # because I can't monitor constantly
 ```
 
-### 2. Psicología
+### 2. Psychology
 
-La mente es el componente más frágil del trading, incluso del algorítmico. Tu robot ejecuta, pero vos decidís cuándo activarlo, cuándo pararlo, y cómo reaccionar cuando las cosas no van como el backtest prometía.
+The mind is the most fragile component of trading, even algorithmic trading. Your bot executes, but you decide when to activate it, when to stop it, and how to react when things don't go as the backtest promised.
 
-**Qué incluir:**
-- **Autoevaluación**: tu perfil de riesgo, tus sesgos conocidos (ver [Sesgos Cognitivos](./Cognitive-Biases-Algo-Trading.md))
-- **Protocolo emocional**: qué hacés cuando estás en drawdown máximo — ¿revisás los datos o empezás a cambiar parámetros impulsivamente?
-- **Mantenimiento**: ejercicio, descanso, desconexión. 20 años operando cada día requiere cuidar el cuerpo y la mente de forma sostenida
-- **Red de soporte**: ¿tenés alguien con quien hablar de trading objetivamente? ¿Un mentor, un grupo, un profesional?
+**What to include:**
+- **Self-assessment**: your risk profile, your known biases (see [Cognitive Biases](./Cognitive-Biases-Algo-Trading.md))
+- **Emotional protocol**: what do you do when you're at maximum drawdown -- do you review the data or start impulsively changing parameters?
+- **Maintenance**: exercise, rest, disconnection. 20 years of daily trading requires sustained care of body and mind
+- **Support network**: do you have someone to talk to objectively about trading? A mentor, a group, a professional?
 
-**Lo que no parece importante hasta que lo es**: un drawdown del 10% en el backtest es un número. Un drawdown del 10% en tu cuenta real, cuando necesitás ese dinero, es una experiencia completamente diferente. El plan psicológico se escribe para el segundo caso, no para el primero.
+**What doesn't seem important until it is**: a 10% drawdown in a backtest is a number. A 10% drawdown in your real account, when you need that money, is a completely different experience. The psychological plan is written for the second case, not the first.
 
-### 3. Reglas y Sistemas
+### 3. Rules and Systems
 
-El corazón operativo del plan. Aquí viven tus sistemas de trading, sus especificaciones, y el portfolio.
+The operational heart of the plan. This is where your trading systems, their specifications, and the portfolio live.
 
-**Para cada sistema, documentar:**
+**For each system, document:**
 
 ```yaml
-sistema:
-  nombre: "Gap_SmallCap_Long_v2"
-  mercado: acciones_us
-  universo: smallcap_0.50_10.99
+system:
+  name: "Gap_SmallCap_Long_v2"
+  market: us_stocks
+  universe: smallcap_0.50_10.99
   timeframe: premarket_5min
-  tipo: momentum  # tendencial
+  type: momentum  # trend-following
 
-  reglas_entrada:
+  entry_rules:
     - gap_up > 10%
-    - volumen_premarket > 500000
-    - precio > vwap
-  reglas_salida:
+    - premarket_volume > 500000
+    - price > vwap
+  exit_rules:
     - stop_loss: -3%
     - take_profit: +8%
-    - tiempo_maximo: 2h
+    - max_time: 2h
 
-  metricas_backtest:
-    periodo: "2021-01-01 a 2024-12-31"
+  backtest_metrics:
+    period: "2021-01-01 to 2024-12-31"
     trades: 847
     win_rate: 0.42
     profit_factor: 1.85
@@ -86,58 +88,58 @@ sistema:
     sharpe: 1.45
     max_consecutive_losses: 11
 
-  gestion_riesgo:
-    risk_per_trade: 1%  # del capital
-    max_posiciones_simultaneas: 3
-    max_exposure: 30%  # del capital total
+  risk_management:
+    risk_per_trade: 1%  # of capital
+    max_simultaneous_positions: 3
+    max_exposure: 30%  # of total capital
 ```
 
-**El portfolio importa más que cualquier sistema individual.** Documentá cómo se combinan tus sistemas:
-- ¿Qué correlación tienen entre sí?
-- ¿Operan en los mismos mercados/horarios?
-- ¿Cómo se reparte el capital entre ellos?
+**The portfolio matters more than any individual system.** Document how your systems combine:
+- What correlation do they have with each other?
+- Do they operate in the same markets/hours?
+- How is capital allocated between them?
 
-Esta es la sección más dinámica del plan — los sistemas cambian, se agregan, se retiran.
+This is the most dynamic section of the plan -- systems change, get added, and get retired.
 
-### 4. Puesta en Marcha (Infraestructura)
+### 4. Launch (Infrastructure)
 
-Trading algorítmico requiere infraestructura. No necesitás un datacenter, pero sí un setup confiable.
+Algorithmic trading requires infrastructure. You don't need a datacenter, but you do need a reliable setup.
 
-**Qué definir:**
+**What to define:**
 
-| Componente | Decisiones clave |
+| Component | Key decisions |
 |---|---|
-| **Hardware** | ¿Local o cloud? Para optimización pesada, servidores cloud temporales son más eficientes que comprar hardware |
-| **Software** | Plataforma de backtesting, lenguaje (Python, etc.), broker API |
-| **Datos** | Proveedor, calidad, costo. ¿Necesitás tick data o bastan velas de 1min? |
-| **Conectividad** | Internet principal + backup. Un corte durante una posición abierta es un riesgo real |
-| **Costos recurrentes** | Datos, hosting, broker, herramientas. Calculá el break-even mensual |
+| **Hardware** | Local or cloud? For heavy optimization, temporary cloud servers are more efficient than buying hardware |
+| **Software** | Backtesting platform, language (Python, etc.), broker API |
+| **Data** | Provider, quality, cost. Do you need tick data or are 1-minute candles enough? |
+| **Connectivity** | Primary internet + backup. An outage during an open position is a real risk |
+| **Recurring costs** | Data, hosting, broker, tools. Calculate the monthly break-even |
 
 ```yaml
-# Ejemplo de análisis de costos
-costos_mensuales:
-  datos_polygon: 29     # USD
-  vps_cloud: 40         # para ejecución 24/7
-  broker_data: 0        # incluido con IBKR
-  herramientas: 0       # Python + open source
+# Example cost analysis
+monthly_costs:
+  polygon_data: 29     # USD
+  cloud_vps: 40        # for 24/7 execution
+  broker_data: 0       # included with IBKR
+  tools: 0             # Python + open source
   total: 69
-  # Break-even: necesito generar > $69/mes solo para cubrir costos
-  # Con capital de $15,000 eso es un 0.46% mensual
+  # Break-even: I need to generate > $69/month just to cover costs
+  # With $15,000 capital that's 0.46% monthly
 ```
 
-### 5. Supervisión y Reciclaje
+### 5. Monitoring and Recycling
 
-Todo sistema tiene vida útil. El mercado cambia de régimen, la volatilidad evoluciona, nuevos participantes alteran la microestructura. Tu trabajo no termina cuando lanzás un sistema — empieza.
+Every system has a lifespan. The market changes regimes, volatility evolves, new participants alter the microstructure. Your job doesn't end when you launch a system -- it begins.
 
-**Punto de Quiebre (Clip Point)**
+**Clip Point (Kill Switch)**
 
-Definí, ANTES de lanzar, en qué condiciones pausás o retirás un sistema. En la industria se lo conoce como "clip point" o "kill switch" — el umbral donde decidís que el sistema dejó de funcionar:
+Define, BEFORE launching, under what conditions you pause or retire a system. In the industry this is known as the "clip point" or "kill switch" -- the threshold where you decide the system has stopped working:
 
 ```python
 def evaluate_system_health(rolling_metrics):
     """
-    Protocolo de supervisión: evaluar mensualmente.
-    Definir ANTES de lanzar, no durante un drawdown.
+    Monitoring protocol: evaluate monthly.
+    Define BEFORE launching, not during a drawdown.
     """
     checks = {
         'drawdown_breach': rolling_metrics['current_dd'] > rolling_metrics['max_expected_dd'] * 1.5,
@@ -149,52 +151,52 @@ def evaluate_system_health(rolling_metrics):
     triggered = [k for k, v in checks.items() if v]
 
     if len(triggered) >= 2:
-        return "PAUSAR — múltiples señales de degradación"
+        return "PAUSE -- multiple degradation signals"
     elif len(triggered) == 1:
-        return f"MONITOREAR — señal de alerta: {triggered[0]}"
+        return f"MONITOR -- alert signal: {triggered[0]}"
     return "NORMAL"
 ```
 
-**Formación continua**: el mercado evoluciona y vos también debés hacerlo. Nuevas técnicas, nuevos datos, nuevas regulaciones. Dedicá tiempo regular a aprender, no solo a operar.
+**Continuous education**: the market evolves and so must you. New techniques, new data, new regulations. Dedicate regular time to learning, not just trading.
 
-**Reciclaje de sistemas**: cuando un sistema se retira, documentá por qué. Esa información es valiosa para el diseño de futuros sistemas.
+**System recycling**: when a system is retired, document why. That information is valuable for designing future systems.
 
-### 6. Plan de Crisis
+### 6. Crisis Plan
 
-¿Qué hacés cuando las cosas salen mal de verdad?
+What do you do when things go seriously wrong?
 
-**Escenarios a planificar:**
+**Scenarios to plan for:**
 
-| Escenario | Protocolo |
+| Scenario | Protocol |
 |---|---|
-| **Corte de internet** | ¿Tenés stops en el servidor del broker (no solo locales)? ¿Podés cerrar desde el celular? |
-| **Caída del servidor** | ¿Hay redundancia? ¿Cuánto tiempo podés estar sin ejecución? |
-| **Flash crash** | ¿Tus stops están en el mercado o son simulados? Los simulados no se ejecutan si tu software se cae |
-| **Broker sin respuesta** | ¿Tenés cuenta en un segundo broker? ¿Podés hedgear la posición? |
-| **Drawdown máximo** | ¿A qué porcentaje parás todo? ¿Quién decide — vos o el código? |
-| **Corte de luz** | Un UPS de 30 minutos cuesta poco y salva mucho |
-| **Error en el código** | ¿Cómo detectás un bug en producción? ¿Hay alertas automáticas para trades anómalos? |
+| **Internet outage** | Do you have stops on the broker's server (not just local)? Can you close from your phone? |
+| **Server crash** | Is there redundancy? How long can you be without execution? |
+| **Flash crash** | Are your stops on the market or simulated? Simulated ones don't execute if your software goes down |
+| **Broker unresponsive** | Do you have an account at a second broker? Can you hedge the position? |
+| **Maximum drawdown** | At what percentage do you stop everything? Who decides -- you or the code? |
+| **Power outage** | A 30-minute UPS costs little and saves a lot |
+| **Code error** | How do you detect a bug in production? Are there automatic alerts for anomalous trades? |
 
-## Mentalidad Empresarial
+## Business Mindset
 
-El trading algorítmico es un negocio con pocas barreras de entrada — lo cual es bueno para acceder, pero significa mucha competencia. Tener un buen sistema (producto) es condición necesaria pero no suficiente.
+Algorithmic trading is a business with low barriers to entry -- which is good for access but means a lot of competition. Having a good system (product) is a necessary but not sufficient condition.
 
-Lo que diferencia a un trader profesional de uno que juega:
+What distinguishes a professional trader from one who's just playing:
 
-- **Protocolos escritos** para cada fase (diseño, testing, lanzamiento, supervisión, retiro)
-- **Análisis de costos** realista (no solo comisiones — también datos, hosting, tiempo)
-- **Métricas de negocio**, no solo de trading: ¿cuánto tiempo invertís por dólar ganado? ¿Es escalable?
-- **Plan de contingencia** para escenarios adversos
-- **Revisión periódica** del plan completo, no solo de los sistemas
+- **Written protocols** for each phase (design, testing, launch, monitoring, retirement)
+- **Realistic cost analysis** (not just commissions -- also data, hosting, time)
+- **Business metrics**, not just trading metrics: how much time do you invest per dollar earned? Is it scalable?
+- **Contingency plan** for adverse scenarios
+- **Periodic review** of the complete plan, not just the systems
 
-Independientemente de si dedicás 2 horas por semana o 12 horas por día, tratá tu trading con la seriedad de un negocio. Los mercados no distinguen entre profesionales y amateurs — pero los resultados a largo plazo sí.
+Whether you dedicate 2 hours per week or 12 hours per day, treat your trading with the seriousness of a business. The markets don't distinguish between professionals and amateurs -- but long-term results do.
 
-## Cuándo Revisar el Plan
+## When to Review the Plan
 
-| Frecuencia | Qué revisar |
+| Frequency | What to review |
 |---|---|
-| **Semanal** | Métricas de sistemas activos, alertas del protocolo de supervisión |
-| **Mensual** | Performance del portfolio completo, correlaciones entre sistemas |
-| **Trimestral** | Filosofía, costos, ¿siguen vigentes los supuestos del plan? |
-| **Ante cambios de vida** | Nuevo trabajo, cambio de capital, cambios familiares → revisar secciones 1 y 2 |
-| **Ante crisis de mercado** | No cambiar el plan durante la crisis. Revisarlo DESPUÉS, en frío, con datos |
+| **Weekly** | Active system metrics, monitoring protocol alerts |
+| **Monthly** | Complete portfolio performance, correlations between systems |
+| **Quarterly** | Philosophy, costs, are the plan's assumptions still valid? |
+| **Life changes** | New job, capital change, family changes -> review sections 1 and 2 |
+| **Market crisis** | Don't change the plan during the crisis. Review it AFTER, with a cool head, using data |

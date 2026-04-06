@@ -1,169 +1,171 @@
-# Sesgos Cognitivos en Trading Algorítmico
+> 🇪🇸 [Leer en Español](Cognitive-Biases-Algo-Trading.es.md) | 🇺🇸 **English**
 
-"Si automatizo, las emociones no me afectan." Falso. Tu robot ejecuta, pero vos decidís cuándo activarlo, cuándo pararlo, qué datos usar para diseñarlo, y cómo reaccionar cuando pierde 12 veces seguidas. La psicología sigue siendo el componente más frágil del trading algorítmico.
+# Cognitive Biases in Algorithmic Trading
 
-## Las Tres M's de Alexander Elder
+"If I automate, emotions won't affect me." Wrong. Your bot executes, but you decide when to activate it, when to stop it, what data to use for designing it, and how to react when it loses 12 times in a row. Psychology remains the most fragile component of algorithmic trading.
 
-Alexander Elder, en *Trading for a Living* (1993), descompuso el trading en tres pilares:
+## Alexander Elder's Three M's
 
-- **Mind (Mente)**: la psicología del trader
-- **Money (Dinero)**: gestión de posición y protección de capital
-- **Method (Método)**: las reglas y estrategias
+Alexander Elder, in *Trading for a Living* (1993), broke trading down into three pillars:
 
-En trading algorítmico, tendemos a pensar que solo importa el Method (el código) y el Money (el position sizing). Pero la Mind sigue siendo el pilar más importante porque:
+- **Mind**: the trader's psychology
+- **Money**: position management and capital protection
+- **Method**: the rules and strategies
 
-- Vos decidís si parar un sistema en drawdown o dejarlo correr
-- Vos elegís qué datos usar y cómo validar
-- Vos interpretás los resultados del backtest
-- Vos podés caer en la tentación de intervenir manualmente cuando "sabés" que el mercado va a hacer algo
+In algorithmic trading, we tend to think that only Method (the code) and Money (position sizing) matter. But Mind remains the most important pillar because:
 
-Sin Mind sólido, el mejor Method se sabotea solo.
+- You decide whether to stop a system in drawdown or let it run
+- You choose what data to use and how to validate
+- You interpret backtest results
+- You can fall into the temptation of manually intervening when you "know" what the market is going to do
 
-## Tu Perfil de Riesgo: El Test que Revela tu Sesgo
+Without a solid Mind, the best Method sabotages itself.
 
-Antes de diseñar cualquier sistema, necesitás entender cómo tu mente procesa ganancias y pérdidas. Estos dos escenarios, basados en la teoría de prospectos de Kahneman y Tversky, lo revelan.
+## Your Risk Profile: The Test that Reveals Your Bias
 
-### Escenario 1: Pérdidas
+Before designing any system, you need to understand how your mind processes gains and losses. These two scenarios, based on Kahneman and Tversky's prospect theory, reveal it.
 
-Elegí UNA opción:
-- **A**: Pérdida segura de $9,000
-- **B**: 95% de probabilidad de perder $10,000 + 5% de probabilidad de no perder nada
+### Scenario 1: Losses
 
-### Escenario 2: Ganancias
+Choose ONE option:
+- **A**: Certain loss of $9,000
+- **B**: 95% probability of losing $10,000 + 5% probability of losing nothing
 
-Elegí UNA opción:
-- **A**: Ganancia segura de $9,000
-- **B**: 95% de probabilidad de ganar $10,000 + 5% de probabilidad de no ganar nada
+### Scenario 2: Gains
 
-### Las Respuestas Matemáticamente Correctas
+Choose ONE option:
+- **A**: Certain gain of $9,000
+- **B**: 95% probability of gaining $10,000 + 5% probability of gaining nothing
+
+### The Mathematically Correct Answers
 
 ```python
 def expected_value(outcomes):
-    """Esperanza matemática: suma de (probabilidad × valor) para cada suceso."""
+    """Expected value: sum of (probability x value) for each outcome."""
     return sum(prob * value for prob, value in outcomes)
 
-# Escenario 1
+# Scenario 1
 ev_loss_sure = expected_value([(1.0, -9000)])           # = -9,000
 ev_loss_game = expected_value([(0.95, -10000), (0.05, 0)])  # = -9,500
-print(f"Escenario 1: Pérdida segura EV={ev_loss_sure}, Jugar EV={ev_loss_game}")
-# Mejor opción: pérdida segura (-9,000 > -9,500)
+print(f"Scenario 1: Certain loss EV={ev_loss_sure}, Gamble EV={ev_loss_game}")
+# Better option: certain loss (-9,000 > -9,500)
 
-# Escenario 2
+# Scenario 2
 ev_gain_sure = expected_value([(1.0, 9000)])             # = 9,000
 ev_gain_game = expected_value([(0.95, 10000), (0.05, 0)])  # = 9,500
-print(f"Escenario 2: Ganancia segura EV={ev_gain_sure}, Jugar EV={ev_gain_game}")
-# Mejor opción: jugar (9,500 > 9,000)
+print(f"Scenario 2: Certain gain EV={ev_gain_sure}, Gamble EV={ev_gain_game}")
+# Better option: gamble (9,500 > 9,000)
 ```
 
-**Lo que la mayoría elige**: en el Escenario 1, jugar (incorrecto). En el Escenario 2, la ganancia segura (incorrecto).
+**What most people choose**: in Scenario 1, gamble (incorrect). In Scenario 2, the certain gain (incorrect).
 
-**Lo que esto significa para tu trading**:
-- **Escenario 1**: nos cuesta aceptar pérdidas seguras → en el mercado, esto se traduce en no cortar pérdidas, mover el stop, o "esperar que vuelva"
-- **Escenario 2**: nos cuesta dejar correr ganancias → cerramos posiciones ganadoras prematuramente por miedo a perder lo ganado
+**What this means for your trading**:
+- **Scenario 1**: we struggle to accept certain losses -- in the market, this translates to not cutting losses, moving the stop, or "waiting for it to come back"
+- **Scenario 2**: we struggle to let winners run -- we close winning positions prematurely out of fear of losing what we've gained
 
-Si elegiste correctamente ambas, tenés una ventaja psicológica real. Si no, no es un problema — es la reacción normal del 70-80% de las personas. Pero ahora lo sabés, y podés diseñar tus sistemas con reglas que te protejan de vos mismo.
+If you chose correctly on both, you have a real psychological edge. If not, it's not a problem -- it's the normal reaction of 70-80% of people. But now you know, and you can design your systems with rules that protect you from yourself.
 
-## Los Sesgos por Fase de Desarrollo
+## Biases by Development Phase
 
-Los sesgos no aparecen todos juntos. Diferentes fases de tu trabajo como quant son vulnerables a diferentes sesgos.
+Biases don't all appear at once. Different phases of your work as a quant are vulnerable to different biases.
 
-### Fase 1: Búsqueda de Ideas
+### Phase 1: Idea Generation
 
-| Sesgo | Qué es | Cómo te afecta en algo trading |
+| Bias | What it is | How it affects you in algo trading |
 |---|---|---|
-| **Optimismo/Pesimismo** | Predisposición a ver todo positivo o negativo, sin base en datos | Descartás ideas viables por pesimismo o te enamorás de ideas malas por optimismo |
-| **Exceso de confianza** | Sobreestimar tus predicciones y habilidades | Tomás más riesgo del necesario, subestimás drawdowns posibles |
-| **Aversión a la pérdida** | Darle más peso a las pérdidas que a las ganancias equivalentes | No cortás pérdidas, cerrás ganancias prematuramente |
+| **Optimism/Pessimism** | Predisposition to see everything as positive or negative, without data basis | You discard viable ideas out of pessimism or fall in love with bad ideas out of optimism |
+| **Overconfidence** | Overestimating your predictions and abilities | You take more risk than necessary, underestimate possible drawdowns |
+| **Loss aversion** | Giving more weight to losses than to equivalent gains | You don't cut losses, you close gains prematurely |
 
-### Fase 2: Investigación y Análisis
+### Phase 2: Research and Analysis
 
-| Sesgo | Qué es | Cómo te afecta en algo trading |
+| Bias | What it is | How it affects you in algo trading |
 |---|---|---|
-| **Ilusión de control** | Creer que tus decisiones influyen más de lo que realmente lo hacen | Sobreoptimizás creyendo que podés "controlar" el mercado |
-| **Confirmación** | Buscar solo información que confirma lo que ya creés | Solo testeas condiciones favorables, ignorás evidencia en contra |
-| **Efecto gurú** (Pygmalion) | Darle autoridad desmedida a una persona o fuente | Copiás sistemas de un "experto" sin validarlos vos mismo |
-| **Disponibilidad** | Darle más importancia a lo que recordás fácilmente | Solo operás activos conocidos (AAPL, TSLA) sin evaluar si son los mejores |
-| **Anclaje** | Fijarte en un número o idea específica y decidir alrededor de eso | Creés que un número redondo ($100, $50) tiene significado especial sin evidencia |
-| **Efecto grupo** | Seguir la opinión mayoritaria | Elegís estrategias "de moda" en vez de las que los datos soportan |
+| **Illusion of control** | Believing your decisions influence outcomes more than they actually do | You over-optimize believing you can "control" the market |
+| **Confirmation** | Seeking only information that confirms what you already believe | You only test favorable conditions, ignoring contradictory evidence |
+| **Guru effect** (Pygmalion) | Giving excessive authority to a person or source | You copy systems from an "expert" without validating them yourself |
+| **Availability** | Giving more importance to what you easily remember | You only trade well-known assets (AAPL, TSLA) without evaluating whether they're the best |
+| **Anchoring** | Fixating on a specific number or idea and deciding around it | You believe a round number ($100, $50) has special significance without evidence |
+| **Herding** | Following the majority opinion | You choose "trendy" strategies instead of those supported by data |
 
-**El sesgo de confirmación es el más peligroso en esta fase.** Es extremadamente fácil backtestear solo las condiciones que favorecen tu hipótesis e ignorar las que la contradicen. Protocolo, protocolo, protocolo.
+**Confirmation bias is the most dangerous in this phase.** It's extremely easy to backtest only the conditions that favor your hypothesis and ignore those that contradict it. Protocol, protocol, protocol.
 
-### Fase 3: Sesgos Específicos del Trading Algorítmico
+### Phase 3: Biases Specific to Algorithmic Trading
 
-Estos sesgos son propios del trabajo con datos y backtesting. No existen (o son menos relevantes) en trading discrecional. Para el protocolo que previene estos sesgos, ver [Método Científico en Desarrollo de Sistemas](../technical-practices/Scientific-Method-System-Development.md).
+These biases are inherent to working with data and backtesting. They don't exist (or are less relevant) in discretionary trading. For the protocol that prevents these biases, see [Scientific Method in System Development](../technical-practices/Scientific-Method-System-Development.md).
 
-**Sesgo de selección (Selection Bias)**
+**Selection Bias**
 
-Elegir subconjuntos de datos de manera arbitraria. "Voy a testear solo de 2020 a 2023 porque ahí el mercado era alcista." Los datos de entrenamiento, validación y out-of-sample deben seleccionarse con protocolo, no con conveniencia.
+Choosing data subsets arbitrarily. "I'll only test from 2020 to 2023 because the market was bullish then." Training, validation, and out-of-sample data must be selected with protocol, not convenience.
 
-**Sesgo de anticipación (Look-Ahead Bias)**
+**Look-Ahead Bias**
 
-Usar información que no estaría disponible en tiempo real. Es el más técnico y el más traicionero.
+Using information that wouldn't be available in real time. It's the most technical and the most treacherous.
 
 ```python
-# INCORRECTO: look-ahead bias
-# El RSI del día se calcula con el close del día,
-# pero tu señal de compra se genera DURANTE el día
+# INCORRECT: look-ahead bias
+# The day's RSI is calculated with the day's close,
+# but your buy signal is generated DURING the day
 data['rsi'] = calculate_rsi(data['close'], 14)
-data['signal'] = data['rsi'] < 30  # usás el RSI del día para comprar ese mismo día
+data['signal'] = data['rsi'] < 30  # you use today's RSI to buy that same day
 
-# CORRECTO: usar datos disponibles al momento de la decisión
+# CORRECT: use data available at the time of the decision
 data['rsi'] = calculate_rsi(data['close'], 14)
-data['signal'] = data['rsi'].shift(1) < 30  # señal basada en el RSI del día anterior
+data['signal'] = data['rsi'].shift(1) < 30  # signal based on the previous day's RSI
 ```
 
-Algunos lenguajes de backtesting previenen esto por diseño. Python/pandas no — sos responsable de evitarlo vos.
+Some backtesting languages prevent this by design. Python/pandas does not -- you're responsible for avoiding it yourself.
 
-**Data Snooping (Torturar los Datos)**
+**Data Snooping (Torturing the Data)**
 
-Como dijo Ronald Coase: "Si torturás los datos lo suficiente, eventualmente confiesan lo que querés." También conocido como **p-hacking** o **data mining bias** — buscar patrones exhaustivamente hasta encontrar algo que fitee, sin significancia estadística real.
+As Ronald Coase said: "If you torture the data long enough, it will eventually confess to whatever you want." Also known as **p-hacking** or **data mining bias** -- exhaustively searching for patterns until you find something that fits, without real statistical significance.
 
-Si probás 1000 combinaciones de parámetros, por puro azar ~50 van a parecer rentables. Eso no es un sistema — es ruido. La solución: validación out-of-sample rigurosa y walk-forward analysis.
+If you test 1,000 parameter combinations, by pure chance ~50 will appear profitable. That's not a system -- it's noise. The solution: rigorous out-of-sample validation and walk-forward analysis.
 
-**Sesgo de supervivencia (Survivorship Bias)**
+**Survivorship Bias**
 
-Backtestear con las acciones que existen HOY, ignorando las que quebraron o fueron deslistadas. El S&P 500 de hoy no es el de hace 10 años — las empresas que quebraron fueron reemplazadas. Si tu backtest histórico solo usa las sobrevivientes, los resultados están inflados.
+Backtesting with stocks that exist TODAY, ignoring those that went bankrupt or were delisted. Today's S&P 500 is not the same as 10 years ago -- the companies that went bankrupt were replaced. If your historical backtest only uses survivors, the results are inflated.
 
 ```python
-# Si backtesteas una estrategia rotacional de acciones del S&P 500
-# desde 2010, necesitás la composición del índice EN CADA MOMENTO,
-# incluyendo las que fueron removidas (Lehman, Enron, etc.)
+# If you backtest a rotational strategy on S&P 500 stocks
+# from 2010, you need the index composition AT EACH POINT IN TIME,
+# including those that were removed (Lehman, Enron, etc.)
 #
-# Fuentes con datos libres de survivorship bias:
+# Sources with survivorship bias-free data:
 # - Sharadar (Nasdaq Data Link)
 # - CRSP
 # - Norgate Data
 ```
 
-### Fase 4: Evaluación y Optimización
+### Phase 4: Evaluation and Optimization
 
-| Sesgo | Qué es | Cómo te afecta |
+| Bias | What it is | How it affects you |
 |---|---|---|
-| **Validación insuficiente** | Muestras demasiado chicas para ser significativas | 30 trades no prueban nada. Necesitás cientos para conclusiones válidas |
-| **Sesgo de normalidad** | Asumir que los retornos siguen una distribución normal | Subestimás cisnes negros. Las colas reales son mucho más gruesas |
+| **Insufficient validation** | Samples too small to be significant | 30 trades prove nothing. You need hundreds for valid conclusions |
+| **Normality bias** | Assuming returns follow a normal distribution | You underestimate black swans. Real tails are much fatter |
 
-El sesgo de normalidad merece atención especial. Si diseñás tu gestión de riesgo asumiendo distribución normal, estás subestimando la frecuencia de eventos extremos en un factor de 10x o más.
+The normality bias deserves special attention. If you design your risk management assuming a normal distribution, you're underestimating the frequency of extreme events by a factor of 10x or more.
 
-### Fase 5: Operativa en Vivo
+### Phase 5: Live Trading
 
-| Sesgo | Qué es | Cómo te afecta |
+| Bias | What it is | How it affects you |
 |---|---|---|
-| **Falacia del jugador** | Creer que eventos independientes están correlacionados | "Lleva 8 pérdidas seguidas, la siguiente TIENE que ser ganadora" — no, no tiene |
-| **Status quo** | Resistencia a cambiar | No actualizar sistemas que ya no funcionan porque "siempre hicieron esto" |
-| **Coste hundido** | Mantener algo solo porque ya invertiste mucho en ello | Seguir operando un sistema roto porque te llevó 6 meses desarrollarlo |
-| **Dotación** | Sobrevalorar lo que ya tenés | Creer que tus sistemas son mejores que nuevas alternativas solo porque son tuyos |
+| **Gambler's fallacy** | Believing independent events are correlated | "It's had 8 losses in a row, the next one HAS to be a winner" -- no, it doesn't |
+| **Status quo** | Resistance to change | Not updating systems that no longer work because "they've always done this" |
+| **Sunk cost** | Keeping something only because you've already invested a lot in it | Continuing to run a broken system because it took you 6 months to develop |
+| **Endowment** | Overvaluing what you already have | Believing your systems are better than new alternatives simply because they're yours |
 
 ```python
 def is_gambler_fallacy(consecutive_losses, expected_loss_streaks):
     """
-    Después de N pérdidas consecutivas, la probabilidad del
-    siguiente trade sigue siendo la misma. Los trades son
-    (generalmente) eventos independientes.
+    After N consecutive losses, the probability of the
+    next trade remains the same. Trades are
+    (generally) independent events.
     """
-    # Un sistema con 40% win rate puede tener rachas de:
-    # 5 pérdidas: ~7.8% de probabilidad en cualquier secuencia de 5
-    # 10 pérdidas: ~0.6% - raro pero esperable en 1000+ trades
-    # 15 pérdidas: ~0.05% - muy raro pero posible
+    # A system with 40% win rate can have streaks of:
+    # 5 losses: ~7.8% probability in any sequence of 5
+    # 10 losses: ~0.6% - rare but expected in 1000+ trades
+    # 15 losses: ~0.05% - very rare but possible
 
     from math import pow
     loss_rate = 0.60  # 40% win rate = 60% loss rate
@@ -171,22 +173,22 @@ def is_gambler_fallacy(consecutive_losses, expected_loss_streaks):
 
     return {
         'prob_this_streak': f"{prob_streak*100:.2f}%",
-        'message': "La probabilidad del próximo trade NO cambia por los anteriores."
+        'message': "The probability of the next trade does NOT change because of previous ones."
     }
 ```
 
-## Protocolo Anti-Sesgos
+## Anti-Bias Protocol
 
-No podés eliminar los sesgos — son parte de cómo funciona el cerebro humano. Pero podés construir protocolos que los neutralicen:
+You can't eliminate biases -- they're part of how the human brain works. But you can build protocols that neutralize them:
 
-1. **Escribí tus reglas ANTES de ver los resultados.** Definí qué vas a testear, con qué datos, y qué criterio de éxito usás. Si lo definís después de ver el backtest, estás sesgado.
+1. **Write your rules BEFORE seeing the results.** Define what you're going to test, with what data, and what success criteria you'll use. If you define it after seeing the backtest, you're biased.
 
-2. **Usá out-of-sample siempre.** Reservá un período de datos que NUNCA uses para optimizar. Es tu prueba de realidad.
+2. **Always use out-of-sample.** Reserve a data period that you NEVER use for optimization. It's your reality check.
 
-3. **Registrá tus decisiones.** Un diario de trading algorítmico no registra trades (eso lo hace el log del sistema). Registra decisiones: "Hoy pausé el sistema X porque..." Releé esas entradas un mes después — vas a sorprenderte de cuánto cambia tu perspectiva.
+3. **Record your decisions.** An algorithmic trading journal doesn't record trades (the system log does that). It records decisions: "Today I paused system X because..." Re-read those entries a month later -- you'll be surprised at how much your perspective changed.
 
-4. **Definí el clip point antes de lanzar.** ¿Cuánto drawdown o cuántas pérdidas consecutivas hacen que pares el sistema? Definilo cuando NO estás en drawdown. Escribilo. No lo cambies durante la operativa.
+4. **Define the clip point before launching.** How much drawdown or how many consecutive losses will make you stop the system? Define it when you're NOT in drawdown. Write it down. Don't change it during live trading.
 
-5. **Pedí una segunda opinión sobre tus datos**, no sobre tu opinión de mercado. Mostrá tu metodología de backtest a alguien y preguntá: "¿ves algún sesgo en cómo estoy testeando esto?"
+5. **Ask for a second opinion on your data**, not on your market opinion. Show your backtest methodology to someone and ask: "Do you see any bias in how I'm testing this?"
 
-6. **Aceptá que todo sistema tiene vida útil.** No existe el sistema eterno. Diseñá desde el inicio un protocolo de supervisión con métricas rolling que te digan cuándo el edge se está degradando, antes de que sea obvio.
+6. **Accept that every system has a lifespan.** There's no such thing as an eternal system. Design from the start a monitoring protocol with rolling metrics that tell you when the edge is degrading, before it becomes obvious.

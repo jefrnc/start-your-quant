@@ -1,19 +1,21 @@
-# Volumen y RVol (Relative Volume)
+> 🇪🇸 [Leer en Español](volume_rvol.es.md) | 🇺🇸 **English**
 
-## El Combustible del Movimiento
+# Volume and RVol (Relative Volume)
 
-En small caps, el volumen es TODO. Sin volumen, no hay movimiento. Con volumen excesivo, hay oportunidad. RVol (Relative Volume) es mi indicador #1 para filtrar qué stocks mirar.
+## The Fuel Behind the Move
 
-## Cálculo de RVol
+In small caps, volume is EVERYTHING. Without volume, there is no movement. With excessive volume, there is opportunity. RVol (Relative Volume) is my #1 indicator for filtering which stocks to watch.
+
+## RVol Calculation
 
 ```python
 def calculate_rvol(df, lookback=10, time_based=True):
-    """Calcular Relative Volume"""
+    """Calculate Relative Volume"""
     if time_based:
-        # RVol por tiempo del día (más preciso)
+        # Time-of-day RVol (more precise)
         df['time'] = df.index.time
         
-        # Volumen promedio para cada minuto de los últimos N días
+        # Average volume for each minute over the last N days
         volume_by_time = {}
         for i in range(1, lookback + 1):
             date = df.index[-1].date() - pd.Timedelta(days=i)
@@ -24,45 +26,45 @@ def calculate_rvol(df, lookback=10, time_based=True):
                     volume_by_time[time_key] = []
                 volume_by_time[time_key].append(row['volume'])
         
-        # Promedio por tiempo
+        # Average by time
         avg_volume_by_time = {
             time: np.mean(vols) for time, vols in volume_by_time.items()
         }
         
-        # Calcular RVol
+        # Calculate RVol
         df['avg_volume_time'] = df.index.time.map(avg_volume_by_time)
         df['rvol'] = df['volume'] / df['avg_volume_time']
         
     else:
-        # RVol simple (menos preciso pero más rápido)
+        # Simple RVol (less precise but faster)
         df['avg_volume'] = df['volume'].rolling(lookback).mean().shift(1)
         df['rvol'] = df['volume'] / df['avg_volume']
     
-    # Llenar NaN con 1 (volumen normal)
+    # Fill NaN with 1 (normal volume)
     df['rvol'] = df['rvol'].fillna(1)
     
     return df
 ```
 
-## RVol para Day Trading
+## RVol for Day Trading
 
 ```python
 def rvol_day_trading_setup(df, rvol_threshold=2):
-    """Identificar setups basados en RVol"""
+    """Identify setups based on RVol"""
     df = calculate_rvol(df, time_based=True)
     
-    # Clasificar niveles de RVol
+    # Classify RVol levels
     df['rvol_level'] = pd.cut(
         df['rvol'],
         bins=[0, 1, 2, 3, 5, 10, np.inf],
         labels=['low', 'normal', 'high', 'very_high', 'extreme', 'explosive']
     )
     
-    # Detectar spikes de volumen
+    # Detect volume spikes
     df['volume_spike'] = df['rvol'] > rvol_threshold
-    df['sustained_volume'] = df['volume_spike'].rolling(5).sum() >= 3  # 3 de 5 barras
+    df['sustained_volume'] = df['volume_spike'].rolling(5).sum() >= 3  # 3 of 5 bars
     
-    # Combinación con precio
+    # Combination with price
     df['bullish_volume'] = df['volume_spike'] & (df['close'] > df['open'])
     df['bearish_volume'] = df['volume_spike'] & (df['close'] < df['open'])
     
@@ -71,39 +73,39 @@ def rvol_day_trading_setup(df, rvol_threshold=2):
 
 ## Volume Profile
 
-Dónde se ejecutó más volumen = niveles clave.
+Where the most volume was executed = key levels.
 
 ```python
 def calculate_volume_profile(df, bins=50):
-    """Crear perfil de volumen"""
-    # Definir bins de precio
+    """Create volume profile"""
+    # Define price bins
     price_min = df['low'].min()
     price_max = df['high'].max()
     price_bins = np.linspace(price_min, price_max, bins)
     
-    # Acumular volumen por nivel de precio
+    # Accumulate volume by price level
     volume_profile = np.zeros(len(price_bins) - 1)
     
     for idx, row in df.iterrows():
-        # Distribuir volumen entre low y high
+        # Distribute volume between low and high
         for i in range(len(price_bins) - 1):
             if price_bins[i] <= row['high'] and price_bins[i+1] >= row['low']:
-                # Porción del rango que cae en este bin
+                # Portion of the range that falls in this bin
                 overlap_low = max(row['low'], price_bins[i])
                 overlap_high = min(row['high'], price_bins[i+1])
                 overlap_pct = (overlap_high - overlap_low) / (row['high'] - row['low'])
                 volume_profile[i] += row['volume'] * overlap_pct
     
-    # Crear DataFrame
+    # Create DataFrame
     vp_df = pd.DataFrame({
         'price': (price_bins[:-1] + price_bins[1:]) / 2,
         'volume': volume_profile
     })
     
-    # Identificar POC (Point of Control)
+    # Identify POC (Point of Control)
     vp_df['poc'] = vp_df['volume'] == vp_df['volume'].max()
     
-    # Value Area (70% del volumen)
+    # Value Area (70% of volume)
     total_volume = vp_df['volume'].sum()
     vp_df = vp_df.sort_values('volume', ascending=False)
     vp_df['cum_volume'] = vp_df['volume'].cumsum()
@@ -116,15 +118,15 @@ def calculate_volume_profile(df, bins=50):
 
 ```python
 def detect_volume_patterns(df, window=20):
-    """Detectar patrones de volumen importantes"""
-    # Preparar datos
+    """Detect important volume patterns"""
+    # Prepare data
     df['volume_ma'] = df['volume'].rolling(window).mean()
     df['volume_std'] = df['volume'].rolling(window).std()
     
     # 1. Climax Volume
     df['climax_volume'] = df['volume'] > (df['volume_ma'] + 3 * df['volume_std'])
     
-    # 2. Dry Up (secado de volumen)
+    # 2. Dry Up (volume drying up)
     df['volume_dryup'] = df['volume'] < df['volume_ma'] * 0.5
     
     # 3. Volume Divergence
@@ -144,22 +146,22 @@ def detect_volume_patterns(df, window=20):
 
 ## Smart Money Volume
 
-Detectar volumen institucional vs retail.
+Detect institutional vs retail volume.
 
 ```python
 def analyze_smart_money_volume(df, block_size=10000):
-    """Identificar volumen institucional"""
-    # Tamaño promedio de trade (aproximado)
+    """Identify institutional volume"""
+    # Approximate average trade size
     df['avg_trade_size'] = df['volume'] / df['tick_count'] if 'tick_count' in df else 100
     
     # Large blocks
     df['large_block'] = df['avg_trade_size'] > block_size
     
-    # Volume en primera y última hora (institucionales)
+    # Volume in first and last hour (institutional)
     df['hour'] = df.index.hour
     df['institutional_hours'] = df['hour'].isin([9, 10, 15])
     
-    # Dark pool prints (si tienes data)
+    # Dark pool prints (if data available)
     if 'dark_pool_volume' in df.columns:
         df['dark_pool_ratio'] = df['dark_pool_volume'] / df['volume']
         df['high_dark_pool'] = df['dark_pool_ratio'] > 0.3
@@ -182,28 +184,28 @@ def analyze_smart_money_volume(df, block_size=10000):
 
 ```python
 def volume_breakout_signals(df, volume_multiplier=3, price_threshold=0.02):
-    """Detectar breakouts con volumen"""
+    """Detect breakouts with volume"""
     df = calculate_rvol(df)
     
-    # Preparar indicadores
+    # Prepare indicators
     df['resistance'] = df['high'].rolling(20).max()
     df['support'] = df['low'].rolling(20).min()
     
-    # Breakout alcista
+    # Bullish breakout
     df['breakout_up'] = (
-        (df['close'] > df['resistance'].shift(1)) &  # Rompe resistencia
-        (df['rvol'] > volume_multiplier) &           # Con volumen alto
-        (df['close'] > df['open'])                   # Vela verde
+        (df['close'] > df['resistance'].shift(1)) &  # Breaks resistance
+        (df['rvol'] > volume_multiplier) &           # With high volume
+        (df['close'] > df['open'])                   # Green candle
     )
     
-    # Breakout bajista
+    # Bearish breakout
     df['breakout_down'] = (
         (df['close'] < df['support'].shift(1)) &
         (df['rvol'] > volume_multiplier) &
         (df['close'] < df['open'])
     )
     
-    # Fuerza del breakout
+    # Breakout strength
     df['breakout_strength'] = np.where(
         df['breakout_up'],
         (df['close'] - df['resistance'].shift(1)) / df['resistance'].shift(1) * 100,
@@ -221,24 +223,24 @@ def volume_breakout_signals(df, volume_multiplier=3, price_threshold=0.02):
 
 ```python
 def calculate_obv_signals(df):
-    """On Balance Volume con señales"""
-    # OBV clásico
+    """On Balance Volume with signals"""
+    # Classic OBV
     df['obv'] = (df['volume'] * np.sign(df['close'] - df['close'].shift(1))).cumsum()
     
-    # OBV suavizado
+    # Smoothed OBV
     df['obv_ema'] = df['obv'].ewm(span=20).mean()
     
-    # Divergencias
+    # Divergences
     df['price_high'] = df['close'].rolling(20).max()
     df['obv_high'] = df['obv'].rolling(20).max()
     
-    # Divergencia bajista: precio hace nuevo high, OBV no
+    # Bearish divergence: price makes new high, OBV does not
     df['bearish_obv_divergence'] = (
         (df['close'] == df['price_high']) & 
         (df['obv'] < df['obv_high'].shift(20))
     )
     
-    # Señal de confirmación
+    # Confirmation signal
     df['obv_trend_up'] = df['obv'] > df['obv_ema']
     df['obv_breakout'] = df['obv'] > df['obv'].rolling(50).max().shift(1)
     
@@ -249,7 +251,7 @@ def calculate_obv_signals(df):
 
 ```python
 def volume_weighted_momentum(df, period=14):
-    """Momentum ponderado por volumen"""
+    """Volume-weighted momentum"""
     # Price momentum
     df['price_change'] = df['close'] - df['close'].shift(period)
     
@@ -257,10 +259,10 @@ def volume_weighted_momentum(df, period=14):
     weights = df['volume'].rolling(period).apply(lambda x: x / x.sum())
     df['vw_momentum'] = df['price_change'] * weights
     
-    # Normalizar
+    # Normalize
     df['vw_momentum_normalized'] = df['vw_momentum'] / df['close'] * 100
     
-    # Señales
+    # Signals
     df['strong_bullish_momentum'] = (
         (df['vw_momentum_normalized'] > 5) & 
         (df['rvol'] > 2)
@@ -273,14 +275,14 @@ def volume_weighted_momentum(df, period=14):
 
 ```python
 def analyze_premarket_volume(ticker, date):
-    """Analizar volumen pre-market"""
-    # Obtener data pre-market
+    """Analyze pre-market volume"""
+    # Get pre-market data
     pm_start = pd.Timestamp(date).replace(hour=4, minute=0)
     pm_end = pd.Timestamp(date).replace(hour=9, minute=29)
     
     pm_data = get_intraday_data(ticker, start=pm_start, end=pm_end)
     
-    # Métricas
+    # Metrics
     analysis = {
         'total_pm_volume': pm_data['volume'].sum(),
         'pm_vwap': calculate_vwap(pm_data)['vwap'].iloc[-1],
@@ -290,7 +292,7 @@ def analyze_premarket_volume(ticker, date):
         'volume_profile': pm_data.groupby(pd.cut(pm_data['close'], bins=10))['volume'].sum()
     }
     
-    # Comparar con días anteriores
+    # Compare with previous days
     historical_pm_volume = []
     for i in range(1, 11):
         hist_date = date - pd.Timedelta(days=i)
@@ -303,7 +305,7 @@ def analyze_premarket_volume(ticker, date):
     return analysis
 ```
 
-## Alertas de Volumen
+## Volume Alerts
 
 ```python
 class VolumeAlertSystem:
@@ -314,7 +316,7 @@ class VolumeAlertSystem:
     def check_alerts(self, ticker, current_data):
         alerts = []
         
-        # RVol extremo
+        # Extreme RVol
         if current_data['rvol'] > self.thresholds['rvol_extreme']:
             alert_key = f"{ticker}_rvol_{current_data.name}"
             if alert_key not in self.alerted:
@@ -323,42 +325,42 @@ class VolumeAlertSystem:
         
         # Climax volume
         if current_data.get('climax_volume', False):
-            alerts.append(f"💥 {ticker}: CLIMAX VOLUME - Posible top/bottom")
+            alerts.append(f"💥 {ticker}: CLIMAX VOLUME - Possible top/bottom")
         
-        # Volume dry up en soporte
+        # Volume dry up at support
         if current_data.get('volume_dryup', False) and current_data['close'] > current_data['support']:
-            alerts.append(f"📉 {ticker}: Volume dry up en soporte ${current_data['support']:.2f}")
+            alerts.append(f"📉 {ticker}: Volume dry up at support ${current_data['support']:.2f}")
         
         return alerts
 ```
 
-## Tips Prácticos
+## Practical Tips
 
 ### 1. Morning Volume Rate
 ```python
 def morning_volume_rate(df):
-    """Tasa de volumen en primera hora"""
+    """First hour volume rate"""
     first_hour = df.between_time('09:30', '10:30')
     first_hour_vol = first_hour['volume'].sum()
     
     avg_daily_vol = df.groupby(df.index.date)['volume'].sum().mean()
     
-    # Si primera hora > 30% del volumen diario promedio = día activo
+    # If first hour > 30% of average daily volume = active day
     return first_hour_vol / avg_daily_vol
 ```
 
-### 2. Volume Patterns por Hora
+### 2. Volume Patterns by Hour
 ```python
 def hourly_volume_pattern(df):
-    """Patrón típico de volumen por hora"""
+    """Typical volume pattern by hour"""
     df['hour'] = df.index.hour
     hourly_avg = df.groupby('hour')['volume'].mean()
     
-    # Normalizar (primera hora = 100)
+    # Normalize (first hour = 100)
     hourly_pattern = hourly_avg / hourly_avg[9] * 100
     return hourly_pattern
 ```
 
-## Siguiente Paso
+## Next Step
 
-Continuemos con [Spike HOD/LOD](spike_hod_lod.md), crítico para timing en small caps.
+Let's continue with [Spike HOD/LOD](spike_hod_lod.md), critical for timing in small caps.

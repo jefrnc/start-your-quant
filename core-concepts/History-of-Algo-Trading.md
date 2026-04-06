@@ -1,19 +1,21 @@
-# Historia del Trading Algorítmico: Lo que Importa para Vos Hoy
+> 🇪🇸 [Leer en Español](History-of-Algo-Trading.es.md) | 🇺🇸 **English**
 
-La historia del algo trading no es solo trivia — cada etapa dejó herramientas, lecciones y estrategias que siguen vigentes. Entender de dónde viene este campo te ayuda a separar lo esencial de lo que es moda.
+# History of Algorithmic Trading: What Matters for You Today
 
-## 1949-1970: Las Reglas Antes que las Máquinas
+The history of algo trading isn't just trivia -- each era left behind tools, lessons, and strategies that remain relevant. Understanding where this field comes from helps you separate the essential from the trendy.
 
-### Richard Donchian y el Nacimiento del Trading Sistemático
+## 1949-1970: Rules Before Machines
 
-En 1949, Richard Donchian lanzó el primer fondo que operaba con **reglas estrictas y objetivas** — sin discreción, sin "feeling". Su herramienta principal: los canales de 4 semanas (comprar cuando el precio rompe el máximo de 20 días, vender cuando rompe el mínimo).
+### Richard Donchian and the Birth of Systematic Trading
+
+In 1949, Richard Donchian launched the first fund that operated with **strict and objective rules** -- no discretion, no "feeling." His main tool: 4-week channels (buy when the price breaks the 20-day high, sell when it breaks the low).
 
 ```python
 def donchian_channel(highs, lows, period=20):
     """
-    La estrategia de Donchian de 1949. Sí, sigue funcionando.
-    Muchos CTAs (Commodity Trading Advisors) operan variaciones
-    de esto con miles de millones bajo gestión.
+    Donchian's 1949 strategy. Yes, it still works.
+    Many CTAs (Commodity Trading Advisors) run variations
+    of this with billions under management.
     """
     upper = highs.rolling(period).max()
     lower = lows.rolling(period).min()
@@ -22,68 +24,68 @@ def donchian_channel(highs, lows, period=20):
 
 def donchian_signal(close, upper, lower):
     if close > upper:
-        return 1   # breakout alcista → largo
+        return 1   # bullish breakout -> long
     elif close < lower:
-        return -1  # breakout bajista → corto
-    return 0       # dentro del canal → sin señal
+        return -1  # bearish breakout -> short
+    return 0       # inside channel -> no signal
 ```
 
-**Lección vigente**: no necesitás complejidad para tener edge. Los canales de Donchian, con 75 años de historia, siguen siendo la base de muchos fondos trend-following. La sofisticación está en la gestión de riesgo y portfolio, no en la señal de entrada.
+**Lesson that still holds**: you don't need complexity to have an edge. Donchian channels, with 75 years of history, remain the foundation of many trend-following funds. The sophistication lies in risk and portfolio management, not in the entry signal.
 
-### Markowitz y la Teoría de Portfolios (1952)
+### Markowitz and Modern Portfolio Theory (1952)
 
-Harry Markowitz formalizó algo que hoy parece obvio: la diversificación reduce el riesgo sin reducir proporcionalmente el retorno. Su frontera eficiente demostró matemáticamente que **un portfolio bien construido supera a cualquier activo individual ajustado por riesgo**.
+Harry Markowitz formalized something that seems obvious today: diversification reduces risk without proportionally reducing return. His efficient frontier mathematically demonstrated that **a well-constructed portfolio outperforms any individual asset on a risk-adjusted basis**.
 
-A partir de los años 60, las ideas de Markowitz empezaron a aplicarse computacionalmente en universidades e instituciones financieras, sentando las bases para el arbitraje y la optimización de portfolios asistida por computadora.
+Starting in the 1960s, Markowitz's ideas began to be applied computationally at universities and financial institutions, laying the groundwork for arbitrage and computer-assisted portfolio optimization.
 
-**Lección vigente**: la diversificación entre sistemas descorrelacionados sigue siendo el concepto más potente en gestión de portfolios algorítmicos. No es glamoroso, pero funciona.
+**Lesson that still holds**: diversification across uncorrelated systems remains the most powerful concept in algorithmic portfolio management. It's not glamorous, but it works.
 
-## 1978-1998: La Infraestructura que Hizo Todo Posible
+## 1978-1998: The Infrastructure That Made It All Possible
 
-### Los Cimientos del Mercado Electrónico
+### The Foundations of Electronic Markets
 
-| Año | Evento | Por qué importa |
+| Year | Event | Why it matters |
 |---|---|---|
-| 1978 | Primer sistema de negociación intermercado (Nasdaq) | Los mercados empiezan a conectarse electrónicamente |
-| 1981 | Fundación de Bloomberg | Terminal de referencia institucional — acceso a datos en tiempo real |
-| 1982 | Jim Simons funda Renaissance Technologies | Empieza como firma de investigación, no como fondo quant aún |
-| 1991 | World Wide Web | Información financiera accesible globalmente por primera vez |
-| 1993 | Interactive Brokers se lanza como broker online | Democratiza el acceso a mercados — antes necesitabas llamar a un broker por teléfono |
-| 1998 | SEC regula mercados electrónicos | Nacimiento oficial del trading algorítmico moderno |
+| 1978 | First intermarket trading system (Nasdaq) | Markets begin connecting electronically |
+| 1981 | Bloomberg founded | Institutional reference terminal -- real-time data access |
+| 1982 | Jim Simons founds Renaissance Technologies | Starts as a research firm, not a quant fund yet |
+| 1991 | World Wide Web | Financial information accessible globally for the first time |
+| 1993 | Interactive Brokers launches as online broker | Democratizes market access -- previously you needed to call a broker by phone |
+| 1998 | SEC regulates electronic markets | Official birth of modern algorithmic trading |
 
-### Renaissance Technologies: Referente, No Requisito
+### Renaissance Technologies: Reference, Not Requirement
 
-Jim Simons armó el equipo más extraordinario de la historia del trading: matemáticos, físicos, criptógrafos. Su fondo Medallion tiene retornos anualizados extraordinarios (reportados en torno al 60-70% bruto antes de fees, según diversas fuentes) desde finales de los 80.
+Jim Simons assembled the most extraordinary team in trading history: mathematicians, physicists, cryptographers. Their Medallion fund has extraordinary annualized returns (reported around 60-70% gross before fees, according to various sources) since the late 80s.
 
-Pero Medallion opera con ventajas que un trader individual no puede replicar:
-- Infraestructura de datos y ejecución de miles de millones de dólares
-- Equipos de 300+ PhD dedicados full-time
-- Acceso a datos y mercados que no están disponibles para retail
+But Medallion operates with advantages an individual trader cannot replicate:
+- Billions of dollars in data and execution infrastructure
+- Teams of 300+ full-time PhDs
+- Access to data and markets not available to retail
 
-**Lección vigente**: Renaissance demuestra que el mercado tiene ineficiencias explotables con métodos cuantitativos. Pero no necesitás su nivel de sofisticación. Hay un espacio enorme entre "opero por intuición" y "tengo 300 PhDs" donde estrategias relativamente simples, bien ejecutadas, son rentables.
+**Lesson that still holds**: Renaissance proves the market has exploitable inefficiencies using quantitative methods. But you don't need their level of sophistication. There's a huge space between "I trade on intuition" and "I have 300 PhDs" where relatively simple strategies, well executed, are profitable.
 
-## 2000-2010: La Explosión
+## 2000-2010: The Explosion
 
-### Decimalización: El Cambio que Nadie Menciona
+### Decimalization: The Change Nobody Mentions
 
-Entre 2000 y 2001, los mercados US completaron la transición de cotizar en fracciones (1/16 de dólar = $0.0625) a cotizar en centavos ($0.01). Esto parece menor, pero fue revolucionario:
+Between 2000 and 2001, US markets completed the transition from quoting in fractions (1/16 of a dollar = $0.0625) to quoting in cents ($0.01). This seems minor, but it was revolutionary:
 
-- **Antes**: el spread mínimo era $0.0625. Una estrategia que ganara menos que eso por trade era inviable
-- **Después**: el spread se comprimió a $0.01. Estrategias de alta frecuencia y scalping se volvieron posibles
+- **Before**: the minimum spread was $0.0625. A strategy earning less than that per trade was unviable
+- **After**: the spread compressed to $0.01. High frequency and scalping strategies became possible
 
-El volumen algorítmico pasó de ~5% a ~50% en esta década. No fue por "mejores algoritmos" — fue porque la microestructura del mercado finalmente permitía que funcionaran.
+Algorithmic volume went from ~5% to ~50% in this decade. It wasn't because of "better algorithms" -- it was because the market microstructure finally allowed them to work.
 
-**Lección vigente**: cuando evaluás una estrategia histórica, considerá los costos de transacción de la época. Un backtest que empieza en 1995 con spreads de $0.01 está mintiendo — los spreads reales eran 6x más grandes. Siempre modelá costos realistas.
+**Lesson that still holds**: when evaluating a historical strategy, consider the transaction costs of the era. A backtest starting in 1995 with $0.01 spreads is lying -- real spreads were 6x larger. Always model realistic costs.
 
 ```python
 def realistic_transaction_costs(year, is_small_cap=False):
     """
-    Costos aproximados de transacción por era.
-    Tu backtest debería usar estos, no un costo fijo.
+    Approximate transaction costs by era.
+    Your backtest should use these, not a fixed cost.
     """
     if year < 2001:
-        spread = 0.0625  # pre-decimalización
-        commission = 0.01  # por acción
+        spread = 0.0625  # pre-decimalization
+        commission = 0.01  # per share
     elif year < 2010:
         spread = 0.02 if not is_small_cap else 0.05
         commission = 0.005
@@ -91,7 +93,7 @@ def realistic_transaction_costs(year, is_small_cap=False):
         spread = 0.01 if not is_small_cap else 0.03
         commission = 0.005  # IBKR-style
 
-    # Para small caps el spread puede ser mucho mayor
+    # For small caps the spread can be much larger
     return {
         'spread_per_share': spread,
         'commission_per_share': commission,
@@ -99,109 +101,109 @@ def realistic_transaction_costs(year, is_small_cap=False):
     }
 ```
 
-### El Flash Crash de 2010
+### The 2010 Flash Crash
 
-El 6 de mayo de 2010, el Dow Jones cayó ~1000 puntos en minutos. La causa: un algoritmo ejecutó una orden de venta masiva de futuros E-mini S&P 500 sin límite de precio, creando una cascada donde otros algoritmos reaccionaron vendiendo, que a su vez disparó más ventas algorítmicas.
+On May 6, 2010, the Dow Jones dropped ~1,000 points in minutes. The cause: an algorithm executed a massive sell order of E-mini S&P 500 futures with no price limit, creating a cascade where other algorithms reacted by selling, which in turn triggered more algorithmic selling.
 
-Consecuencias directas:
-- Se implementaron **circuit breakers** (HALT) que pausan el mercado en caídas del 7%, 14% y 20%
-- Se crearon reglas de "limit up/limit down" para acciones individuales
-- Mayor escrutinio regulatorio sobre el trading algorítmico
+Direct consequences:
+- **Circuit breakers** (HALT) were implemented that pause the market on drops of 7%, 14%, and 20%
+- "Limit up/limit down" rules were created for individual stocks
+- Increased regulatory scrutiny of algorithmic trading
 
-**Lección vigente**: tu sistema debe contemplar halts y condiciones extremas de mercado. Un backtest que ignora halts va a sobreestimar la capacidad de salida en crashes. También: usar market orders en momentos de pánico es peligroso — tu order puede llenar a precios absurdos.
+**Lesson that still holds**: your system must account for halts and extreme market conditions. A backtest that ignores halts will overestimate exit capacity during crashes. Also: using market orders during panic moments is dangerous -- your order may fill at absurd prices.
 
 ```python
 def is_market_halted(price_change_pct, level_1=-7, level_2=-14, level_3=-20):
     """
-    Circuit breakers del mercado US (post-2010).
-    Tu sistema debe saber que no puede operar durante halts.
+    US market circuit breakers (post-2010).
+    Your system must know it cannot trade during halts.
     """
     if price_change_pct <= level_3:
-        return "HALT_LEVEL_3 — mercado cerrado por el día"
+        return "HALT_LEVEL_3 -- market closed for the day"
     elif price_change_pct <= level_2:
-        return "HALT_LEVEL_2 — pausa 15 min (solo antes de 15:25 ET)"
+        return "HALT_LEVEL_2 -- 15 min pause (only before 3:25 PM ET)"
     elif price_change_pct <= level_1:
-        return "HALT_LEVEL_1 — pausa 15 min (solo antes de 15:25 ET)"
+        return "HALT_LEVEL_1 -- 15 min pause (only before 3:25 PM ET)"
     return None
 ```
 
-## 2010-Presente: HFT, IA, y la Democratización
+## 2010-Present: HFT, AI, and Democratization
 
-### High Frequency Trading: El Extremo del Espectro
+### High Frequency Trading: The Extreme End of the Spectrum
 
-El HFT opera en microsegundos y nanosegundos. Requiere:
-- Colocación física de servidores junto al exchange (colocation)
-- Conexiones de fibra óptica dedicadas (o incluso microondas)
-- Hardware FPGA personalizado
-- Inversión de millones en infraestructura
+HFT operates in microseconds and nanoseconds. It requires:
+- Physical server placement next to the exchange (colocation)
+- Dedicated fiber optic connections (or even microwave)
+- Custom FPGA hardware
+- Millions of dollars in infrastructure investment
 
-El HFT captura ineficiencias que duran fracciones de segundo. Como trader individual, **no estás compitiendo contra HFT** — estás operando en timeframes completamente diferentes. Un sistema que opera en gráficos de 15 minutos o diarios no compite por las mismas ineficiencias que uno que opera en nanosegundos.
+HFT captures inefficiencies that last fractions of a second. As an individual trader, **you're not competing against HFT** -- you're operating on completely different timeframes. A system that trades on 15-minute or daily charts isn't competing for the same inefficiencies as one that trades in nanoseconds.
 
-### IA y Machine Learning en Trading
+### AI and Machine Learning in Trading
 
-La narrativa actual es que "la IA va a revolucionar el trading". La realidad es más matizada:
+The current narrative is that "AI will revolutionize trading." The reality is more nuanced:
 
-- **Lo que funciona**: ML para procesamiento de datos alternativos (NLP en noticias, sentiment de redes sociales), detección de regímenes de mercado, optimización de ejecución
-- **Lo que es difícil**: predecir dirección de precios con ML puro. Los mercados financieros tienen una relación señal/ruido extremadamente baja comparado con otros dominios de ML
-- **Lo que no necesitás**: no hace falta usar deep learning para ser rentable. Un sistema de cruce de medias con buena gestión de riesgo puede superar a un modelo LSTM mal implementado
+- **What works**: ML for alternative data processing (NLP on news, social media sentiment), market regime detection, execution optimization
+- **What's difficult**: predicting price direction with pure ML. Financial markets have an extremely low signal-to-noise ratio compared to other ML domains
+- **What you don't need**: you don't need deep learning to be profitable. A moving average crossover system with good risk management can outperform a poorly implemented LSTM model
 
-### La Era Actual: Tu Ventaja como Trader Individual
+### The Current Era: Your Advantage as an Individual Trader
 
-Nunca en la historia fue tan accesible hacer trading algorítmico:
+Never in history has algorithmic trading been so accessible:
 
-| Antes (pre-2000) | Ahora |
+| Before (pre-2000) | Now |
 |---|---|
-| Datos históricos costaban miles de dólares | Yahoo Finance, Polygon.io gratis o baratos |
-| Ejecutar una orden requería llamar al broker | APIs que ejecutan en milisegundos |
-| Backtesting requería infraestructura propia | Python + pandas en tu laptop |
-| Información del mercado era privilegio institucional | Fluye en tiempo real para todos |
+| Historical data cost thousands of dollars | Yahoo Finance, Polygon.io free or cheap |
+| Executing an order required calling the broker | APIs that execute in milliseconds |
+| Backtesting required your own infrastructure | Python + pandas on your laptop |
+| Market information was an institutional privilege | Flows in real-time for everyone |
 
-En US, el 60-70% del volumen es algorítmico. Pero la mayoría de ese volumen son estrategias institucionales que operan en timeframes y capitales completamente diferentes al tuyo. Las ineficiencias en small caps, en premarket, en eventos específicos — esas siguen ahí para quien las busque con disciplina y método.
+In the US, 60-70% of volume is algorithmic. But most of that volume is institutional strategies operating on completely different timeframes and with completely different capital than yours. The inefficiencies in small caps, in premarket, in specific events -- those are still there for anyone who seeks them with discipline and method.
 
-## Timeline Visual
+## Visual Timeline
 
 ```
-1949  Donchian: primeras reglas sistemáticas
-  │
-1952  Markowitz: teoría moderna de portfolios
-  │
-1960  Primera operación de arbitraje computacional
-  │
-1978  Primer sistema de negociación electrónica (Nasdaq)
-  │
-1981  Bloomberg — datos institucionales en tiempo real
-  │
-1982  Renaissance Technologies fundada
-  │
-1991  World Wide Web — información globalizada
-  │
-1993  Interactive Brokers — trading online democratizado
-  │
-1998  SEC regula mercados electrónicos → nace el algo trading moderno
-  │
-2001  Decimalización → explosión de estrategias de corto plazo
-  │
-2005  ~35% del volumen US es algorítmico
-  │
-2010  Flash Crash → circuit breakers → más regulación
-  │
-2010  ~50% del volumen US es algorítmico
-  │
-2015  HFT en nanosegundos, colocación, FPGA
-  │
-2020  ~65% del volumen US es algorítmico
-  │        
-HOY   IA/ML, datos alternativos, acceso democratizado
+1949  Donchian: first systematic rules
+  |
+1952  Markowitz: modern portfolio theory
+  |
+1960  First computational arbitrage trade
+  |
+1978  First electronic trading system (Nasdaq)
+  |
+1981  Bloomberg -- institutional real-time data
+  |
+1982  Renaissance Technologies founded
+  |
+1991  World Wide Web -- globalized information
+  |
+1993  Interactive Brokers -- democratized online trading
+  |
+1998  SEC regulates electronic markets -> modern algo trading is born
+  |
+2001  Decimalization -> explosion of short-term strategies
+  |
+2005  ~35% of US volume is algorithmic
+  |
+2010  Flash Crash -> circuit breakers -> more regulation
+  |
+2010  ~50% of US volume is algorithmic
+  |
+2015  HFT in nanoseconds, colocation, FPGA
+  |
+2020  ~65% of US volume is algorithmic
+  |        
+TODAY AI/ML, alternative data, democratized access
 ```
 
-## Qué Llevarte de Todo Esto
+## Key Takeaways
 
-1. **Las estrategias simples sobreviven décadas**. Los canales de Donchian tienen 75 años y siguen funcionando. No subestimes lo básico.
+1. **Simple strategies survive decades**. Donchian channels are 75 years old and still work. Don't underestimate the basics.
 
-2. **La infraestructura importa más que el algoritmo**. Cada salto grande en algo trading vino de cambios en infraestructura (electrónica, internet, decimalización), no de algoritmos más inteligentes.
+2. **Infrastructure matters more than the algorithm**. Every major leap in algo trading came from infrastructure changes (electronics, internet, decimalization), not smarter algorithms.
 
-3. **No competís contra Renaissance ni contra HFT**. Operás en timeframes y mercados donde tus ventajas (flexibilidad, costos bajos, nichos específicos) son reales.
+3. **You're not competing against Renaissance or HFT**. You operate on timeframes and in markets where your advantages (flexibility, low costs, specific niches) are real.
 
-4. **El mercado genera regulación reactiva**. Cada crisis genera nuevas reglas. Tu sistema debe ser adaptable a cambios regulatorios, no depender de una mecánica específica.
+4. **The market generates reactive regulation**. Every crisis generates new rules. Your system must be adaptable to regulatory changes, not dependent on a specific mechanism.
 
-5. **La tecnología es accesible como nunca**. La brecha entre institucional y retail se achicó dramáticamente. Lo que te diferencia hoy no es la tecnología — es la disciplina, la gestión de riesgo, y la paciencia para dejar que el edge se materialice.
+5. **Technology is more accessible than ever**. The gap between institutional and retail has shrunk dramatically. What differentiates you today isn't technology -- it's discipline, risk management, and the patience to let the edge materialize.

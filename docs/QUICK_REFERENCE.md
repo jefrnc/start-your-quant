@@ -1,20 +1,22 @@
-# 📚 Quick Reference - Trading Algorítmico
+> 🇪🇸 [Leer en Español](QUICK_REFERENCE.es.md) | 🇺🇸 **English**
 
-> Referencia rápida de conceptos, métricas y código esencial para trading cuantitativo
+# Quick Reference - Algorithmic Trading
 
-## 🎯 Métricas Clave
+> Quick reference for concepts, metrics, and essential code for quantitative trading
 
-### 📊 Performance Metrics
+## Key Metrics
 
-| Métrica | Fórmula | Interpretación | Valor Objetivo |
-|---------|---------|----------------|----------------|
-| **Sharpe Ratio** | `(Return - Risk_Free) / Volatility` | Rendimiento ajustado por riesgo | > 1.0 (>2.0 excelente) |
-| **Calmar Ratio** | `Annual_Return / Max_Drawdown` | Retorno vs drawdown máximo | > 1.0 |
-| **Win Rate** | `Winning_Trades / Total_Trades` | % de trades ganadores | > 50% (depende de R:R) |
-| **Max Drawdown** | `Max(Peak - Trough) / Peak` | Pérdida máxima desde peak | < 20% |
-| **Profit Factor** | `Gross_Profit / Gross_Loss` | Relación ganancia/pérdida | > 1.3 |
+### Performance Metrics
 
-### 🎯 Position Sizing
+| Metric | Formula | Interpretation | Target Value |
+|--------|---------|----------------|--------------|
+| **Sharpe Ratio** | `(Return - Risk_Free) / Volatility` | Risk-adjusted return | > 1.0 (>2.0 excellent) |
+| **Calmar Ratio** | `Annual_Return / Max_Drawdown` | Return vs max drawdown | > 1.0 |
+| **Win Rate** | `Winning_Trades / Total_Trades` | % of winning trades | > 50% (depends on R:R) |
+| **Max Drawdown** | `Max(Peak - Trough) / Peak` | Maximum loss from peak | < 20% |
+| **Profit Factor** | `Gross_Profit / Gross_Loss` | Profit/loss ratio | > 1.3 |
+
+### Position Sizing
 
 ```python
 # Kelly Criterion
@@ -32,9 +34,9 @@ def volatility_position_size(capital, price, atr, multiplier=2):
     return risk_amount / (stop_distance * price)
 ```
 
-## 📈 Indicadores Esenciales
+## Essential Indicators
 
-### 🔢 Moving Averages
+### Moving Averages
 
 ```python
 # Simple Moving Average
@@ -47,7 +49,7 @@ df['EMA_20'] = df['close'].ewm(span=20).mean()
 df['VWAP'] = (df['close'] * df['volume']).cumsum() / df['volume'].cumsum()
 ```
 
-### 📊 Volatility Indicators
+### Volatility Indicators
 
 ```python
 # True Range
@@ -67,7 +69,7 @@ df['BB_upper'] = df['SMA_20'] + (df['close'].rolling(20).std() * 2)
 df['BB_lower'] = df['SMA_20'] - (df['close'].rolling(20).std() * 2)
 ```
 
-### 📈 Volume Indicators
+### Volume Indicators
 
 ```python
 # Relative Volume
@@ -80,38 +82,38 @@ df['VROC'] = df['volume'].pct_change(periods=1)
 df['OBV'] = (df['volume'] * np.where(df['close'] > df['close'].shift(1), 1, -1)).cumsum()
 ```
 
-## 🎯 Estrategias Quick Setup
+## Quick Strategy Setup
 
-### 🚀 Gap and Go
+### Gap and Go
 
 ```python
 def gap_and_go_signal(df):
-    # Condiciones
+    # Conditions
     gap_up = (df['open'] / df['close'].shift(1)) > 1.02  # 2% gap
     high_volume = df['volume'] > df['volume'].rolling(20).mean() * 2
     above_vwap = df['close'] > df['VWAP']
     
-    # Señal de entrada
+    # Entry signal
     entry_signal = gap_up & high_volume & above_vwap
     
     return entry_signal
 ```
 
-### 📊 VWAP Reclaim
+### VWAP Reclaim
 
 ```python
 def vwap_reclaim_signal(df):
-    # Precio por debajo de VWAP
+    # Price below VWAP
     below_vwap = df['close'] < df['VWAP']
     
-    # Reclaim con volumen
+    # Reclaim with volume
     reclaim = (df['close'] > df['VWAP']) & below_vwap.shift(1)
     volume_confirmation = df['volume'] > df['volume'].rolling(10).mean()
     
     return reclaim & volume_confirmation
 ```
 
-### 🔄 Mean Reversion
+### Mean Reversion
 
 ```python
 def mean_reversion_signal(df):
@@ -128,9 +130,9 @@ def mean_reversion_signal(df):
     return oversold & bb_touch & volume_spike
 ```
 
-## ⚖️ Risk Management Templates
+## Risk Management Templates
 
-### 🛡️ Stop Loss Types
+### Stop Loss Types
 
 ```python
 # ATR-based Stop
@@ -152,7 +154,7 @@ def technical_stop(entry_price, support_resistance_level, buffer=0.01):
     return support_resistance_level * (1 - buffer)
 ```
 
-### 💰 Position Sizing Calculator
+### Position Sizing Calculator
 
 ```python
 class PositionSizer:
@@ -165,15 +167,15 @@ class PositionSizer:
         max_risk_amount = self.capital * self.max_risk
         max_shares = int(max_risk_amount / risk_per_share)
         
-        # Máximo 50% del capital en una posición
+        # Maximum 50% of capital in one position
         max_shares_by_capital = int((self.capital * 0.5) / entry_price)
         
         return min(max_shares, max_shares_by_capital)
 ```
 
-## 🧪 Backtesting Quick Start
+## Backtesting Quick Start
 
-### 📊 Simple Backtest Framework
+### Simple Backtest Framework
 
 ```python
 class SimpleBacktester:
@@ -208,7 +210,7 @@ class SimpleBacktester:
         return portfolio_value
 ```
 
-### 📈 Performance Calculator
+### Performance Calculator
 
 ```python
 def calculate_performance_metrics(returns):
@@ -239,9 +241,9 @@ def calculate_performance_metrics(returns):
     }
 ```
 
-## 🔧 Data Utilities
+## Data Utilities
 
-### 📊 Data Loading
+### Data Loading
 
 ```python
 import yfinance as yf
@@ -278,7 +280,7 @@ def clean_data(df):
     return df
 ```
 
-### 🔍 Market Screening
+### Market Screening
 
 ```python
 # Screen for gap ups
@@ -299,9 +301,9 @@ def screen_gap_ups(symbols, min_gap=0.02):
     return sorted(gap_stocks, key=lambda x: x['gap_percentage'], reverse=True)
 ```
 
-## 🎚️ Configuration Templates
+## Configuration Templates
 
-### ⚙️ Strategy Parameters
+### Strategy Parameters
 
 ```python
 # Gap and Go Parameters
@@ -331,7 +333,7 @@ RISK_PARAMS = {
 }
 ```
 
-### 📊 Timeframe Settings
+### Timeframe Settings
 
 ```python
 TIMEFRAMES = {
@@ -350,9 +352,9 @@ MARKET_HOURS = {
 }
 ```
 
-## 🚨 Error Handling
+## Error Handling
 
-### 🛡️ Common Error Patterns
+### Common Error Patterns
 
 ```python
 def safe_execute_trade(trade_function, *args, **kwargs):
@@ -385,7 +387,7 @@ def validate_data(df):
     return True
 ```
 
-## 📱 Cheat Codes
+## Cheat Codes
 
 ```python
 # Quick profit/loss calculation
@@ -406,4 +408,4 @@ win_rate = (returns > 0).mean()
 
 ---
 
-💡 **Pro Tip**: Bookmark esta página y úsala como referencia rápida mientras desarrollas y optimizas tus estrategias de trading.
+**Pro Tip**: Bookmark this page and use it as a quick reference while developing and optimizing your trading strategies.

@@ -1,26 +1,28 @@
+> 🇪🇸 [Leer en Español](spike_hod_lod.es.md) | 🇺🇸 **English**
+
 # Spike HOD/LOD (High/Low of Day)
 
-## El Arte del Timing
+## The Art of Timing
 
-En small caps, los spikes de HOD (High of Day) y LOD (Low of Day) son momentos decisivos. Un break del HOD con volumen puede significar el inicio de un runner. Un break del LOD puede ser capitulación.
+In small caps, HOD (High of Day) and LOD (Low of Day) spikes are decisive moments. An HOD break with volume can signal the start of a runner. An LOD break can mean capitulation.
 
-## Tracking HOD/LOD en Tiempo Real
+## Real-Time HOD/LOD Tracking
 
 ```python
 def track_hod_lod(df):
-    """Trackear HOD/LOD durante el día"""
-    # Agrupar por fecha
+    """Track HOD/LOD during the day"""
+    # Group by date
     df['date'] = df.index.date
     
-    # HOD/LOD running
+    # Running HOD/LOD
     df['hod'] = df.groupby('date')['high'].cummax()
     df['lod'] = df.groupby('date')['low'].cummin()
     
-    # Distancia de HOD/LOD
+    # Distance from HOD/LOD
     df['distance_from_hod'] = (df['hod'] - df['close']) / df['close'] * 100
     df['distance_from_lod'] = (df['close'] - df['lod']) / df['lod'] * 100
     
-    # Tiempo desde último HOD/LOD
+    # Time since last HOD/LOD
     df['is_new_hod'] = df['high'] >= df['hod']
     df['is_new_lod'] = df['low'] <= df['lod']
     
@@ -51,36 +53,36 @@ def track_hod_lod(df):
 
 ```python
 def hod_spike_setup(df, volume_threshold=2, strength_threshold=0.02):
-    """Detectar spike de HOD con confirmación"""
+    """Detect HOD spike with confirmation"""
     df = track_hod_lod(df)
     df = calculate_rvol(df)
     
-    # Condiciones para HOD spike
+    # Conditions for HOD spike
     df['hod_break'] = (
-        df['is_new_hod'] &  # Nuevo HOD
-        (df['rvol'] > volume_threshold) &  # Volumen alto
-        (df['close'] > df['open'])  # Vela verde
+        df['is_new_hod'] &  # New HOD
+        (df['rvol'] > volume_threshold) &  # High volume
+        (df['close'] > df['open'])  # Green candle
     )
     
-    # Fuerza del break
+    # Break strength
     df['hod_break_strength'] = np.where(
         df['hod_break'],
         (df['close'] - df['hod'].shift(1)) / df['hod'].shift(1) * 100,
         0
     )
     
-    # Clasificar calidad del break
+    # Classify break quality
     df['hod_quality'] = pd.cut(
         df['hod_break_strength'],
         bins=[0, 0.5, 2, 5, np.inf],
         labels=['weak', 'decent', 'strong', 'explosive']
     )
     
-    # Continuación del spike
+    # Spike continuation
     df['hod_continuation'] = (
         df['hod_break'] &
         (df['hod_break_strength'] > strength_threshold) &
-        (df['close'] > df['hod'].shift(1) * 1.01)  # 1% sobre HOD anterior
+        (df['close'] > df['hod'].shift(1) * 1.01)  # 1% above previous HOD
     )
     
     return df
@@ -90,16 +92,16 @@ def hod_spike_setup(df, volume_threshold=2, strength_threshold=0.02):
 
 ```python
 def lod_bounce_setup(df, bounce_threshold=0.03):
-    """Detectar bounces del LOD"""
+    """Detect LOD bounces"""
     df = track_hod_lod(df)
     
-    # Test del LOD
+    # LOD test
     df['lod_test'] = (
-        (df['low'] <= df['lod'] * 1.001) &  # Cerca del LOD
-        (df['close'] > df['lod'] * 1.01)    # Cierra 1% arriba del LOD
+        (df['low'] <= df['lod'] * 1.001) &  # Near LOD
+        (df['close'] > df['lod'] * 1.01)    # Closes 1% above LOD
     )
     
-    # Fuerza del bounce
+    # Bounce strength
     df['bounce_strength'] = np.where(
         df['lod_test'],
         (df['close'] - df['low']) / df['low'] * 100,
@@ -109,15 +111,15 @@ def lod_bounce_setup(df, bounce_threshold=0.03):
     # Double bottom
     df['double_bottom'] = (
         df['lod_test'] &
-        (df['minutes_since_lod'] > 30) &  # Al menos 30 min desde último LOD
-        (abs(df['low'] - df['lod']) / df['lod'] < 0.005)  # Dentro del 0.5%
+        (df['minutes_since_lod'] > 30) &  # At least 30 min since last LOD
+        (abs(df['low'] - df['lod']) / df['lod'] < 0.005)  # Within 0.5%
     )
     
-    # Hammer/Doji en LOD
+    # Hammer/Doji at LOD
     df['hammer_at_lod'] = (
         df['lod_test'] &
-        ((df['close'] - df['low']) / (df['high'] - df['low']) > 0.7) &  # Close en top 30%
-        ((df['high'] - df['low']) / df['open'] > 0.02)  # Rango mínimo 2%
+        ((df['close'] - df['low']) / (df['high'] - df['low']) > 0.7) &  # Close in top 30%
+        ((df['high'] - df['low']) / df['open'] > 0.02)  # Minimum 2% range
     )
     
     return df
@@ -127,7 +129,7 @@ def lod_bounce_setup(df, bounce_threshold=0.03):
 
 ```python
 def multi_day_levels(ticker, lookback_days=5):
-    """Obtener niveles HOD/LOD de múltiples días"""
+    """Get HOD/LOD levels from multiple days"""
     levels = {}
     
     for i in range(lookback_days):
@@ -144,10 +146,10 @@ def multi_day_levels(ticker, lookback_days=5):
         except:
             continue
     
-    # Crear DataFrame de niveles
+    # Create levels DataFrame
     levels_df = pd.DataFrame(levels).T
     
-    # Identificar niveles clave
+    # Identify key levels
     levels_df['key_resistance'] = levels_df['hod'] > levels_df['hod'].quantile(0.8)
     levels_df['key_support'] = levels_df['lod'] < levels_df['lod'].quantile(0.2)
     
@@ -158,19 +160,19 @@ def multi_day_levels(ticker, lookback_days=5):
 
 ```python
 def hod_lod_by_time(df):
-    """Analizar cuándo ocurren típicamente HOD/LOD"""
+    """Analyze when HOD/LOD typically occur"""
     df = track_hod_lod(df)
     
-    # Agregar timestamp info
+    # Add timestamp info
     df['hour'] = df.index.hour
     df['minute'] = df.index.minute
     df['time_of_day'] = df.index.time
     
-    # Frecuencia de HOD por hora
+    # HOD frequency by hour
     hod_times = df[df['is_new_hod']]['hour'].value_counts().sort_index()
     lod_times = df[df['is_new_lod']]['hour'].value_counts().sort_index()
     
-    # Probabilidad de HOD/LOD por período
+    # HOD/LOD probability by period
     time_periods = {
         'opening': (9, 10),
         'morning': (10, 12),
@@ -203,10 +205,10 @@ def hod_lod_by_time(df):
 
 ```python
 def analyze_failed_breaks(df, failure_threshold=0.005):
-    """Analizar breaks fallidos de HOD/LOD"""
+    """Analyze failed HOD/LOD breaks"""
     df = track_hod_lod(df)
     
-    # Identificar breaks iniciales
+    # Identify initial breaks
     df['hod_break_attempt'] = df['high'] > df['hod'].shift(1)
     df['lod_break_attempt'] = df['low'] < df['lod'].shift(1)
     
@@ -241,21 +243,21 @@ def analyze_failed_breaks(df, failure_threshold=0.005):
 
 ```python
 def progressive_hod_strategy(df, position_sizes=[0.25, 0.25, 0.5]):
-    """Estrategia de entries progresivos en HOD breaks"""
+    """Progressive entry strategy on HOD breaks"""
     df = hod_spike_setup(df)
     
-    # Diferentes niveles de confirmación
-    df['hod_level_1'] = df['hod_break']  # Break inicial
-    df['hod_level_2'] = (  # Break con volumen
+    # Different confirmation levels
+    df['hod_level_1'] = df['hod_break']  # Initial break
+    df['hod_level_2'] = (  # Break with volume
         df['hod_break'] & 
         (df['rvol'] > 3)
     )
-    df['hod_level_3'] = (  # Break fuerte con continuación
+    df['hod_level_3'] = (  # Strong break with continuation
         df['hod_continuation'] &
         (df['hod_break_strength'] > 2)
     )
     
-    # Backtesting con entries progresivos
+    # Backtesting with progressive entries
     signals = []
     
     for i, row in df.iterrows():
@@ -293,8 +295,8 @@ def progressive_hod_strategy(df, position_sizes=[0.25, 0.25, 0.5]):
 
 ```python
 def gap_hod_combo(df, gap_threshold=10):
-    """Combinar gap analysis con HOD breaks"""
-    # Calcular gap
+    """Combine gap analysis with HOD breaks"""
+    # Calculate gap
     df['gap_pct'] = (df['open'] - df['close'].shift(1)) / df['close'].shift(1) * 100
     
     df = track_hod_lod(df)
@@ -302,8 +304,8 @@ def gap_hod_combo(df, gap_threshold=10):
     
     # Gap up + holding gains + HOD break
     df['gap_hod_setup'] = (
-        (df['gap_pct'] > gap_threshold) &  # Gap up significativo
-        (df['close'] > df['open']) &       # Manteniendo gains
+        (df['gap_pct'] > gap_threshold) &  # Significant gap up
+        (df['close'] > df['open']) &       # Holding gains
         df['hod_break']                    # Breaking HOD
     )
     
@@ -328,8 +330,8 @@ class HODLODMonitor:
         self.lod_tests = []
         
     def update(self, new_bar):
-        """Update con nueva barra"""
-        # Actualizar HOD/LOD
+        """Update with new bar"""
+        # Update HOD/LOD
         if new_bar['high'] > self.daily_hod:
             self.daily_hod = new_bar['high']
             self.hod_breaks.append({
@@ -347,7 +349,7 @@ class HODLODMonitor:
             })
     
     def get_status(self):
-        """Estado actual"""
+        """Current status"""
         return {
             'ticker': self.ticker,
             'hod': self.daily_hod,
@@ -359,11 +361,11 @@ class HODLODMonitor:
         }
 ```
 
-## Alertas HOD/LOD
+## HOD/LOD Alerts
 
 ```python
 def hod_lod_alerts(df, ticker):
-    """Generar alertas para HOD/LOD"""
+    """Generate HOD/LOD alerts"""
     alerts = []
     latest = df.iloc[-1]
     
@@ -386,6 +388,6 @@ def hod_lod_alerts(df, ticker):
     return alerts
 ```
 
-## Siguiente Paso
+## Next Step
 
-Finalizemos los indicadores con [Gap % y Float](gap_float.md), fundamentales para el screening de small caps.
+Let's wrap up the indicators with [Gap % and Float](gap_float.md), fundamental for small cap screening.

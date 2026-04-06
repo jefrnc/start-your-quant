@@ -1,35 +1,37 @@
-# Algoritmos de Ejecución para Small Caps
+> 🇪🇸 [Leer en Español](Execution-Algorithms.es.md) | 🇺🇸 **English**
 
-Los small caps presentan desafíos únicos de ejecución debido a su liquidez limitada y spreads más amplios. Este documento proporciona algoritmos optimizados para la ejecución eficiente en estos mercados.
+# Execution Algorithms for Small Caps
 
-## Índice
-1. [Desafíos de Small Caps](#desafíos-de-small-caps)
+Small caps present unique execution challenges due to their limited liquidity and wider spreads. This document provides optimized algorithms for efficient execution in these markets.
+
+## Table of Contents
+1. [Small Cap Challenges](#small-cap-challenges)
 2. [Smart Order Routing](#smart-order-routing)
-3. [Modelos de Impacto de Mercado](#modelos-de-impacto-de-mercado)
-4. [Algoritmos de Ejecución](#algoritmos-de-ejecución)
-5. [Detección de Liquidez](#detección-de-liquidez)
-6. [Optimización de Timing](#optimización-de-timing)
+3. [Market Impact Models](#market-impact-models)
+4. [Execution Algorithms](#execution-algorithms)
+5. [Liquidity Detection](#liquidity-detection)
+6. [Timing Optimization](#timing-optimization)
 
-## Desafíos de Small Caps
+## Small Cap Challenges
 
-### Características del Mercado
-- **Liquidez Limitada**: Volúmenes bajos comparados con large caps
-- **Spreads Amplios**: Bid-ask spreads de 1-10 cents vs. 1 cent en large caps
-- **Volatilidad Intraday**: Movimientos abruptos por órdenes grandes
-- **Fragmentación**: Liquidez distribuida en múltiples venues
-- **Información Asimétrica**: Mayor impacto de trading informado
+### Market Characteristics
+- **Limited Liquidity**: Low volumes compared to large caps
+- **Wide Spreads**: Bid-ask spreads of 1-10 cents vs. 1 cent in large caps
+- **Intraday Volatility**: Abrupt moves from large orders
+- **Fragmentation**: Liquidity distributed across multiple venues
+- **Information Asymmetry**: Greater impact from informed trading
 
-### Métricas Críticas
+### Critical Metrics
 ```python
 class SmallCapMetrics:
     def __init__(self):
-        self.min_spread_threshold = 0.01  # 1 cent mínimo
-        self.max_spread_threshold = 0.10  # 10 cents máximo
-        self.min_volume_adv = 100000  # $100K ADV mínimo
-        self.max_position_adv_pct = 0.10  # 10% max del ADV
+        self.min_spread_threshold = 0.01  # 1 cent minimum
+        self.max_spread_threshold = 0.10  # 10 cents maximum
+        self.min_volume_adv = 100000  # $100K ADV minimum
+        self.max_position_adv_pct = 0.10  # 10% max of ADV
 
     def evaluate_tradability(self, symbol_data: dict) -> dict:
-        """Evalúa si un símbolo es tradeable eficientemente"""
+        """Evaluates whether a symbol can be traded efficiently"""
         adv = symbol_data['average_daily_volume_usd']
         spread_pct = symbol_data['avg_spread'] / symbol_data['price']
 
@@ -43,7 +45,7 @@ class SmallCapMetrics:
 
 ## Smart Order Routing
 
-### Router Multi-Venue
+### Multi-Venue Router
 ```python
 import asyncio
 from datetime import datetime, timedelta
@@ -90,15 +92,15 @@ class SmallCapRouter:
                                     side: str,  # 'buy' or 'sell'
                                     quantity: int,
                                     urgency: str = 'medium') -> dict:
-        """Determina el mejor plan de ejecución"""
+        """Determines the best execution plan"""
 
-        # Obtener quotes de todos los venues
+        # Get quotes from all venues
         await self._update_venue_quotes(symbol)
 
-        # Analizar liquidez disponible
+        # Analyze available liquidity
         liquidity_analysis = self._analyze_liquidity(side, quantity)
 
-        # Determinar estrategia óptima
+        # Determine optimal strategy
         if urgency == 'high':
             return self._aggressive_execution_plan(symbol, side, quantity, liquidity_analysis)
         elif urgency == 'low':
@@ -107,7 +109,7 @@ class SmallCapRouter:
             return self._balanced_execution_plan(symbol, side, quantity, liquidity_analysis)
 
     def _analyze_liquidity(self, side: str, quantity: int) -> dict:
-        """Analiza liquidez disponible en el mercado"""
+        """Analyzes available market liquidity"""
         lit_liquidity = 0
         dark_liquidity_estimate = 0
         best_venues = []
@@ -119,7 +121,7 @@ class SmallCapRouter:
                 available = quote.ask_size if side == 'buy' else quote.bid_size
                 lit_liquidity += available
 
-                if available >= quantity * 0.1:  # Al menos 10% de la orden
+                if available >= quantity * 0.1:  # At least 10% of the order
                     best_venues.append({
                         'venue': venue_name,
                         'available': available,
@@ -127,8 +129,8 @@ class SmallCapRouter:
                         'net_cost': self._calculate_net_cost(venue, side)
                     })
             else:
-                # Estimar liquidez dark basado en ADV histórico
-                dark_liquidity_estimate += quantity * 0.05  # Estimación conservadora
+                # Estimate dark liquidity based on historical ADV
+                dark_liquidity_estimate += quantity * 0.05  # Conservative estimate
 
         return {
             'lit_liquidity': lit_liquidity,
@@ -138,16 +140,16 @@ class SmallCapRouter:
         }
 
     def _aggressive_execution_plan(self, symbol: str, side: str, quantity: int, liquidity: dict) -> dict:
-        """Plan de ejecución agresivo para máxima velocidad"""
+        """Aggressive execution plan for maximum speed"""
         plan = {
             'strategy': 'aggressive_sweep',
-            'target_completion_time': 30,  # 30 segundos
+            'target_completion_time': 30,  # 30 seconds
             'orders': []
         }
 
         remaining_qty = quantity
 
-        # Sweep los mejores venues lit hasta completar
+        # Sweep the best lit venues until complete
         for venue_info in liquidity['best_venues']:
             if remaining_qty <= 0:
                 break
@@ -164,7 +166,7 @@ class SmallCapRouter:
 
             remaining_qty -= fill_qty
 
-        # Si queda cantidad, usar dark pools
+        # If quantity remains, use dark pools
         if remaining_qty > 0:
             for venue_name, venue in self.venues.items():
                 if venue.dark_pool and remaining_qty > venue.min_size:
@@ -172,7 +174,7 @@ class SmallCapRouter:
                         'venue': venue_name,
                         'type': 'market',
                         'quantity': remaining_qty,
-                        'expected_price': None,  # Precio incierto en dark
+                        'expected_price': None,  # Price uncertain in dark
                         'sequence': len(plan['orders']) + 1
                     })
                     break
@@ -180,15 +182,15 @@ class SmallCapRouter:
         return plan
 
     def _passive_execution_plan(self, symbol: str, side: str, quantity: int, liquidity: dict) -> dict:
-        """Plan de ejecución pasivo para minimizar impacto"""
+        """Passive execution plan to minimize impact"""
         plan = {
             'strategy': 'passive_liquidity_seeking',
-            'target_completion_time': 1800,  # 30 minutos
+            'target_completion_time': 1800,  # 30 minutes
             'orders': []
         }
 
-        # Dividir en chunks más pequeños
-        chunk_size = max(100, quantity // 10)  # Máximo 10 chunks
+        # Split into smaller chunks
+        chunk_size = max(100, quantity // 10)  # Maximum 10 chunks
         chunks = []
 
         remaining = quantity
@@ -197,9 +199,9 @@ class SmallCapRouter:
             chunks.append(chunk)
             remaining -= chunk
 
-        # Planificar ejecución escalonada
+        # Plan staggered execution
         for i, chunk in enumerate(chunks):
-            # Alternar entre venues para evitar detection
+            # Alternate between venues to avoid detection
             venue_options = [v for v in liquidity['best_venues'] if v['available'] >= chunk]
             selected_venue = venue_options[i % len(venue_options)] if venue_options else liquidity['best_venues'][0]
 
@@ -209,25 +211,25 @@ class SmallCapRouter:
                 'quantity': chunk,
                 'limit_price': selected_venue['price'],
                 'time_in_force': 'IOC',  # Immediate or Cancel
-                'delay_seconds': i * 180,  # 3 minutos entre órdenes
+                'delay_seconds': i * 180,  # 3 minutes between orders
                 'sequence': i + 1
             })
 
         return plan
 
     def _balanced_execution_plan(self, symbol: str, side: str, quantity: int, liquidity: dict) -> dict:
-        """Plan de ejecución balanceado (velocidad vs. impacto)"""
+        """Balanced execution plan (speed vs. impact)"""
         plan = {
             'strategy': 'balanced_twap',
-            'target_completion_time': 600,  # 10 minutos
+            'target_completion_time': 600,  # 10 minutes
             'orders': []
         }
 
-        # Estrategia híbrida: 60% agresivo, 40% pasivo
+        # Hybrid strategy: 60% aggressive, 40% passive
         aggressive_qty = int(quantity * 0.6)
         passive_qty = quantity - aggressive_qty
 
-        # Parte agresiva: barrer mejores venues
+        # Aggressive portion: sweep best venues
         remaining_aggressive = aggressive_qty
         for venue_info in liquidity['best_venues'][:3]:  # Top 3 venues
             if remaining_aggressive <= 0:
@@ -247,18 +249,18 @@ class SmallCapRouter:
 
             remaining_aggressive -= fill_qty
 
-        # Parte pasiva: TWAP en chunks
-        twap_chunks = max(2, passive_qty // 500)  # Chunks de ~500 acciones
+        # Passive portion: TWAP in chunks
+        twap_chunks = max(2, passive_qty // 500)  # Chunks of ~500 shares
         chunk_size = passive_qty // twap_chunks
 
         for i in range(twap_chunks):
-            delay = 60 + (i * 300)  # 1 min inicial + 5 min entre chunks
+            delay = 60 + (i * 300)  # 1 min initial + 5 min between chunks
 
             plan['orders'].append({
-                'venue': 'IEX',  # Venue neutro para TWAP
+                'venue': 'IEX',  # Neutral venue for TWAP
                 'type': 'limit',
                 'quantity': chunk_size,
-                'limit_price': None,  # Precio a determinar en el momento
+                'limit_price': None,  # Price to be determined at execution time
                 'time_in_force': 'GTC',
                 'delay_seconds': delay,
                 'sequence': len(plan['orders']) + 1,
@@ -268,25 +270,25 @@ class SmallCapRouter:
         return plan
 
     def _calculate_net_cost(self, venue: ExecutionVenue, side: str) -> float:
-        """Calcula costo neto considerando fees y rebates"""
+        """Calculates net cost considering fees and rebates"""
         base_cost = venue.fee_per_share
 
         if side == 'buy':
-            # Fees por tomar liquidez
+            # Fees for taking liquidity
             return base_cost
         else:
-            # Posible rebate por proveer liquidez
+            # Possible rebate for providing liquidity
             return base_cost - venue.rebate_per_share
 
     async def _update_venue_quotes(self, symbol: str):
-        """Actualiza quotes de todos los venues (simulado)"""
-        # En implementación real, conectaría a market data feeds
-        base_price = 5.50  # Precio ejemplo
+        """Updates quotes from all venues (simulated)"""
+        # In a real implementation, this would connect to market data feeds
+        base_price = 5.50  # Example price
 
         for venue_name in self.venues.keys():
             venue = self.venues[venue_name]
 
-            # Simular variación en spread y sizes
+            # Simulate variation in spread and sizes
             spread = 0.02 + (0.01 if venue.dark_pool else 0)
             size_variance = 500 + (venue.reliability_score * 1000)
 
@@ -301,9 +303,9 @@ class SmallCapRouter:
             )
 ```
 
-## Modelos de Impacto de Mercado
+## Market Impact Models
 
-### Modelo de Impacto Permanente y Temporal
+### Permanent and Temporary Impact Model
 ```python
 import numpy as np
 from scipy.optimize import minimize
@@ -311,11 +313,11 @@ import pandas as pd
 
 class SmallCapImpactModel:
     def __init__(self):
-        # Parámetros calibrados para small caps
-        self.lambda_permanent = 0.05  # Impacto permanente más alto
-        self.lambda_temporary = 0.02   # Impacto temporal
-        self.gamma = 0.6              # Elasticidad de volumen
-        self.decay_halflife = 300     # 5 minutos para decay temporal
+        # Parameters calibrated for small caps
+        self.lambda_permanent = 0.05  # Higher permanent impact
+        self.lambda_temporary = 0.02   # Temporary impact
+        self.gamma = 0.6              # Volume elasticity
+        self.decay_halflife = 300     # 5 minutes for temporal decay
 
     def estimate_market_impact(self,
                              quantity: int,
@@ -323,30 +325,30 @@ class SmallCapImpactModel:
                              spread: float,
                              volatility: float,
                              time_horizon_seconds: int = 600) -> dict:
-        """Estima impacto de mercado total"""
+        """Estimates total market impact"""
 
-        # Normalizar cantidad por ADV
+        # Normalize quantity by ADV
         participation_rate = quantity / adv
 
-        # Impacto permanente (no se recupera)
+        # Permanent impact (does not recover)
         permanent_impact_bps = self.lambda_permanent * (participation_rate ** self.gamma) * 10000
 
-        # Impacto temporal (se decay exponencialmente)
+        # Temporary impact (decays exponentially)
         temporary_impact_bps = self.lambda_temporary * (participation_rate ** 0.5) * 10000
 
-        # Factor de spread (small caps tienen spreads más altos)
+        # Spread factor (small caps have higher spreads)
         spread_impact_bps = (spread * 10000) * min(1.0, participation_rate * 2)
 
-        # Factor de volatilidad
+        # Volatility factor
         volatility_impact_bps = volatility * participation_rate * 5000
 
-        # Impacto total
+        # Total impact
         total_impact_bps = (permanent_impact_bps +
                            temporary_impact_bps +
                            spread_impact_bps +
                            volatility_impact_bps)
 
-        # Calcular decay temporal
+        # Calculate temporal decay
         decay_factor = np.exp(-np.log(2) * time_horizon_seconds / self.decay_halflife)
         recoverable_impact_bps = temporary_impact_bps * decay_factor
 
@@ -358,7 +360,7 @@ class SmallCapImpactModel:
             'volatility_impact_bps': volatility_impact_bps,
             'recoverable_impact_bps': recoverable_impact_bps,
             'participation_rate': participation_rate,
-            'recommended_max_quantity': int(adv * 0.05)  # Máximo 5% ADV
+            'recommended_max_quantity': int(adv * 0.05)  # Maximum 5% ADV
         }
 
     def optimize_execution_schedule(self,
@@ -366,9 +368,9 @@ class SmallCapImpactModel:
                                   adv: float,
                                   price: float,
                                   target_time_minutes: int = 30) -> dict:
-        """Optimiza cronograma de ejecución para minimizar impacto"""
+        """Optimizes execution schedule to minimize impact"""
 
-        # Función objetivo: minimizar impacto total
+        # Objective function: minimize total impact
         def objective(chunk_sizes):
             total_cost = 0
             cumulative_qty = 0
@@ -377,7 +379,7 @@ class SmallCapImpactModel:
                 if chunk <= 0:
                     continue
 
-                # Impacto marginal de este chunk
+                # Marginal impact of this chunk
                 remaining_adv = adv * (1 - cumulative_qty / total_quantity * 0.1)
                 impact = self.estimate_market_impact(chunk, remaining_adv, 0.02, 0.3)
 
@@ -386,17 +388,17 @@ class SmallCapImpactModel:
 
             return total_cost
 
-        # Restricciones
-        n_chunks = min(10, target_time_minutes // 3)  # Un chunk cada 3 minutos
+        # Constraints
+        n_chunks = min(10, target_time_minutes // 3)  # One chunk every 3 minutes
 
         def constraint_total_quantity(chunk_sizes):
             return np.sum(chunk_sizes) - total_quantity
 
         def constraint_max_chunk(chunk_sizes):
-            max_chunk = adv * 0.02  # Máximo 2% ADV por chunk
+            max_chunk = adv * 0.02  # Maximum 2% ADV per chunk
             return max_chunk - np.max(chunk_sizes)
 
-        # Optimización
+        # Optimization
         x0 = np.ones(n_chunks) * (total_quantity / n_chunks)
         bounds = [(0, total_quantity) for _ in range(n_chunks)]
         constraints = [
@@ -418,9 +420,9 @@ class SmallCapImpactModel:
         }
 ```
 
-## Algoritmos de Ejecución
+## Execution Algorithms
 
-### TWAP Adaptativo para Small Caps
+### Adaptive TWAP for Small Caps
 ```python
 class AdaptiveTWAP:
     def __init__(self, symbol: str, total_quantity: int, duration_minutes: int):
@@ -430,70 +432,70 @@ class AdaptiveTWAP:
         self.executed_quantity = 0
         self.remaining_quantity = total_quantity
 
-        # Parámetros adaptativos
-        self.base_chunk_size = total_quantity // (duration_minutes // 3)  # Chunk cada 3 min
+        # Adaptive parameters
+        self.base_chunk_size = total_quantity // (duration_minutes // 3)  # Chunk every 3 min
         self.volatility_multiplier = 1.0
         self.liquidity_multiplier = 1.0
         self.urgency_multiplier = 1.0
 
-        # Estado del mercado
+        # Market state
         self.current_spread = 0.02
-        self.current_volume_rate = 1.0  # Multiplicador de volumen normal
-        self.market_trend = 0.0  # -1 (bajista) a 1 (alcista)
+        self.current_volume_rate = 1.0  # Normal volume multiplier
+        self.market_trend = 0.0  # -1 (bearish) to 1 (bullish)
 
     def get_next_chunk_size(self, current_market_data: dict) -> int:
-        """Calcula tamaño del próximo chunk basado en condiciones actuales"""
+        """Calculates next chunk size based on current conditions"""
 
-        # Actualizar estado del mercado
+        # Update market state
         self._update_market_state(current_market_data)
 
-        # Chunk base ajustado por tiempo restante
+        # Base chunk adjusted for remaining time
         progress = self.executed_quantity / self.total_quantity
         time_progress = self._get_time_progress()
 
-        if time_progress > progress + 0.1:  # Estamos atrasados
+        if time_progress > progress + 0.1:  # We're behind schedule
             urgency_adj = 1.5
-        elif time_progress < progress - 0.1:  # Estamos adelantados
+        elif time_progress < progress - 0.1:  # We're ahead of schedule
             urgency_adj = 0.7
         else:
             urgency_adj = 1.0
 
-        # Ajuste por volatilidad
-        if self.current_spread > 0.03:  # Spread alto = reducir chunks
+        # Volatility adjustment
+        if self.current_spread > 0.03:  # High spread = reduce chunks
             volatility_adj = 0.8
         else:
             volatility_adj = 1.2
 
-        # Ajuste por liquidez disponible
-        if current_market_data.get('volume_rate', 1.0) > 2.0:  # Alta actividad
+        # Liquidity adjustment
+        if current_market_data.get('volume_rate', 1.0) > 2.0:  # High activity
             liquidity_adj = 1.3
         else:
             liquidity_adj = 0.9
 
-        # Calcular chunk final
+        # Calculate final chunk
         adjusted_chunk = int(self.base_chunk_size * urgency_adj * volatility_adj * liquidity_adj)
 
-        # Límites de seguridad
-        min_chunk = max(100, self.remaining_quantity // 20)  # Mínimo razonable
-        max_chunk = min(self.remaining_quantity, self.total_quantity // 5)  # Máximo 20%
+        # Safety limits
+        min_chunk = max(100, self.remaining_quantity // 20)  # Reasonable minimum
+        max_chunk = min(self.remaining_quantity, self.total_quantity // 5)  # Maximum 20%
 
         return max(min_chunk, min(adjusted_chunk, max_chunk))
 
     def _update_market_state(self, market_data: dict):
-        """Actualiza estado del mercado para decisiones adaptativas"""
+        """Updates market state for adaptive decisions"""
         self.current_spread = market_data.get('spread', 0.02)
         self.current_volume_rate = market_data.get('volume_rate', 1.0)
 
-        # Calcular tendencia basada en precio reciente
+        # Calculate trend based on recent price
         price_change = market_data.get('price_change_5min', 0.0)
         self.market_trend = np.tanh(price_change / market_data.get('price', 1.0) * 100)
 
     def _get_time_progress(self) -> float:
-        """Calcula progreso temporal (0 a 1)"""
-        # Simplificado - en realidad usaría timestamp actual
+        """Calculates time progress (0 to 1)"""
+        # Simplified - would use actual timestamp in practice
         return 0.5  # Placeholder
 
-### Iceberg Orders para Small Caps
+### Iceberg Orders for Small Caps
 class IcebergOrderManager:
     def __init__(self, symbol: str, total_quantity: int, visible_size: int):
         self.symbol = symbol
@@ -502,65 +504,65 @@ class IcebergOrderManager:
         self.executed_quantity = 0
         self.active_order_id = None
 
-        # Configuración específica para small caps
-        self.min_refresh_interval = 30  # 30 segundos mínimo entre refreshes
-        self.max_visible_percentage = 0.15  # Máximo 15% visible del size total
+        # Small cap-specific configuration
+        self.min_refresh_interval = 30  # 30 seconds minimum between refreshes
+        self.max_visible_percentage = 0.15  # Maximum 15% visible of total size
 
     def calculate_optimal_visible_size(self, current_book_depth: dict) -> int:
-        """Calcula tamaño visible óptimo basado en book depth"""
+        """Calculates optimal visible size based on book depth"""
 
         total_book_size = sum(current_book_depth.get('bid_sizes', []))
 
-        # No ser más del 20% del book depth total
+        # No more than 20% of total book depth
         max_by_book = int(total_book_size * 0.2)
 
-        # No ser más del 15% de nuestra orden total
+        # No more than 15% of our total order
         max_by_order = int(self.total_quantity * self.max_visible_percentage)
 
-        # Usar el menor
+        # Use the smaller value
         optimal_size = min(max_by_book, max_by_order, self.visible_size)
 
-        return max(100, optimal_size)  # Mínimo 100 acciones
+        return max(100, optimal_size)  # Minimum 100 shares
 
     def should_refresh_order(self, time_since_last: int, market_move: float) -> bool:
-        """Determina si debe hacer refresh de la orden visible"""
+        """Determines whether the visible order should be refreshed"""
 
-        # Refresh por tiempo
-        if time_since_last > 300:  # 5 minutos máximo
+        # Refresh by time
+        if time_since_last > 300:  # 5 minutes maximum
             return True
 
-        # Refresh por movimiento de mercado
-        if abs(market_move) > 0.01:  # 1% de movimiento
+        # Refresh by market movement
+        if abs(market_move) > 0.01:  # 1% movement
             return True
 
-        # Refresh si muy poco fill en tiempo razonable
-        if time_since_last > 120 and self.executed_quantity == 0:  # 2 min sin fills
+        # Refresh if very few fills in a reasonable time
+        if time_since_last > 120 and self.executed_quantity == 0:  # 2 min without fills
             return True
 
         return False
 ```
 
-## Detección de Liquidez
+## Liquidity Detection
 
-### Monitor de Liquidez en Tiempo Real
+### Real-Time Liquidity Monitor
 ```python
 class LiquidityMonitor:
     def __init__(self):
         self.liquidity_history = {}
-        self.anomaly_threshold = 2.0  # Desviaciones estándar
+        self.anomaly_threshold = 2.0  # Standard deviations
 
     def analyze_liquidity_pattern(self, symbol: str, timeframe_minutes: int = 60) -> dict:
-        """Analiza patrones de liquidez para timing óptimo"""
+        """Analyzes liquidity patterns for optimal timing"""
 
-        # Simular datos históricos de liquidez
+        # Simulate historical liquidity data
         historical_data = self._get_historical_liquidity(symbol, timeframe_minutes)
 
         current_liquidity = self._calculate_current_liquidity(symbol)
 
-        # Detectar anomalías en liquidez
+        # Detect liquidity anomalies
         liquidity_z_score = self._calculate_z_score(current_liquidity, historical_data)
 
-        # Predecir ventanas de liquidez óptima
+        # Predict optimal liquidity windows
         optimal_windows = self._predict_liquidity_windows(historical_data)
 
         return {
@@ -573,9 +575,9 @@ class LiquidityMonitor:
         }
 
     def _calculate_current_liquidity(self, symbol: str) -> float:
-        """Calcula score de liquidez actual"""
-        # Factores de liquidez:
-        # 1. Book depth (suma de bid/ask sizes)
+        """Calculates current liquidity score"""
+        # Liquidity factors:
+        # 1. Book depth (sum of bid/ask sizes)
         # 2. Spread tightness
         # 3. Volume rate vs. normal
         # 4. Number of active market makers
@@ -592,16 +594,16 @@ class LiquidityMonitor:
         return sum(w * s for w, s in zip(weights, scores))
 
     def _predict_liquidity_windows(self, historical_data: list) -> list:
-        """Predice ventanas de liquidez óptima usando patterns históricos"""
+        """Predicts optimal liquidity windows using historical patterns"""
 
-        # Análisis por hora del día
+        # Analysis by hour of day
         hourly_patterns = {}
         for hour in range(24):
             hour_data = [d for d in historical_data if d['hour'] == hour]
             if hour_data:
                 hourly_patterns[hour] = np.mean([d['liquidity_score'] for d in hour_data])
 
-        # Identificar mejores horas
+        # Identify best hours
         best_hours = sorted(hourly_patterns.items(), key=lambda x: x[1], reverse=True)[:3]
 
         return [
@@ -614,29 +616,29 @@ class LiquidityMonitor:
         ]
 
     def _get_execution_recommendation(self, current_liquidity: float, historical_data: list) -> str:
-        """Recomienda timing de ejecución"""
+        """Recommends execution timing"""
 
         avg_liquidity = np.mean([d['liquidity_score'] for d in historical_data])
 
         if current_liquidity > avg_liquidity * 1.5:
-            return "EXECUTE_NOW"  # Liquidez excepcional
+            return "EXECUTE_NOW"  # Exceptional liquidity
         elif current_liquidity > avg_liquidity * 1.2:
-            return "EXECUTE_SOON"  # Buena liquidez
+            return "EXECUTE_SOON"  # Good liquidity
         elif current_liquidity > avg_liquidity * 0.8:
-            return "WAIT_FOR_BETTER"  # Liquidez promedio
+            return "WAIT_FOR_BETTER"  # Average liquidity
         else:
-            return "AVOID_EXECUTION"  # Liquidez pobre
+            return "AVOID_EXECUTION"  # Poor liquidity
 
     def _get_historical_liquidity(self, symbol: str, timeframe_minutes: int) -> list:
-        """Obtiene datos históricos de liquidez (simulado)"""
-        # En implementación real, consultaría base de datos
+        """Gets historical liquidity data (simulated)"""
+        # In a real implementation, this would query a database
         return [
             {'hour': i % 24, 'liquidity_score': 5.0 + np.random.normal(0, 1.5)}
-            for i in range(timeframe_minutes // 15)  # Data cada 15 minutos
+            for i in range(timeframe_minutes // 15)  # Data every 15 minutes
         ]
 
     def _calculate_z_score(self, current: float, historical: list) -> float:
-        """Calcula z-score de liquidez actual vs. histórica"""
+        """Calculates z-score of current vs. historical liquidity"""
         historical_scores = [d['liquidity_score'] for d in historical]
         mean = np.mean(historical_scores)
         std = np.std(historical_scores)
@@ -644,15 +646,15 @@ class LiquidityMonitor:
         return (current - mean) / std if std > 0 else 0
 
     def _get_percentile(self, current: float, historical: list) -> float:
-        """Calcula percentil de liquidez actual"""
+        """Calculates current liquidity percentile"""
         historical_scores = [d['liquidity_score'] for d in historical]
         return (sum(1 for score in historical_scores if score <= current) /
                 len(historical_scores) * 100)
 ```
 
-## Optimización de Timing
+## Timing Optimization
 
-### Sistema de Timing Inteligente
+### Intelligent Timing System
 ```python
 from datetime import datetime, time
 import pytz
@@ -661,13 +663,13 @@ class SmallCapTimingOptimizer:
     def __init__(self):
         self.est = pytz.timezone('US/Eastern')
 
-        # Ventanas de tiempo optimizadas para small caps
+        # Time windows optimized for small caps
         self.optimal_windows = {
-            'market_open': (time(9, 30), time(10, 30)),    # 60 min después de apertura
-            'mid_morning': (time(10, 30), time(11, 30)),   # Actividad estable
-            'lunch_lull': (time(12, 0), time(14, 0)),      # EVITAR - baja liquidez
-            'afternoon': (time(14, 0), time(15, 30)),      # Buena liquidez
-            'close': (time(15, 30), time(16, 0))           # EVITAR - volatilidad alta
+            'market_open': (time(9, 30), time(10, 30)),    # 60 min after open
+            'mid_morning': (time(10, 30), time(11, 30)),   # Stable activity
+            'lunch_lull': (time(12, 0), time(14, 0)),      # AVOID - low liquidity
+            'afternoon': (time(14, 0), time(15, 30)),      # Good liquidity
+            'close': (time(15, 30), time(16, 0))           # AVOID - high volatility
         }
 
         self.volatility_windows = {
@@ -680,7 +682,7 @@ class SmallCapTimingOptimizer:
                                  strategy: str,
                                  urgency: str = 'medium',
                                  max_acceptable_spread: float = 0.05) -> dict:
-        """Determina timing óptimo para ejecución"""
+        """Determines optimal timing for execution"""
 
         current_time = datetime.now(self.est).time()
         current_window = self._get_current_window(current_time)
@@ -694,42 +696,42 @@ class SmallCapTimingOptimizer:
             'estimated_wait_minutes': 0
         }
 
-        # Lógica de decisión basada en estrategia
+        # Decision logic based on strategy
         if strategy == 'aggressive':
             if current_window in ['mid_morning', 'afternoon']:
                 recommendation['action'] = 'EXECUTE'
-                recommendation['reason'] = 'Ventana óptima para ejecución agresiva'
+                recommendation['reason'] = 'Optimal window for aggressive execution'
             else:
                 recommendation['action'] = 'WAIT'
-                recommendation['reason'] = 'Esperar ventana de menor volatilidad'
+                recommendation['reason'] = 'Wait for lower volatility window'
                 recommendation['next_optimal_window'] = self._get_next_optimal_window(current_time, ['mid_morning', 'afternoon'])
 
         elif strategy == 'passive':
             if current_window == 'lunch_lull':
                 recommendation['action'] = 'EXECUTE'
-                recommendation['reason'] = 'Período de baja competencia por liquidez'
+                recommendation['reason'] = 'Period of low competition for liquidity'
             elif current_window in ['mid_morning', 'afternoon']:
                 recommendation['action'] = 'EXECUTE'
-                recommendation['reason'] = 'Ventana aceptable para ejecución pasiva'
+                recommendation['reason'] = 'Acceptable window for passive execution'
             else:
                 recommendation['action'] = 'WAIT'
-                recommendation['reason'] = 'Esperar menor volatilidad'
+                recommendation['reason'] = 'Wait for lower volatility'
 
         elif strategy == 'opportunistic':
-            # Ejecutar en cualquier ventana que no sea alta volatilidad
+            # Execute in any window that is not high volatility
             if current_window not in ['market_open', 'close']:
                 recommendation['action'] = 'EXECUTE'
-                recommendation['reason'] = 'Ventana aceptable para oportunidades'
+                recommendation['reason'] = 'Acceptable window for opportunities'
             else:
                 recommendation['action'] = 'WAIT'
-                recommendation['reason'] = 'Alta volatilidad - esperar'
+                recommendation['reason'] = 'High volatility - wait'
 
-        # Override por urgencia
+        # Override for urgency
         if urgency == 'high':
             recommendation['action'] = 'EXECUTE'
-            recommendation['reason'] = 'Ejecutar inmediatamente por urgencia alta'
+            recommendation['reason'] = 'Execute immediately due to high urgency'
 
-        # Calcular tiempo de espera si aplica
+        # Calculate wait time if applicable
         if recommendation['action'] == 'WAIT' and recommendation['next_optimal_window']:
             recommendation['estimated_wait_minutes'] = self._calculate_wait_time(
                 current_time, recommendation['next_optimal_window']
@@ -738,24 +740,24 @@ class SmallCapTimingOptimizer:
         return recommendation
 
     def _get_current_window(self, current_time: time) -> str:
-        """Identifica ventana de tiempo actual"""
+        """Identifies current time window"""
         for window_name, (start, end) in self.optimal_windows.items():
             if start <= current_time <= end:
                 return window_name
         return 'after_hours'
 
     def _get_next_optimal_window(self, current_time: time, preferred_windows: list) -> str:
-        """Encuentra la próxima ventana óptima"""
+        """Finds the next optimal window"""
         for window_name in preferred_windows:
             window_start, window_end = self.optimal_windows[window_name]
             if current_time < window_start:
                 return window_name
 
-        # Si no hay ventana hoy, retornar la primera del próximo día
+        # If no window today, return the first one for next day
         return preferred_windows[0]
 
     def _calculate_wait_time(self, current_time: time, target_window: str) -> int:
-        """Calcula minutos de espera hasta ventana objetivo"""
+        """Calculates minutes to wait until target window"""
         target_start, _ = self.optimal_windows[target_window]
 
         current_minutes = current_time.hour * 60 + current_time.minute
@@ -764,32 +766,32 @@ class SmallCapTimingOptimizer:
         if target_minutes > current_minutes:
             return target_minutes - current_minutes
         else:
-            # Próximo día
+            # Next day
             return (24 * 60) - current_minutes + target_minutes
 
     def get_execution_quality_forecast(self, symbol: str, target_time: datetime) -> dict:
-        """Predice calidad de ejecución para un timing específico"""
+        """Predicts execution quality for a specific timing"""
 
         target_time_et = target_time.astimezone(self.est)
         target_window = self._get_current_window(target_time_et.time())
 
-        # Score base por ventana
+        # Base score by window
         window_scores = {
-            'market_open': 6.0,    # Alta liquidez pero alta volatilidad
-            'mid_morning': 8.5,    # Óptimo
-            'lunch_lull': 7.0,     # Baja competencia pero menos liquidez
-            'afternoon': 8.0,      # Muy bueno
-            'close': 5.0,          # Alta volatilidad
-            'after_hours': 3.0     # Muy limitado
+            'market_open': 6.0,    # High liquidity but high volatility
+            'mid_morning': 8.5,    # Optimal
+            'lunch_lull': 7.0,     # Low competition but less liquidity
+            'afternoon': 8.0,      # Very good
+            'close': 5.0,          # High volatility
+            'after_hours': 3.0     # Very limited
         }
 
         base_score = window_scores.get(target_window, 5.0)
 
-        # Ajustes por día de la semana
+        # Day of week adjustments
         weekday = target_time_et.weekday()
-        if weekday == 0:  # Lunes
+        if weekday == 0:  # Monday
             day_adjustment = -0.5  # Slightly worse
-        elif weekday == 4:  # Viernes
+        elif weekday == 4:  # Friday
             day_adjustment = -1.0  # Worse liquidity
         else:
             day_adjustment = 0.0
@@ -805,64 +807,64 @@ class SmallCapTimingOptimizer:
         }
 
     def _estimate_spread_for_window(self, window: str) -> float:
-        """Estima spread esperado por ventana"""
+        """Estimates expected spread by window"""
         spread_estimates = {
-            'market_open': 3.5,    # Spreads más amplios
-            'mid_morning': 2.0,    # Spreads normales
-            'lunch_lull': 3.0,     # Spreads ligeramente amplios
-            'afternoon': 2.2,      # Spreads normales
-            'close': 4.0,          # Spreads amplios
-            'after_hours': 8.0     # Spreads muy amplios
+            'market_open': 3.5,    # Wider spreads
+            'mid_morning': 2.0,    # Normal spreads
+            'lunch_lull': 3.0,     # Slightly wider spreads
+            'afternoon': 2.2,      # Normal spreads
+            'close': 4.0,          # Wide spreads
+            'after_hours': 8.0     # Very wide spreads
         }
         return spread_estimates.get(window, 3.0)
 
     def _estimate_impact_for_window(self, window: str) -> float:
-        """Estima impacto de mercado por ventana"""
+        """Estimates market impact by window"""
         impact_estimates = {
-            'market_open': 4.0,    # Alto impacto por volatilidad
-            'mid_morning': 2.5,    # Impacto normal
-            'lunch_lull': 3.5,     # Impacto alto por baja liquidez
-            'afternoon': 2.8,      # Impacto normal
-            'close': 5.0,          # Alto impacto
-            'after_hours': 8.0     # Impacto muy alto
+            'market_open': 4.0,    # High impact from volatility
+            'mid_morning': 2.5,    # Normal impact
+            'lunch_lull': 3.5,     # High impact from low liquidity
+            'afternoon': 2.8,      # Normal impact
+            'close': 5.0,          # High impact
+            'after_hours': 8.0     # Very high impact
         }
         return impact_estimates.get(window, 3.0)
 ```
 
-## Ejemplo de Implementación Completa
+## Complete Implementation Example
 
 ```python
 async def execute_small_cap_order():
-    """Ejemplo completo de ejecución optimizada para small caps"""
+    """Complete example of optimized small cap execution"""
 
-    # Configuración de la orden
+    # Order configuration
     symbol = "ABCD"
     quantity = 5000
     side = "buy"
     urgency = "medium"
 
-    # Inicializar componentes
+    # Initialize components
     router = SmallCapRouter()
     impact_model = SmallCapImpactModel()
     timing_optimizer = SmallCapTimingOptimizer()
     liquidity_monitor = LiquidityMonitor()
 
-    # 1. Analizar timing óptimo
+    # 1. Analyze optimal timing
     timing_rec = timing_optimizer.get_optimal_execution_time("balanced", urgency)
 
     if timing_rec['action'] == 'WAIT':
-        print(f"Esperando {timing_rec['estimated_wait_minutes']} minutos para ventana óptima")
+        print(f"Waiting {timing_rec['estimated_wait_minutes']} minutes for optimal window")
         return
 
-    # 2. Analizar liquidez actual
+    # 2. Analyze current liquidity
     liquidity_analysis = liquidity_monitor.analyze_liquidity_pattern(symbol)
 
     if liquidity_analysis['recommendation'] == 'AVOID_EXECUTION':
-        print("Liquidez insuficiente - evitar ejecución")
+        print("Insufficient liquidity - avoid execution")
         return
 
-    # 3. Estimar impacto de mercado
-    adv = 250000  # $250K ADV estimado
+    # 3. Estimate market impact
+    adv = 250000  # Estimated $250K ADV
     impact_estimate = impact_model.estimate_market_impact(
         quantity=quantity,
         adv=adv,
@@ -870,46 +872,46 @@ async def execute_small_cap_order():
         volatility=0.35
     )
 
-    print(f"Impacto estimado: {impact_estimate['total_impact_bps']:.1f} bps")
+    print(f"Estimated impact: {impact_estimate['total_impact_bps']:.1f} bps")
 
-    if impact_estimate['total_impact_bps'] > 50:  # Más de 50 bps
-        print("Impacto muy alto - considerando división en chunks")
+    if impact_estimate['total_impact_bps'] > 50:  # More than 50 bps
+        print("Very high impact - considering splitting into chunks")
 
-        # Optimizar cronograma
+        # Optimize schedule
         schedule = impact_model.optimize_execution_schedule(
             quantity, adv, 5.50, target_time_minutes=30
         )
 
-        print(f"Ejecutando en {len(schedule['optimal_chunks'])} chunks")
+        print(f"Executing in {len(schedule['optimal_chunks'])} chunks")
         return schedule
 
-    # 4. Obtener plan de ejecución
+    # 4. Get execution plan
     execution_plan = await router.get_best_execution_plan(
         symbol, side, quantity, urgency
     )
 
-    print(f"Estrategia: {execution_plan['strategy']}")
-    print(f"Órdenes planificadas: {len(execution_plan['orders'])}")
+    print(f"Strategy: {execution_plan['strategy']}")
+    print(f"Planned orders: {len(execution_plan['orders'])}")
 
-    # 5. Ejecutar plan
+    # 5. Execute plan
     for order in execution_plan['orders']:
-        print(f"Ejecutando {order['quantity']} en {order['venue']}")
-        # Aquí iría la lógica de envío real de órdenes
+        print(f"Executing {order['quantity']} on {order['venue']}")
+        # Real order submission logic would go here
 
     return execution_plan
 
-# Ejecutar ejemplo
+# Run example
 # asyncio.run(execute_small_cap_order())
 ```
 
-## Conclusiones
+## Conclusions
 
-Los algoritmos de ejecución para small caps requieren consideraciones especiales:
+Execution algorithms for small caps require special considerations:
 
-1. **Fragmentación de Liquidez**: Usar smart routing para encontrar liquidez oculta
-2. **Impacto de Mercado**: Modelos calibrados para spreads amplios y baja liquidez
-3. **Timing Inteligente**: Evitar períodos de alta volatilidad
-4. **Ejecución Adaptativa**: Ajustar estrategia basada en condiciones en tiempo real
-5. **Monitoreo Continuo**: Detectar cambios en patrones de liquidez
+1. **Liquidity Fragmentation**: Use smart routing to find hidden liquidity
+2. **Market Impact**: Models calibrated for wide spreads and low liquidity
+3. **Intelligent Timing**: Avoid periods of high volatility
+4. **Adaptive Execution**: Adjust strategy based on real-time conditions
+5. **Continuous Monitoring**: Detect changes in liquidity patterns
 
-La clave está en balancear velocidad vs. impacto, adaptándose constantemente a las condiciones únicas del mercado de small caps.
+The key is balancing speed vs. impact, constantly adapting to the unique conditions of the small cap market.

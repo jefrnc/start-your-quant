@@ -1,10 +1,12 @@
-# Portfolio Risk Management: Gestión Integral del Riesgo
+> 🇪🇸 [Leer en Español](portfolio_risk.es.md) | 🇺🇸 **English**
 
-## Introducción: Del Riesgo Individual al Riesgo de Portfolio
+# Portfolio Risk Management: Comprehensive Risk Management
 
-Mientras que la gestión de riesgo individual se enfoca en trades específicos, la gestión de riesgo de portfolio considera las interacciones, correlaciones y efectos sistémicos across todas las posiciones. Este documento presenta un framework completo para optimizar el riesgo a nivel portfolio.
+## Introduction: From Individual Risk to Portfolio Risk
 
-## Architecture de Portfolio Risk Management
+While individual risk management focuses on specific trades, portfolio risk management considers the interactions, correlations, and systemic effects across all positions. This document presents a complete framework for optimizing risk at the portfolio level.
+
+## Portfolio Risk Management Architecture
 
 ### Core Risk Engine
 
@@ -20,7 +22,7 @@ import warnings
 
 @dataclass
 class Position:
-    """Estructura de posición individual"""
+    """Individual position structure"""
     symbol: str
     quantity: float
     entry_price: float
@@ -45,7 +47,7 @@ class Position:
 
 @dataclass
 class RiskMetrics:
-    """Métricas de riesgo del portfolio"""
+    """Portfolio risk metrics"""
     total_var: float
     component_var: Dict[str, float]
     marginal_var: Dict[str, float]
@@ -57,7 +59,7 @@ class RiskMetrics:
     concentration_risk: float
 
 class PortfolioRiskManager:
-    """Manager central de riesgo de portfolio"""
+    """Central portfolio risk manager"""
     
     def __init__(self, initial_capital: float = 1000000):
         self.initial_capital = initial_capital
@@ -77,21 +79,21 @@ class PortfolioRiskManager:
         self.risk_metrics_history = []
         
     def _default_risk_limits(self) -> Dict[str, float]:
-        """Límites de riesgo por defecto"""
+        """Default risk limits"""
         return {
-            'max_portfolio_var': 0.02,          # 2% diario VaR máximo
-            'max_position_weight': 0.10,         # 10% máximo por posición
-            'max_sector_weight': 0.25,           # 25% máximo por sector
-            'max_strategy_weight': 0.40,         # 40% máximo por estrategia
-            'max_correlation': 0.80,             # 80% correlación máxima
-            'max_concentration_ratio': 0.30,     # 30% concentración máxima
-            'max_leverage': 1.0,                 # Sin leverage por defecto
-            'max_drawdown': 0.15,                # 15% drawdown máximo
-            'min_liquidity_ratio': 0.05          # 5% del volumen diario mínimo
+            'max_portfolio_var': 0.02,          # 2% daily max VaR
+            'max_position_weight': 0.10,         # 10% max per position
+            'max_sector_weight': 0.25,           # 25% max per sector
+            'max_strategy_weight': 0.40,         # 40% max per strategy
+            'max_correlation': 0.80,             # 80% max correlation
+            'max_concentration_ratio': 0.30,     # 30% max concentration
+            'max_leverage': 1.0,                 # No leverage by default
+            'max_drawdown': 0.15,                # 15% max drawdown
+            'min_liquidity_ratio': 0.05          # 5% of daily volume minimum
         }
     
     def add_position(self, position: Position) -> bool:
-        """Agrega nueva posición al portfolio"""
+        """Adds new position to portfolio"""
         # 1. Pre-trade risk check
         risk_check = self._pre_trade_risk_check(position)
         if not risk_check['approved']:
@@ -111,7 +113,7 @@ class PortfolioRiskManager:
         return True
     
     def remove_position(self, symbol: str) -> bool:
-        """Remueve posición del portfolio"""
+        """Removes position from portfolio"""
         if symbol in self.positions:
             del self.positions[symbol]
             self._update_exposures()
@@ -120,7 +122,7 @@ class PortfolioRiskManager:
         return False
     
     def update_prices(self, price_updates: Dict[str, float]):
-        """Actualiza precios de las posiciones"""
+        """Updates position prices"""
         for symbol, price in price_updates.items():
             if symbol in self.positions:
                 self.positions[symbol].current_price = price
@@ -129,7 +131,7 @@ class PortfolioRiskManager:
         self._calculate_real_time_risk_metrics()
     
     def _pre_trade_risk_check(self, new_position: Position) -> Dict[str, Any]:
-        """Verificación de riesgo pre-trade"""
+        """Pre-trade risk check"""
         checks = {
             'position_size': self._check_position_size_limit(new_position),
             'sector_concentration': self._check_sector_limit(new_position),
@@ -149,14 +151,14 @@ class PortfolioRiskManager:
         }
     
     def _check_position_size_limit(self, position: Position) -> bool:
-        """Verifica límite de tamaño de posición"""
+        """Verifies position size limit"""
         portfolio_value = self._calculate_portfolio_value()
         position_weight = position.market_value / portfolio_value
         
         return position_weight <= self.risk_limits['max_position_weight']
     
     def _check_sector_limit(self, new_position: Position) -> bool:
-        """Verifica límite de concentración sectorial"""
+        """Verifies sector concentration limit"""
         portfolio_value = self._calculate_portfolio_value()
         
         # Calculate current sector exposure
@@ -166,7 +168,7 @@ class PortfolioRiskManager:
         return new_sector_exposure <= self.risk_limits['max_sector_weight']
     
     def _check_correlation_risk(self, new_position: Position) -> bool:
-        """Verifica riesgo de correlación"""
+        """Verifies correlation risk"""
         if not self.positions:  # First position
             return True
         
@@ -180,7 +182,7 @@ class PortfolioRiskManager:
     
     def calculate_portfolio_var(self, confidence_level: float = 0.05, 
                                lookback_days: int = 252) -> Dict[str, float]:
-        """Calcula Value at Risk del portfolio"""
+        """Calculates portfolio Value at Risk"""
         if not self.positions:
             return {'portfolio_var': 0, 'component_vars': {}}
         
@@ -214,7 +216,7 @@ class PortfolioRiskManager:
     
     def _calculate_component_var(self, returns_matrix: pd.DataFrame, 
                                weights: np.ndarray, confidence_level: float) -> Dict[str, float]:
-        """Calcula VaR componente para cada posición"""
+        """Calculates component VaR for each position"""
         component_vars = {}
         
         # Covariance matrix
@@ -237,7 +239,7 @@ class PortfolioRiskManager:
         return component_vars
     
     def optimize_portfolio_risk(self, target_return: Optional[float] = None) -> Dict[str, Any]:
-        """Optimiza weights del portfolio para minimizar riesgo"""
+        """Optimizes portfolio weights to minimize risk"""
         if not self.positions:
             return {'status': 'error', 'message': 'No positions to optimize'}
         
@@ -312,7 +314,7 @@ class PortfolioRiskManager:
 
 ```python
 class AdvancedRiskModels:
-    """Modelos avanzados de riesgo"""
+    """Advanced risk models"""
     
     def __init__(self):
         self.factor_models = {}
@@ -322,7 +324,7 @@ class AdvancedRiskModels:
                               market_returns: pd.Series,
                               smb_factor: pd.Series,
                               hml_factor: pd.Series) -> Dict[str, Any]:
-        """Modelo de riesgo Fama-French 3-factor"""
+        """Fama-French 3-factor risk model"""
         
         risk_decomposition = {}
         
@@ -376,7 +378,7 @@ class AdvancedRiskModels:
         return risk_decomposition
     
     def regime_switching_risk_model(self, returns_data: pd.DataFrame) -> Dict[str, Any]:
-        """Modelo de riesgo con cambios de régimen"""
+        """Risk model with regime changes"""
         from sklearn.mixture import GaussianMixture
         
         # Identify market regimes using portfolio returns
@@ -419,7 +421,7 @@ class AdvancedRiskModels:
         }
 
 class RiskAttributionEngine:
-    """Engine de atribución de riesgo"""
+    """Risk attribution engine"""
     
     def __init__(self):
         self.attribution_methods = {
@@ -431,7 +433,7 @@ class RiskAttributionEngine:
     
     def attribute_portfolio_risk(self, portfolio_manager: PortfolioRiskManager,
                                 method: str = 'component_var') -> Dict[str, Any]:
-        """Atribuye riesgo del portfolio a diferentes fuentes"""
+        """Attributes portfolio risk to different sources"""
         
         if method not in self.attribution_methods:
             raise ValueError(f"Unknown attribution method: {method}")
@@ -439,7 +441,7 @@ class RiskAttributionEngine:
         return self.attribution_methods[method](portfolio_manager)
     
     def _component_var_attribution(self, portfolio_manager: PortfolioRiskManager) -> Dict[str, Any]:
-        """Atribución basada en VaR componente"""
+        """Component VaR-based attribution"""
         var_results = portfolio_manager.calculate_portfolio_var()
         
         attribution = {
@@ -455,7 +457,7 @@ class RiskAttributionEngine:
         return attribution
     
     def _factor_based_attribution(self, portfolio_manager: PortfolioRiskManager) -> Dict[str, Any]:
-        """Atribución basada en factores de riesgo"""
+        """Risk factor-based attribution"""
         
         # Get positions data
         positions_data = {}
@@ -478,7 +480,7 @@ class RiskAttributionEngine:
         return factor_attribution
     
     def _calculate_sector_risk_attribution(self, positions_data: Dict) -> Dict[str, float]:
-        """Calcula atribución de riesgo por sector"""
+        """Calculates risk attribution by sector"""
         sector_weights = {}
         
         for symbol, data in positions_data.items():
@@ -498,7 +500,7 @@ class RiskAttributionEngine:
         return sector_risk
 
 class StressTestingFramework:
-    """Framework de stress testing"""
+    """Stress testing framework"""
     
     def __init__(self):
         self.stress_scenarios = {
@@ -510,7 +512,7 @@ class StressTestingFramework:
         }
     
     def run_stress_tests(self, portfolio_manager: PortfolioRiskManager) -> Dict[str, Any]:
-        """Ejecuta suite completo de stress tests"""
+        """Runs complete stress test suite"""
         
         stress_results = {}
         
@@ -534,7 +536,7 @@ class StressTestingFramework:
     
     def _run_scenario(self, portfolio_manager: PortfolioRiskManager, 
                      scenario_params: Dict[str, Any]) -> Dict[str, Any]:
-        """Ejecuta escenario específico de stress"""
+        """Runs specific stress scenario"""
         
         # Calculate impact on each position
         position_impacts = {}
@@ -558,7 +560,7 @@ class StressTestingFramework:
     
     def _calculate_position_impact(self, position: Position, 
                                  scenario_params: Dict[str, Any]) -> Dict[str, Any]:
-        """Calcula impacto en posición individual"""
+        """Calculates impact on individual position"""
         
         # Base impact from market crash
         market_impact = scenario_params.get('market_return', 0)
@@ -591,7 +593,7 @@ class StressTestingFramework:
 
 ```python
 class RealTimeRiskMonitor:
-    """Monitor de riesgo en tiempo real"""
+    """Real-time risk monitor"""
     
     def __init__(self, portfolio_manager: PortfolioRiskManager):
         self.portfolio_manager = portfolio_manager
@@ -604,7 +606,7 @@ class RealTimeRiskMonitor:
         }
         
     async def start_monitoring(self):
-        """Inicia monitoreo en tiempo real"""
+        """Starts real-time monitoring"""
         self.monitoring_active = True
         
         while self.monitoring_active:
@@ -630,7 +632,7 @@ class RealTimeRiskMonitor:
                 await asyncio.sleep(5)
     
     def _calculate_current_metrics(self) -> Dict[str, Any]:
-        """Calcula métricas de riesgo actuales"""
+        """Calculates current risk metrics"""
         
         # VaR calculation
         var_metrics = self.portfolio_manager.calculate_portfolio_var()
@@ -653,7 +655,7 @@ class RealTimeRiskMonitor:
         }
     
     def _check_risk_thresholds(self, metrics: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Verifica umbrales de riesgo"""
+        """Checks risk thresholds"""
         alerts = []
         
         # VaR threshold check
@@ -674,7 +676,7 @@ class RealTimeRiskMonitor:
         return alerts
     
     async def _process_alerts(self, alerts: List[Dict[str, Any]]):
-        """Procesa alertas de riesgo"""
+        """Processes risk alerts"""
         for alert in alerts:
             # Log alert
             print(f"🚨 RISK ALERT: {alert['message']}")
@@ -687,7 +689,7 @@ class RealTimeRiskMonitor:
             await self._send_risk_notification(alert)
     
     async def _take_emergency_action(self, alert: Dict[str, Any]):
-        """Toma acción automática de emergencia"""
+        """Takes automatic emergency action"""
         if alert['type'] == 'var_breach':
             # Reduce position sizes automatically
             reduction_factor = 0.9  # Reduce positions by 10%
@@ -699,7 +701,7 @@ class RealTimeRiskMonitor:
             print("⚠️ Emergency position reduction executed")
 
 class RiskReportingEngine:
-    """Engine de reportes de riesgo"""
+    """Risk reporting engine"""
     
     def __init__(self):
         self.report_templates = {
@@ -711,7 +713,7 @@ class RiskReportingEngine:
     
     def generate_risk_report(self, portfolio_manager: PortfolioRiskManager,
                            report_type: str = 'daily_risk_report') -> str:
-        """Genera reporte de riesgo"""
+        """Generates risk report"""
         
         if report_type not in self.report_templates:
             raise ValueError(f"Unknown report type: {report_type}")
@@ -719,7 +721,7 @@ class RiskReportingEngine:
         return self.report_templates[report_type](portfolio_manager)
     
     def _generate_daily_risk_report(self, portfolio_manager: PortfolioRiskManager) -> str:
-        """Genera reporte diario de riesgo"""
+        """Generates daily risk report"""
         
         # Calculate metrics
         var_metrics = portfolio_manager.calculate_portfolio_var()
@@ -764,9 +766,9 @@ class RiskReportingEngine:
 ### Usage Example
 
 ```python
-# Ejemplo de uso completo del sistema de riesgo de portfolio
+# Complete usage example of the portfolio risk system
 async def main():
-    """Ejemplo completo de gestión de riesgo de portfolio"""
+    """Complete portfolio risk management example"""
     
     # 1. Initialize portfolio risk manager
     portfolio_manager = PortfolioRiskManager(initial_capital=1000000)
@@ -810,4 +812,4 @@ if __name__ == "__main__":
 
 ---
 
-*La gestión de riesgo de portfolio es fundamental para el éxito a largo plazo en trading algorítmico. Un framework robusto que considere correlaciones, concentraciones y efectos sistémicos permite optimizar el balance riesgo-rendimiento mientras protege el capital.*
+*Portfolio risk management is fundamental for long-term success in algorithmic trading. A robust framework that considers correlations, concentrations, and systemic effects enables optimizing the risk-return balance while protecting capital.*

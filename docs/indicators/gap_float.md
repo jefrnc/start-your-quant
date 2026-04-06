@@ -1,20 +1,22 @@
-# Gap % y Float
+> 🇪🇸 [Leer en Español](gap_float.es.md) | 🇺🇸 **English**
 
-## Los Fundamentos del Small Cap Trading
+# Gap % and Float
 
-Gap % y Float son los dos criterios más importantes para filtrar small caps con potencial explosivo. Un stock con float bajo y gap alto es dinamita.
+## The Fundamentals of Small Cap Trading
 
-## Cálculo de Gap %
+Gap % and Float are the two most important criteria for filtering small caps with explosive potential. A stock with low float and a large gap is dynamite.
+
+## Gap % Calculation
 
 ```python
 def calculate_gap_metrics(df):
-    """Calcular todas las métricas de gap"""
-    # Gap básico
+    """Calculate all gap metrics"""
+    # Basic gap
     df['prev_close'] = df['close'].shift(1)
     df['gap_dollar'] = df['open'] - df['prev_close']
     df['gap_pct'] = (df['gap_dollar'] / df['prev_close']) * 100
     
-    # Clasificar gaps
+    # Classify gaps
     df['gap_type'] = pd.cut(
         df['gap_pct'],
         bins=[-np.inf, -10, -5, -2, 2, 5, 10, 20, np.inf],
@@ -45,9 +47,9 @@ def calculate_gap_metrics(df):
 
 ```python
 def get_float_data(ticker):
-    """Obtener datos de float y shares outstanding"""
-    # Esto requiere conexión a API de fundamentales
-    # Ejemplo con yfinance (no siempre confiable para float)
+    """Get float and shares outstanding data"""
+    # This requires a connection to a fundamentals API
+    # Example with yfinance (not always reliable for float)
     import yfinance as yf
     
     stock = yf.Ticker(ticker)
@@ -62,7 +64,7 @@ def get_float_data(ticker):
         'short_percent': info.get('shortPercentOfFloat', None)
     }
     
-    # Calcular float real si no está disponible
+    # Calculate real float if not available
     if float_data['float_shares'] is None and float_data['shares_outstanding']:
         insider_held = float_data['held_by_insiders'] or 0
         institutional_held = float_data['held_by_institutions'] or 0
@@ -72,7 +74,7 @@ def get_float_data(ticker):
     return float_data
 
 def classify_float_size(float_shares):
-    """Clasificar tamaño de float"""
+    """Classify float size"""
     if float_shares is None:
         return 'unknown'
     elif float_shares < 10_000_000:
@@ -91,27 +93,27 @@ def classify_float_size(float_shares):
 
 ```python
 def gap_float_scanner(universe, gap_threshold=15, max_float=50_000_000):
-    """Scanner para gap + low float combo"""
+    """Scanner for gap + low float combo"""
     candidates = []
     
     for ticker in universe:
         try:
-            # Obtener datos de precio
+            # Get price data
             data = get_latest_data(ticker)
             gap_pct = calculate_gap_pct(data)
             
-            # Filtros básicos
+            # Basic filters
             if abs(gap_pct) < gap_threshold:
                 continue
                 
-            # Obtener float
+            # Get float
             float_data = get_float_data(ticker)
             float_shares = float_data['float_shares']
             
             if float_shares is None or float_shares > max_float:
                 continue
             
-            # Calcular métricas adicionales
+            # Calculate additional metrics
             price = data['close'].iloc[-1]
             volume = data['volume'].iloc[-1]
             dollar_volume = price * volume
@@ -139,7 +141,7 @@ def gap_float_scanner(universe, gap_threshold=15, max_float=50_000_000):
             print(f"Error processing {ticker}: {e}")
             continue
     
-    # Ordenar por potencial
+    # Sort by potential
     candidates_df = pd.DataFrame(candidates)
     candidates_df['rank_score'] = (
         candidates_df['gap_pct'].abs() * 0.3 +
@@ -154,10 +156,10 @@ def gap_float_scanner(universe, gap_threshold=15, max_float=50_000_000):
 
 ```python
 def gap_fill_analysis(df, lookback_period=252):
-    """Analizar probabilidad de que se llene el gap"""
+    """Analyze the probability of a gap being filled"""
     df = calculate_gap_metrics(df)
     
-    # Análisis histórico de gap fills
+    # Historical gap fill analysis
     gap_fill_stats = {}
     
     for gap_type in df['gap_type'].unique():
@@ -166,7 +168,7 @@ def gap_fill_analysis(df, lookback_period=252):
             
         gaps = df[df['gap_type'] == gap_type].copy()
         
-        # Para cada gap, ver si se llenó en N días
+        # For each gap, check if it was filled in N days
         fill_rates = {}
         for days in [1, 3, 5, 10, 20]:
             fills = 0
@@ -197,24 +199,24 @@ def gap_fill_analysis(df, lookback_period=252):
 
 ```python
 def float_rotation_analysis(df, float_shares):
-    """Analizar cuántas veces rota el float"""
+    """Analyze how many times the float rotates"""
     if float_shares is None:
         return None
     
-    # Volumen acumulado vs float
+    # Cumulative volume vs float
     df['daily_rotation'] = df['volume'] / float_shares
     df['cumulative_rotation'] = df['daily_rotation'].cumsum()
     
-    # Ventana móvil de rotación
+    # Rolling rotation window
     df['rotation_5d'] = df['daily_rotation'].rolling(5).sum()
     df['rotation_20d'] = df['daily_rotation'].rolling(20).sum()
     
-    # Velocidad de rotación
+    # Rotation velocity
     df['rotation_velocity'] = df['daily_rotation'].rolling(5).mean()
     
-    # Alerta de alta rotación
-    df['high_rotation'] = df['daily_rotation'] > 0.5  # 50% del float en un día
-    df['extreme_rotation'] = df['daily_rotation'] > 1.0  # Float completo
+    # High rotation alert
+    df['high_rotation'] = df['daily_rotation'] > 0.5  # 50% of float in one day
+    df['extreme_rotation'] = df['daily_rotation'] > 1.0  # Full float
     
     return df
 ```
@@ -223,22 +225,22 @@ def float_rotation_analysis(df, float_shares):
 
 ```python
 def gap_strategy_signals(df, float_shares):
-    """Determinar si fade o follow el gap"""
+    """Determine whether to fade or follow the gap"""
     df = calculate_gap_metrics(df)
     
-    # Factores para la decisión
+    # Factors for the decision
     gap_size = abs(df['gap_pct'])
     float_category = classify_float_size(float_shares)
     
-    # Reglas generales (simplificadas)
+    # General rules (simplified)
     df['strategy'] = 'hold'
     
-    # Gap pequeño en large float = probable fill (fade)
+    # Small gap on large float = probable fill (fade)
     fade_conditions = (
         (gap_size < 5) & (float_category in ['large_float', 'institutional'])
     )
     
-    # Gap grande en low float = probable momentum (follow)
+    # Large gap on low float = probable momentum (follow)
     follow_conditions = (
         (gap_size > 15) & (float_category in ['micro_float', 'low_float'])
     )
@@ -246,11 +248,11 @@ def gap_strategy_signals(df, float_shares):
     df.loc[fade_conditions, 'strategy'] = 'fade'
     df.loc[follow_conditions, 'strategy'] = 'follow'
     
-    # Ajustar por volumen
+    # Adjust by volume
     if 'rvol' in df.columns:
-        # Alto volumen favorece follow
+        # High volume favors follow
         df.loc[(df['strategy'] == 'fade') & (df['rvol'] > 3), 'strategy'] = 'follow'
-        # Bajo volumen favorece fade
+        # Low volume favors fade
         df.loc[(df['strategy'] == 'follow') & (df['rvol'] < 1), 'strategy'] = 'fade'
     
     return df
@@ -260,17 +262,17 @@ def gap_strategy_signals(df, float_shares):
 
 ```python
 def analyze_ownership_impact(ticker, float_data):
-    """Analizar impacto de ownership en volatilidad"""
+    """Analyze impact of ownership on volatility"""
     insider_pct = float_data.get('held_by_insiders', 0)
     institution_pct = float_data.get('held_by_institutions', 0)
     float_shares = float_data.get('float_shares', 0)
     
-    # Free float real
+    # Real free float
     locked_shares = (insider_pct + institution_pct) / 100
     truly_free_float = float_shares * (1 - locked_shares)
     
-    # Volatility multiplier basado en ownership
-    ownership_factor = 1 + (locked_shares * 2)  # Más locked = más volátil
+    # Volatility multiplier based on ownership
+    ownership_factor = 1 + (locked_shares * 2)  # More locked = more volatile
     
     analysis = {
         'insider_locked_pct': insider_pct,
@@ -290,7 +292,7 @@ def analyze_ownership_impact(ticker, float_data):
 
 ```python
 def historical_gap_performance(ticker, lookback_days=252):
-    """Performance histórico por tipo de gap"""
+    """Historical performance by gap type"""
     df = get_historical_data(ticker, lookback_days)
     df = calculate_gap_metrics(df)
     
@@ -333,15 +335,15 @@ class GapFloatMonitor:
         self.watchlist = []
         
     def scan_premarket(self):
-        """Scan pre-market para gaps"""
+        """Scan pre-market for gaps"""
         candidates = []
         
-        # Obtener movers pre-market
+        # Get pre-market movers
         premarket_movers = get_premarket_movers()
         
         for ticker in premarket_movers:
             try:
-                # Validar criterios
+                # Validate criteria
                 gap_pct = calculate_premarket_gap(ticker)
                 float_data = get_float_data(ticker)
                 
@@ -362,7 +364,7 @@ class GapFloatMonitor:
         return candidates
     
     def monitor_intraday(self):
-        """Monitorear durante el día"""
+        """Monitor during the day"""
         alerts = []
         
         for item in self.watchlist:
@@ -380,7 +382,7 @@ class GapFloatMonitor:
         return alerts
 ```
 
-## Tips de Trading Real
+## Real Trading Tips
 
 ### 1. Float Categories Strategy
 ```python
@@ -409,7 +411,7 @@ FLOAT_STRATEGIES = {
 ### 2. Gap Size Rules
 ```python
 def gap_trading_rules(gap_pct):
-    """Reglas según tamaño de gap"""
+    """Rules based on gap size"""
     if abs(gap_pct) > 50:
         return "AVOID - Too risky"
     elif abs(gap_pct) > 30:
@@ -422,11 +424,11 @@ def gap_trading_rules(gap_pct):
         return "NORMAL GAP - No special strategy"
 ```
 
-## Alertas Críticas
+## Critical Alerts
 
 ```python
 def critical_gap_float_alerts(ticker, gap_pct, float_shares):
-    """Alertas para combinaciones extremas"""
+    """Alerts for extreme combinations"""
     alerts = []
     
     # Micro float + large gap = nuclear

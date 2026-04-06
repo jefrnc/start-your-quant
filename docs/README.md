@@ -1,129 +1,131 @@
-# 🚀 Start Your Quant - Guía Completa de Trading Algorítmico
+> 🇪🇸 [Leer en Español](README.es.md) | 🇺🇸 **English**
 
-> La guía más comprehensiva para trading cuantitativo de small caps, desde principiante hasta experto
+# Start Your Quant - Complete Algorithmic Trading Guide
 
-## 🎯 ¿Qué encontrarás aquí?
+> The most comprehensive guide to quantitative trading in small caps, from beginner to expert
 
-Esta documentación te guiará desde los conceptos fundamentales hasta las implementaciones más avanzadas de trading algorítmico, con un enfoque especial en **small caps** y **estrategias cuantitativas prácticas**.
+## What Will You Find Here?
 
-## 🗺️ Mapa de Navegación
+This documentation will guide you from fundamental concepts to the most advanced implementations of algorithmic trading, with a special focus on **small caps** and **practical quantitative strategies**.
 
-### 📚 **Para Principiantes**
+## Navigation Map
+
+### **For Beginners**
 ```
-1. 📖 Fundamentos
-   ├── ¿Qué es trading cuantitativo?
-   ├── Diferencias discrecional vs algorítmico
-   └── ¿Por qué programar tus estrategias?
+1. Fundamentals
+   ├── What is quantitative trading?
+   ├── Discretionary vs algorithmic differences
+   └── Why code your strategies?
 
-2. ⚙️ Setup Inicial
-   ├── Configuración del entorno
-   ├── Librerías esenciales
-   └── Integración con brokers
+2. Initial Setup
+   ├── Environment configuration
+   ├── Essential libraries
+   └── Broker integration
 
-3. 🎯 Primera Estrategia
-   ├── Gap and Go básico
-   ├── Backtesting simple
-   └── Gestión de riesgo básica
+3. First Strategy
+   ├── Basic Gap and Go
+   ├── Simple backtesting
+   └── Basic risk management
 ```
 
-### 🔬 **Para Nivel Intermedio**
+### **For Intermediate Level**
 ```
-4. 📊 Indicadores Avanzados
-   ├── VWAP y variaciones
+4. Advanced Indicators
+   ├── VWAP and variations
    ├── Volume RVOL
-   └── Moving averages especializados
+   └── Specialized moving averages
 
-5. 🧪 Backtesting Riguroso
-   ├── Métricas avanzadas
-   ├── Análisis de overfitting
-   └── Validación estadística
+5. Rigorous Backtesting
+   ├── Advanced metrics
+   ├── Overfitting analysis
+   └── Statistical validation
 
-6. ⚖️ Gestión de Riesgo
-   ├── Position sizing avanzado
-   ├── Stops dinámicos
-   └── Risk limits por estrategia
+6. Risk Management
+   ├── Advanced position sizing
+   ├── Dynamic stops
+   └── Risk limits per strategy
 ```
 
-### 🚀 **Para Nivel Avanzado**
+### **For Advanced Level**
 ```
-7. 🤖 Machine Learning
-   ├── Modelos predictivos
-   ├── Transformers en finanzas
-   └── Redes neuronales
+7. Machine Learning
+   ├── Predictive models
+   ├── Transformers in finance
+   └── Neural networks
 
-8. 💰 Crypto Trading
+8. Crypto Trading
    ├── DeFi strategies
    ├── Cross-chain arbitrage
    └── MEV opportunities
 
-9. 🏛️ Aspectos Institucionales
-   ├── Evaluación de modelos
-   ├── Compliance y regulación
+9. Institutional Aspects
+   ├── Model evaluation
+   ├── Compliance and regulation
    └── Scaling strategies
 ```
 
-## 🛤️ Rutas de Aprendizaje Sugeridas
+## Suggested Learning Paths
 
-### 🌱 **Ruta del Principiante** (2-4 semanas)
-1. [¿Qué es trading cuantitativo?](./fundamentals/what_is_quant.md)
-2. [¿Por qué programar?](./fundamentals/why_code.md) 
-3. [Setup inicial](./setup/getting_started.md)
-4. [Primera estrategia: Gap and Go](./strategies/gap_and_go.md)
-5. [Backtesting básico](./backtesting/what_is_backtest.md)
+### **Beginner Path** (2-4 weeks)
+1. [What is quantitative trading?](./fundamentals/what_is_quant.md)
+2. [Why code?](./fundamentals/why_code.md) 
+3. [Initial setup](./setup/getting_started.md)
+4. [First strategy: Gap and Go](./strategies/gap_and_go.md)
+5. [Basic backtesting](./backtesting/what_is_backtest.md)
 6. [Position sizing](./risk/position_sizing.md)
 
-### 🔬 **Ruta del Analista** (4-8 semanas)
-1. [Tipos de estrategias](./fundamentals/strategy_types.md)
-2. [Indicadores técnicos avanzados](./indicators/)
-3. [Backtesting avanzado](./backtesting/advanced_analysis.md)
-4. [Métricas de performance](./backtesting/metrics.md)
-5. [Machine Learning aplicado](./analysis/machine_learning.md)
-6. [Validación de modelos](./validation/model_evaluation.md)
+### **Analyst Path** (4-8 weeks)
+1. [Strategy types](./fundamentals/strategy_types.md)
+2. [Advanced technical indicators](./indicators/)
+3. [Advanced backtesting](./backtesting/advanced_analysis.md)
+4. [Performance metrics](./backtesting/metrics.md)
+5. [Applied Machine Learning](./analysis/machine_learning.md)
+6. [Model validation](./validation/model_evaluation.md)
 
-### 🚀 **Ruta del Desarrollador** (6-12 semanas)
-1. [Herramientas avanzadas](./tools/advanced_trading_infrastructure.md)
-2. [Workflow de desarrollo](./tools/development_workflow.md)
-3. [Transformers en trading](./analysis/transformers_finance.md)
-4. [Análisis de redes](./analysis/network_analysis.md)
-5. [Trading de criptomonedas](./assets/crypto/crypto_algorithmic_trading.md)
-6. [Aspectos éticos y regulatorios](./compliance/)
+### **Developer Path** (6-12 weeks)
+1. [Advanced tools](./tools/advanced_trading_infrastructure.md)
+2. [Development workflow](./tools/development_workflow.md)
+3. [Transformers in trading](./analysis/transformers_finance.md)
+4. [Network analysis](./analysis/network_analysis.md)
+5. [Cryptocurrency trading](./assets/crypto/crypto_algorithmic_trading.md)
+6. [Ethical and regulatory aspects](./compliance/)
 
-## 📋 Índice Completo por Categorías
+## Complete Index by Category
 
 <details>
-<summary><strong>📖 Fundamentos</strong> - Conceptos básicos y filosofía</summary>
+<summary><strong>Fundamentals</strong> - Basic concepts and philosophy</summary>
 
-- [¿Qué es trading cuantitativo?](./fundamentals/what_is_quant.md)
-- [Discrecional vs Algorítmico](./fundamentals/discretionary_vs_quant.md)
-- [Tipos de estrategias](./fundamentals/strategy_types.md)
-- [¿Por qué programar?](./fundamentals/why_code.md)
+- [What is quantitative trading?](./fundamentals/what_is_quant.md)
+- [Discretionary vs Algorithmic](./fundamentals/discretionary_vs_quant.md)
+- [Strategy types](./fundamentals/strategy_types.md)
+- [Why code?](./fundamentals/why_code.md)
 
 </details>
 
 <details>
-<summary><strong>⚙️ Setup y Configuración</strong> - Prepara tu entorno</summary>
+<summary><strong>Setup and Configuration</strong> - Prepare your environment</summary>
 
-- [Guía de inicio](./setup/getting_started.md)
-- [Integración con brokers](./setup/broker_integration.md)
+- [Getting started guide](./setup/getting_started.md)
+- [Broker integration](./setup/broker_integration.md)
 - [DAS Trader setup](./setup/das_trader_integration.md)
-- [Proveedores de datos](./setup/data_providers.md)
+- [Data providers](./setup/data_providers.md)
 
 </details>
 
 <details>
-<summary><strong>🎯 Estrategias de Trading</strong> - Implementaciones prácticas</summary>
+<summary><strong>Trading Strategies</strong> - Practical implementations</summary>
 
-- [Gap and Go](./strategies/gap_and_go.md) - Estrategia fundamental
+- [Gap and Go](./strategies/gap_and_go.md) - Core strategy
 - [First Green Red Day](./strategies/first_green_red_day.md)
 - [Low Float Runners](./strategies/low_float_runners.md)
 - [VWAP Reclaim](./strategies/vwap_reclaim.md)
 - [Parabolic Reversal](./strategies/parabolic_reversal.md)
-- [Short Selling Avanzado](./strategies/short_selling_advanced.md)
+- [Advanced Short Selling](./strategies/short_selling_advanced.md)
 
 </details>
 
 <details>
-<summary><strong>📊 Indicadores Técnicos</strong> - Herramientas de análisis</summary>
+<summary><strong>Technical Indicators</strong> - Analysis tools</summary>
 
 - [VWAP](./indicators/vwap.md) - Volume Weighted Average Price
 - [Moving Averages](./indicators/moving_averages.md)
@@ -131,139 +133,135 @@ Esta documentación te guiará desde los conceptos fundamentales hasta las imple
 - [Volume RVOL](./indicators/volume_rvol.md)
 - [Gap Float](./indicators/gap_float.md)
 - [Parabolic SAR](./indicators/parabolic_sar.md)
-- [Super Tendencia](./indicators/super_tendencia.md)
+- [Super Trend](./indicators/super_tendencia.md)
 - [Spike HOD/LOD](./indicators/spike_hod_lod.md)
 
 </details>
 
 <details>
-<summary><strong>🧪 Backtesting y Validación</strong> - Prueba tus estrategias</summary>
+<summary><strong>Backtesting and Validation</strong> - Test your strategies</summary>
 
-- [¿Qué es backtesting?](./backtesting/what_is_backtest.md)
-- [Motor de backtesting simple](./backtesting/simple_engine.md)
-- [Métricas de performance](./backtesting/metrics.md)
-- [Análisis avanzado](./backtesting/advanced_analysis.md)
+- [What is backtesting?](./backtesting/what_is_backtest.md)
+- [Simple backtesting engine](./backtesting/simple_engine.md)
+- [Performance metrics](./backtesting/metrics.md)
+- [Advanced analysis](./backtesting/advanced_analysis.md)
 - [Overfitting](./backtesting/overfitting.md)
-- [Evaluación de modelos](./validation/model_evaluation.md) ⭐
-- [Consideraciones institucionales](./validation/institutional_considerations.md) ⭐
+- [Model evaluation](./validation/model_evaluation.md)
+- [Institutional considerations](./validation/institutional_considerations.md)
 
 </details>
 
 <details>
-<summary><strong>⚖️ Gestión de Riesgo</strong> - Protege tu capital</summary>
+<summary><strong>Risk Management</strong> - Protect your capital</summary>
 
 - [Position Sizing](./risk/position_sizing.md)
 - [Stops](./risk/stops.md)
 - [Risk Limits](./risk/risk_limits.md)
-- [Riesgo Asimétrico](./risk/asymmetric_risk.md)
+- [Asymmetric Risk](./risk/asymmetric_risk.md)
 
 </details>
 
 <details>
-<summary><strong>📈 Análisis Avanzado</strong> - Machine Learning y AI</summary>
+<summary><strong>Advanced Analysis</strong> - Machine Learning and AI</summary>
 
-- [Análisis Fundamental](./analysis/fundamental_analysis.md)
+- [Fundamental Analysis](./analysis/fundamental_analysis.md)
 - [Machine Learning](./analysis/machine_learning.md)
 - [Market Microstructure](./analysis/market_microstructure.md)
 - [Performance Tracking](./analysis/performance_tracking.md)
 - [Sentiment Analysis](./analysis/sentiment_analysis.md)
 - [Trade Validation](./analysis/trade_validation.md)
-- [**Transformers en Finanzas**](./analysis/transformers_finance.md) ⭐
-- [**Análisis de Redes**](./analysis/network_analysis.md) ⭐
+- [**Transformers in Finance**](./analysis/transformers_finance.md)
+- [**Network Analysis**](./analysis/network_analysis.md)
 
 </details>
 
 <details>
-<summary><strong>💰 Criptomonedas y DeFi</strong> - El nuevo frontier</summary>
+<summary><strong>Cryptocurrencies and DeFi</strong> - The new frontier</summary>
 
-- [**Trading Algorítmico en Crypto**](./assets/crypto/crypto_algorithmic_trading.md) ⭐
-
-</details>
-
-<details>
-<summary><strong>🤖 Automatización</strong> - Sistemas autónomos</summary>
-
-- [Estrategias de Automatización](./automation/automation_strategies.md)
-- [Arquitectura de Sistemas](./automation/system_architecture.md)
-- [**Robo-Advisors**](./automation/robo_advisors.md) ⭐
+- [**Algorithmic Crypto Trading**](./assets/crypto/crypto_algorithmic_trading.md)
 
 </details>
 
 <details>
-<summary><strong>🏛️ Compliance y Regulación</strong> - Aspectos legales</summary>
+<summary><strong>Automation</strong> - Autonomous systems</summary>
 
-- [**IA Ética en Trading**](./compliance/ethical_ai_trading.md) ⭐
-- [**Frameworks Regulatorios**](./compliance/regulatory_frameworks.md) ⭐
-
-</details>
-
-<details>
-<summary><strong>📊 Datos y Fuentes</strong> - La base de todo</summary>
-
-- [Tipos de datos](./data/data_types.md)
-- [Fuentes de datos](./data/data_sources.md)
-- [Limpieza de datos](./data/data_cleaning.md)
-- [Datasets para backtesting](./data/backtesting_datasets.md)
+- [Automation Strategies](./automation/automation_strategies.md)
+- [System Architecture](./automation/system_architecture.md)
+- [**Robo-Advisors**](./automation/robo_advisors.md)
 
 </details>
 
 <details>
-<summary><strong>🛠️ Herramientas y Desarrollo</strong> - Infraestructura técnica</summary>
+<summary><strong>Compliance and Regulation</strong> - Legal aspects</summary>
 
-- [Librerías esenciales](./tools/essential_libraries.md)
-- [Workflow de desarrollo](./tools/development_workflow.md)
-- [Infraestructura avanzada](./tools/advanced_trading_infrastructure.md)
-- [Configuración Flash Research](./tools/flash_research_config.md)
+- [**Ethical AI in Trading**](./compliance/ethical_ai_trading.md)
+- [**Regulatory Frameworks**](./compliance/regulatory_frameworks.md)
 
 </details>
 
-## ⭐ **Contenido Destacado (Nuevo)**
+<details>
+<summary><strong>Data and Sources</strong> - The foundation of everything</summary>
 
-Los elementos marcados con ⭐ son contenido avanzado agregado recientemente, basado en las mejores prácticas institucionales y experiencias de fondos cuantitativos.
+- [Data types](./data/data_types.md)
+- [Data sources](./data/data_sources.md)
+- [Data cleaning](./data/data_cleaning.md)
+- [Backtesting datasets](./data/backtesting_datasets.md)
 
-## 🆘 ¿Necesitas Ayuda?
+</details>
 
-### 🤔 **Si eres nuevo en trading algorítmico:**
-Comienza con la [Ruta del Principiante](#-ruta-del-principiante-2-4-semanas) y dedica tiempo a entender cada concepto antes de avanzar.
+<details>
+<summary><strong>Tools and Development</strong> - Technical infrastructure</summary>
 
-### 💻 **Si tienes experiencia en programación:**
-Salta directamente a [Setup Inicial](./setup/getting_started.md) y luego explora las [Estrategias](./strategies/).
+- [Essential libraries](./tools/essential_libraries.md)
+- [Development workflow](./tools/development_workflow.md)
+- [Advanced infrastructure](./tools/advanced_trading_infrastructure.md)
+- [Flash Research configuration](./tools/flash_research_config.md)
 
-### 📊 **Si tienes experiencia en trading manual:**
-Empieza con [Discrecional vs Algorítmico](./fundamentals/discretionary_vs_quant.md) para entender las diferencias conceptuales.
+</details>
 
-### 🚀 **Si buscas contenido avanzado:**
-Ve directamente al contenido marcado con ⭐ o explora las secciones de [Machine Learning](./analysis/) y [Crypto](./assets/crypto/).
+## Need Help?
 
-## 🎓 Certificación de Progreso
+### **If you're new to algorithmic trading:**
+Start with the [Beginner Path](#beginner-path-2-4-weeks) and take time to understand each concept before moving on.
 
-Para validar tu progreso, asegúrate de poder:
+### **If you have programming experience:**
+Jump directly to [Initial Setup](./setup/getting_started.md) and then explore the [Strategies](./strategies/).
 
-**Nivel Principiante ✅**
-- [ ] Configurar entorno de desarrollo
-- [ ] Implementar estrategia Gap and Go básica
-- [ ] Hacer backtesting simple
-- [ ] Aplicar position sizing básico
+### **If you have manual trading experience:**
+Start with [Discretionary vs Algorithmic](./fundamentals/discretionary_vs_quant.md) to understand the conceptual differences.
 
-**Nivel Intermedio ✅**
-- [ ] Crear indicadores técnicos personalizados
-- [ ] Implementar análisis de overfitting
-- [ ] Optimizar parámetros de estrategia
-- [ ] Integrar múltiples fuentes de datos
+### **If you're looking for advanced content:**
+Go directly to the advanced content or explore the [Machine Learning](./analysis/) and [Crypto](./assets/crypto/) sections.
 
-**Nivel Avanzado ✅**
-- [ ] Implementar modelos de ML para trading
-- [ ] Desarrollar sistemas de validación rigurosos
-- [ ] Manejar aspectos de compliance
-- [ ] Crear infraestructura de trading escalable
+## Progress Certification
+
+To validate your progress, make sure you can:
+
+**Beginner Level**
+- [ ] Configure your development environment
+- [ ] Implement a basic Gap and Go strategy
+- [ ] Run simple backtesting
+- [ ] Apply basic position sizing
+
+**Intermediate Level**
+- [ ] Create custom technical indicators
+- [ ] Implement overfitting analysis
+- [ ] Optimize strategy parameters
+- [ ] Integrate multiple data sources
+
+**Advanced Level**
+- [ ] Implement ML models for trading
+- [ ] Develop rigorous validation systems
+- [ ] Handle compliance aspects
+- [ ] Create scalable trading infrastructure
 
 ---
 
-## 🌟 Próximos Pasos
+## Next Steps
 
-1. **Identifica tu nivel actual** usando las certificaciones arriba
-2. **Elige tu ruta de aprendizaje** según tus objetivos
-3. **Síguenos** para updates del repositorio
-4. **Contribuye** con mejoras y sugerencias
+1. **Identify your current level** using the certifications above
+2. **Choose your learning path** based on your goals
+3. **Follow us** for repository updates
+4. **Contribute** with improvements and suggestions
 
-¡Bienvenido al mundo del trading cuantitativo! 🚀
+Welcome to the world of quantitative trading!

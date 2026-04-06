@@ -1,10 +1,12 @@
-# IBKR Premarket Trader - Caso de Estudio
+> 🇪🇸 [Leer en Español](README.es.md) | 🇺🇸 **English**
 
-## Resumen Ejecutivo
+# IBKR Premarket Trader - Case Study
 
-El **IBKR Premarket Trader** es un sistema automatizado de trading que implementa la estrategia Gap & Go en small caps durante las horas de premarket (5:30 AM - 8:00 AM ET). Es el ejemplo principal del Quant Playbook y demuestra cómo aplicar metodologías sistemáticas en trading real.
+## Executive Summary
 
-## Arquitectura del Sistema
+The **IBKR Premarket Trader** is an automated trading system that implements the Gap & Go strategy on small caps during premarket hours (5:30 AM - 8:00 AM ET). It is the main example of the Quant Playbook and demonstrates how to apply systematic methodologies in real trading.
+
+## System Architecture
 
 ```mermaid
 graph TB
@@ -23,48 +25,48 @@ graph TB
     H --> L[Grafana Monitoring]
 ```
 
-## Componentes Principales
+## Main Components
 
-### 1. **trading_console.py** - Aplicación Principal
+### 1. **trading_console.py** - Main Application
 ```python
-# Características principales:
-- Console interactiva para control manual
-- REST API en puerto 8080
-- WebSocket para actualizaciones en tiempo real
-- Sistema de logging estructurado
+# Key features:
+- Interactive console for manual control
+- REST API on port 8080
+- WebSocket for real-time updates
+- Structured logging system
 ```
 
-### 2. **generate_watchlist_smallcaps.py** - Generador de Watchlist
+### 2. **generate_watchlist_smallcaps.py** - Watchlist Generator
 ```python
-# Criterios de filtrado:
+# Filtering criteria:
 - Market cap: $50M - $2B
-- Precio: $0.50 - $10.99
-- Volumen promedio: > 100K shares/día
-- Evita penny stocks extremos
-- Filtra por sector y exchanges
+- Price: $0.50 - $10.99
+- Average volume: > 100K shares/day
+- Avoids extreme penny stocks
+- Filters by sector and exchanges
 ```
 
 ### 3. **simple_realistic_backtest.py** - Backtesting
 ```python
-# Características del backtest:
-- Slippage y comisiones realistas
-- Gaps de apertura simulados
-- Horarios de trading respetados
-- Análisis de drawdown temporal
+# Backtest features:
+- Realistic slippage and commissions
+- Simulated opening gaps
+- Respected trading hours
+- Temporal drawdown analysis
 ```
 
-### 4. **parameter_optimizer.py** - Optimización Bayesiana
+### 4. **parameter_optimizer.py** - Bayesian Optimization
 ```python
-# Parámetros optimizados:
-- Gap % mínimo y máximo
-- Multiplicador de volumen
-- Stop loss dinámico
-- Targets de profit taking
+# Optimized parameters:
+- Minimum and maximum gap %
+- Volume multiplier
+- Dynamic stop loss
+- Profit taking targets
 ```
 
-### 5. **early_runner_detector.py** - Detección ML
+### 5. **early_runner_detector.py** - ML Detection
 ```python
-# Sistema de scoring:
+# Scoring system:
 - Dark pool activity (30%)
 - Technical setup (25%)
 - Float rotation (20%)
@@ -72,13 +74,13 @@ graph TB
 - Social momentum (10%)
 ```
 
-## Configuración de Strategy
+## Strategy Configuration
 
-### Archivo: `config/strategy_config.yaml`
+### File: `config/strategy_config.yaml`
 
 ```yaml
 gap_and_go:
-  # Filtros de Entry
+  # Entry Filters
   min_gap_percent: 3.0
   max_gap_percent: 25.0
   min_premarket_volume: 50000
@@ -99,9 +101,9 @@ gap_and_go:
   timeout_seconds: 30
 ```
 
-## Performance Histórica
+## Historical Performance
 
-### Métricas Clave (Últimos 6 meses)
+### Key Metrics (Last 6 months)
 ```
 Sharpe Ratio:       1.85
 Max Drawdown:      -8.3%
@@ -111,51 +113,51 @@ Avg Trade:         $12.50
 Total Trades:      1,247
 ```
 
-### Breakdown por Mes
-| Mes | Trades | Win Rate | P&L | Sharpe | Max DD |
-|-----|--------|----------|-----|---------|--------|
+### Monthly Breakdown
+| Month | Trades | Win Rate | P&L | Sharpe | Max DD |
+|-------|--------|----------|-----|---------|--------|
 | Nov 2024 | 189 | 71.2% | $2,847 | 2.1 | -4.2% |
 | Oct 2024 | 205 | 65.9% | $2,156 | 1.8 | -6.1% |
 | Sep 2024 | 178 | 63.5% | $1,923 | 1.6 | -8.3% |
 
-## Position Recycling en Acción
+## Position Recycling in Action
 
-### Ejemplo Real: CTIC - 15 Nov 2024
+### Real Example: CTIC - Nov 15, 2024
 
 ```
 08:45:32 - BUY 100 CTIC @ $3.42 (Gap: +12.5%, Vol: 3.2x)
-08:52:15 - SELL 30 CTIC @ $3.78 (+10.5%, parcial profit)
+08:52:15 - SELL 30 CTIC @ $3.78 (+10.5%, partial profit)
 08:58:41 - BUY 20 CTIC @ $3.61 (pullback entry)
 09:03:27 - SELL 90 CTIC @ $3.85 (+11.8%, final exit)
 
-Resultado: +$347 en 18 minutos
-Trades: 3 (parte de 1 campaña)
-Average price mejorado: $3.48 → $3.52
+Result: +$347 in 18 minutes
+Trades: 3 (part of 1 campaign)
+Average price improved: $3.48 -> $3.52
 ```
 
-## Integración de APIs
+## API Integration
 
-### Polygon.io - Datos de Mercado
+### Polygon.io - Market Data
 ```python
-# Endpoints utilizados:
+# Endpoints used:
 - /v2/aggs/ticker/{ticker}/prev
 - /v2/last/trade/{ticker}
 - /v3/quotes/{ticker}
 - /v2/reference/financials/{ticker}
 ```
 
-### IBKR TWS API - Ejecución
+### IBKR TWS API - Execution
 ```python
-# Funcionalidades:
+# Features:
 - Market data subscription
-- Order placement y management
+- Order placement and management
 - Position tracking
 - Account balance monitoring
 ```
 
 ### PostgreSQL - Storage
 ```sql
--- Tabla principal de trades
+-- Main trades table
 CREATE TABLE trades (
     id SERIAL PRIMARY KEY,
     symbol VARCHAR(10),
@@ -171,18 +173,18 @@ CREATE TABLE trades (
 );
 ```
 
-## Monitoreo y Alertas
+## Monitoring and Alerts
 
 ### Grafana Dashboard
-- P&L en tiempo real
-- Trades por hora/día
-- Success rate por gap range
+- Real-time P&L
+- Trades per hour/day
+- Success rate by gap range
 - Drawdown analysis
 - Volatility tracking
 
 ### Telegram Integration
 ```
-🚀 TRADE ALERT
+TRADE ALERT
 Symbol: ABCD
 Action: BUY 150 @ $4.23
 Gap: +8.7% | Vol: 2.4x
@@ -190,20 +192,20 @@ Strategy: Gap_And_Go
 Time: 06:42:15 ET
 ```
 
-## Sistema de Early Runner Detection
+## Early Runner Detection System
 
-### Cómo Funciona
-1. **Scan diario** de 3,000+ small caps
-2. **Análisis multi-factor** con ML
-3. **Scoring 0-100** con clasificación
-4. **Integration** con watchlist automática
+### How It Works
+1. **Daily scan** of 3,000+ small caps
+2. **Multi-factor analysis** with ML
+3. **0-100 scoring** with classification
+4. **Integration** with automatic watchlist
 
-### Ejemplo de Output
+### Example Output
 ```json
 {
   "symbol": "MNKD",
   "score": 87.5,
-  "classification": "🔥 HOT",
+  "classification": "HOT",
   "factors": {
     "dark_pool_activity": 89,
     "technical_setup": 92,
@@ -217,30 +219,30 @@ Time: 06:42:15 ET
 
 ## Lessons Learned
 
-### ✅ Qué Funciona Bien
+### What Works Well
 
-1. **Position Recycling**: Mejora significativamente el average price
-2. **Tight Risk Management**: $10 max risk mantiene drawdowns bajos
-3. **Volume Confirmation**: Filtro de volumen reduce false breakouts
-4. **Time-based Exits**: Evita holds largos en small caps
+1. **Position Recycling**: Significantly improves average price
+2. **Tight Risk Management**: $10 max risk keeps drawdowns low
+3. **Volume Confirmation**: Volume filter reduces false breakouts
+4. **Time-based Exits**: Avoids long holds in small caps
 
-### ⚠️ Desafíos Encontrados
+### Challenges Encountered
 
-1. **Halts Frecuentes**: 3-5% de trades terminan en halt
-2. **Slippage Variable**: Puede ser 0.1% - 2% según liquidez
-3. **Gap Fades**: 30% de gaps > 10% revierten rápidamente
-4. **Competition**: Más algoritmos en premarket últimamente
+1. **Frequent Halts**: 3-5% of trades end in halts
+2. **Variable Slippage**: Can be 0.1% - 2% depending on liquidity
+3. **Gap Fades**: 30% of gaps > 10% reverse quickly
+4. **Competition**: More algorithms in premarket lately
 
-### 🔧 Mejoras Implementadas
+### Improvements Implemented
 
-1. **Misprint Detection**: Evita bad fills 7:58-8:08 AM
-2. **Dynamic Position Sizing**: Basado en ATR y volatility
-3. **Smart Order Routing**: Mejora execution quality
-4. **Circuit Breakers**: Auto-stop en drawdown > 15%
+1. **Misprint Detection**: Avoids bad fills 7:58-8:08 AM
+2. **Dynamic Position Sizing**: Based on ATR and volatility
+3. **Smart Order Routing**: Improves execution quality
+4. **Circuit Breakers**: Auto-stop on drawdown > 15%
 
-## Configuración para Desarrollo
+## Development Setup
 
-### Prerrequisitos
+### Prerequisites
 ```bash
 # Python environment
 python -m venv trading_env
@@ -253,7 +255,7 @@ pip install -r requirements.txt
 ./database/postgresql/scripts/01_setup_database.sh
 ```
 
-### Variables de Entorno
+### Environment Variables
 ```bash
 # .env file
 POLYGON_API_KEY=your_polygon_key
@@ -263,31 +265,31 @@ TELEGRAM_BOT_TOKEN=your_telegram_token
 DATABASE_URL=postgresql://trader:password@localhost:5432/trading_db
 ```
 
-### Comandos de Ejecución
+### Execution Commands
 ```bash
-# Generar watchlist
+# Generate watchlist
 python generate_watchlist_smallcaps.py
 
-# Ejecutar backtesting
+# Run backtesting
 python simple_realistic_backtest.py --days 30
 
-# Optimizar parámetros
+# Optimize parameters
 python parameter_optimizer.py --evaluations 100
 
-# Detector de runners
+# Runner detector
 python early_runner_detector.py
 
 # Trading console
 python trading_console.py
 ```
 
-## Roadmap de Mejoras
+## Improvement Roadmap
 
 ### Q1 2025
-- [ ] Integration con más brokers (Schwab, E*Trade)
+- [ ] Integration with more brokers (Schwab, E*Trade)
 - [ ] Options trading module
 - [ ] News sentiment analysis
-- [ ] Mobile app para monitoring
+- [ ] Mobile app for monitoring
 
 ### Q2 2025
 - [ ] Multi-timeframe strategies
@@ -295,17 +297,17 @@ python trading_console.py
 - [ ] Real-time strategy switching
 - [ ] Community signals marketplace
 
-## Contacto y Soporte
+## Contact and Support
 
-Para preguntas sobre este caso de estudio:
+For questions about this case study:
 
 - **Issues**: GitHub repository issues
-- **Documentation**: Ver `/docs` en repo principal
+- **Documentation**: See `/docs` in main repo
 - **Community**: Discord server #ibkr-trading
 - **Updates**: Twitter @QuantPlaybook
 
 ---
 
-**Disclaimer**: Este sistema es para propósitos educativos. Trading involves substantial risk. Past performance no garantiza resultados futuros.
+**Disclaimer**: This system is for educational purposes. Trading involves substantial risk. Past performance does not guarantee future results.
 
-**Live Performance**: Puedes seguir el performance en vivo en nuestro [dashboard público](https://grafana.quantplaybook.com) (simulado para demo).
+**Live Performance**: You can follow live performance on our [public dashboard](https://grafana.quantplaybook.com) (simulated for demo).

@@ -1,54 +1,56 @@
-# Método Científico Aplicado al Desarrollo de Sistemas
+> 🇪🇸 [Leer en Español](Scientific-Method-System-Development.es.md) | 🇺🇸 **English**
 
-Desarrollar un sistema de trading no es "probar cosas hasta que algo funcione". Es un proceso científico con protocolo, aislamiento de variables, y evaluación estadística. Si no seguís un método estructurado, estás haciendo data snooping disfrazado de investigación.
+# The Scientific Method Applied to System Development
 
-## Los Tres Pilares del Método Científico en Trading
+Developing a trading system is not "trying things until something works." It's a scientific process with protocol, variable isolation, and statistical evaluation. If you don't follow a structured method, you're doing data snooping disguised as research.
 
-### 1. Objeto de Estudio
+## The Three Pillars of the Scientific Method in Trading
 
-Tu sistema de trading — o una de sus partes. Cada componente debe ser observable de forma objetiva, sin depender de tu juicio subjetivo.
+### 1. Object of Study
 
-Esto implica que todo lo que evalúes debe poder expresarse en números: win rate, profit factor, drawdown, Sharpe ratio. "Me parece que funciona bien" no es una evaluación — es una opinión.
+Your trading system -- or one of its parts. Each component must be objectively observable, without relying on your subjective judgment.
 
-### 2. Procedimiento Estandarizado
+This means that everything you evaluate must be expressible in numbers: win rate, profit factor, drawdown, Sharpe ratio. "It seems to work well" is not an evaluation -- it's an opinion.
 
-Un método ordenado para evaluar el comportamiento del sistema. El procedimiento debe ser **reproducible**: si vos lo hacés o lo hace otra persona con los mismos datos y el mismo protocolo, los resultados deben ser compatibles.
+### 2. Standardized Procedure
 
-Si tu proceso de evaluación da resultados distintos según quién lo ejecute, hay subjetividad infiltrada en alguna fase.
+An orderly method for evaluating the system's behavior. The procedure must be **reproducible**: if you do it or someone else does it with the same data and the same protocol, the results should be compatible.
 
-### 3. Evaluación Estadística
+If your evaluation process gives different results depending on who runs it, there's subjectivity infiltrating some phase.
 
-Los resultados se evalúan con herramientas estadísticas, no con intuición. Una racha de 15 trades ganadores no prueba que un sistema funcione, y una racha de 10 pérdidas no prueba que esté roto. Lo que importa es la significancia estadística sobre una muestra suficiente.
+### 3. Statistical Evaluation
 
-## El Protocolo: La Palabra Clave
+Results are evaluated with statistical tools, not intuition. A streak of 15 winning trades doesn't prove a system works, and a streak of 10 losses doesn't prove it's broken. What matters is statistical significance over a sufficient sample.
 
-El método científico aplicado al trading se resume en una palabra: **protocolo**. Todos los procesos que seguís al desarrollar un sistema deben estar protocolizados. No cambiás las reglas a mitad de camino, no hacés excepciones "porque esta vez es diferente", no ajustás el proceso después de ver los resultados.
+## The Protocol: The Key Word
+
+The scientific method applied to trading boils down to one word: **protocol**. All the processes you follow when developing a system must be protocolized. You don't change the rules midway, you don't make exceptions "because this time is different," you don't adjust the process after seeing the results.
 
 ```python
 class SystemDevelopmentProtocol:
     """
-    Framework para desarrollo de sistemas siguiendo el método científico.
-    Cada fase tiene inputs definidos, proceso estandarizado, y outputs medibles.
+    Framework for system development following the scientific method.
+    Each phase has defined inputs, standardized process, and measurable outputs.
     """
 
     def __init__(self):
         self.phases = [
-            "1_hypothesis",      # idea con lógica de mercado
-            "2_data_preparation", # datos limpios, período definido
-            "3_in_sample_test",   # backtest en datos de entrenamiento
-            "4_parameter_selection",  # optimización con protocolo
-            "5_out_of_sample",    # validación en datos NO vistos
-            "6_walk_forward",     # validación temporal progresiva
-            "7_robustness_tests", # Monte Carlo, sensibilidad
-            "8_paper_trading",    # ejecución sin capital real
-            "9_live_deployment",  # capital real, tamaño reducido
+            "1_hypothesis",      # idea with market logic
+            "2_data_preparation", # clean data, defined period
+            "3_in_sample_test",   # backtest on training data
+            "4_parameter_selection",  # optimization with protocol
+            "5_out_of_sample",    # validation on UNSEEN data
+            "6_walk_forward",     # progressive temporal validation
+            "7_robustness_tests", # Monte Carlo, sensitivity
+            "8_paper_trading",    # execution without real capital
+            "9_live_deployment",  # real capital, reduced size
         ]
         self.log = []
 
     def execute_phase(self, phase_name, inputs, process, outputs):
         """
-        Cada fase se documenta ANTES de ejecutarse.
-        No se puede cambiar el criterio de éxito después de ver los resultados.
+        Each phase is documented BEFORE execution.
+        The success criteria cannot be changed after seeing results.
         """
         record = {
             'phase': phase_name,
@@ -61,23 +63,23 @@ class SystemDevelopmentProtocol:
         return record
 ```
 
-### Aislamiento de Variables
+### Variable Isolation
 
-Cuando evaluás un sistema, cambiá **una cosa a la vez**. Si modificás el indicador de entrada, el stop loss, y el filtro de mercado simultáneamente, no sabés cuál de los tres causó el cambio en los resultados.
+When evaluating a system, change **one thing at a time**. If you modify the entry indicator, the stop loss, and the market filter simultaneously, you don't know which of the three caused the change in results.
 
 ```python
 def isolated_test(base_system, variable_name, variable_values, data):
     """
-    Testear el efecto de UNA variable manteniendo todo lo demás fijo.
-    Esto es el método científico: aislar para entender causalidad.
+    Test the effect of ONE variable while keeping everything else fixed.
+    This is the scientific method: isolate to understand causality.
     """
     results = {}
     for value in variable_values:
-        # Modificar solo la variable bajo estudio
+        # Modify only the variable under study
         test_system = base_system.copy()
         test_system[variable_name] = value
 
-        # Ejecutar backtest con todo lo demás idéntico
+        # Run backtest with everything else identical
         metrics = run_backtest(test_system, data)
         results[value] = {
             'profit_factor': metrics['profit_factor'],
@@ -88,82 +90,82 @@ def isolated_test(base_system, variable_name, variable_values, data):
 
     return results
 
-# Ejemplo: testear distintos períodos de media móvil,
-# manteniendo fijo el stop loss, el take profit, y el filtro de volumen
+# Example: test different moving average periods,
+# keeping the stop loss, take profit, and volume filter fixed
 # results = isolated_test(my_system, 'ma_period', range(10, 60, 5), data)
 ```
 
-### Pruebas Estandarizadas
+### Standardized Tests
 
-Para que las comparaciones sean válidas, las condiciones del test deben ser idénticas:
+For comparisons to be valid, the test conditions must be identical:
 
-- **Mismo período de datos** para todos los tests de una comparación
-- **Mismos costos de transacción** (comisiones, slippage)
-- **Mismo capital inicial** y reglas de position sizing
-- **Misma semilla** si hay componentes aleatorios
+- **Same data period** for all tests in a comparison
+- **Same transaction costs** (commissions, slippage)
+- **Same initial capital** and position sizing rules
+- **Same seed** if there are random components
 
-Si comparás el Sistema A testeado en 2020-2023 con el Sistema B testeado en 2018-2024, la comparación no es válida. Los períodos de mercado son diferentes.
+If you compare System A tested on 2020-2023 with System B tested on 2018-2024, the comparison is not valid. The market periods are different.
 
-## De la Hipótesis al Sistema: El Flujo Completo
+## From Hypothesis to System: The Complete Flow
 
-### Fase 1: Hipótesis con Lógica de Mercado
+### Phase 1: Hypothesis with Market Logic
 
-Toda idea de sistema debe partir de una razón lógica de por qué debería funcionar. "Compro cuando el RSI cruza 30 porque el backtest da bien" no es una hipótesis — es overfitting esperando a ocurrir.
+Every system idea must start with a logical reason for why it should work. "I buy when the RSI crosses 30 because the backtest looks good" is not a hypothesis -- it's overfitting waiting to happen.
 
-Una hipótesis válida se basa en una ineficiencia de mercado explicable:
+A valid hypothesis is based on an explainable market inefficiency:
 
 ```
-BIEN: "Las acciones small cap que abren con gap >10% con volumen alto
-tienden a continuar en la dirección del gap durante los primeros 30 minutos
-porque los traders retail entran tarde persiguiendo el movimiento."
+GOOD: "Small cap stocks that open with a >10% gap on high volume
+tend to continue in the gap direction for the first 30 minutes
+because retail traders enter late chasing the move."
 
-MAL: "Si la EMA de 13 cruza la EMA de 34 cuando el RSI está entre
-42 y 58 y el MACD es positivo, el precio sube."
+BAD: "If the 13 EMA crosses the 34 EMA when the RSI is between
+42 and 58 and the MACD is positive, the price goes up."
 ```
 
-La primera tiene una razón de mercado (comportamiento de participantes). La segunda es una combinación arbitraria de indicadores que probablemente sea ruido.
+The first one has a market reason (participant behavior). The second is an arbitrary combination of indicators that is probably noise.
 
-### Fase 2: División de Datos
+### Phase 2: Data Splitting
 
-Antes de tocar un solo parámetro, dividí tus datos:
+Before touching a single parameter, split your data:
 
 ```python
 def split_data(data, in_sample_pct=0.60, validation_pct=0.20):
     """
-    División de datos ANTES de cualquier optimización.
-    Una vez divididos, no se tocan los límites.
+    Data split BEFORE any optimization.
+    Once split, the boundaries are not moved.
     """
     n = len(data)
     is_end = int(n * in_sample_pct)
     val_end = int(n * (in_sample_pct + validation_pct))
 
     return {
-        'in_sample': data[:is_end],           # para desarrollar y optimizar
-        'validation': data[is_end:val_end],    # para validar candidatos
-        'out_of_sample': data[val_end:]         # NUNCA se toca hasta el final
+        'in_sample': data[:is_end],           # for development and optimization
+        'validation': data[is_end:val_end],    # for validating candidates
+        'out_of_sample': data[val_end:]         # NEVER touched until the end
     }
 
-# REGLA INQUEBRANTABLE: el out-of-sample se usa UNA VEZ.
-# Si lo usás para ajustar y volvés a testear, ya no es out-of-sample.
+# UNBREAKABLE RULE: the out-of-sample is used ONCE.
+# If you use it to adjust and test again, it's no longer out-of-sample.
 ```
 
-### Fase 3: Optimización In-Sample
+### Phase 3: In-Sample Optimization
 
-Buscás los mejores parámetros usando solo los datos in-sample. Pero "mejor" no significa "más rentable" — significa más **robusto**.
+You search for the best parameters using only the in-sample data. But "best" doesn't mean "most profitable" -- it means most **robust**.
 
-Un sistema robusto mantiene resultados aceptables en un rango amplio de parámetros. Si solo funciona con MA=17 pero falla con MA=15 y MA=19, es frágil.
+A robust system maintains acceptable results across a wide range of parameters. If it only works with MA=17 but fails with MA=15 and MA=19, it's fragile.
 
 ```python
 def evaluate_robustness(optimization_results, metric='profit_factor'):
     """
-    Un sistema robusto tiene una "meseta" de parámetros buenos,
-    no un pico aislado. Si los vecinos del óptimo también funcionan,
-    la señal es real. Si solo funciona un punto, es ruido.
+    A robust system has a "plateau" of good parameters,
+    not an isolated peak. If the neighbors of the optimum also work,
+    the signal is real. If only one point works, it's noise.
     """
     values = [r[metric] for r in optimization_results]
     peak_idx = values.index(max(values))
 
-    # Verificar que los parámetros vecinos también sean buenos
+    # Verify that neighboring parameters are also good
     neighbors = []
     for offset in [-2, -1, 1, 2]:
         idx = peak_idx + offset
@@ -171,48 +173,48 @@ def evaluate_robustness(optimization_results, metric='profit_factor'):
             neighbors.append(values[idx])
 
     if not neighbors:
-        return False, "Insuficientes datos para evaluar"
+        return False, "Insufficient data to evaluate"
 
     peak_value = values[peak_idx]
     avg_neighbor = sum(neighbors) / len(neighbors)
     ratio = avg_neighbor / peak_value if peak_value > 0 else 0
 
-    # Si los vecinos retienen >70% del valor del pico, es robusto
-    return ratio > 0.70, f"Ratio vecinos/pico: {ratio:.2f}"
+    # If neighbors retain >70% of the peak value, it's robust
+    return ratio > 0.70, f"Neighbor/peak ratio: {ratio:.2f}"
 ```
 
-### Fase 4: Validación
+### Phase 4: Validation
 
-El sistema con los parámetros seleccionados se testea en los datos de validación. No se modifica nada. Si pasa, avanza. Si no pasa, se descarta o se vuelve a la hipótesis.
+The system with the selected parameters is tested on the validation data. Nothing is modified. If it passes, it advances. If it doesn't pass, it's discarded or you go back to the hypothesis.
 
-**No se reoptimiza para que pase la validación.** Eso convierte la validación en in-sample.
+**You do not re-optimize to pass validation.** That turns validation into in-sample.
 
-### Fase 5: Out-of-Sample
+### Phase 5: Out-of-Sample
 
-El test definitivo. Una sola oportunidad. Si los resultados son consistentes con el in-sample (no idénticos — consistentes), el sistema es candidato para paper trading.
+The definitive test. One chance only. If the results are consistent with the in-sample (not identical -- consistent), the system is a candidate for paper trading.
 
-### Fase 6: Paper Trading
+### Phase 6: Paper Trading
 
-Ejecución real sin capital. Verificás que la ejecución en tiempo real produce resultados compatibles con el backtest. Diferencias esperables: slippage, timing de ejecución, datos que difieren ligeramente del histórico.
+Real execution without capital. You verify that real-time execution produces results compatible with the backtest. Expected differences: slippage, execution timing, data that differs slightly from historical.
 
-### Fase 7: Live con Tamaño Reducido
+### Phase 7: Live with Reduced Size
 
-Capital real, pero con el tamaño de posición mínimo posible. El objetivo no es ganar dinero — es validar que todo funciona en producción.
+Real capital, but with the minimum possible position size. The goal is not to make money -- it's to validate that everything works in production.
 
-## Errores que el Protocolo Previene
+## Errors the Protocol Prevents
 
-| Error | Sin protocolo | Con protocolo |
+| Error | Without protocol | With protocol |
 |---|---|---|
-| **Overfitting** | Optimizás hasta que el backtest sea perfecto | Validás en datos no vistos, evaluás robustez de parámetros |
-| **Data snooping** | Probás 500 combinaciones y elegís la mejor | Definís la hipótesis antes de testear, limitás las variables |
-| **Look-ahead bias** | Usás información futura sin darte cuenta | El procedimiento estandarizado fuerza el shift temporal |
-| **Survivorship bias** | Testeas con las acciones que existen hoy | El protocolo exige datos con composición histórica real |
-| **Cambio de criterio** | "Este sistema no pasa mi filtro, pero lo voy a usar igual" | El criterio se define antes de ver resultados, y no se cambia |
+| **Overfitting** | You optimize until the backtest is perfect | You validate on unseen data, evaluate parameter robustness |
+| **Data snooping** | You try 500 combinations and pick the best | You define the hypothesis before testing, limit the variables |
+| **Look-ahead bias** | You use future information without realizing it | The standardized procedure enforces temporal shift |
+| **Survivorship bias** | You test with stocks that exist today | The protocol requires data with real historical composition |
+| **Criteria shifting** | "This system doesn't pass my filter, but I'll use it anyway" | Criteria are defined before seeing results, and are not changed |
 
-## Cuándo el Protocolo Parece Excesivo
+## When the Protocol Seems Excessive
 
-Al principio, seguir un protocolo completo para cada idea parece lento. Y lo es — pero te ahorra meses de operar sistemas que no funcionan.
+At first, following a complete protocol for every idea seems slow. And it is -- but it saves you months of trading systems that don't work.
 
-Un atajo legítimo para ideas iniciales: antes de todo el proceso formal, hacé un **test rápido** con parámetros default y sin optimización. Si la idea no muestra señales de vida con parámetros genéricos, no vale la pena dedicarle un protocolo completo.
+A legitimate shortcut for initial ideas: before the whole formal process, do a **quick test** with default parameters and no optimization. If the idea shows no signs of life with generic parameters, it's not worth dedicating a complete protocol to it.
 
-Pero una vez que decidís avanzar con una idea, el protocolo no es negociable. "Voy a saltarme la validación porque me lleva tiempo" es exactamente cómo terminás operando sistemas overfitteados con dinero real.
+But once you decide to move forward with an idea, the protocol is non-negotiable. "I'll skip validation because it takes time" is exactly how you end up trading overfitted systems with real money.

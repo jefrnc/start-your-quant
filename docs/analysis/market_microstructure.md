@@ -1,30 +1,32 @@
-# Market Microstructure y Tape Reading
+> 🇪🇸 [Leer en Español](market_microstructure.es.md) | 🇺🇸 **English**
 
-## Introducción
+# Market Microstructure and Tape Reading
 
-La microestructura del mercado estudia cómo se ejecutan las operaciones en los mercados financieros y cómo el proceso de trading afecta a los precios. El tape reading es el arte de interpretar el flujo de órdenes para anticipar movimientos de precio.
+## Introduction
 
-### ¿Por qué es importante?
+Market microstructure studies how trades are executed in financial markets and how the trading process affects prices. Tape reading is the art of interpreting order flow to anticipate price movements.
 
-1. **Mejor ejecución**: Entender la microestructura ayuda a minimizar el impacto de mercado
-2. **Detección de oportunidades**: Identificar acumulación/distribución institucional
-3. **Gestión de riesgo**: Reconocer cambios en la dinámica del mercado
-4. **Timing de entrada/salida**: Mejorar los puntos de entrada y salida
+### Why Is It Important?
 
-## Fundamentos de Market Microstructure
+1. **Better execution**: Understanding microstructure helps minimize market impact
+2. **Opportunity detection**: Identifying institutional accumulation/distribution
+3. **Risk management**: Recognizing changes in market dynamics
+4. **Entry/exit timing**: Improving entry and exit points
 
-### Comprensión del Order Book
+## Market Microstructure Fundamentals
 
-El order book (libro de órdenes) es la estructura fundamental que muestra todas las órdenes de compra y venta pendientes en un mercado. Entender su dinámica es esencial para el trading moderno.
+### Understanding the Order Book
 
-#### Componentes clave:
-- **Bid (Compra)**: Órdenes de compra ordenadas por precio descendente
-- **Ask (Venta)**: Órdenes de venta ordenadas por precio ascendente
-- **Spread**: Diferencia entre el mejor bid y el mejor ask
-- **Depth (Profundidad)**: Cantidad de órdenes en cada nivel de precio
-#### Implementación del Order Book
+The order book is the fundamental structure that shows all pending buy and sell orders in a market. Understanding its dynamics is essential for modern trading.
 
-Vamos a crear una representación completa del order book con métricas avanzadas:
+#### Key Components:
+- **Bid (Buy)**: Buy orders sorted by descending price
+- **Ask (Sell)**: Sell orders sorted by ascending price
+- **Spread**: Difference between the best bid and best ask
+- **Depth**: Number of orders at each price level
+#### Order Book Implementation
+
+Let's create a complete order book representation with advanced metrics:
 
 ```python
 import pandas as pd
@@ -37,41 +39,41 @@ from collections import deque
 
 @dataclass
 class OrderBookLevel:
-    """Nivel del order book"""
+    """Order book level"""
     price: float
     size: int
     orders: int = 1
 
 @dataclass
 class OrderBook:
-    """Order book completo"""
+    """Complete order book"""
     symbol: str
     timestamp: datetime
     bids: List[OrderBookLevel]
     asks: List[OrderBookLevel]
     
     def get_spread(self) -> float:
-        """Obtener spread bid-ask"""
+        """Get bid-ask spread"""
         if not self.bids or not self.asks:
             return 0.0
         return self.asks[0].price - self.bids[0].price
     
     def get_mid_price(self) -> float:
-        """Obtener precio medio"""
+        """Get mid price"""
         if not self.bids or not self.asks:
             return 0.0
         return (self.bids[0].price + self.asks[0].price) / 2
     
     def get_total_bid_volume(self, levels: int = 5) -> int:
-        """Volumen total en bids"""
+        """Total volume in bids"""
         return sum(level.size for level in self.bids[:levels])
     
     def get_total_ask_volume(self, levels: int = 5) -> int:
-        """Volumen total en asks"""
+        """Total volume in asks"""
         return sum(level.size for level in self.asks[:levels])
     
     def get_imbalance_ratio(self, levels: int = 5) -> float:
-        """Ratio de imbalance bid/ask"""
+        """Bid/ask imbalance ratio"""
         bid_vol = self.get_total_bid_volume(levels)
         ask_vol = self.get_total_ask_volume(levels)
         
@@ -81,7 +83,7 @@ class OrderBook:
         return bid_vol / ask_vol
     
     def get_depth_at_price(self, price: float, side: str) -> int:
-        """Obtener profundidad a precio específico"""
+        """Get depth at specific price"""
         levels = self.bids if side == 'bid' else self.asks
         
         for level in levels:
@@ -91,17 +93,17 @@ class OrderBook:
         
         return 0
 
-### Análisis Avanzado de Microestructura
+### Advanced Microstructure Analysis
 
-El análisis de microestructura va más allá de simplemente observar el order book. Necesitamos:
+Microstructure analysis goes beyond simply observing the order book. We need:
 
-1. **Historial de order books**: Para detectar cambios en la liquidez
-2. **Métricas dinámicas**: Spread, imbalance, volatilidad
-3. **Detección de patrones**: Identificar comportamientos anómalos
-4. **Estimación de impacto**: Calcular el costo de ejecutar órdenes grandes
+1. **Order book history**: To detect changes in liquidity
+2. **Dynamic metrics**: Spread, imbalance, volatility
+3. **Pattern detection**: Identifying anomalous behavior
+4. **Impact estimation**: Calculating the cost of executing large orders
 
 class MarketMicrostructureAnalyzer:
-    """Analizador de microestructura de mercado"""
+    """Market microstructure analyzer"""
     
     def __init__(self, max_history: int = 1000):
         self.order_books: deque = deque(maxlen=max_history)
@@ -109,20 +111,20 @@ class MarketMicrostructureAnalyzer:
         self.metrics_history: List[Dict] = []
     
     def add_order_book(self, order_book: OrderBook):
-        """Agregar nuevo order book"""
+        """Add new order book"""
         self.order_books.append(order_book)
         
-        # Calcular métricas si tenemos suficiente historia
+        # Calculate metrics if we have enough history
         if len(self.order_books) >= 2:
             metrics = self._calculate_microstructure_metrics(order_book)
             self.metrics_history.append(metrics)
     
     def add_trade(self, trade: Dict):
-        """Agregar nuevo trade"""
+        """Add new trade"""
         self.trades.append(trade)
     
     def _calculate_microstructure_metrics(self, current_book: OrderBook) -> Dict:
-        """Calcular métricas de microestructura"""
+        """Calculate microstructure metrics"""
         
         metrics = {
             'timestamp': current_book.timestamp,
@@ -136,30 +138,30 @@ class MarketMicrostructureAnalyzer:
             'total_depth': current_book.get_total_bid_volume() + current_book.get_total_ask_volume()
         }
         
-        # Spread en basis points
+        # Spread in basis points
         if metrics['mid_price'] > 0:
             metrics['spread_bps'] = (metrics['spread'] / metrics['mid_price']) * 10000
         
-        # Métricas comparativas si tenemos historia
+        # Comparative metrics if we have history
         if len(self.order_books) >= 2:
             prev_book = self.order_books[-2]
             
-            # Cambio en mid price
+            # Mid price change
             prev_mid = prev_book.get_mid_price()
             if prev_mid > 0:
                 metrics['mid_price_change'] = (metrics['mid_price'] - prev_mid) / prev_mid
             else:
                 metrics['mid_price_change'] = 0.0
             
-            # Cambio en spread
+            # Spread change
             prev_spread = prev_book.get_spread()
             metrics['spread_change'] = metrics['spread'] - prev_spread
             
-            # Cambio en imbalance
+            # Imbalance change
             prev_imbalance = prev_book.get_imbalance_ratio()
             metrics['imbalance_change'] = metrics['imbalance_ratio'] - prev_imbalance
         
-        # Métricas de volatilidad si tenemos suficiente historia
+        # Volatility metrics if we have enough history
         if len(self.metrics_history) >= 20:
             recent_mid_prices = [m['mid_price'] for m in self.metrics_history[-20:]]
             recent_spreads = [m['spread'] for m in self.metrics_history[-20:]]
@@ -170,7 +172,7 @@ class MarketMicrostructureAnalyzer:
         return metrics
     
     def detect_order_flow_patterns(self) -> Dict:
-        """Detectar patrones en el order flow"""
+        """Detect order flow patterns"""
         
         if len(self.metrics_history) < 10:
             return {}
@@ -202,7 +204,7 @@ class MarketMicrostructureAnalyzer:
         return patterns
     
     def calculate_market_impact(self, order_size: int, side: str) -> float:
-        """Calcular impacto de mercado estimado"""
+        """Calculate estimated market impact"""
         
         if not self.order_books:
             return 0.0
@@ -223,49 +225,49 @@ class MarketMicrostructureAnalyzer:
             remaining_size -= filled_size
         
         if remaining_size > 0:
-            # Si no hay suficiente liquidez, estimar impacto adicional
+            # If there is not enough liquidity, estimate additional impact
             last_price = levels[-1].price if levels else reference_price
-            additional_impact = remaining_size * 0.01  # 1% adicional por cada share sin liquidez
+            additional_impact = remaining_size * 0.01  # 1% additional per share without liquidity
             total_cost += remaining_size * (last_price + additional_impact)
         
-        # Calcular impacto como % del precio de referencia
+        # Calculate impact as % of reference price
         avg_execution_price = total_cost / order_size
         impact = abs(avg_execution_price - reference_price) / reference_price
         
         return impact
 
-### Métricas Clave de Microestructura
+### Metrics Clave de Microestructura
 
-#### 1. Spread Bid-Ask
-- **Absoluto**: Diferencia en precio entre bid y ask
-- **Relativo (bps)**: Spread como porcentaje del precio medio
-- **Interpretación**: Spreads amplios indican menor liquidez o mayor incertidumbre
+#### 1. Bid-Ask Spread
+- **Absolute**: Price difference between bid and ask
+- **Relative (bps)**: Spread as percentage of mid price
+- **Interpretation**: Wide spreads indicate lower liquidity or higher uncertainty
 
 #### 2. Imbalance Ratio
-- **Fórmula**: Volumen Bid / Volumen Ask
-- **>1**: Mayor presión compradora
-- **<1**: Mayor presión vendedora
-- **Uso**: Anticipar dirección del movimiento a corto plazo
+- **Formula**: Bid Volume / Ask Volume
+- **>1**: Greater buying pressure
+- **<1**: Greater selling pressure
+- **Usage**: Anticipate short-term movement direction
 
 #### 3. Market Impact
-- **Definición**: Cómo una orden grande mueve el precio
-- **Cálculo**: Diferencia entre precio de ejecución promedio y precio inicial
-- **Minimización**: Dividir órdenes grandes, usar algoritmos
+- **Definition**: How a large order moves the price
+- **Calculation**: Difference between average execution price and initial price
+- **Minimization**: Split large orders, use algorithms
 
-#### 4. Patrones de Order Flow
-- **Spread Widening**: Aumento del spread indica incertidumbre
-- **Depth Depletion**: Reducción de liquidez, posible movimiento fuerte
-- **Persistent Imbalance**: Acumulación o distribución en proceso
+#### 4. Order Flow Patterns
+- **Spread Widening**: Spread increase indicates uncertainty
+- **Depth Depletion**: Liquidity reduction, possible strong move
+- **Persistent Imbalance**: Accumulation or distribution in progress
 
-# Demo del analizador de microestructura
+# Microstructure analyzer demo
 def demo_microstructure_analyzer():
-    """Demo del análisis de microestructura"""
+    """Microstructure analysis demo"""
     
     analyzer = MarketMicrostructureAnalyzer()
     
-    # Simular order books
+    # Simulate order books
     for i in range(20):
-        # Generar order book sintético
+        # Generate synthetic order book
         base_price = 100 + np.random.normal(0, 0.1)
         spread = 0.01 + np.random.exponential(0.005)
         
@@ -292,19 +294,19 @@ def demo_microstructure_analyzer():
         
         analyzer.add_order_book(order_book)
     
-    # Analizar patrones
+    # Analyze patterns
     patterns = analyzer.detect_order_flow_patterns()
-    print("📊 Análisis de Microestructura:")
+    print("📊 Microstructure Analysis:")
     print(f"Spread widening: {patterns.get('spread_widening', False)}")
     print(f"Bid imbalance: {patterns.get('persistent_bid_imbalance', False)}")
     print(f"Ask imbalance: {patterns.get('persistent_ask_imbalance', False)}")
     print(f"Depth depletion: {patterns.get('depth_depletion', False)}")
     
-    # Calcular impacto de mercado
+    # Calculate market impact
     impact_buy_1000 = analyzer.calculate_market_impact(1000, 'buy')
     impact_sell_1000 = analyzer.calculate_market_impact(1000, 'sell')
     
-    print(f"\n💰 Impacto de Mercado:")
+    print(f"\n💰 Market Impact:")
     print(f"Buy 1000 shares: {impact_buy_1000:.4%}")
     print(f"Sell 1000 shares: {impact_sell_1000:.4%}")
 
@@ -312,29 +314,29 @@ if __name__ == "__main__":
     demo_microstructure_analyzer()
 ```
 
-## Tape Reading Moderno
+## Modern Tape Reading
 
-### ¿Qué es el Tape Reading?
+### What Is Tape Reading?
 
-El tape reading es la práctica de analizar el flujo de transacciones (trades) en tiempo real para entender la dinámica del mercado. Originalmente se hacía leyendo cintas de ticker físicas, ahora se hace con herramientas digitales.
+Tape reading is the practice of analyzing the flow of transactions (trades) in real time to understand market dynamics. Originally done by reading physical ticker tapes, it is now done with digital tools.
 
-### Elementos del Tape Reading
+### Elements of Tape Reading
 
-1. **Time & Sales**: Lista de todas las transacciones con tiempo, precio y volumen
-2. **Agresión de Órdenes**: Identificar si el trade fue iniciado por comprador o vendedor
-3. **Tamaño de Trades**: Distinguir entre retail, profesional e institucional
-4. **Velocidad de Trading**: Cuántos trades por minuto
-5. **Patrones de Ejecución**: Cómo se ejecutan las órdenes grandes
+1. **Time & Sales**: List of all transactions with time, price and volume
+2. **Order Aggression**: Identify whether the trade was initiated by buyer or seller
+3. **Trade Size**: Distinguish between retail, professional and institutional
+4. **Trading Speed**: How many trades per minute
+5. **Execution Patterns**: How large orders are executed
 
-### Sistema de Análisis de Time & Sales
+### Time & Sales Analysis System
 
-Implementaremos un sistema completo que analiza el flujo de trades para detectar patrones importantes:
+We will implement a complete system that analyzes trade flow to detect important patterns:
 ```python
 from enum import Enum
 from collections import Counter
 
 class TradeType(Enum):
-    """Tipos de trade"""
+    """Trade types"""
     BUY_MARKET = "buy_market"      # Market buy (hit ask)
     SELL_MARKET = "sell_market"    # Market sell (hit bid)
     BUY_LIMIT = "buy_limit"        # Limit buy
@@ -343,7 +345,7 @@ class TradeType(Enum):
 
 @dataclass
 class Trade:
-    """Trade individual"""
+    """Individual trade"""
     symbol: str
     timestamp: datetime
     price: float
@@ -352,39 +354,39 @@ class Trade:
     aggressor_side: str  # 'buy', 'sell', 'unknown'
     
     def get_dollar_volume(self) -> float:
-        """Obtener volumen en dólares"""
+        """Get dollar volume"""
         return self.price * self.size
 
-### Arquitectura del Tape Reader
+### Tape Reader Architecture
 
-Nuestro sistema de tape reading mantiene:
-- **Historial de trades**: Con ventana deslizante para eficiencia
-- **Perfiles de volumen**: Por precio, tamaño y tiempo
-- **Detección de patrones**: En tiempo real
-- **Métricas de presión**: Compradora vs vendedora
+Our tape reading system maintains:
+- **Trade history**: With sliding window for efficiency
+- **Volume profiles**: By price, size and time
+- **Pattern detection**: In real time
+- **Metrics de presión**: Compradora vs vendedora
 
 class TapeReader:
-    """Sistema de tape reading moderno"""
+    """Modern tape reading system"""
     
     def __init__(self, lookback_minutes: int = 30):
         self.lookback_minutes = lookback_minutes
         self.trades: deque = deque(maxlen=10000)
         self.order_books: deque = deque(maxlen=1000)
         
-        # Métricas de seguimiento
+        # Metrics de seguimiento
         self.volume_profile = {}
         self.size_profile = Counter()
         self.time_profile = {}
     
     def add_trade(self, trade: Trade):
-        """Agregar nuevo trade"""
+        """Add new trade"""
         self.trades.append(trade)
         self._update_profiles(trade)
     
     def _update_profiles(self, trade: Trade):
-        """Actualizar perfiles de trading"""
+        """Update trading profiles"""
         
-        # Volume profile por precio
+        # Volume profile by price
         price_bucket = round(trade.price, 2)
         if price_bucket not in self.volume_profile:
             self.volume_profile[price_bucket] = {'volume': 0, 'trades': 0}
@@ -405,7 +407,7 @@ class TapeReader:
         self.time_profile[minute_bucket]['trades'] += 1
     
     def _get_size_bucket(self, size: int) -> str:
-        """Obtener bucket de tamaño"""
+        """Get size bucket"""
         if size < 100:
             return "small"
         elif size < 500:
@@ -418,18 +420,18 @@ class TapeReader:
             return "institutional"
     
     def get_recent_trades(self, minutes: int = 5) -> List[Trade]:
-        """Obtener trades recientes"""
+        """Get recent trades"""
         cutoff_time = datetime.now() - timedelta(minutes=minutes)
         return [trade for trade in self.trades if trade.timestamp >= cutoff_time]
     
     def analyze_order_flow(self, minutes: int = 5) -> Dict:
-        """Analizar order flow reciente
+        """Analyze recent order flow
         
-        Esta función es el corazón del tape reading moderno:
-        - Calcula volumen total y por lado (buy/sell)
-        - Identifica trades grandes vs pequeños
-        - Mide la velocidad del trading
-        - Proporciona ratios de presión compradora/vendedora
+        This function is the heart of modern tape reading:
+        - Calculates total volume and by side (buy/sell)
+        - Identifies large vs small trades
+        - Measures trading speed
+        - Provides buying/selling pressure ratios
         """
         
         recent_trades = self.get_recent_trades(minutes)
@@ -437,29 +439,29 @@ class TapeReader:
         if not recent_trades:
             return {}
         
-        # Métricas básicas
+        # Metrics básicas
         total_volume = sum(trade.size for trade in recent_trades)
         total_dollar_volume = sum(trade.get_dollar_volume() for trade in recent_trades)
         
-        # Separar por lado
+        # Separate by side
         buy_trades = [t for t in recent_trades if t.aggressor_side == 'buy']
         sell_trades = [t for t in recent_trades if t.aggressor_side == 'sell']
         
         buy_volume = sum(trade.size for trade in buy_trades)
         sell_volume = sum(trade.size for trade in sell_trades)
         
-        # Ratio de volumen
+        # Volume ratio
         buy_sell_ratio = buy_volume / sell_volume if sell_volume > 0 else float('inf')
         
-        # Tamaño promedio de trades
+        # Average trade size
         avg_trade_size = total_volume / len(recent_trades)
         
-        # Trades grandes (>1000 shares)
+        # Large trades (>1000 shares)
         large_trades = [t for t in recent_trades if t.size >= 1000]
         large_trade_volume = sum(t.size for t in large_trades)
         large_trade_pct = large_trade_volume / total_volume if total_volume > 0 else 0
         
-        # Velocidad de trading
+        # Trading speed
         time_span = (recent_trades[-1].timestamp - recent_trades[0].timestamp).total_seconds() / 60
         trades_per_minute = len(recent_trades) / time_span if time_span > 0 else 0
         
@@ -478,20 +480,20 @@ class TapeReader:
         }
     
     def detect_tape_patterns(self) -> Dict:
-        """Detectar patrones en el tape
+        """Detect tape patterns
         
-        Patrones importantes a detectar:
+        Important patterns to detect:
         
-        1. **Acumulación/Distribución**: Volumen sesgado hacia un lado
-        2. **Actividad Institucional**: Trades grandes consistentes
-        3. **Rapid Fire**: Muchos trades pequeños (posible HFT)
-        4. **Price Level Testing**: Precio estable con volumen alto
-        5. **Momentum**: Movimiento direccional consistente
-        6. **Iceberg Orders**: Mismo tamaño repetido (orden oculta)
+        1. **Accumulation/Distribution**: Volume skewed to one side
+        2. **Institutional Activity**: Consistent large trades
+        3. **Rapid Fire**: Many small trades (possible HFT)
+        4. **Price Level Testing**: Stable price with high volume
+        5. **Momentum**: Consistent directional movement
+        6. **Iceberg Orders**: Same size repeated (hidden order)
         """
         
         patterns = {}
-        recent_trades = self.get_recent_trades(10)  # Últimos 10 minutos
+        recent_trades = self.get_recent_trades(10)  # Last 10 minutes
         
         if len(recent_trades) < 10:
             return patterns
@@ -510,7 +512,7 @@ class TapeReader:
         if len(large_trades) >= 3:
             patterns['institutional_activity'] = True
         
-        # 3. Rapid fire pattern (muchos trades pequeños seguidos)
+        # 3. Rapid fire pattern (many small consecutive trades)
         small_trades = [t for t in recent_trades if t.size <= 100]
         if len(small_trades) >= len(recent_trades) * 0.7:
             patterns['rapid_fire'] = True
@@ -519,12 +521,12 @@ class TapeReader:
         prices = [t.price for t in recent_trades]
         price_variance = np.var(prices)
         
-        if price_variance < 0.01:  # Precio muy estable
+        if price_variance < 0.01:  # Very stable price
             patterns['price_level_test'] = True
         
         # 5. Momentum pattern
         if len(recent_trades) >= 5:
-            # Calcular si precio está subiendo/bajando consistentemente
+            # Calculate if price is consistently rising/falling
             price_changes = []
             for i in range(1, len(recent_trades)):
                 change = recent_trades[i].price - recent_trades[i-1].price
@@ -538,34 +540,34 @@ class TapeReader:
             elif negative_changes >= len(price_changes) * 0.8:
                 patterns['downward_momentum'] = True
         
-        # 6. Iceberg detection (trades consistentes del mismo tamaño)
+        # 6. Iceberg detection (consistent same-size trades)
         trade_sizes = [t.size for t in recent_trades]
         size_counts = Counter(trade_sizes)
         max_repeated_size = max(size_counts.values()) if size_counts else 0
         
-        if max_repeated_size >= 5:  # Mismo tamaño repetido 5+ veces
+        if max_repeated_size >= 5:  # Same size repeated 5+ times
             patterns['potential_iceberg'] = True
         
         return patterns
     
     def get_support_resistance_levels(self) -> Dict:
-        """Obtener niveles de soporte/resistencia basados en volume profile"""
+        """Get support/resistance levels based on volume profile"""
         
         if not self.volume_profile:
             return {}
         
-        # Ordenar por volumen
+        # Sort by volume
         sorted_levels = sorted(self.volume_profile.items(), 
                              key=lambda x: x[1]['volume'], reverse=True)
         
-        # Top 5 niveles por volumen
+        # Top 5 levels by volume
         high_volume_levels = sorted_levels[:5]
         
-        # Identificar precio actual
+        # Identify current price
         recent_trades = self.get_recent_trades(1)
         current_price = recent_trades[-1].price if recent_trades else 0
         
-        # Separar en soporte y resistencia
+        # Separate into support and resistance
         support_levels = []
         resistance_levels = []
         
@@ -583,7 +585,7 @@ class TapeReader:
                     'trades': data['trades']
                 })
         
-        # Ordenar soporte descendente, resistencia ascendente
+        # Sort support descending, resistance ascending
         support_levels.sort(key=lambda x: x['price'], reverse=True)
         resistance_levels.sort(key=lambda x: x['price'])
         
@@ -594,26 +596,26 @@ class TapeReader:
         }
     
     def calculate_buying_selling_pressure(self, minutes: int = 15) -> Dict:
-        """Calcular presión compradora/vendedora"""
+        """Calculate buying/selling pressure"""
         
         recent_trades = self.get_recent_trades(minutes)
         
         if not recent_trades:
             return {}
         
-        # Separar por tipo de trade
+        # Separate by trade type
         market_buys = [t for t in recent_trades if t.trade_type == TradeType.BUY_MARKET]
         market_sells = [t for t in recent_trades if t.trade_type == TradeType.SELL_MARKET]
         
-        # Volumen por tipo
+        # Volume by type
         market_buy_volume = sum(t.size for t in market_buys)
         market_sell_volume = sum(t.size for t in market_sells)
         
-        # Dollar volume por tipo
+        # Dollar volume by type
         market_buy_dollars = sum(t.get_dollar_volume() for t in market_buys)
         market_sell_dollars = sum(t.get_dollar_volume() for t in market_sells)
         
-        # Presión neta
+        # Net pressure
         volume_pressure = market_buy_volume - market_sell_volume
         dollar_pressure = market_buy_dollars - market_sell_dollars
         
@@ -632,26 +634,26 @@ class TapeReader:
             'sell_pressure_ratio': 1 - buy_pressure_ratio
         }
 
-### Interpretación de Patrones del Tape
+### Tape Pattern Interpretation
 
-#### Patrones Alcistas:
-- **Acumulación**: Buy volume > 1.5x sell volume
-- **Trades grandes en asks**: Institucionales comprando agresivamente
-- **Momentum alcista**: Precios subiendo con volumen creciente
+#### Bullish Patterns:
+- **Accumulation**: Buy volume > 1.5x sell volume
+- **Large trades at asks**: Institutions buying aggressively
+- **Bullish momentum**: Prices rising with increasing volume
 
-#### Patrones Bajistas:
-- **Distribución**: Sell volume > 1.5x buy volume
-- **Trades grandes en bids**: Institucionales vendiendo agresivamente
-- **Momentum bajista**: Precios bajando con volumen creciente
+#### Bearish Patterns:
+- **Distribution**: Sell volume > 1.5x buy volume
+- **Large trades at bids**: Institutions selling aggressively
+- **Bearish momentum**: Prices falling with increasing volume
 
-#### Señales de Alerta:
-- **Cambio de régimen**: De acumulación a distribución o viceversa
-- **Volumen anómalo**: Spike repentino en actividad
-- **Icebergs detectados**: Órdenes ocultas ejecutándose
+#### Warning Signals:
+- **Regime change**: From accumulation to distribution or vice versa
+- **Anomalous volume**: Sudden spike in activity
+- **Icebergs detected**: Hidden orders executing
 
 # Sistema de alertas basado en tape reading
 class TapeAlertSystem:
-    """Sistema de alertas basado en análisis de tape"""
+    """Alert system based on tape analysis"""
     
     def __init__(self, tape_reader: TapeReader):
         self.tape_reader = tape_reader
@@ -663,11 +665,11 @@ class TapeAlertSystem:
         }
     
     def check_alerts(self) -> List[Dict]:
-        """Verificar condiciones de alerta"""
+        """Check alert conditions"""
         
         alerts = []
         
-        # Analizar order flow reciente
+        # Analyze recent order flow
         flow_analysis = self.tape_reader.analyze_order_flow(5)
         
         if not flow_analysis:
@@ -677,7 +679,7 @@ class TapeAlertSystem:
         if flow_analysis.get('large_trades_count', 0) >= 3:
             alerts.append({
                 'type': 'large_trades',
-                'message': f"Múltiples trades grandes detectados: {flow_analysis['large_trades_count']}",
+                'message': f"Multiple large trades detected: {flow_analysis['large_trades_count']}",
                 'severity': 'medium',
                 'data': flow_analysis
             })
@@ -687,14 +689,14 @@ class TapeAlertSystem:
         if buy_sell_ratio > self.alert_thresholds['buy_sell_imbalance']:
             alerts.append({
                 'type': 'buy_imbalance',
-                'message': f"Fuerte presión compradora detectada: ratio {buy_sell_ratio:.1f}",
+                'message': f"Strong buying pressure detected: ratio {buy_sell_ratio:.1f}",
                 'severity': 'high',
                 'data': flow_analysis
             })
         elif buy_sell_ratio < 1 / self.alert_thresholds['buy_sell_imbalance']:
             alerts.append({
                 'type': 'sell_imbalance',
-                'message': f"Fuerte presión vendedora detectada: ratio {buy_sell_ratio:.1f}",
+                'message': f"Strong selling pressure detected: ratio {buy_sell_ratio:.1f}",
                 'severity': 'high',
                 'data': flow_analysis
             })
@@ -704,7 +706,7 @@ class TapeAlertSystem:
         if large_trade_pct > self.alert_thresholds['institutional_volume_pct']:
             alerts.append({
                 'type': 'institutional_volume',
-                'message': f"Alto volumen institucional: {large_trade_pct:.1%}",
+                'message': f"High institutional volume: {large_trade_pct:.1%}",
                 'severity': 'high',
                 'data': flow_analysis
             })
@@ -716,48 +718,48 @@ class TapeAlertSystem:
             if detected:
                 alerts.append({
                     'type': 'pattern',
-                    'message': f"Patrón detectado: {pattern}",
+                    'message': f"Pattern detected: {pattern}",
                     'severity': 'medium',
                     'data': {'pattern': pattern, 'flow_analysis': flow_analysis}
                 })
         
         return alerts
 
-# Demo del sistema de tape reading
+# Tape reading system demo
 def demo_tape_reading():
-    """Demo del sistema de tape reading"""
+    """Tape reading system demo"""
     
     tape_reader = TapeReader()
     alert_system = TapeAlertSystem(tape_reader)
     
-    # Simular trades
+    # Simulate trades
     base_price = 150.0
     current_time = datetime.now()
     
     for i in range(100):
-        # Simular diferentes tipos de trades
+        # Simulate different types of trades
         if i < 20:
-            # Período de acumulación
+            # Accumulation period
             trade_type = TradeType.BUY_MARKET
             aggressor = 'buy'
             size = np.random.choice([100, 200, 500], p=[0.6, 0.3, 0.1])
         elif i < 40:
-            # Trades normales
+            # Normal trades
             trade_type = np.random.choice([TradeType.BUY_MARKET, TradeType.SELL_MARKET])
             aggressor = 'buy' if trade_type == TradeType.BUY_MARKET else 'sell'
             size = np.random.randint(100, 300)
         elif i < 60:
-            # Período con trades grandes
+            # Period with large trades
             trade_type = np.random.choice([TradeType.BUY_MARKET, TradeType.SELL_MARKET])
             aggressor = 'buy' if trade_type == TradeType.BUY_MARKET else 'sell'
             size = np.random.choice([1000, 2000, 5000], p=[0.7, 0.2, 0.1])
         else:
-            # Distribución
+            # Distribution
             trade_type = TradeType.SELL_MARKET
             aggressor = 'sell'
             size = np.random.choice([200, 500, 1000], p=[0.5, 0.3, 0.2])
         
-        # Precio con drift aleatorio
+        # Price with random drift
         price_change = np.random.normal(0, 0.01)
         base_price += price_change
         
@@ -772,28 +774,28 @@ def demo_tape_reading():
         
         tape_reader.add_trade(trade)
     
-    # Analizar resultados
+    # Analyze results
     flow_analysis = tape_reader.analyze_order_flow(10)
     patterns = tape_reader.detect_tape_patterns()
     pressure = tape_reader.calculate_buying_selling_pressure()
     support_resistance = tape_reader.get_support_resistance_levels()
     alerts = alert_system.check_alerts()
     
-    print("📊 Análisis de Tape Reading:")
+    print("📊 Tape Reading Analysis:")
     print(f"Total trades: {flow_analysis.get('total_trades', 0)}")
     print(f"Buy/Sell ratio: {flow_analysis.get('buy_sell_ratio', 0):.2f}")
     print(f"Large trades: {flow_analysis.get('large_trades_count', 0)} ({flow_analysis.get('large_trade_volume_pct', 0):.1%})")
     
-    print(f"\n🎯 Patrones detectados:")
+    print(f"\n🎯 Patterns detected:")
     for pattern, detected in patterns.items():
         if detected:
             print(f"  ✅ {pattern}")
     
-    print(f"\n💪 Presión de mercado:")
-    print(f"Presión compradora: {pressure.get('buy_pressure_ratio', 0):.1%}")
-    print(f"Presión vendedora: {pressure.get('sell_pressure_ratio', 0):.1%}")
+    print(f"\n💪 Market pressure:")
+    print(f"Buying pressure: {pressure.get('buy_pressure_ratio', 0):.1%}")
+    print(f"Selling pressure: {pressure.get('sell_pressure_ratio', 0):.1%}")
     
-    print(f"\n🚨 Alertas: {len(alerts)}")
+    print(f"\n🚨 Alerts: {len(alerts)}")
     for alert in alerts:
         print(f"  {alert['type']}: {alert['message']}")
 
@@ -801,43 +803,43 @@ if __name__ == "__main__":
     demo_tape_reading()
 ```
 
-## Integración con Estrategias de Trading
+## Integration with Trading Strategies
 
-### Cómo Usar Microestructura en Trading
+### How to Use Microstructure in Trading
 
-La microestructura y el tape reading no son estrategias por sí solas, sino herramientas que mejoran otras estrategias:
+Microstructure and tape reading are not standalone strategies, but tools that improve other strategies:
 
-1. **Confirmación de Señales**: Validar señales técnicas con order flow
-2. **Timing de Ejecución**: Entrar cuando la liquidez es favorable
-3. **Gestión de Riesgo**: Salir cuando cambia la dinámica del mercado
-4. **Detección de Trampa**: Identificar false breakouts
+1. **Signal Confirmation**: Validate technical signals with order flow
+2. **Execution Timing**: Enter when liquidity is favorable
+3. **Risk Management**: Exit when market dynamics change
+4. **Trap Detection**: Identify false breakouts
 
-### Tipos de Señales
+### Types of Signals
 
 #### 1. Breakout Confirmation
-- **Setup**: Precio cerca de resistencia/soporte
-- **Confirmación**: Order flow agresivo en dirección del breakout
-- **Acción**: Entrar con la confirmación del flujo
+- **Setup**: Price near resistance/support
+- **Confirmation**: Aggressive order flow in breakout direction
+- **Action**: Enter with flow confirmation
 
 #### 2. Institutional Flow
-- **Setup**: Detección de trades grandes consistentes
-- **Confirmación**: Imbalance sostenido en order book
-- **Acción**: Seguir la dirección institucional
+- **Setup**: Detection of consistent large trades
+- **Confirmation**: Sustained order book imbalance
+- **Action**: Follow institutional direction
 
 #### 3. Liquidity Provision
-- **Setup**: Spread amplio sin volatilidad alta
-- **Confirmación**: Volumen normal, sin noticias
-- **Acción**: Proveer liquidez con órdenes límite
+- **Setup**: Wide spread without high volatility
+- **Confirmation**: Normal volume, no news
+- **Action**: Provide liquidity with limit orders
 
 #### 4. Momentum Continuation
-- **Setup**: Movimiento direccional fuerte
-- **Confirmación**: Order flow consistente con la dirección
-- **Acción**: Entrar en pullbacks con flujo favorable
+- **Setup**: Strong directional movement
+- **Confirmation**: Order flow consistent with direction
+- **Action**: Enter on pullbacks with favorable flow
 
-### Señales Basadas en Microestructura
+### Microstructure-Based Signals
 ```python
 class MicrostructureSignalGenerator:
-    """Generador de señales basado en microestructura"""
+    """Microstructure-based signal generator"""
     
     def __init__(self, tape_reader: TapeReader, microstructure_analyzer: MarketMicrostructureAnalyzer):
         self.tape_reader = tape_reader
@@ -845,17 +847,17 @@ class MicrostructureSignalGenerator:
         self.signal_history = []
     
     def generate_signals(self) -> List[Dict]:
-        """Generar señales de trading basadas en microestructura"""
+        """Generate signals de trading basadas en microestructura"""
         
         signals = []
         
-        # Obtener análisis actuales
+        # Get current analysis
         flow_analysis = self.tape_reader.analyze_order_flow(5)
         patterns = self.tape_reader.detect_tape_patterns()
         pressure = self.tape_reader.calculate_buying_selling_pressure()
         microstructure_patterns = self.microstructure_analyzer.detect_order_flow_patterns()
         
-        # Señal 1: Breakout confirmation
+        # Signal 1: Breakout confirmation
         if self._detect_breakout_confirmation(patterns, pressure, microstructure_patterns):
             signals.append({
                 'type': 'breakout_confirmation',
@@ -869,7 +871,7 @@ class MicrostructureSignalGenerator:
                 }
             })
         
-        # Señal 2: Institutional flow
+        # Signal 2: Institutional flow
         if self._detect_institutional_flow(flow_analysis, patterns):
             signals.append({
                 'type': 'institutional_flow',
@@ -882,7 +884,7 @@ class MicrostructureSignalGenerator:
                 }
             })
         
-        # Señal 3: Liquidity provision opportunity
+        # Signal 3: Liquidity provision opportunity
         if self._detect_liquidity_opportunity(microstructure_patterns):
             signals.append({
                 'type': 'liquidity_provision',
@@ -894,7 +896,7 @@ class MicrostructureSignalGenerator:
                 }
             })
         
-        # Señal 4: Momentum continuation
+        # Signal 4: Momentum continuation
         if self._detect_momentum_continuation(patterns, pressure):
             direction = 'long' if patterns.get('upward_momentum') else 'short'
             signals.append({
@@ -908,7 +910,7 @@ class MicrostructureSignalGenerator:
                 }
             })
         
-        # Guardar historial
+        # Save history
         for signal in signals:
             signal['timestamp'] = datetime.now()
             self.signal_history.append(signal)
@@ -917,33 +919,33 @@ class MicrostructureSignalGenerator:
     
     def _detect_breakout_confirmation(self, patterns: Dict, pressure: Dict, 
                                    microstructure_patterns: Dict) -> bool:
-        """Detectar confirmación de breakout"""
+        """Detect breakout confirmation"""
         
-        # Condiciones para breakout confirmation
+        # Conditions for breakout confirmation
         conditions = [
-            pressure.get('buy_pressure_ratio', 0.5) > 0.65 or pressure.get('buy_pressure_ratio', 0.5) < 0.35,  # Presión direccional
-            patterns.get('institutional_activity', False),  # Actividad institucional
-            not microstructure_patterns.get('high_volatility', False),  # No alta volatilidad
-            microstructure_patterns.get('depth_depletion', False)  # Depleción de liquidez
+            pressure.get('buy_pressure_ratio', 0.5) > 0.65 or pressure.get('buy_pressure_ratio', 0.5) < 0.35,  # Directional pressure
+            patterns.get('institutional_activity', False),  # Institutional activity
+            not microstructure_patterns.get('high_volatility', False),  # Not high volatility
+            microstructure_patterns.get('depth_depletion', False)  # Liquidity depletion
         ]
         
         return sum(conditions) >= 3
     
     def _detect_institutional_flow(self, flow_analysis: Dict, patterns: Dict) -> bool:
-        """Detectar flujo institucional"""
+        """Detect institutional flow"""
         
-        # Condiciones para flujo institucional
+        # Conditions for institutional flow
         large_trade_pct = flow_analysis.get('large_trade_volume_pct', 0)
         avg_trade_size = flow_analysis.get('avg_trade_size', 0)
         
         return (
-            large_trade_pct > 0.25 and  # >25% volumen en trades grandes
-            avg_trade_size > 500 and   # Tamaño promedio grande
-            patterns.get('institutional_activity', False)  # Patrón institucional
+            large_trade_pct > 0.25 and  # >25% volume in large trades
+            avg_trade_size > 500 and   # Large average size
+            patterns.get('institutional_activity', False)  # Institutional pattern
         )
     
     def _detect_liquidity_opportunity(self, microstructure_patterns: Dict) -> bool:
-        """Detectar oportunidad de provisión de liquidez"""
+        """Detect liquidity provision opportunity"""
         
         return (
             microstructure_patterns.get('spread_widening', False) and
@@ -951,7 +953,7 @@ class MicrostructureSignalGenerator:
         )
     
     def _detect_momentum_continuation(self, patterns: Dict, pressure: Dict) -> bool:
-        """Detectar continuación de momentum"""
+        """Detect momentum continuation"""
         
         has_momentum = patterns.get('upward_momentum', False) or patterns.get('downward_momentum', False)
         consistent_pressure = (
@@ -961,37 +963,37 @@ class MicrostructureSignalGenerator:
         
         return has_momentum and consistent_pressure
 
-### Mejores Prácticas
+### Best Practices
 
-1. **No usar en aislamiento**: Siempre combinar con otros indicadores
-2. **Considerar el contexto**: La microestructura varía según hora del día y eventos
-3. **Adaptarse al mercado**: Diferentes activos tienen diferentes características
-4. **Gestionar latencia**: La microestructura requiere datos de baja latencia
-5. **Backtesting cuidadoso**: Muchos patrones solo funcionan en tiempo real
+1. **Do not use in isolation**: Always combine with other indicators
+2. **Consider context**: Microstructure varies by time of day and events
+3. **Adapt to the market**: Different assets have different characteristics
+4. **Manage latency**: Microstructure requires low-latency data
+5. **Careful backtesting**: Many patterns only work in real time
 
-### Limitaciones
+### Limitations
 
-- **Datos costosos**: Feeds de nivel 2 y time & sales son caros
-- **Competencia HFT**: Difícil competir en microsegundos
-- **Ruido**: Muchas señales falsas en mercados volátiles
-- **Complejidad**: Requiere experiencia para interpretar correctamente
+- **Costly data**: Level 2 feeds and time & sales are expensive
+- **HFT competition**: Difficult to compete in microseconds
+- **Noise**: Many false signals in volatile markets
+- **Complexity**: Requires experience to interpret correctly
 
 # Demo de integración completa
 def demo_microstructure_integration():
-    """Demo de integración completa de microestructura"""
+    """Complete microstructure integration demo"""
     
     # Inicializar componentes
     tape_reader = TapeReader()
     microstructure_analyzer = MarketMicrostructureAnalyzer()
     signal_generator = MicrostructureSignalGenerator(tape_reader, microstructure_analyzer)
     
-    print("🔄 Simulando trading session con microestructura...")
+    print("🔄 Simulating trading session with microstructure...")
     
-    # Simular sesión de trading
+    # Simulate trading session
     base_price = 100.0
     current_time = datetime.now()
     
-    # Generar order books y trades sintéticos
+    # Generate synthetic order books and trades
     for i in range(50):
         # Order book
         spread = 0.01 + np.random.exponential(0.005)
@@ -1008,14 +1010,14 @@ def demo_microstructure_integration():
             trade_type = np.random.choice([TradeType.BUY_MARKET, TradeType.SELL_MARKET])
             aggressor = 'buy' if trade_type == TradeType.BUY_MARKET else 'sell'
             
-            # Simular diferentes fases
-            if i < 15:  # Acumulación
+            # Simulate different phases
+            if i < 15:  # Accumulation
                 size = np.random.choice([500, 1000, 2000], p=[0.6, 0.3, 0.1])
                 aggressor = 'buy'
             elif i < 35:  # Breakout
                 size = np.random.choice([200, 500, 1000], p=[0.4, 0.4, 0.2])
-                base_price += np.random.normal(0.05, 0.02)  # Tendencia alcista
-            else:  # Distribución
+                base_price += np.random.normal(0.05, 0.02)  # Bullish trend
+            else:  # Distribution
                 size = np.random.choice([300, 800, 1500], p=[0.5, 0.3, 0.2])
                 aggressor = 'sell'
             
@@ -1030,19 +1032,19 @@ def demo_microstructure_integration():
             
             tape_reader.add_trade(trade)
     
-    # Generar señales
+    # Generate signals
     signals = signal_generator.generate_signals()
     
-    print(f"\n📈 Señales generadas: {len(signals)}")
+    print(f"\n📈 Signals generated: {len(signals)}")
     for signal in signals:
         print(f"  🎯 {signal['type']}: {signal['direction']} (fuerza: {signal['strength']:.1f})")
         print(f"     Razón: {signal['reasoning']}")
     
-    # Mostrar métricas finales
+    # Show final metrics
     flow_analysis = tape_reader.analyze_order_flow(10)
     patterns = tape_reader.detect_tape_patterns()
     
-    print(f"\n📊 Resumen final:")
+    print(f"\n📊 Final summary:")
     print(f"Buy/Sell ratio: {flow_analysis.get('buy_sell_ratio', 0):.2f}")
     print(f"Trades grandes: {flow_analysis.get('large_trade_volume_pct', 0):.1%}")
     print(f"Patrones: {[p for p, detected in patterns.items() if detected]}")
@@ -1051,27 +1053,27 @@ if __name__ == "__main__":
     demo_microstructure_integration()
 ```
 
-## Conclusión
+## Conclusion
 
-El market microstructure y tape reading son herramientas poderosas para entender la dinámica real del mercado:
+Market microstructure and tape reading are powerful tools for understanding real market dynamics:
 
-- **Order Book Analysis**: Revela la liquidez disponible y las intenciones del mercado
-- **Tape Reading**: Muestra quién está comprando/vendiendo y cómo
-- **Pattern Detection**: Identifica comportamientos institucionales y oportunidades
-- **Signal Generation**: Mejora el timing y la calidad de las entradas
+- **Order Book Analysis**: Reveals available liquidity and market intentions
+- **Tape Reading**: Shows who is buying/selling and how
+- **Pattern Detection**: Identifies institutional behavior and opportunities
+- **Signal Generation**: Improves timing and quality of entries
 
-### Recursos Adicionales
+### Additional Resources
 
-- **Libros**: "Market Microstructure Theory" por O'Hara
+- **Books**: "Market Microstructure Theory" by O'Hara
 - **Papers**: "The Information Content of the Limit Order Book"
-- **Práctica**: Observar order books en tiempo real con paper trading
-- **Herramientas**: BookMap, Jigsaw Trading, plataformas con DOM
+- **Practice**: Observe order books in real time with paper trading
+- **Tools**: BookMap, Jigsaw Trading, platforms with DOM
 
-### Próximos Pasos
+### Next Steps
 
-1. Practicar leyendo el tape en mercados líquidos (SPY, QQQ)
-2. Identificar patrones recurrentes en tu activo favorito
-3. Combinar con indicadores técnicos para confirmación
-4. Desarrollar intuición observando miles de horas de tape
+1. Practice reading the tape in liquid markets (SPY, QQQ)
+2. Identify recurring patterns in your favorite asset
+3. Combine with technical indicators for confirmation
+4. Develop intuition by observing thousands of hours of tape
 
-Recuerda: La microestructura es un arte que requiere práctica constante. No esperes dominarla en semanas, toma meses o años desarrollar la intuición necesaria.
+Remember: Microstructure is an art that requires constant practice. Do not expect to master it in weeks; it takes months or years to develop the necessary intuition.

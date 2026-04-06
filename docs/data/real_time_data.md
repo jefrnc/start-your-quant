@@ -1,10 +1,12 @@
-# Real-Time Data Management para Trading Algorítmico
+> 🇪🇸 [Leer en Español](real_time_data.es.md) | 🇺🇸 **English**
 
-## Introducción: La Velocidad Como Ventaja Competitiva
+# Real-Time Data Management for Algorithmic Trading
 
-En trading algorítmico, especialmente en small caps y estrategias intraday, la latencia de datos puede ser la diferencia entre profit y loss. Este documento cubre la arquitectura completa para manejo de datos en tiempo real, desde la ingesta hasta el procesamiento y distribución.
+## Introduction: Speed as a Competitive Advantage
 
-## Arquitectura de Real-Time Data
+In algorithmic trading, especially in small caps and intraday strategies, data latency can be the difference between profit and loss. This document covers the complete architecture for real-time data handling, from ingestion to processing and distribution.
+
+## Real-Time Data Architecture
 
 ### Core Components
 
@@ -22,7 +24,7 @@ import numpy as np
 
 @dataclass
 class MarketDataTick:
-    """Estructura estándar para datos de mercado"""
+    """Standard structure for market data"""
     symbol: str
     timestamp: float
     bid: float
@@ -35,7 +37,7 @@ class MarketDataTick:
     data_type: str = "quote"
 
 class DataFeedInterface(ABC):
-    """Interface estándar para feeds de datos"""
+    """Standard interface for data feeds"""
     
     @abstractmethod
     async def connect(self) -> bool:
@@ -54,7 +56,7 @@ class DataFeedInterface(ABC):
         pass
 
 class RealTimeDataManager:
-    """Manager central para datos en tiempo real"""
+    """Central manager for real-time data"""
     
     def __init__(self):
         self.feeds = {}
@@ -72,18 +74,18 @@ class RealTimeDataManager:
         }
     
     def register_feed(self, name: str, feed: DataFeedInterface):
-        """Registra un nuevo feed de datos"""
+        """Registers a new data feed"""
         self.feeds[name] = feed
     
     def subscribe_to_symbols(self, symbols: List[str], callback: Callable):
-        """Suscribe a símbolos específicos"""
+        """Subscribes to specific symbols"""
         for symbol in symbols:
             if symbol not in self.subscribers:
                 self.subscribers[symbol] = []
             self.subscribers[symbol].append(callback)
     
     async def start_all_feeds(self):
-        """Inicia todos los feeds registrados"""
+        """Starts all registered feeds"""
         tasks = []
         for name, feed in self.feeds.items():
             task = asyncio.create_task(self._manage_feed(name, feed))
@@ -92,18 +94,18 @@ class RealTimeDataManager:
         await asyncio.gather(*tasks)
     
     async def _manage_feed(self, name: str, feed: DataFeedInterface):
-        """Maneja un feed individual con reconexión automática"""
+        """Manages individual feed with automatic reconnection"""
         while True:
             try:
                 await feed.connect()
                 print(f"✅ Connected to {name}")
                 
-                # Suscribir a todos los símbolos
+                # Subscribe to all symbols
                 symbols = list(self.subscribers.keys())
                 if symbols:
                     await feed.subscribe(symbols)
                 
-                # Iniciar stream
+                # Start stream
                 await feed.start_stream(self._process_data_tick)
                 
             except Exception as e:
@@ -112,7 +114,7 @@ class RealTimeDataManager:
                 continue
     
     def _process_data_tick(self, tick: MarketDataTick):
-        """Procesa cada tick de datos"""
+        """Processes each data tick"""
         try:
             # 1. Validation
             if not self.data_validator.validate_tick(tick):
@@ -142,7 +144,7 @@ class RealTimeDataManager:
 
 ```python
 class AlpacaRealTimeFeed(DataFeedInterface):
-    """Feed de datos real-time para Alpaca"""
+    """Real-time data feed for Alpaca"""
     
     def __init__(self, api_key: str, api_secret: str):
         self.api_key = api_key
@@ -150,7 +152,7 @@ class AlpacaRealTimeFeed(DataFeedInterface):
         self.websocket = None
         
     async def connect(self) -> bool:
-        """Conecta al websocket de Alpaca"""
+        """Connects to Alpaca websocket"""
         try:
             self.websocket = await websockets.connect(
                 "wss://stream.data.alpaca.markets/v2/iex",
@@ -177,7 +179,7 @@ class AlpacaRealTimeFeed(DataFeedInterface):
             return False
     
     async def subscribe(self, symbols: List[str]) -> bool:
-        """Suscribe a símbolos específicos"""
+        """Subscribes to specific symbols"""
         try:
             subscribe_message = {
                 "action": "subscribe",
@@ -191,7 +193,7 @@ class AlpacaRealTimeFeed(DataFeedInterface):
             return False
     
     async def start_stream(self, callback: Callable) -> None:
-        """Inicia el stream de datos"""
+        """Starts the data stream"""
         try:
             async for message in self.websocket:
                 data = json.loads(message)
@@ -211,7 +213,7 @@ class AlpacaRealTimeFeed(DataFeedInterface):
             print(f"Stream error: {e}")
 
 class PolygonRealTimeFeed(DataFeedInterface):
-    """Feed de datos real-time para Polygon.io"""
+    """Real-time data feed for Polygon.io"""
     
     def __init__(self, api_key: str):
         self.api_key = api_key
@@ -257,7 +259,7 @@ class PolygonRealTimeFeed(DataFeedInterface):
             return False
 
 class IEXRealTimeFeed(DataFeedInterface):
-    """Feed de datos real-time para IEX Cloud"""
+    """Real-time data feed for IEX Cloud"""
     
     def __init__(self, api_token: str):
         self.api_token = api_token
@@ -278,7 +280,7 @@ class IEXRealTimeFeed(DataFeedInterface):
 
 ```python
 class MarketDataProcessor:
-    """Procesador avanzado de datos de mercado"""
+    """Advanced market data processor"""
     
     def __init__(self):
         self.tick_storage = {}
@@ -287,7 +289,7 @@ class MarketDataProcessor:
         self.anomaly_detector = AnomalyDetector()
         
     def process_tick(self, tick: MarketDataTick):
-        """Procesa tick individual y actualiza estructuras"""
+        """Processes individual tick and updates structures"""
         symbol = tick.symbol
         
         # 1. Store raw tick
@@ -308,7 +310,7 @@ class MarketDataProcessor:
         self._trigger_strategy_updates(tick)
     
     def _update_bars(self, tick: MarketDataTick):
-        """Actualiza constructores de barras"""
+        """Updates bar builders"""
         symbol = tick.symbol
         
         if symbol not in self.bar_builders:
@@ -324,7 +326,7 @@ class MarketDataProcessor:
                 self._publish_new_bar(symbol, timeframe, new_bar)
     
     def _update_indicators(self, tick: MarketDataTick):
-        """Actualiza indicadores en tiempo real"""
+        """Updates indicators in real time"""
         symbol = tick.symbol
         
         if symbol not in self.indicators:
@@ -339,7 +341,7 @@ class MarketDataProcessor:
             indicator.update(tick)
 
 class RealTimeVWAP:
-    """VWAP en tiempo real"""
+    """Real-time VWAP"""
     
     def __init__(self):
         self.cum_volume = 0
@@ -348,7 +350,7 @@ class RealTimeVWAP:
         self.session_start = None
     
     def update(self, tick: MarketDataTick):
-        """Actualiza VWAP con nuevo tick"""
+        """Updates VWAP with new tick"""
         # Reset at market open
         current_time = pd.Timestamp.fromtimestamp(tick.timestamp)
         if self._is_new_session(current_time):
@@ -367,7 +369,7 @@ class RealTimeVWAP:
         return self.vwap
     
     def _is_new_session(self, timestamp: pd.Timestamp) -> bool:
-        """Detecta nueva sesión de trading"""
+        """Detects new trading session"""
         if self.session_start is None:
             self.session_start = timestamp.normalize() + pd.Timedelta(hours=9, minutes=30)
             return True
@@ -380,7 +382,7 @@ class RealTimeVWAP:
         return False
 
 class RealTimeEMA:
-    """EMA en tiempo real"""
+    """Real-time EMA"""
     
     def __init__(self, period: int):
         self.period = period
@@ -389,7 +391,7 @@ class RealTimeEMA:
         self.initialized = False
     
     def update(self, tick: MarketDataTick):
-        """Actualiza EMA con nuevo tick"""
+        """Updates EMA with new tick"""
         price = tick.last
         
         if not self.initialized:
@@ -401,7 +403,7 @@ class RealTimeEMA:
         return self.ema
 
 class AnomalyDetector:
-    """Detector de anomalías en datos de mercado"""
+    """Anomaly detector for market data"""
     
     def __init__(self):
         self.price_history = {}
@@ -409,7 +411,7 @@ class AnomalyDetector:
         self.spread_history = {}
         
     def detect(self, tick: MarketDataTick) -> Dict[str, Any]:
-        """Detecta anomalías en el tick"""
+        """Detects anomalies in the tick"""
         symbol = tick.symbol
         anomalies = {}
         
@@ -436,7 +438,7 @@ class AnomalyDetector:
         return anomalies if anomalies else None
     
     def _detect_price_anomaly(self, tick: MarketDataTick) -> Dict[str, Any]:
-        """Detecta anomalías de precio"""
+        """Detects price anomalies"""
         symbol = tick.symbol
         
         if symbol not in self.price_history:
@@ -472,7 +474,7 @@ class AnomalyDetector:
 
 ```python
 class ProductionDataInfrastructure:
-    """Infraestructura de datos para producción"""
+    """Data infrastructure for production"""
     
     def __init__(self, config: Dict[str, Any]):
         self.config = config
@@ -482,7 +484,7 @@ class ProductionDataInfrastructure:
         self.metrics_collector = MetricsCollector()
         
     async def deploy(self):
-        """Deploya infraestructura completa"""
+        """Deploys complete infrastructure"""
         # 1. Setup primary and backup feeds
         await self._setup_feeds()
         
@@ -496,7 +498,7 @@ class ProductionDataInfrastructure:
         await self._setup_alerting()
     
     async def _setup_feeds(self):
-        """Configura feeds primarios y de backup"""
+        """Configures primary and backup feeds"""
         # Primary feed
         primary_feed = AlpacaRealTimeFeed(
             self.config['alpaca']['api_key'],
@@ -514,22 +516,22 @@ class ProductionDataInfrastructure:
             self.data_manager.register_feed('backup_iex', backup_feed2)
     
     async def _start_monitoring(self):
-        """Inicia monitoreo de infraestructura"""
+        """Starts infrastructure monitoring"""
         monitor = InfrastructureMonitor(self.data_manager)
         await monitor.start()
     
     def _setup_alerting(self):
-        """Configura sistema de alertas"""
+        """Configures alerting system"""
         alerting = AlertingSystem()
         
-        # Alertas críticas
+        # Critical alerts
         alerting.add_alert(
             condition=lambda: self.data_manager.metrics['error_count'] > 100,
             action=self._handle_critical_error,
             severity='critical'
         )
         
-        # Alertas de latencia
+        # Latency alerts
         alerting.add_alert(
             condition=lambda: self.data_manager.metrics['avg_latency_ms'] > 100,
             action=self._handle_latency_issue,
@@ -537,7 +539,7 @@ class ProductionDataInfrastructure:
         )
 
 class CircuitBreaker:
-    """Circuit breaker para feeds de datos"""
+    """Circuit breaker for data feeds"""
     
     def __init__(self, failure_threshold: int = 5, timeout: int = 60):
         self.failure_threshold = failure_threshold
@@ -547,7 +549,7 @@ class CircuitBreaker:
         self.state = 'closed'  # closed, open, half-open
     
     def call(self, func, *args, **kwargs):
-        """Llama función con circuit breaker"""
+        """Calls function with circuit breaker"""
         if self.state == 'open':
             if time.time() - self.last_failure_time > self.timeout:
                 self.state = 'half-open'
@@ -571,7 +573,7 @@ class CircuitBreaker:
 
 # Usage Example
 async def main():
-    """Ejemplo de uso completo"""
+    """Complete usage example"""
     
     # Configuration
     config = {
@@ -611,7 +613,7 @@ if __name__ == "__main__":
 
 ```python
 class DataPerformanceOptimizer:
-    """Optimizador de performance para datos real-time"""
+    """Performance optimizer for real-time data"""
     
     def __init__(self):
         self.compression_enabled = True
@@ -619,7 +621,7 @@ class DataPerformanceOptimizer:
         self.caching_enabled = True
         
     def optimize_tick_processing(self, processor_func):
-        """Optimiza procesamiento de ticks"""
+        """Optimizes tick processing"""
         
         @functools.wraps(processor_func)
         def optimized_processor(tick: MarketDataTick):
@@ -644,7 +646,7 @@ class DataPerformanceOptimizer:
         return optimized_processor
     
     def _batch_process(self, tick: MarketDataTick, processor_func):
-        """Procesa ticks en batches para eficiencia"""
+        """Processes ticks in batches for efficiency"""
         # Implementation would accumulate ticks and process in batches
         pass
 ```
@@ -655,7 +657,7 @@ class DataPerformanceOptimizer:
 
 ```python
 def minimize_latency():
-    """Best practices para minimizar latencia"""
+    """Best practices for minimizing latency"""
     return {
         'network': [
             'Use dedicated network connections',
@@ -682,7 +684,7 @@ def minimize_latency():
 
 ```python
 class DataQualityMonitor:
-    """Monitor de calidad de datos"""
+    """Data quality monitor"""
     
     def __init__(self):
         self.quality_checks = [
@@ -693,14 +695,14 @@ class DataQualityMonitor:
         ]
     
     def validate_tick(self, tick: MarketDataTick) -> bool:
-        """Valida calidad del tick"""
+        """Validates tick quality"""
         for check in self.quality_checks:
             if not check(tick):
                 return False
         return True
     
     def _check_price_continuity(self, tick: MarketDataTick) -> bool:
-        """Verifica continuidad de precios"""
+        """Verifies price continuity"""
         # Implementation for price continuity check
         return True
 ```
@@ -709,18 +711,18 @@ class DataQualityMonitor:
 
 ```python
 class DisasterRecoveryManager:
-    """Manager de recuperación ante desastres"""
+    """Disaster recovery manager"""
     
     def __init__(self):
         self.backup_systems = []
         self.recovery_procedures = {}
         
     def add_recovery_procedure(self, failure_type: str, procedure: Callable):
-        """Agrega procedimiento de recuperación"""
+        """Adds recovery procedure"""
         self.recovery_procedures[failure_type] = procedure
     
     async def handle_failure(self, failure_type: str, context: Dict):
-        """Maneja falla del sistema"""
+        """Handles system failure"""
         if failure_type in self.recovery_procedures:
             await self.recovery_procedures[failure_type](context)
         else:
@@ -729,4 +731,4 @@ class DisasterRecoveryManager:
 
 ---
 
-*El manejo eficiente de datos en tiempo real es fundamental para el éxito en trading algorítmico. Una infraestructura robusta que combine baja latencia, alta disponibilidad y calidad de datos es esencial para strategies competitivas.*
+*Efficient real-time data handling is fundamental for success in algorithmic trading. A robust infrastructure that combines low latency, high availability, and data quality is essential for competitive strategies.*

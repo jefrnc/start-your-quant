@@ -1,42 +1,44 @@
-# F4: Tu Primera Estrategia Completa 🚀
+> 🇪🇸 [Leer en Español](README.es.md) | 🇺🇸 **English**
 
-**Módulo Fundamental 4 - Duración: 2-3 horas**
+# F4: Your First Complete Strategy
 
-## 🎯 Objetivos del Módulo
+**Fundamental Module 4 - Duration: 2-3 hours**
 
-Al completar este módulo tendrás:
-- ✅ Una estrategia de trading completa y funcional
-- ✅ Reglas claras de entrada, salida y gestión de riesgo
-- ✅ Un backtest que prueba tu estrategia con datos reales
-- ✅ Métricas para evaluar si tu estrategia es rentable
+## Module Objectives
 
-## 📊 La Estrategia: "Golden Cross con Filtros"
+After completing this module you will have:
+- A complete and functional trading strategy
+- Clear entry, exit, and risk management rules
+- A backtest that proves your strategy with real data
+- Metrics to evaluate whether your strategy is profitable
 
-Vamos a construir una estrategia **real y probada** paso a paso.
+## The Strategy: "Golden Cross with Filters"
 
-### ¿Por qué esta estrategia?
-- ✅ **Simple pero efectiva**: Fácil de entender y programar
-- ✅ **Probada históricamente**: Usada por fondos institucionales
-- ✅ **Adaptable**: Funciona en diferentes mercados
-- ✅ **Buena para aprender**: Incluye todos los componentes esenciales
+We will build a **real and proven** strategy step by step.
 
-### Componentes de la Estrategia
+### Why This Strategy?
+- **Simple but effective**: Easy to understand and program
+- **Historically proven**: Used by institutional funds
+- **Adaptable**: Works in different markets
+- **Great for learning**: Includes all essential components
 
-| Componente | Descripción |
-|------------|-------------|
-| **Señal Principal** | Golden Cross (SMA 50 cruza SMA 200) |
-| **Filtro 1** | RSI no en sobrecompra (< 70) |
-| **Filtro 2** | Volumen > promedio 20 días |
-| **Stop Loss** | 5% desde entrada |
-| **Take Profit** | 15% desde entrada |
-| **Gestión de Riesgo** | Máximo 2% del capital por trade |
+### Strategy Components
 
-## 🔨 Paso 1: Construir la Estrategia
+| Component | Description |
+|-----------|-------------|
+| **Main Signal** | Golden Cross (SMA 50 crosses SMA 200) |
+| **Filter 1** | RSI not overbought (< 70) |
+| **Filter 2** | Volume > 20-day average |
+| **Stop Loss** | 5% from entry |
+| **Take Profit** | 15% from entry |
+| **Risk Management** | Maximum 2% of capital per trade |
 
-### Código Base de la Estrategia
+## Step 1: Build the Strategy
+
+### Strategy Base Code
 
 ```python
-# Para Google Colab
+# For Google Colab
 !pip install yfinance pandas numpy matplotlib
 
 import yfinance as yf
@@ -47,63 +49,63 @@ from datetime import datetime, timedelta
 
 class GoldenCrossStrategy:
     """
-    Estrategia Golden Cross con Filtros de Calidad
+    Golden Cross Strategy with Quality Filters
     """
 
-    def __init__(self, symbol, start_date, end_date, capital_inicial=10000):
+    def __init__(self, symbol, start_date, end_date, initial_capital=10000):
         self.symbol = symbol
         self.start_date = start_date
         self.end_date = end_date
-        self.capital_inicial = capital_inicial
-        self.capital = capital_inicial
+        self.initial_capital = initial_capital
+        self.capital = initial_capital
 
-        # Parámetros de la estrategia
-        self.sma_corta = 50
-        self.sma_larga = 200
-        self.rsi_periodo = 14
-        self.rsi_sobrecompra = 70
-        self.volumen_filtro = 1.2  # 20% sobre promedio
+        # Strategy parameters
+        self.short_sma = 50
+        self.long_sma = 200
+        self.rsi_period = 14
+        self.rsi_overbought = 70
+        self.volume_filter = 1.2  # 20% above average
         self.stop_loss_pct = 0.05   # 5%
         self.take_profit_pct = 0.15 # 15%
-        self.riesgo_por_trade = 0.02 # 2% del capital
+        self.risk_per_trade = 0.02 # 2% of capital
 
-        # Datos para tracking
+        # Tracking data
         self.trades = []
-        self.posicion_actual = None
+        self.current_position = None
 
-    def descargar_datos(self):
-        """Descarga y prepara los datos"""
-        print(f"📊 Descargando datos de {self.symbol}...")
+    def download_data(self):
+        """Downloads and prepares the data"""
+        print(f"Downloading data for {self.symbol}...")
 
-        # Descargar con margen extra para calcular indicadores
-        fecha_inicio_ext = pd.to_datetime(self.start_date) - timedelta(days=300)
-        self.data = yf.download(self.symbol, start=fecha_inicio_ext, end=self.end_date)
+        # Download with extra margin to calculate indicators
+        extended_start = pd.to_datetime(self.start_date) - timedelta(days=300)
+        self.data = yf.download(self.symbol, start=extended_start, end=self.end_date)
 
         if self.data.empty:
-            raise ValueError(f"No se encontraron datos para {self.symbol}")
+            raise ValueError(f"No data found for {self.symbol}")
 
-        print(f"✅ Descargados {len(self.data)} días de datos")
+        print(f"Downloaded {len(self.data)} days of data")
 
-    def calcular_indicadores(self):
-        """Calcula todos los indicadores necesarios"""
-        print("🧮 Calculando indicadores...")
+    def calculate_indicators(self):
+        """Calculates all required indicators"""
+        print("Calculating indicators...")
 
-        # Medias móviles
-        self.data['SMA_50'] = self.data['Close'].rolling(window=self.sma_corta).mean()
-        self.data['SMA_200'] = self.data['Close'].rolling(window=self.sma_larga).mean()
+        # Moving averages
+        self.data['SMA_50'] = self.data['Close'].rolling(window=self.short_sma).mean()
+        self.data['SMA_200'] = self.data['Close'].rolling(window=self.long_sma).mean()
 
         # RSI
         delta = self.data['Close'].diff()
-        ganancia = (delta.where(delta > 0, 0)).rolling(window=self.rsi_periodo).mean()
-        perdida = (-delta.where(delta < 0, 0)).rolling(window=self.rsi_periodo).mean()
-        rs = ganancia / perdida
+        gain = (delta.where(delta > 0, 0)).rolling(window=self.rsi_period).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(window=self.rsi_period).mean()
+        rs = gain / loss
         self.data['RSI'] = 100 - (100 / (1 + rs))
 
-        # Volumen promedio
+        # Average volume
         self.data['Volume_MA'] = self.data['Volume'].rolling(window=20).mean()
         self.data['Volume_Ratio'] = self.data['Volume'] / self.data['Volume_MA']
 
-        # Señales de cruce
+        # Crossover signals
         self.data['Golden_Cross'] = (
             (self.data['SMA_50'] > self.data['SMA_200']) &
             (self.data['SMA_50'].shift(1) <= self.data['SMA_200'].shift(1))
@@ -114,187 +116,187 @@ class GoldenCrossStrategy:
             (self.data['SMA_50'].shift(1) >= self.data['SMA_200'].shift(1))
         )
 
-        # Limpiar NaN del inicio
+        # Clean NaN from beginning
         self.data = self.data[self.data.index >= self.start_date].dropna()
 
-        print("✅ Indicadores calculados")
+        print("Indicators calculated")
 
-    def generar_señales(self):
-        """Genera señales de compra/venta basadas en la estrategia"""
-        print("🎯 Generando señales de trading...")
+    def generate_signals(self):
+        """Generates buy/sell signals based on the strategy"""
+        print("Generating trading signals...")
 
-        self.data['Señal'] = 0  # 0: Sin posición, 1: Compra, -1: Venta
+        self.data['Signal'] = 0  # 0: No position, 1: Buy, -1: Sell
 
         for i in range(len(self.data)):
-            fecha = self.data.index[i]
+            date = self.data.index[i]
             row = self.data.iloc[i]
 
-            # SEÑAL DE COMPRA
+            # BUY SIGNAL
             if (row['Golden_Cross'] and
-                row['RSI'] < self.rsi_sobrecompra and
-                row['Volume_Ratio'] > self.volumen_filtro and
-                self.posicion_actual is None):
+                row['RSI'] < self.rsi_overbought and
+                row['Volume_Ratio'] > self.volume_filter and
+                self.current_position is None):
 
-                self.data.loc[fecha, 'Señal'] = 1
-                self.abrir_posicion(fecha, row['Close'], 'LONG')
+                self.data.loc[date, 'Signal'] = 1
+                self.open_position(date, row['Close'], 'LONG')
 
-            # VERIFICAR STOPS SI HAY POSICIÓN
-            elif self.posicion_actual is not None:
-                precio_actual = row['Close']
-                precio_entrada = self.posicion_actual['precio_entrada']
+            # CHECK STOPS IF POSITION EXISTS
+            elif self.current_position is not None:
+                current_price = row['Close']
+                entry_price = self.current_position['entry_price']
 
                 # Stop Loss
-                if precio_actual <= precio_entrada * (1 - self.stop_loss_pct):
-                    self.data.loc[fecha, 'Señal'] = -1
-                    self.cerrar_posicion(fecha, precio_actual, 'STOP_LOSS')
+                if current_price <= entry_price * (1 - self.stop_loss_pct):
+                    self.data.loc[date, 'Signal'] = -1
+                    self.close_position(date, current_price, 'STOP_LOSS')
 
                 # Take Profit
-                elif precio_actual >= precio_entrada * (1 + self.take_profit_pct):
-                    self.data.loc[fecha, 'Señal'] = -1
-                    self.cerrar_posicion(fecha, precio_actual, 'TAKE_PROFIT')
+                elif current_price >= entry_price * (1 + self.take_profit_pct):
+                    self.data.loc[date, 'Signal'] = -1
+                    self.close_position(date, current_price, 'TAKE_PROFIT')
 
-                # Death Cross (salida por señal)
+                # Death Cross (signal exit)
                 elif row['Death_Cross']:
-                    self.data.loc[fecha, 'Señal'] = -1
-                    self.cerrar_posicion(fecha, precio_actual, 'DEATH_CROSS')
+                    self.data.loc[date, 'Signal'] = -1
+                    self.close_position(date, current_price, 'DEATH_CROSS')
 
-        # Cerrar posición al final si queda abierta
-        if self.posicion_actual is not None:
-            ultimo_precio = self.data['Close'].iloc[-1]
-            self.cerrar_posicion(self.data.index[-1], ultimo_precio, 'FIN_PERIODO')
+        # Close position at end if still open
+        if self.current_position is not None:
+            last_price = self.data['Close'].iloc[-1]
+            self.close_position(self.data.index[-1], last_price, 'END_OF_PERIOD')
 
-        print(f"✅ Generadas {len(self.trades)} operaciones")
+        print(f"Generated {len(self.trades)} trades")
 
-    def abrir_posicion(self, fecha, precio, tipo):
-        """Abre una nueva posición"""
+    def open_position(self, date, price, type):
+        """Opens a new position"""
 
-        # Calcular tamaño de posición basado en riesgo
-        capital_a_riesgo = self.capital * self.riesgo_por_trade
-        stop_loss_precio = precio * (1 - self.stop_loss_pct)
-        riesgo_por_accion = precio - stop_loss_precio
-        num_acciones = int(capital_a_riesgo / riesgo_por_accion)
+        # Calculate position size based on risk
+        capital_at_risk = self.capital * self.risk_per_trade
+        stop_loss_price = price * (1 - self.stop_loss_pct)
+        risk_per_share = price - stop_loss_price
+        num_shares = int(capital_at_risk / risk_per_share)
 
-        # Limitar al capital disponible
-        max_acciones = int(self.capital * 0.95 / precio)  # Usar máximo 95% del capital
-        num_acciones = min(num_acciones, max_acciones)
+        # Limit to available capital
+        max_shares = int(self.capital * 0.95 / price)  # Use max 95% of capital
+        num_shares = min(num_shares, max_shares)
 
-        self.posicion_actual = {
-            'fecha_entrada': fecha,
-            'precio_entrada': precio,
-            'num_acciones': num_acciones,
-            'tipo': tipo,
-            'stop_loss': stop_loss_precio,
-            'take_profit': precio * (1 + self.take_profit_pct)
+        self.current_position = {
+            'entry_date': date,
+            'entry_price': price,
+            'num_shares': num_shares,
+            'type': type,
+            'stop_loss': stop_loss_price,
+            'take_profit': price * (1 + self.take_profit_pct)
         }
 
-    def cerrar_posicion(self, fecha, precio, razon):
-        """Cierra la posición actual y registra el trade"""
+    def close_position(self, date, price, reason):
+        """Closes the current position and records the trade"""
 
-        if self.posicion_actual is None:
+        if self.current_position is None:
             return
 
-        # Calcular resultado
-        precio_entrada = self.posicion_actual['precio_entrada']
-        num_acciones = self.posicion_actual['num_acciones']
-        ganancia_perdida = (precio - precio_entrada) * num_acciones
-        retorno_pct = ((precio - precio_entrada) / precio_entrada) * 100
+        # Calculate result
+        entry_price = self.current_position['entry_price']
+        num_shares = self.current_position['num_shares']
+        profit_loss = (price - entry_price) * num_shares
+        return_pct = ((price - entry_price) / entry_price) * 100
 
-        # Actualizar capital
-        self.capital += ganancia_perdida
+        # Update capital
+        self.capital += profit_loss
 
-        # Registrar trade
+        # Record trade
         trade = {
-            'fecha_entrada': self.posicion_actual['fecha_entrada'],
-            'fecha_salida': fecha,
-            'precio_entrada': precio_entrada,
-            'precio_salida': precio,
-            'num_acciones': num_acciones,
-            'ganancia_perdida': ganancia_perdida,
-            'retorno_pct': retorno_pct,
-            'razon_salida': razon,
-            'capital_despues': self.capital
+            'entry_date': self.current_position['entry_date'],
+            'exit_date': date,
+            'entry_price': entry_price,
+            'exit_price': price,
+            'num_shares': num_shares,
+            'profit_loss': profit_loss,
+            'return_pct': return_pct,
+            'exit_reason': reason,
+            'capital_after': self.capital
         }
         self.trades.append(trade)
 
-        # Limpiar posición
-        self.posicion_actual = None
+        # Clear position
+        self.current_position = None
 
-    def calcular_metricas(self):
-        """Calcula métricas de performance de la estrategia"""
+    def calculate_metrics(self):
+        """Calculates strategy performance metrics"""
 
         if not self.trades:
-            print("❌ No hay trades para analizar")
+            print("No trades to analyze")
             return None
 
         df_trades = pd.DataFrame(self.trades)
 
-        # Métricas básicas
+        # Basic metrics
         total_trades = len(df_trades)
-        trades_ganadores = len(df_trades[df_trades['ganancia_perdida'] > 0])
-        trades_perdedores = len(df_trades[df_trades['ganancia_perdida'] < 0])
-        win_rate = (trades_ganadores / total_trades) * 100
+        winning_trades = len(df_trades[df_trades['profit_loss'] > 0])
+        losing_trades = len(df_trades[df_trades['profit_loss'] < 0])
+        win_rate = (winning_trades / total_trades) * 100
 
-        # Ganancias y pérdidas
-        total_ganancia = df_trades[df_trades['ganancia_perdida'] > 0]['ganancia_perdida'].sum()
-        total_perdida = abs(df_trades[df_trades['ganancia_perdida'] < 0]['ganancia_perdida'].sum())
-        profit_factor = total_ganancia / total_perdida if total_perdida > 0 else np.inf
+        # Gains and losses
+        total_gains = df_trades[df_trades['profit_loss'] > 0]['profit_loss'].sum()
+        total_losses = abs(df_trades[df_trades['profit_loss'] < 0]['profit_loss'].sum())
+        profit_factor = total_gains / total_losses if total_losses > 0 else np.inf
 
-        # Retornos
-        retorno_total = ((self.capital - self.capital_inicial) / self.capital_inicial) * 100
-        promedio_ganancia = df_trades[df_trades['ganancia_perdida'] > 0]['retorno_pct'].mean()
-        promedio_perdida = df_trades[df_trades['ganancia_perdida'] < 0]['retorno_pct'].mean()
+        # Returns
+        total_return = ((self.capital - self.initial_capital) / self.initial_capital) * 100
+        avg_win = df_trades[df_trades['profit_loss'] > 0]['return_pct'].mean()
+        avg_loss = df_trades[df_trades['profit_loss'] < 0]['return_pct'].mean()
 
-        # Drawdown máximo
-        capital_maximo = self.capital_inicial
+        # Maximum drawdown
+        peak_capital = self.initial_capital
         max_drawdown = 0
         for trade in self.trades:
-            capital_maximo = max(capital_maximo, trade['capital_despues'])
-            drawdown = ((capital_maximo - trade['capital_despues']) / capital_maximo) * 100
+            peak_capital = max(peak_capital, trade['capital_after'])
+            drawdown = ((peak_capital - trade['capital_after']) / peak_capital) * 100
             max_drawdown = max(max_drawdown, drawdown)
 
         # Buy & Hold comparison
-        precio_inicial = self.data['Close'].iloc[0]
-        precio_final = self.data['Close'].iloc[-1]
-        buy_hold_return = ((precio_final - precio_inicial) / precio_inicial) * 100
+        initial_price = self.data['Close'].iloc[0]
+        final_price = self.data['Close'].iloc[-1]
+        buy_hold_return = ((final_price - initial_price) / initial_price) * 100
 
-        metricas = {
+        metrics = {
             'total_trades': total_trades,
-            'trades_ganadores': trades_ganadores,
-            'trades_perdedores': trades_perdedores,
+            'winning_trades': winning_trades,
+            'losing_trades': losing_trades,
             'win_rate': win_rate,
             'profit_factor': profit_factor,
-            'retorno_total': retorno_total,
-            'promedio_ganancia': promedio_ganancia,
-            'promedio_perdida': promedio_perdida,
+            'total_return': total_return,
+            'avg_win': avg_win,
+            'avg_loss': avg_loss,
             'max_drawdown': max_drawdown,
-            'capital_final': self.capital,
+            'final_capital': self.capital,
             'buy_hold_return': buy_hold_return
         }
 
-        return metricas
+        return metrics
 
-    def visualizar_resultados(self):
-        """Crea visualizaciones de los resultados"""
+    def visualize_results(self):
+        """Creates result visualizations"""
 
         fig, axes = plt.subplots(4, 1, figsize=(15, 16), sharex=True)
 
-        # 1. Precio y Señales
+        # 1. Price and Signals
         ax1 = axes[0]
-        ax1.plot(self.data.index, self.data['Close'], label='Precio', linewidth=1, alpha=0.7)
+        ax1.plot(self.data.index, self.data['Close'], label='Price', linewidth=1, alpha=0.7)
         ax1.plot(self.data.index, self.data['SMA_50'], label='SMA 50', linewidth=1, alpha=0.7)
         ax1.plot(self.data.index, self.data['SMA_200'], label='SMA 200', linewidth=1, alpha=0.7)
 
-        # Marcar entradas y salidas
-        entradas = self.data[self.data['Señal'] == 1]
-        salidas = self.data[self.data['Señal'] == -1]
+        # Mark entries and exits
+        entries = self.data[self.data['Signal'] == 1]
+        exits = self.data[self.data['Signal'] == -1]
 
-        ax1.scatter(entradas.index, entradas['Close'], color='green', marker='^',
-                   s=100, label=f'Compras ({len(entradas)})', zorder=5)
-        ax1.scatter(salidas.index, salidas['Close'], color='red', marker='v',
-                   s=100, label=f'Ventas ({len(salidas)})', zorder=5)
+        ax1.scatter(entries.index, entries['Close'], color='green', marker='^',
+                   s=100, label=f'Buys ({len(entries)})', zorder=5)
+        ax1.scatter(exits.index, exits['Close'], color='red', marker='v',
+                   s=100, label=f'Sells ({len(exits)})', zorder=5)
 
-        ax1.set_title(f'{self.symbol} - Estrategia Golden Cross con Filtros', fontsize=14)
-        ax1.set_ylabel('Precio ($)')
+        ax1.set_title(f'{self.symbol} - Golden Cross Strategy with Filters', fontsize=14)
+        ax1.set_ylabel('Price ($)')
         ax1.legend(loc='upper left')
         ax1.grid(True, alpha=0.3)
 
@@ -307,334 +309,334 @@ class GoldenCrossStrategy:
         ax2.set_ylim(0, 100)
         ax2.grid(True, alpha=0.3)
 
-        # 3. Volumen
+        # 3. Volume
         ax3 = axes[2]
-        colors = ['green' if s == 1 else 'red' if s == -1 else 'gray' for s in self.data['Señal']]
+        colors = ['green' if s == 1 else 'red' if s == -1 else 'gray' for s in self.data['Signal']]
         ax3.bar(self.data.index, self.data['Volume'], color=colors, alpha=0.5)
         ax3.plot(self.data.index, self.data['Volume_MA'], color='blue', linewidth=1)
-        ax3.set_ylabel('Volumen')
+        ax3.set_ylabel('Volume')
         ax3.grid(True, alpha=0.3)
 
         # 4. Equity Curve
         ax4 = axes[3]
         if self.trades:
-            equity_data = [self.capital_inicial]
+            equity_data = [self.initial_capital]
             equity_dates = [self.data.index[0]]
 
             for trade in self.trades:
-                equity_dates.append(trade['fecha_salida'])
-                equity_data.append(trade['capital_despues'])
+                equity_dates.append(trade['exit_date'])
+                equity_data.append(trade['capital_after'])
 
-            ax4.plot(equity_dates, equity_data, color='blue', linewidth=2, label='Estrategia')
+            ax4.plot(equity_dates, equity_data, color='blue', linewidth=2, label='Strategy')
 
-            # Comparar con Buy & Hold
-            buy_hold_values = self.capital_inicial * (self.data['Close'] / self.data['Close'].iloc[0])
+            # Compare with Buy & Hold
+            buy_hold_values = self.initial_capital * (self.data['Close'] / self.data['Close'].iloc[0])
             ax4.plot(self.data.index, buy_hold_values, color='gray', linewidth=1,
                     alpha=0.7, label='Buy & Hold')
 
             ax4.set_ylabel('Capital ($)')
-            ax4.set_xlabel('Fecha')
+            ax4.set_xlabel('Date')
             ax4.legend()
             ax4.grid(True, alpha=0.3)
 
         plt.tight_layout()
         plt.show()
 
-    def ejecutar_backtest(self):
-        """Ejecuta el backtest completo"""
-        print("\\n" + "="*60)
-        print(f"🚀 BACKTESTING: {self.symbol}")
-        print(f"📅 Período: {self.start_date} a {self.end_date}")
-        print(f"💰 Capital Inicial: ${self.capital_inicial:,.2f}")
+    def run_backtest(self):
+        """Runs the complete backtest"""
+        print("\n" + "="*60)
+        print(f"BACKTESTING: {self.symbol}")
+        print(f"Period: {self.start_date} to {self.end_date}")
+        print(f"Initial Capital: ${self.initial_capital:,.2f}")
         print("="*60)
 
-        # Ejecutar pasos
-        self.descargar_datos()
-        self.calcular_indicadores()
-        self.generar_señales()
+        # Run steps
+        self.download_data()
+        self.calculate_indicators()
+        self.generate_signals()
 
-        # Calcular métricas
-        metricas = self.calcular_metricas()
+        # Calculate metrics
+        metrics = self.calculate_metrics()
 
-        if metricas:
-            print("\\n📊 RESULTADOS DEL BACKTEST:")
+        if metrics:
+            print("\nBACKTEST RESULTS:")
             print("="*60)
-            print(f"Total de Operaciones: {metricas['total_trades']}")
-            print(f"Operaciones Ganadoras: {metricas['trades_ganadores']}")
-            print(f"Operaciones Perdedoras: {metricas['trades_perdedores']}")
-            print(f"\\n✅ Win Rate: {metricas['win_rate']:.2f}%")
-            print(f"📈 Profit Factor: {metricas['profit_factor']:.2f}")
-            print(f"\\n💰 Capital Final: ${metricas['capital_final']:,.2f}")
-            print(f"📊 Retorno Total: {metricas['retorno_total']:.2f}%")
-            print(f"📉 Max Drawdown: {metricas['max_drawdown']:.2f}%")
-            print(f"\\n🔄 Buy & Hold Return: {metricas['buy_hold_return']:.2f}%")
+            print(f"Total Trades: {metrics['total_trades']}")
+            print(f"Winning Trades: {metrics['winning_trades']}")
+            print(f"Losing Trades: {metrics['losing_trades']}")
+            print(f"\nWin Rate: {metrics['win_rate']:.2f}%")
+            print(f"Profit Factor: {metrics['profit_factor']:.2f}")
+            print(f"\nFinal Capital: ${metrics['final_capital']:,.2f}")
+            print(f"Total Return: {metrics['total_return']:.2f}%")
+            print(f"Max Drawdown: {metrics['max_drawdown']:.2f}%")
+            print(f"\nBuy & Hold Return: {metrics['buy_hold_return']:.2f}%")
 
-            if metricas['retorno_total'] > metricas['buy_hold_return']:
-                print("\\n✅ ¡La estrategia SUPERA a Buy & Hold!")
+            if metrics['total_return'] > metrics['buy_hold_return']:
+                print("\nThe strategy BEATS Buy & Hold!")
             else:
-                print("\\n❌ La estrategia NO supera a Buy & Hold")
+                print("\nThe strategy DOES NOT beat Buy & Hold")
 
-        # Visualizar
-        self.visualizar_resultados()
+        # Visualize
+        self.visualize_results()
 
-        return metricas
+        return metrics
 
-# EJECUTAR LA ESTRATEGIA
+# RUN THE STRATEGY
 if __name__ == "__main__":
-    # Configurar parámetros
-    SYMBOL = 'AAPL'  # Puedes cambiar el símbolo
+    # Configure parameters
+    SYMBOL = 'AAPL'  # You can change the symbol
     START_DATE = '2020-01-01'
     END_DATE = '2024-01-01'
-    CAPITAL_INICIAL = 10000
+    INITIAL_CAPITAL = 10000
 
-    # Crear y ejecutar estrategia
-    estrategia = GoldenCrossStrategy(SYMBOL, START_DATE, END_DATE, CAPITAL_INICIAL)
-    resultados = estrategia.ejecutar_backtest()
+    # Create and run strategy
+    strategy = GoldenCrossStrategy(SYMBOL, START_DATE, END_DATE, INITIAL_CAPITAL)
+    results = strategy.run_backtest()
 ```
 
-## 📈 Paso 2: Optimizar la Estrategia
+## Step 2: Optimize the Strategy
 
-### Probando Diferentes Parámetros
+### Testing Different Parameters
 
 ```python
-def optimizar_parametros(symbol='AAPL', start_date='2020-01-01', end_date='2024-01-01'):
-    """Prueba diferentes combinaciones de parámetros"""
+def optimize_parameters(symbol='AAPL', start_date='2020-01-01', end_date='2024-01-01'):
+    """Tests different parameter combinations"""
 
-    print("🔧 OPTIMIZACIÓN DE PARÁMETROS")
+    print("PARAMETER OPTIMIZATION")
     print("="*60)
 
-    resultados_optimizacion = []
+    optimization_results = []
 
-    # Parámetros a probar
-    sma_cortas = [20, 30, 50]
-    sma_largas = [100, 150, 200]
+    # Parameters to test
+    short_smas = [20, 30, 50]
+    long_smas = [100, 150, 200]
     stop_losses = [0.03, 0.05, 0.07]
     take_profits = [0.10, 0.15, 0.20]
 
-    mejor_resultado = None
-    mejor_retorno = -np.inf
+    best_result = None
+    best_return = -np.inf
 
-    for sma_c in sma_cortas:
-        for sma_l in sma_largas:
-            if sma_c >= sma_l:
+    for sma_s in short_smas:
+        for sma_l in long_smas:
+            if sma_s >= sma_l:
                 continue
 
             for sl in stop_losses:
                 for tp in take_profits:
-                    # Crear estrategia con estos parámetros
-                    estrategia = GoldenCrossStrategy(symbol, start_date, end_date)
-                    estrategia.sma_corta = sma_c
-                    estrategia.sma_larga = sma_l
-                    estrategia.stop_loss_pct = sl
-                    estrategia.take_profit_pct = tp
+                    # Create strategy with these parameters
+                    strategy = GoldenCrossStrategy(symbol, start_date, end_date)
+                    strategy.short_sma = sma_s
+                    strategy.long_sma = sma_l
+                    strategy.stop_loss_pct = sl
+                    strategy.take_profit_pct = tp
 
-                    # Ejecutar backtest silenciosamente
+                    # Run backtest silently
                     try:
-                        estrategia.descargar_datos()
-                        estrategia.calcular_indicadores()
-                        estrategia.generar_señales()
-                        metricas = estrategia.calcular_metricas()
+                        strategy.download_data()
+                        strategy.calculate_indicators()
+                        strategy.generate_signals()
+                        metrics = strategy.calculate_metrics()
 
-                        if metricas and metricas['total_trades'] > 0:
-                            resultado = {
-                                'sma_corta': sma_c,
-                                'sma_larga': sma_l,
+                        if metrics and metrics['total_trades'] > 0:
+                            result = {
+                                'short_sma': sma_s,
+                                'long_sma': sma_l,
                                 'stop_loss': sl,
                                 'take_profit': tp,
-                                'retorno': metricas['retorno_total'],
-                                'win_rate': metricas['win_rate'],
-                                'profit_factor': metricas['profit_factor'],
-                                'max_drawdown': metricas['max_drawdown'],
-                                'num_trades': metricas['total_trades']
+                                'return': metrics['total_return'],
+                                'win_rate': metrics['win_rate'],
+                                'profit_factor': metrics['profit_factor'],
+                                'max_drawdown': metrics['max_drawdown'],
+                                'num_trades': metrics['total_trades']
                             }
 
-                            resultados_optimizacion.append(resultado)
+                            optimization_results.append(result)
 
-                            if metricas['retorno_total'] > mejor_retorno:
-                                mejor_retorno = metricas['retorno_total']
-                                mejor_resultado = resultado
+                            if metrics['total_return'] > best_return:
+                                best_return = metrics['total_return']
+                                best_result = result
 
                     except:
                         continue
 
-    # Mostrar resultados
-    if mejor_resultado:
-        print("\\n🏆 MEJORES PARÁMETROS ENCONTRADOS:")
+    # Show results
+    if best_result:
+        print("\nBEST PARAMETERS FOUND:")
         print("="*60)
-        print(f"SMA Corta: {mejor_resultado['sma_corta']}")
-        print(f"SMA Larga: {mejor_resultado['sma_larga']}")
-        print(f"Stop Loss: {mejor_resultado['stop_loss']*100:.1f}%")
-        print(f"Take Profit: {mejor_resultado['take_profit']*100:.1f}%")
-        print(f"\\nRetorno: {mejor_resultado['retorno']:.2f}%")
-        print(f"Win Rate: {mejor_resultado['win_rate']:.2f}%")
-        print(f"Profit Factor: {mejor_resultado['profit_factor']:.2f}")
-        print(f"Max Drawdown: {mejor_resultado['max_drawdown']:.2f}%")
+        print(f"Short SMA: {best_result['short_sma']}")
+        print(f"Long SMA: {best_result['long_sma']}")
+        print(f"Stop Loss: {best_result['stop_loss']*100:.1f}%")
+        print(f"Take Profit: {best_result['take_profit']*100:.1f}%")
+        print(f"\nReturn: {best_result['return']:.2f}%")
+        print(f"Win Rate: {best_result['win_rate']:.2f}%")
+        print(f"Profit Factor: {best_result['profit_factor']:.2f}")
+        print(f"Max Drawdown: {best_result['max_drawdown']:.2f}%")
 
-    return pd.DataFrame(resultados_optimizacion)
+    return pd.DataFrame(optimization_results)
 
-# Ejecutar optimización
-df_optimizacion = optimizar_parametros('AAPL')
+# Run optimization
+df_optimization = optimize_parameters('AAPL')
 
-# Ver top 5 combinaciones
-print("\\n📊 TOP 5 COMBINACIONES:")
-print(df_optimizacion.nlargest(5, 'retorno')[['sma_corta', 'sma_larga', 'stop_loss', 'take_profit', 'retorno', 'win_rate']])
+# View top 5 combinations
+print("\nTOP 5 COMBINATIONS:")
+print(df_optimization.nlargest(5, 'return')[['short_sma', 'long_sma', 'stop_loss', 'take_profit', 'return', 'win_rate']])
 ```
 
-## 🎯 Paso 3: Validación y Mejoras
+## Step 3: Validation and Improvements
 
-### Analizando Debilidades
+### Analyzing Weaknesses
 
 ```python
-def analizar_trades_detallado(estrategia):
-    """Análisis detallado de cada trade"""
+def detailed_trade_analysis(strategy):
+    """Detailed analysis of each trade"""
 
-    if not estrategia.trades:
-        print("No hay trades para analizar")
+    if not strategy.trades:
+        print("No trades to analyze")
         return
 
-    df_trades = pd.DataFrame(estrategia.trades)
+    df_trades = pd.DataFrame(strategy.trades)
 
-    print("\\n📋 ANÁLISIS DETALLADO DE TRADES:")
+    print("\nDETAILED TRADE ANALYSIS:")
     print("="*60)
 
-    # Análisis por razón de salida
-    print("\\n📊 Distribución de Salidas:")
-    for razon in df_trades['razon_salida'].unique():
-        trades_razon = df_trades[df_trades['razon_salida'] == razon]
-        avg_return = trades_razon['retorno_pct'].mean()
-        count = len(trades_razon)
-        print(f"{razon}: {count} trades, Retorno promedio: {avg_return:.2f}%")
+    # Analysis by exit reason
+    print("\nExit Distribution:")
+    for reason in df_trades['exit_reason'].unique():
+        reason_trades = df_trades[df_trades['exit_reason'] == reason]
+        avg_return = reason_trades['return_pct'].mean()
+        count = len(reason_trades)
+        print(f"{reason}: {count} trades, Average return: {avg_return:.2f}%")
 
-    # Duración de trades
-    df_trades['duracion'] = (pd.to_datetime(df_trades['fecha_salida']) -
-                            pd.to_datetime(df_trades['fecha_entrada'])).dt.days
+    # Trade duration
+    df_trades['duration'] = (pd.to_datetime(df_trades['exit_date']) -
+                            pd.to_datetime(df_trades['entry_date'])).dt.days
 
-    print(f"\\n⏱️ Duración promedio: {df_trades['duracion'].mean():.1f} días")
-    print(f"Duración máxima: {df_trades['duracion'].max()} días")
-    print(f"Duración mínima: {df_trades['duracion'].min()} días")
+    print(f"\nAverage duration: {df_trades['duration'].mean():.1f} days")
+    print(f"Maximum duration: {df_trades['duration'].max()} days")
+    print(f"Minimum duration: {df_trades['duration'].min()} days")
 
-    # Mejor y peor trade
-    mejor_trade = df_trades.loc[df_trades['ganancia_perdida'].idxmax()]
-    peor_trade = df_trades.loc[df_trades['ganancia_perdida'].idxmin()]
+    # Best and worst trade
+    best_trade = df_trades.loc[df_trades['profit_loss'].idxmax()]
+    worst_trade = df_trades.loc[df_trades['profit_loss'].idxmin()]
 
-    print(f"\\n🏆 Mejor Trade:")
-    print(f"  Entrada: {mejor_trade['fecha_entrada']}")
-    print(f"  Ganancia: ${mejor_trade['ganancia_perdida']:.2f} ({mejor_trade['retorno_pct']:.2f}%)")
+    print(f"\nBest Trade:")
+    print(f"  Entry: {best_trade['entry_date']}")
+    print(f"  Gain: ${best_trade['profit_loss']:.2f} ({best_trade['return_pct']:.2f}%)")
 
-    print(f"\\n😞 Peor Trade:")
-    print(f"  Entrada: {peor_trade['fecha_entrada']}")
-    print(f"  Pérdida: ${peor_trade['ganancia_perdida']:.2f} ({peor_trade['retorno_pct']:.2f}%)")
+    print(f"\nWorst Trade:")
+    print(f"  Entry: {worst_trade['entry_date']}")
+    print(f"  Loss: ${worst_trade['profit_loss']:.2f} ({worst_trade['return_pct']:.2f}%)")
 
     return df_trades
 
-# Analizar trades de la última estrategia
-df_trades = analizar_trades_detallado(estrategia)
+# Analyze trades from the last strategy
+df_trades = detailed_trade_analysis(strategy)
 ```
 
-## 🏆 Proyecto Final: Multi-Estrategia
+## Final Project: Multi-Strategy
 
-### Comparando Múltiples Estrategias
+### Comparing Multiple Strategies
 
 ```python
-def comparar_estrategias():
-    """Compara diferentes estrategias en el mismo período"""
+def compare_strategies():
+    """Compares different strategies over the same period"""
 
-    estrategias_config = [
-        {'nombre': 'Golden Cross Original', 'sma_c': 50, 'sma_l': 200, 'sl': 0.05, 'tp': 0.15},
-        {'nombre': 'Golden Cross Agresivo', 'sma_c': 20, 'sma_l': 50, 'sl': 0.03, 'tp': 0.10},
-        {'nombre': 'Golden Cross Conservador', 'sma_c': 50, 'sma_l': 200, 'sl': 0.07, 'tp': 0.20},
-        {'nombre': 'Golden Cross Rápido', 'sma_c': 10, 'sma_l': 30, 'sl': 0.02, 'tp': 0.05},
+    strategy_configs = [
+        {'name': 'Golden Cross Original', 'sma_s': 50, 'sma_l': 200, 'sl': 0.05, 'tp': 0.15},
+        {'name': 'Golden Cross Aggressive', 'sma_s': 20, 'sma_l': 50, 'sl': 0.03, 'tp': 0.10},
+        {'name': 'Golden Cross Conservative', 'sma_s': 50, 'sma_l': 200, 'sl': 0.07, 'tp': 0.20},
+        {'name': 'Golden Cross Fast', 'sma_s': 10, 'sma_l': 30, 'sl': 0.02, 'tp': 0.05},
     ]
 
-    resultados_comparacion = []
+    comparison_results = []
 
-    for config in estrategias_config:
-        print(f"\\nProbando: {config['nombre']}...")
+    for config in strategy_configs:
+        print(f"\nTesting: {config['name']}...")
 
-        estrategia = GoldenCrossStrategy('SPY', '2020-01-01', '2024-01-01', 10000)
-        estrategia.sma_corta = config['sma_c']
-        estrategia.sma_larga = config['sma_l']
-        estrategia.stop_loss_pct = config['sl']
-        estrategia.take_profit_pct = config['tp']
+        strategy = GoldenCrossStrategy('SPY', '2020-01-01', '2024-01-01', 10000)
+        strategy.short_sma = config['sma_s']
+        strategy.long_sma = config['sma_l']
+        strategy.stop_loss_pct = config['sl']
+        strategy.take_profit_pct = config['tp']
 
-        estrategia.descargar_datos()
-        estrategia.calcular_indicadores()
-        estrategia.generar_señales()
-        metricas = estrategia.calcular_metricas()
+        strategy.download_data()
+        strategy.calculate_indicators()
+        strategy.generate_signals()
+        metrics = strategy.calculate_metrics()
 
-        if metricas:
-            resultados_comparacion.append({
-                'Estrategia': config['nombre'],
-                'Retorno (%)': metricas['retorno_total'],
-                'Win Rate (%)': metricas['win_rate'],
-                'Profit Factor': metricas['profit_factor'],
-                'Max DD (%)': metricas['max_drawdown'],
-                'Trades': metricas['total_trades']
+        if metrics:
+            comparison_results.append({
+                'Strategy': config['name'],
+                'Return (%)': metrics['total_return'],
+                'Win Rate (%)': metrics['win_rate'],
+                'Profit Factor': metrics['profit_factor'],
+                'Max DD (%)': metrics['max_drawdown'],
+                'Trades': metrics['total_trades']
             })
 
-    # Crear tabla comparativa
-    df_comparacion = pd.DataFrame(resultados_comparacion)
-    df_comparacion = df_comparacion.round(2)
+    # Create comparison table
+    df_comparison = pd.DataFrame(comparison_results)
+    df_comparison = df_comparison.round(2)
 
-    print("\\n" + "="*80)
-    print("📊 COMPARACIÓN DE ESTRATEGIAS")
+    print("\n" + "="*80)
+    print("STRATEGY COMPARISON")
     print("="*80)
-    print(df_comparacion.to_string(index=False))
+    print(df_comparison.to_string(index=False))
 
-    # Identificar ganadora
-    mejor_estrategia = df_comparacion.loc[df_comparacion['Retorno (%)'].idxmax()]
-    print(f"\\n🏆 MEJOR ESTRATEGIA: {mejor_estrategia['Estrategia']}")
-    print(f"   Retorno: {mejor_estrategia['Retorno (%)']}%")
-    print(f"   Profit Factor: {mejor_estrategia['Profit Factor']}")
+    # Identify winner
+    best_strategy = df_comparison.loc[df_comparison['Return (%)'].idxmax()]
+    print(f"\nBEST STRATEGY: {best_strategy['Strategy']}")
+    print(f"   Return: {best_strategy['Return (%)']}%")
+    print(f"   Profit Factor: {best_strategy['Profit Factor']}")
 
-    return df_comparacion
+    return df_comparison
 
-# Ejecutar comparación
-df_comparacion = comparar_estrategias()
+# Run comparison
+df_comparison = compare_strategies()
 ```
 
-## ✅ Checkpoint del Módulo
+## Module Checkpoint
 
-### Estrategia Completa ✅
-- [ ] Mi estrategia tiene reglas claras de entrada
-- [ ] Implementé stop loss y take profit
-- [ ] Uso gestión de riesgo (2% por trade)
-- [ ] Combino múltiples indicadores
+### Complete Strategy
+- [ ] My strategy has clear entry rules
+- [ ] I implemented stop loss and take profit
+- [ ] I use risk management (2% per trade)
+- [ ] I combine multiple indicators
 
-### Backtest Funcional ✅
-- [ ] Puedo probar con datos históricos reales
-- [ ] Calculo métricas de performance
-- [ ] Comparo con Buy & Hold
-- [ ] Visualizo resultados claramente
+### Working Backtest
+- [ ] I can test with real historical data
+- [ ] I calculate performance metrics
+- [ ] I compare with Buy & Hold
+- [ ] I visualize results clearly
 
-### Optimización ✅
-- [ ] Probé diferentes parámetros
-- [ ] Identifiqué mejores configuraciones
-- [ ] Analicé trades individuales
-- [ ] Comparé múltiples variaciones
+### Optimization
+- [ ] I tested different parameters
+- [ ] I identified best configurations
+- [ ] I analyzed individual trades
+- [ ] I compared multiple variations
 
-### Aprendizajes ✅
-- [ ] Entiendo por qué algunas estrategias fallan
-- [ ] Sé la importancia del stop loss
-- [ ] Veo el impacto de los parámetros
-- [ ] Puedo mejorar la estrategia
+### Learnings
+- [ ] I understand why some strategies fail
+- [ ] I know the importance of stop loss
+- [ ] I see the impact of parameters
+- [ ] I can improve the strategy
 
-## 🎓 ¡FELICITACIONES!
+## CONGRATULATIONS!
 
-**Has completado los FUNDAMENTOS del trading cuantitativo.**
+**You have completed the FUNDAMENTALS of quantitative trading.**
 
-Ya tienes:
-- ✅ Conocimiento de qué es ser quant
-- ✅ Habilidades de Python para trading
-- ✅ Dominio de indicadores técnicos
-- ✅ Tu primera estrategia completa y probada
+You now have:
+- Knowledge of what being a quant means
+- Python trading skills
+- Mastery of technical indicators
+- Your first complete and tested strategy
 
-## 🚀 Próximos Pasos
+## Next Steps
 
-### Continúa con ESTRATEGIAS (Nivel 2)
+### Continue with STRATEGIES (Level 2)
 
 **E1: Momentum Trading**
-- Gap & Go para small caps
+- Gap & Go for small caps
 - Breakout strategies
 - Momentum scanning
 
@@ -643,21 +645,21 @@ Ya tienes:
 - Oversold bounces
 - Pairs trading
 
-**E3: Backtesting Avanzado**
+**E3: Advanced Backtesting**
 - Walk-forward analysis
 - Monte Carlo simulation
 - Stress testing
 
 ---
 
-### 💡 Reflexión Final
+### Final Reflection
 
-> **"Una estrategia mediocre bien ejecutada es mejor que una estrategia perfecta mal ejecutada."**
+> **"A mediocre strategy well executed is better than a perfect strategy poorly executed."**
 
-Tu primera estrategia no será perfecta, pero ya tienes las herramientas para mejorarla continuamente. Cada día de trading genera nuevos datos para aprender.
+Your first strategy won't be perfect, but you now have the tools to continuously improve it. Every day of trading generates new data to learn from.
 
-**¡Ya eres oficialmente un Quant Trader en formación! 🎉**
+**You are officially a Quant Trader in training!**
 
 ---
 
-🎯 **¿Listo para estrategias más avanzadas?** → [E1: Momentum Trading](../../estrategias/e1-momentum-trading/)
+**Ready for more advanced strategies?** -> [E1: Momentum Trading](../../estrategias/e1-momentum-trading/)

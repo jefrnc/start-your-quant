@@ -1,8 +1,10 @@
-# Validación y Análisis de Trades
+> 🇪🇸 [Leer en Español](trade_validation.es.md) | 🇺🇸 **English**
 
-## Framework de Validación Pre-Trade
+# Trade Validation and Analysis
 
-### Checklist de Validación
+## Pre-Trade Validation Framework
+
+### Validation Checklist
 ```python
 import pandas as pd
 import numpy as np
@@ -12,20 +14,20 @@ from typing import Dict, List, Optional, Tuple
 from enum import Enum
 
 class ValidationLevel(Enum):
-    """Niveles de validación"""
+    """Validation levels"""
     BASIC = "basic"
     STANDARD = "standard"
     STRICT = "strict"
 
 class ValidationResult(Enum):
-    """Resultados de validación"""
+    """Validation results"""
     PASS = "pass"
     WARNING = "warning"
     FAIL = "fail"
 
 @dataclass
 class TradeProposal:
-    """Propuesta de trade para validación"""
+    """Trade proposal for validation"""
     symbol: str
     side: str  # 'buy' or 'sell'
     quantity: int
@@ -39,7 +41,7 @@ class TradeProposal:
 
 @dataclass
 class ValidationCheck:
-    """Resultado de una validación específica"""
+    """Result of a specific validation"""
     check_name: str
     result: ValidationResult
     message: str
@@ -47,7 +49,7 @@ class ValidationCheck:
     critical: bool = False
 
 class PreTradeValidator:
-    """Sistema de validación pre-trade"""
+    """Pre-trade validation system"""
     
     def __init__(self, validation_level: ValidationLevel = ValidationLevel.STANDARD):
         self.validation_level = validation_level
@@ -56,47 +58,47 @@ class PreTradeValidator:
         self.daily_stats = {}
         
     def set_account_info(self, account_info: Dict):
-        """Configurar información de cuenta"""
+        """Configure account information"""
         self.account_info = account_info
         
     def set_current_positions(self, positions: Dict):
-        """Configurar posiciones actuales"""
+        """Configure current positions"""
         self.current_positions = positions
         
     def validate_trade(self, proposal: TradeProposal) -> List[ValidationCheck]:
-        """Validar propuesta de trade completa"""
+        """Validate complete trade proposal"""
         
         validations = []
         
-        # Validaciones básicas
+        # Basic validations
         validations.extend(self._validate_basic_checks(proposal))
         
-        # Validaciones de risk management
+        # Risk management validations
         validations.extend(self._validate_risk_management(proposal))
         
-        # Validaciones de setup quality
+        # Setup quality validations
         validations.extend(self._validate_setup_quality(proposal))
         
-        # Validaciones de market conditions
+        # Market conditions validations
         validations.extend(self._validate_market_conditions(proposal))
         
-        # Validaciones de timing
+        # Timing validations
         validations.extend(self._validate_timing(proposal))
         
         if self.validation_level in [ValidationLevel.STANDARD, ValidationLevel.STRICT]:
-            # Validaciones adicionales
+            # Additional validations
             validations.extend(self._validate_correlation_risk(proposal))
             validations.extend(self._validate_liquidity(proposal))
         
         if self.validation_level == ValidationLevel.STRICT:
-            # Validaciones estrictas
+            # Strict validations
             validations.extend(self._validate_news_sentiment(proposal))
             validations.extend(self._validate_technical_confluence(proposal))
         
         return validations
     
     def _validate_basic_checks(self, proposal: TradeProposal) -> List[ValidationCheck]:
-        """Validaciones básicas obligatorias"""
+        """Basic validations obligatorias"""
         
         checks = []
         
@@ -105,7 +107,7 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "symbol_validation",
                 ValidationResult.FAIL,
-                "Symbol inválido",
+                "Invalid symbol",
                 0,
                 critical=True
             ))
@@ -113,7 +115,7 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "symbol_validation",
                 ValidationResult.PASS,
-                f"Symbol {proposal.symbol} válido",
+                f"Symbol {proposal.symbol} valid",
                 100
             ))
         
@@ -122,7 +124,7 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "quantity_validation",
                 ValidationResult.FAIL,
-                "Cantidad debe ser positiva",
+                "Quantity must be positive",
                 0,
                 critical=True
             ))
@@ -130,7 +132,7 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "quantity_validation",
                 ValidationResult.PASS,
-                f"Cantidad {proposal.quantity} válida",
+                f"Quantity {proposal.quantity} válida",
                 100
             ))
         
@@ -139,7 +141,7 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "price_validation",
                 ValidationResult.FAIL,
-                "Precio de entrada debe ser positivo",
+                "Entry price must be positive",
                 0,
                 critical=True
             ))
@@ -147,7 +149,7 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "price_validation",
                 ValidationResult.PASS,
-                f"Precio ${proposal.entry_price:.2f} válido",
+                f"Price ${proposal.entry_price:.2f} valid",
                 100
             ))
         
@@ -156,7 +158,7 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "stop_loss_validation",
                 ValidationResult.FAIL,
-                "Stop loss debe ser menor que precio de entrada para longs",
+                "Stop loss must be less than entry price for longs",
                 0,
                 critical=True
             ))
@@ -164,7 +166,7 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "stop_loss_validation",
                 ValidationResult.FAIL,
-                "Stop loss debe ser mayor que precio de entrada para shorts",
+                "Stop loss must be greater than entry price for shorts",
                 0,
                 critical=True
             ))
@@ -172,14 +174,14 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "stop_loss_validation",
                 ValidationResult.PASS,
-                f"Stop loss ${proposal.stop_loss:.2f} válido",
+                f"Stop loss ${proposal.stop_loss:.2f} valid",
                 100
             ))
         
         return checks
     
     def _validate_risk_management(self, proposal: TradeProposal) -> List[ValidationCheck]:
-        """Validaciones de gestión de riesgo"""
+        """Risk management validations"""
         
         checks = []
         
@@ -194,7 +196,7 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "position_size_risk",
                 ValidationResult.FAIL,
-                f"Posición {position_pct:.1%} excede máximo {max_position_pct:.1%}",
+                f"Position {position_pct:.1%} exceeds maximum {max_position_pct:.1%}",
                 0,
                 critical=True
             ))
@@ -202,7 +204,7 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "position_size_risk",
                 ValidationResult.WARNING,
-                f"Posición {position_pct:.1%} es grande (máx {max_position_pct:.1%})",
+                f"Position {position_pct:.1%} is large (max {max_position_pct:.1%})",
                 60
             ))
         else:
@@ -210,7 +212,7 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "position_size_risk",
                 ValidationResult.PASS,
-                f"Posición {position_pct:.1%} dentro de límites",
+                f"Position {position_pct:.1%} within limits",
                 score
             ))
         
@@ -225,7 +227,7 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "risk_per_trade",
                 ValidationResult.FAIL,
-                f"Riesgo {risk_pct:.2%} excede máximo {max_risk_pct:.2%}",
+                f"Risk {risk_pct:.2%} exceeds maximum {max_risk_pct:.2%}",
                 0,
                 critical=True
             ))
@@ -233,7 +235,7 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "risk_per_trade",
                 ValidationResult.WARNING,
-                f"Riesgo {risk_pct:.2%} es alto",
+                f"Risk {risk_pct:.2%} is high",
                 70
             ))
         else:
@@ -241,13 +243,13 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "risk_per_trade",
                 ValidationResult.PASS,
-                f"Riesgo {risk_pct:.2%} apropiado",
+                f"Risk {risk_pct:.2%} appropriate",
                 score
             ))
         
         # 3. Daily loss limit
         current_daily_pnl = self.daily_stats.get('unrealized_pnl', 0)
-        max_daily_loss = account_value * 0.05  # 5% máximo diario
+        max_daily_loss = account_value * 0.05  # 5% máximo daily
         
         potential_loss = current_daily_pnl - total_risk
         
@@ -255,7 +257,7 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "daily_loss_limit",
                 ValidationResult.FAIL,
-                f"Pérdida potencial diaria excede límite",
+                f"Potential daily loss exceeds limit",
                 0,
                 critical=True
             ))
@@ -263,7 +265,7 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "daily_loss_limit",
                 ValidationResult.PASS,
-                "Dentro de límite de pérdida diaria",
+                "Within daily loss limit",
                 100
             ))
         
@@ -275,7 +277,7 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "max_positions",
                 ValidationResult.FAIL,
-                f"Ya tienes {current_positions_count} posiciones (máx {max_positions})",
+                f"You already have {current_positions_count} positions (max {max_positions})",
                 0,
                 critical=True
             ))
@@ -283,21 +285,21 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "max_positions",
                 ValidationResult.WARNING,
-                f"Tienes {current_positions_count} posiciones, cerca del límite",
+                f"Tienes {current_positions_count} positions, near limit",
                 70
             ))
         else:
             checks.append(ValidationCheck(
                 "max_positions",
                 ValidationResult.PASS,
-                f"Posiciones actuales: {current_positions_count}/{max_positions}",
+                f"Current positions: {current_positions_count}/{max_positions}",
                 100
             ))
         
         return checks
     
     def _validate_setup_quality(self, proposal: TradeProposal) -> List[ValidationCheck]:
-        """Validar calidad del setup"""
+        """Validate setup quality"""
         
         checks = []
         
@@ -308,21 +310,21 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "setup_quality",
                 ValidationResult.FAIL,
-                f"Setup score {proposal.setup_score} por debajo del mínimo {min_setup_score}",
+                f"Setup score {proposal.setup_score} below minimum {min_setup_score}",
                 proposal.setup_score
             ))
         elif proposal.setup_score < min_setup_score + 20:
             checks.append(ValidationCheck(
                 "setup_quality",
                 ValidationResult.WARNING,
-                f"Setup score {proposal.setup_score} es marginal",
+                f"Setup score {proposal.setup_score} is marginal",
                 proposal.setup_score
             ))
         else:
             checks.append(ValidationCheck(
                 "setup_quality",
                 ValidationResult.PASS,
-                f"Setup score {proposal.setup_score} es bueno",
+                f"Setup score {proposal.setup_score} is good",
                 proposal.setup_score
             ))
         
@@ -338,21 +340,21 @@ class PreTradeValidator:
                 checks.append(ValidationCheck(
                     "risk_reward_ratio",
                     ValidationResult.WARNING,
-                    f"R/R ratio {rr_ratio:.1f} por debajo del mínimo {min_rr_ratio}",
+                    f"R/R ratio {rr_ratio:.1f} below minimum {min_rr_ratio}",
                     max(0, (rr_ratio / min_rr_ratio) * 100)
                 ))
             else:
                 checks.append(ValidationCheck(
                     "risk_reward_ratio",
                     ValidationResult.PASS,
-                    f"R/R ratio {rr_ratio:.1f} es bueno",
+                    f"R/R ratio {rr_ratio:.1f} is good",
                     min(100, (rr_ratio / min_rr_ratio) * 80)
                 ))
         
         return checks
     
     def _validate_market_conditions(self, proposal: TradeProposal) -> List[ValidationCheck]:
-        """Validar condiciones de mercado"""
+        """Validate market conditions"""
         
         checks = []
         market_data = proposal.market_data
@@ -362,13 +364,13 @@ class PreTradeValidator:
         avg_volume = market_data.get('avg_volume_20d', 1)
         volume_ratio = current_volume / avg_volume if avg_volume > 0 else 0
         
-        min_volume_ratio = 0.5  # Mínimo 50% del volumen promedio
+        min_volume_ratio = 0.5  # Minimum 50% of volume average
         
         if volume_ratio < min_volume_ratio:
             checks.append(ValidationCheck(
                 "volume_validation",
                 ValidationResult.WARNING,
-                f"Volumen bajo: {volume_ratio:.1f}x vs promedio",
+                f"Low volume: {volume_ratio:.1f}x vs average",
                 max(0, volume_ratio / min_volume_ratio * 100)
             ))
         else:
@@ -376,7 +378,7 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "volume_validation",
                 ValidationResult.PASS,
-                f"Volumen adecuado: {volume_ratio:.1f}x vs promedio",
+                f"Adequate volume: {volume_ratio:.1f}x vs average",
                 score
             ))
         
@@ -394,14 +396,14 @@ class PreTradeValidator:
                 checks.append(ValidationCheck(
                     "spread_validation",
                     ValidationResult.WARNING,
-                    f"Spread amplio: {spread_pct:.2%}",
+                    f"Wide spread: {spread_pct:.2%}",
                     max(0, (max_spread_pct - spread_pct) / max_spread_pct * 100)
                 ))
             else:
                 checks.append(ValidationCheck(
                     "spread_validation",
                     ValidationResult.PASS,
-                    f"Spread aceptable: {spread_pct:.2%}",
+                    f"Acceptable spread: {spread_pct:.2%}",
                     100
                 ))
         
@@ -414,21 +416,21 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "market_hours",
                 ValidationResult.WARNING,
-                "Trade fuera de horario regular",
+                "Trade outside regular hours",
                 70
             ))
         else:
             checks.append(ValidationCheck(
                 "market_hours",
                 ValidationResult.PASS,
-                "Dentro de horario de mercado",
+                "Within market hours",
                 100
             ))
         
         return checks
     
     def _validate_timing(self, proposal: TradeProposal) -> List[ValidationCheck]:
-        """Validar timing del trade"""
+        """Validate trade timing"""
         
         checks = []
         current_time = proposal.timestamp
@@ -444,21 +446,21 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "opening_timing",
                 ValidationResult.WARNING,
-                f"Trade muy cerca de apertura ({minutes_from_open:.0f} min)",
+                f"Trade too close to open ({minutes_from_open:.0f} min)",
                 max(0, minutes_from_open / 30 * 100)
             ))
         elif minutes_to_close < 30:
             checks.append(ValidationCheck(
                 "closing_timing",
                 ValidationResult.WARNING,
-                f"Trade muy cerca de cierre ({minutes_to_close:.0f} min)",
+                f"Trade too close to close ({minutes_to_close:.0f} min)",
                 max(0, minutes_to_close / 30 * 100)
             ))
         else:
             checks.append(ValidationCheck(
                 "market_timing",
                 ValidationResult.PASS,
-                "Timing de mercado apropiado",
+                "Timing de mercado appropriate",
                 100
             ))
         
@@ -467,14 +469,14 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "friday_timing",
                 ValidationResult.WARNING,
-                "Trade en viernes por la tarde - riesgo de weekend",
+                "Trade on Friday afternoon - weekend risk",
                 80
             ))
         
         return checks
     
     def _validate_correlation_risk(self, proposal: TradeProposal) -> List[ValidationCheck]:
-        """Validar riesgo de correlación"""
+        """Validate correlation risk"""
         
         checks = []
         
@@ -492,21 +494,21 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "correlation_risk",
                 ValidationResult.WARNING,
-                f"Ya tienes {correlated_positions} posiciones en sector {symbol_sector}",
+                f"You already have {correlated_positions} posiciones en sector {symbol_sector}",
                 max(0, (max_sector_positions - correlated_positions) / max_sector_positions * 100)
             ))
         else:
             checks.append(ValidationCheck(
                 "correlation_risk",
                 ValidationResult.PASS,
-                f"Exposición sectorial aceptable",
+                f"Acceptable sector exposure",
                 100
             ))
         
         return checks
     
     def _validate_liquidity(self, proposal: TradeProposal) -> List[ValidationCheck]:
-        """Validar liquidez suficiente"""
+        """Validate sufficient liquidity"""
         
         checks = []
         market_data = proposal.market_data
@@ -524,53 +526,53 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "liquidity_risk",
                 ValidationResult.WARNING,
-                f"Posición es {volume_impact:.1%} del volumen diario promedio",
+                f"Position es {volume_impact:.1%} of average daily volume",
                 max(0, (max_volume_impact - volume_impact) / max_volume_impact * 100)
             ))
         else:
             checks.append(ValidationCheck(
                 "liquidity_risk",
                 ValidationResult.PASS,
-                f"Liquidez adecuada ({volume_impact:.1%} del volumen)",
+                f"Adequate liquidity ({volume_impact:.1%} of volume)",
                 100
             ))
         
         return checks
     
     def _validate_news_sentiment(self, proposal: TradeProposal) -> List[ValidationCheck]:
-        """Validar sentiment de noticias"""
+        """Validate news sentiment"""
         
         checks = []
         
-        # Placeholder - en implementación real consultaría API de noticias
+        # Placeholder - real implementation would query news API
         news_sentiment = market_data.get('news_sentiment', 'neutral')
         
         if proposal.side == 'buy' and news_sentiment == 'negative':
             checks.append(ValidationCheck(
                 "news_sentiment",
                 ValidationResult.WARNING,
-                "Sentiment de noticias negativo para posición long",
+                "Negative news sentiment for long position",
                 60
             ))
         elif proposal.side == 'sell' and news_sentiment == 'positive':
             checks.append(ValidationCheck(
                 "news_sentiment",
                 ValidationResult.WARNING,
-                "Sentiment de noticias positivo para posición short",
+                "Positive news sentiment for short position",
                 60
             ))
         else:
             checks.append(ValidationCheck(
                 "news_sentiment",
                 ValidationResult.PASS,
-                f"Sentiment de noticias: {news_sentiment}",
+                f"News sentiment: {news_sentiment}",
                 100
             ))
         
         return checks
     
     def _validate_technical_confluence(self, proposal: TradeProposal) -> List[ValidationCheck]:
-        """Validar confluencia técnica"""
+        """Validate technical confluence"""
         
         checks = []
         market_data = proposal.market_data
@@ -607,22 +609,22 @@ class PreTradeValidator:
             checks.append(ValidationCheck(
                 "technical_confluence",
                 ValidationResult.WARNING,
-                f"Pocas confirmaciones técnicas ({confluences}/{min_confluences})",
+                f"Few technical confirmations ({confluences}/{min_confluences})",
                 (confluences / min_confluences) * 100
             ))
         else:
             checks.append(ValidationCheck(
                 "technical_confluence",
                 ValidationResult.PASS,
-                f"Buena confluencia técnica ({confluences} confirmaciones)",
+                f"Good technical confluence ({confluences} confirmations)",
                 min(100, confluences * 30)
             ))
         
         return checks
     
     def _get_symbol_sector(self, symbol: str) -> str:
-        """Obtener sector del símbolo (placeholder)"""
-        # En implementación real, consultaría base de datos de sectores
+        """Get symbol sector (placeholder)"""
+        # In real implementation, would query sector database
         sector_mapping = {
             'AAPL': 'Technology',
             'MSFT': 'Technology', 
@@ -633,7 +635,7 @@ class PreTradeValidator:
         return sector_mapping.get(symbol, 'Unknown')
     
     def get_validation_summary(self, validations: List[ValidationCheck]) -> Dict:
-        """Obtener resumen de validaciones"""
+        """Get validation summary"""
         
         total_checks = len(validations)
         passed = len([v for v in validations if v.result == ValidationResult.PASS])
@@ -666,26 +668,26 @@ class PreTradeValidator:
             'details': validations
         }
 
-# Ejemplo de uso
+# Usage example
 def demo_trade_validation():
-    """Demo del sistema de validación"""
+    """Validation system demo"""
     
-    # Configurar validator
+    # Configure validator
     validator = PreTradeValidator(ValidationLevel.STANDARD)
     
-    # Configurar información de cuenta
+    # Configure account information
     validator.set_account_info({
         'total_value': 100000,
         'buying_power': 80000,
         'cash': 20000
     })
     
-    # Configurar posiciones actuales
+    # Configure current positions
     validator.set_current_positions({
         'AAPL': {'shares': 100, 'avg_price': 150.0}
     })
     
-    # Crear propuesta de trade
+    # Create trade proposal
     proposal = TradeProposal(
         symbol="TSLA",
         side="buy",
@@ -707,17 +709,17 @@ def demo_trade_validation():
         timestamp=datetime.now().replace(hour=10, minute=30)
     )
     
-    # Ejecutar validación
+    # Run validation
     validations = validator.validate_trade(proposal)
     summary = validator.get_validation_summary(validations)
     
-    # Mostrar resultados
-    print(f"🔍 Validación de Trade: {proposal.symbol}")
-    print(f"Recomendación: {summary['recommendation']}")
-    print(f"Score promedio: {summary['average_score']:.1f}")
+    # Show results
+    print(f"🔍 Trade Validation: {proposal.symbol}")
+    print(f"Recommendation: {summary['recommendation']}")
+    print(f"Score average: {summary['average_score']:.1f}")
     print(f"Checks: ✅{summary['passed']} ⚠️{summary['warnings']} ❌{summary['failed']}")
     
-    print("\n📋 Detalles:")
+    print("\n📋 Details:")
     for validation in validations:
         icon = "✅" if validation.result == ValidationResult.PASS else \
                "⚠️" if validation.result == ValidationResult.WARNING else "❌"
@@ -732,14 +734,14 @@ if __name__ == "__main__":
 ### Trade Journal System
 ```python
 class TradeJournal:
-    """Sistema de journaling de trades"""
+    """Trade journaling system"""
     
     def __init__(self, db_connection=None):
         self.db = db_connection
         self.trades = []
         
     def log_trade_entry(self, trade_data: Dict):
-        """Registrar entrada de trade"""
+        """Log trade entry"""
         
         entry_record = {
             'trade_id': self._generate_trade_id(),
@@ -767,7 +769,7 @@ class TradeJournal:
         return entry_record['trade_id']
     
     def log_trade_exit(self, trade_id: str, exit_data: Dict):
-        """Registrar salida de trade"""
+        """Log trade exit"""
         
         exit_record = {
             'trade_id': trade_id,
@@ -791,21 +793,21 @@ class TradeJournal:
         return exit_record
     
     def analyze_trade_performance(self, lookback_days: int = 30) -> Dict:
-        """Analizar performance de trades"""
+        """Analyze trade performance"""
         
         cutoff_date = datetime.now() - timedelta(days=lookback_days)
         
-        # Filtrar trades recientes
+        # Filter recent trades
         recent_trades = [t for t in self.trades if t['timestamp'] >= cutoff_date]
         
-        # Separar entries y exits
+        # Separate entries and exits
         entries = [t for t in recent_trades if t['type'] == 'entry']
         exits = [t for t in recent_trades if t['type'] == 'exit']
         
-        # Calcular métricas
+        # Calculate metrics
         total_trades = len(exits)
         if total_trades == 0:
-            return {'error': 'No hay trades completados en el período'}
+            return {'error': 'No completed trades in the period'}
         
         winning_trades = len([t for t in exits if t['pnl'] > 0])
         losing_trades = len([t for t in exits if t['pnl'] < 0])
@@ -817,10 +819,10 @@ class TradeJournal:
         win_rate = winning_trades / total_trades if total_trades > 0 else 0
         profit_factor = abs(avg_win / avg_loss) if avg_loss != 0 else float('inf')
         
-        # Análisis por estrategia
+        # Analysis by strategy
         strategy_performance = {}
         for exit_trade in exits:
-            # Encontrar entrada correspondiente
+            # Find corresponding entry
             entry_trade = next((e for e in entries if e['trade_id'] == exit_trade['trade_id']), None)
             if entry_trade:
                 strategy = entry_trade['strategy']
@@ -850,14 +852,14 @@ class TradeJournal:
         }
     
     def identify_patterns(self) -> Dict:
-        """Identificar patrones en el trading"""
+        """Identify patterns in trading"""
         
         exits = [t for t in self.trades if t['type'] == 'exit']
         entries = [t for t in self.trades if t['type'] == 'entry']
         
         patterns = {}
         
-        # 1. Análisis por día de la semana
+        # 1. Analysis by day of week
         day_performance = {}
         for exit_trade in exits:
             day_of_week = exit_trade['timestamp'].strftime('%A')
@@ -874,10 +876,10 @@ class TradeJournal:
             for day, pnls in day_performance.items()
         }
         
-        # 2. Análisis por hora de entrada
+        # 2. Analysis by entry hour
         hour_performance = {}
         for entry_trade in entries:
-            # Encontrar exit correspondiente
+            # Find corresponding exit
             exit_trade = next((e for e in exits if e['trade_id'] == entry_trade['trade_id']), None)
             if exit_trade:
                 hour = entry_trade['timestamp'].hour
@@ -894,7 +896,7 @@ class TradeJournal:
             for hour, pnls in hour_performance.items()
         }
         
-        # 3. Análisis por setup score
+        # 3. Analysis by setup score
         score_buckets = {'low': [], 'medium': [], 'high': []}
         for entry_trade in entries:
             exit_trade = next((e for e in exits if e['trade_id'] == entry_trade['trade_id']), None)
@@ -920,51 +922,51 @@ class TradeJournal:
         return patterns
     
     def generate_insights(self) -> List[str]:
-        """Generar insights basados en patrones"""
+        """Generate insights based on patterns"""
         
         patterns = self.identify_patterns()
         insights = []
         
-        # Insights por día de la semana
+        # Insights by day of week
         if 'day_of_week' in patterns:
             best_day = max(patterns['day_of_week'].items(), 
                           key=lambda x: x[1]['avg_pnl'])
             worst_day = min(patterns['day_of_week'].items(), 
                            key=lambda x: x[1]['avg_pnl'])
             
-            insights.append(f"📅 Mejor día para trading: {best_day[0]} (${best_day[1]['avg_pnl']:.2f} promedio)")
-            insights.append(f"📅 Peor día para trading: {worst_day[0]} (${worst_day[1]['avg_pnl']:.2f} promedio)")
+            insights.append(f"📅 Best day for trading: {best_day[0]} (${best_day[1]['avg_pnl']:.2f} average)")
+            insights.append(f"📅 Worst day for trading: {worst_day[0]} (${worst_day[1]['avg_pnl']:.2f} average)")
         
-        # Insights por setup score
+        # Insights by setup score
         if 'setup_score' in patterns:
             high_score_perf = patterns['setup_score']['high']
             low_score_perf = patterns['setup_score']['low']
             
             if high_score_perf['trade_count'] > 0 and low_score_perf['trade_count'] > 0:
-                insights.append(f"🎯 Setup scores altos tienen {high_score_perf['win_rate']:.1%} win rate vs {low_score_perf['win_rate']:.1%} para scores bajos")
+                insights.append(f"🎯 Setup scoris highs tienen {high_score_perf['win_rate']:.1%} win rate vs {low_score_perf['win_rate']:.1%} for low scores")
         
-        # Insights generales
+        # General insights
         performance = self.analyze_trade_performance(30)
         if 'win_rate' in performance:
             if performance['win_rate'] < 0.5:
-                insights.append("⚠️ Win rate por debajo del 50% - revisar criterios de entrada")
+                insights.append("⚠️ Win rate below 50% - review entry criteria")
             if performance['profit_factor'] < 1.5:
-                insights.append("⚠️ Profit factor bajo - trabajar en relación risk/reward")
+                insights.append("⚠️ Low profit factor - work on risk/reward ratio")
         
         return insights
     
     def _generate_trade_id(self) -> str:
-        """Generar ID único para trade"""
+        """Generate unique trade ID"""
         import uuid
         return str(uuid.uuid4())[:8]
 
-# Ejemplo de uso del journal
+# Journal usage example
 def demo_trade_journal():
-    """Demo del sistema de journaling"""
+    """Journaling system demo"""
     
     journal = TradeJournal()
     
-    # Registrar entrada de trade
+    # Log trade entry
     trade_id = journal.log_trade_entry({
         'symbol': 'AAPL',
         'side': 'buy',
@@ -977,11 +979,11 @@ def demo_trade_journal():
         'emotions': 'Confident but not overexcited'
     })
     
-    print(f"📝 Trade registrado con ID: {trade_id}")
+    print(f"📝 Trade logged with ID: {trade_id}")
     
-    # Simular salida después de tiempo
+    # Simulate exit after time
     import time
-    time.sleep(1)  # Simular tiempo en trade
+    time.sleep(1)  # Simulate time in trade
     
     journal.log_trade_exit(trade_id, {
         'price': 155.0,
@@ -996,14 +998,14 @@ def demo_trade_journal():
         'what_wrong': 'Could have held longer for bigger profit'
     })
     
-    # Analizar performance
+    # Analyze performance
     performance = journal.analyze_trade_performance(30)
-    print(f"\n📊 Performance (30 días):")
+    print(f"\n📊 Performance (30 days):")
     print(f"Total trades: {performance['total_trades']}")
     print(f"Win rate: {performance['win_rate']:.1%}")
-    print(f"P&L total: ${performance['total_pnl']:.2f}")
+    print(f"Total P&L: ${performance['total_pnl']:.2f}")
     
-    # Obtener insights
+    # Get insights
     insights = journal.generate_insights()
     print(f"\n💡 Insights:")
     for insight in insights:
@@ -1013,4 +1015,4 @@ if __name__ == "__main__":
     demo_trade_journal()
 ```
 
-Este sistema de validación y journaling proporciona un framework robusto para mantener disciplina y mejorar continuamente el trading performance a través de análisis sistemático.
+This validation and journaling system provides a robust framework for maintaining discipline and continuously improving trading performance through systematic analysis.

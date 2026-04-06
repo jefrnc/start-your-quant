@@ -1,69 +1,71 @@
-# SuperTendencia - El Seguidor de Tendencias Definitivo
+> 🇪🇸 [Leer en Español](super_tendencia.es.md) | 🇺🇸 **English**
 
-## Definición
+# SuperTrend - The Ultimate Trend Follower
 
-SuperTendencia es un indicador de seguimiento de tendencia que dibuja una línea en el gráfico de velas. Dependiendo del color, indica si está en tendencia negativa (línea roja sobre las velas) o tendencia positiva (línea verde debajo de las velas), funcionando como soporte dinámico o resistencia.
+## Definition
 
-## Filosofía del Indicador
+SuperTrend is a trend-following indicator that draws a line on the candlestick chart. Depending on the color, it indicates a negative trend (red line above candles) or positive trend (green line below candles), functioning as dynamic support or resistance.
 
-### ¿Por Qué Funciona?
-- **Basado en ATR**: Utiliza volatilidad real para ajustar distancias
-- **Soporte/Resistencia Dinámico**: Se adapta a las condiciones del mercado
-- **Señales Claras**: Color verde = alcista, color rojo = bajista
-- **Filtro de Ruido**: Reduce señales falsas comparado con MA simples
+## Indicator Philosophy
 
-### Componentes Clave
+### Why Does It Work?
+- **ATR-Based**: Uses actual volatility to adjust distances
+- **Dynamic Support/Resistance**: Adapts to market conditions
+- **Clear Signals**: Green = bullish, red = bearish
+- **Noise Filter**: Reduces false signals compared to simple MAs
+
+### Key Components
 ```
-ATR = Average True Range (volatilidad)
-Precio_Medio = (High + Low) / 2
-Banda_Superior = Precio_Medio + (Factor × ATR)
-Banda_Inferior = Precio_Medio - (Factor × ATR)
+ATR = Average True Range (volatility)
+Mid_Price   = (High + Low) / 2
+Upper_Band  = Mid_Price + (Factor × ATR)
+Lower_Band  = Mid_Price - (Factor × ATR)
 ```
 
-## Implementación de Referencia
+## Reference Implementation
 
 ```python
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-def SuperTendencia(df: pd.DataFrame, longitud: int = 14, factor: float = 3.0) -> pd.DataFrame:
+def SuperTrend(df: pd.DataFrame, length: int = 14, factor: float = 3.0) -> pd.DataFrame:
     """
-    SuperTendencia - Implementación de referencia exacta
+    SuperTrend - Exact reference implementation
     
-    Indicador de seguimiento de tendencia que dibuja líneas de soporte/resistencia
-    dinámicas basadas en ATR (Average True Range).
+    A trend-following indicator that draws dynamic support/resistance
+    lines based on ATR (Average True Range).
     
-    Parámetros
+    Parameters
     ----------
     df : pd.DataFrame
-        Datos históricos del activo (debe incluir High, Low, Close)
-    longitud : int, default 14
-        Ventana para el cálculo del ATR
+        Historical asset data (must include High, Low, Close)
+    length : int, default 14
+        Window for ATR calculation
     factor : float, default 3.0
-        Multiplicador del ATR para calcular las bandas
+        ATR multiplier for calculating the bands
     
     Returns
     -------
     pd.DataFrame
-        DataFrame con columnas: FinalUpperB, FinalLowerB, SuperTendencia
+        DataFrame with columns: FinalUpperB, FinalLowerB, SuperTrend
         
-    Cómo Operarlo
-    -------------
-    - COMPRA: Línea verde (debajo del precio) - Tendencia alcista
-    - VENTA: Línea roja (encima del precio) - Tendencia bajista
-    - La línea actúa como soporte dinámico (verde) o resistencia (roja)
+    How to Trade It
+    ---------------
+    - BUY: Green line (below price) - Bullish trend
+    - SELL: Red line (above price) - Bearish trend
+    - The line acts as dynamic support (green) or resistance (red)
     
-    Ejemplo de Uso
+    Usage Example
     --------------
     >>> df = yf.download("AAPL", start="2023-01-01", end="2024-01-01")
-    >>> st = SuperTendencia(df, longitud=14, factor=3.0)
+    >>> st = SuperTrend(df, length=14, factor=3.0)
     >>> print(st.head())
     """
-    # Calcular True Range (TR)
+    # Calculate True Range (TR)
     High, Low = df["High"], df["Low"]
     
-    # Componentes del True Range
+    # True Range components
     H_minus_L = High - Low
     prev_close = df["Close"].shift(periods=1)
     H_minus_PC = abs(High - prev_close)
@@ -73,85 +75,85 @@ def SuperTendencia(df: pd.DataFrame, longitud: int = 14, factor: float = 3.0) ->
     TR = pd.Series(np.max([H_minus_L, H_minus_PC, L_minus_PC], axis=0), 
                    index=df.index, name="TR")
     
-    # Calcular ATR usando suavizado exponencial
-    ATR = TR.ewm(alpha=1 / longitud).mean()
+    # Calculate ATR using exponential smoothing
+    ATR = TR.ewm(alpha=1 / length).mean()
     
-    # Calcular precio medio y bandas básicas
-    medio = (High + Low) / 2
-    FinalUpperB = medio + factor * ATR
-    FinalLowerB = medio - factor * ATR
+    # Calculate mid price and basic bands
+    mid = (High + Low) / 2
+    FinalUpperB = mid + factor * ATR
+    FinalLowerB = mid - factor * ATR
     
-    # Inicializar SuperTendencia
-    Supertendencia = np.zeros(ATR.shape[0], dtype=bool)
+    # Initialize SuperTrend
+    Supertrend = np.zeros(ATR.shape[0], dtype=bool)
     close = df["Close"]
     
-    # Calcular SuperTendencia punto por punto
+    # Calculate SuperTrend point by point
     for i in range(1, ATR.shape[0]):
-        # Determinar dirección de tendencia
+        # Determine trend direction
         if close[i] > FinalUpperB[i - 1]:
-            # Precio rompe banda superior -> tendencia alcista
-            Supertendencia[i] = True
+            # Price breaks upper band -> bullish trend
+            Supertrend[i] = True
         elif close[i] < FinalLowerB[i - 1]:
-            # Precio rompe banda inferior -> tendencia bajista
-            Supertendencia[i] = False
+            # Price breaks lower band -> bearish trend
+            Supertrend[i] = False
         else:
-            # Mantener tendencia anterior
-            Supertendencia[i] = Supertendencia[i - 1]
+            # Maintain previous trend
+            Supertrend[i] = Supertrend[i - 1]
             
-            # Ajustar bandas para evitar cambios prematuros
-            if Supertendencia[i] == True and FinalLowerB[i] < FinalLowerB[i - 1]:
-                # En tendencia alcista, banda inferior no puede bajar
+            # Adjust bands to prevent premature changes
+            if Supertrend[i] == True and FinalLowerB[i] < FinalLowerB[i - 1]:
+                # In bullish trend, lower band cannot decrease
                 FinalLowerB[i] = FinalLowerB[i - 1]
-            elif Supertendencia[i] == False and FinalUpperB[i] > FinalUpperB[i - 1]:
-                # En tendencia bajista, banda superior no puede subir
+            elif Supertrend[i] == False and FinalUpperB[i] > FinalUpperB[i - 1]:
+                # In bearish trend, upper band cannot increase
                 FinalUpperB[i] = FinalUpperB[i - 1]
         
-        # Eliminar banda inactiva según dirección de tendencia
-        if Supertendencia[i] == True:
-            # Tendencia alcista: eliminar banda superior
+        # Remove inactive band based on trend direction
+        if Supertrend[i] == True:
+            # Bullish trend: remove upper band
             FinalUpperB[i] = np.nan
         else:
-            # Tendencia bajista: eliminar banda inferior
+            # Bearish trend: remove lower band
             FinalLowerB[i] = np.nan
     
-    # Ajustar primer valor
-    if Supertendencia[1] == False:
+    # Adjust first value
+    if Supertrend[1] == False:
         FinalLowerB[0] = np.nan
     else:
         FinalUpperB[0] = np.nan
     
-    # Preparar datos finales (eliminar período de calentamiento)
-    FU = FinalUpperB[longitud - 1:]
-    FL = FinalLowerB[longitud - 1:]
+    # Prepare final data (remove warm-up period)
+    FU = FinalUpperB[length - 1:]
+    FL = FinalLowerB[length - 1:]
     
-    # Crear SuperTendencia final combinando ambas bandas
+    # Create final SuperTrend combining both bands
     ST_array = np.nansum([FU, FL], axis=0)
-    ST_array[0] = np.nan  # Primer valor siempre NaN
+    ST_array[0] = np.nan  # First value always NaN
     
-    # Crear DataFrame resultado
+    # Create result DataFrame
     ST_df = pd.concat([FU, FL], axis=1)
-    ST_df["SuperTendencia"] = ST_array
-    ST_df.columns = ["FinalUpperB", "FinalLowerB", "SuperTendencia"]
+    ST_df["SuperTrend"] = ST_array
+    ST_df.columns = ["FinalUpperB", "FinalLowerB", "SuperTrend"]
     
     return ST_df
 
 def analyze_supertrend_signals(df: pd.DataFrame, st_data: pd.DataFrame) -> pd.DataFrame:
     """
-    Analizar señales de trading del SuperTendencia
+    Analyze SuperTrend trading signals
     
-    Parámetros
+    Parameters
     ----------
     df : pd.DataFrame
-        Datos históricos originales
+        Original historical data
     st_data : pd.DataFrame
-        Datos del SuperTendencia (output de SuperTendencia)
+        SuperTrend data (output of SuperTrend)
     
     Returns
     -------
     pd.DataFrame
-        DataFrame con señales y análisis
+        DataFrame with signals and analysis
     """
-    # Alinear índices (ST tiene menos datos por período de calentamiento)
+    # Align indices (ST has fewer data points due to warm-up period)
     aligned_df = df.loc[st_data.index]
     
     signals = pd.DataFrame(index=st_data.index)
@@ -159,67 +161,67 @@ def analyze_supertrend_signals(df: pd.DataFrame, st_data: pd.DataFrame) -> pd.Da
     signals['high'] = aligned_df['High']
     signals['low'] = aligned_df['Low']
     signals['volume'] = aligned_df['Volume']
-    signals['supertrend'] = st_data['SuperTendencia']
+    signals['supertrend'] = st_data['SuperTrend']
     signals['upper_band'] = st_data['FinalUpperB']
     signals['lower_band'] = st_data['FinalLowerB']
     
-    # Determinar tendencia actual
-    signals['trend'] = np.where(~pd.isna(st_data['FinalLowerB']), 1, -1)  # 1=alcista, -1=bajista
+    # Determine current trend
+    signals['trend'] = np.where(~pd.isna(st_data['FinalLowerB']), 1, -1)  # 1=bullish, -1=bearish
     signals['trend_change'] = signals['trend'].diff().fillna(0)
     
-    # Señales de cambio de tendencia
-    signals['buy_signal'] = signals['trend_change'] == 2    # De bajista a alcista
-    signals['sell_signal'] = signals['trend_change'] == -2  # De alcista a bajista
+    # Trend change signals
+    signals['buy_signal'] = signals['trend_change'] == 2    # From bearish to bullish
+    signals['sell_signal'] = signals['trend_change'] == -2  # From bullish to bearish
     
-    # Distancia del precio al SuperTendencia (fuerza de tendencia)
+    # Distance from price to SuperTrend (trend strength)
     signals['price_st_distance'] = np.where(
         signals['trend'] == 1,
-        (signals['price'] - signals['supertrend']) / signals['supertrend'],  # Alcista
-        (signals['supertrend'] - signals['price']) / signals['supertrend']   # Bajista
+        (signals['price'] - signals['supertrend']) / signals['supertrend'],  # Bullish
+        (signals['supertrend'] - signals['price']) / signals['supertrend']   # Bearish
     )
     
-    # Duración de la tendencia
+    # Trend duration
     trend_groups = (signals['trend'] != signals['trend'].shift()).cumsum()
     signals['trend_duration'] = signals.groupby(trend_groups).cumcount() + 1
     
-    # Volatilidad del período (usando SuperTendencia como proxy)
+    # Period volatility (using SuperTrend as proxy)
     st_changes = signals['supertrend'].pct_change().abs()
     signals['st_volatility'] = st_changes.rolling(10).mean()
     
-    # Calidad de señales
+    # Signal quality
     signals['signal_strength'] = 'NONE'
     
-    # Señales fuertes (con confirmaciones)
+    # Strong signals (with confirmations)
     strong_buy = (
         signals['buy_signal'] &
-        (signals['trend_duration'].shift(1) > 3) &  # Tendencia bajista duradera
-        (signals['volume'] > signals['volume'].rolling(20).mean()) &  # Volumen confirmatorio
-        (signals['price'] > signals['price'].shift(1))  # Momentum alcista
+        (signals['trend_duration'].shift(1) > 3) &  # Lasting bearish trend
+        (signals['volume'] > signals['volume'].rolling(20).mean()) &  # Confirmatory volume
+        (signals['price'] > signals['price'].shift(1))  # Bullish momentum
     )
     
     strong_sell = (
         signals['sell_signal'] &
-        (signals['trend_duration'].shift(1) > 3) &  # Tendencia alcista duradera
+        (signals['trend_duration'].shift(1) > 3) &  # Lasting bullish trend
         (signals['volume'] > signals['volume'].rolling(20).mean()) &
-        (signals['price'] < signals['price'].shift(1))  # Momentum bajista
+        (signals['price'] < signals['price'].shift(1))  # Bearish momentum
     )
     
-    # Señales de pullback (retrocesos en tendencia)
+    # Pullback signals (retracements within trend)
     pullback_buy = (
-        (signals['trend'] == 1) &  # Tendencia alcista
-        (signals['low'] <= signals['supertrend'] * 1.005) &  # Precio cerca del ST
-        (signals['close'] > signals['supertrend']) &  # Pero cierra arriba
-        (signals['trend_duration'] > 5)  # Tendencia establecida
+        (signals['trend'] == 1) &  # Bullish trend
+        (signals['low'] <= signals['supertrend'] * 1.005) &  # Price near ST
+        (signals['close'] > signals['supertrend']) &  # But closes above
+        (signals['trend_duration'] > 5)  # Established trend
     )
     
     pullback_sell = (
-        (signals['trend'] == -1) &  # Tendencia bajista
-        (signals['high'] >= signals['supertrend'] * 0.995) &  # Precio cerca del ST
-        (signals['close'] < signals['supertrend']) &  # Pero cierra abajo
-        (signals['trend_duration'] > 5)  # Tendencia establecida
+        (signals['trend'] == -1) &  # Bearish trend
+        (signals['high'] >= signals['supertrend'] * 0.995) &  # Price near ST
+        (signals['close'] < signals['supertrend']) &  # But closes below
+        (signals['trend_duration'] > 5)  # Established trend
     )
     
-    # Asignar calidades
+    # Assign quality levels
     signals.loc[strong_buy, 'signal_strength'] = 'STRONG_BUY'
     signals.loc[strong_sell, 'signal_strength'] = 'STRONG_SELL'
     signals.loc[pullback_buy, 'signal_strength'] = 'PULLBACK_BUY'
@@ -230,45 +232,45 @@ def analyze_supertrend_signals(df: pd.DataFrame, st_data: pd.DataFrame) -> pd.Da
     return signals
 ```
 
-## Estrategias de Trading con SuperTendencia
+## Trading Strategies with SuperTrend
 
 ### 1. Trend Following Strategy
 ```python
 def supertrend_following_strategy(df: pd.DataFrame, st_length: int = 14, st_factor: float = 3.0):
     """
-    Estrategia de seguimiento de tendencia usando SuperTendencia
+    Trend following strategy using SuperTrend
     """
-    # Calcular SuperTendencia
-    st = SuperTendencia(df, longitud=st_length, factor=st_factor)
+    # Calculate SuperTrend
+    st = SuperTrend(df, length=st_length, factor=st_factor)
     signals = analyze_supertrend_signals(df, st)
     
-    # Filtros adicionales
+    # Additional filters
     sma_200 = df['Close'].rolling(200).mean()
     aligned_sma = sma_200.loc[signals.index]
     
     entry_signals = pd.Series(0, index=signals.index)
     
-    # Long entries (solo en mercado alcista general)
+    # Long entries (only in overall bullish market)
     long_entry = (
         signals['buy_signal'] &
         (signals['signal_strength'].isin(['STRONG_BUY'])) &
-        (signals['price'] > aligned_sma)  # Precio sobre SMA 200
+        (signals['price'] > aligned_sma)  # Price above SMA 200
     )
     
-    # Short entries (solo en mercado bajista general)
+    # Short entries (only in overall bearish market)
     short_entry = (
         signals['sell_signal'] &
         (signals['signal_strength'].isin(['STRONG_SELL'])) &
-        (signals['price'] < aligned_sma)  # Precio bajo SMA 200
+        (signals['price'] < aligned_sma)  # Price below SMA 200
     )
     
-    # Pullback entries (entradas en retrocesos)
+    # Pullback entries (entries on retracements)
     pullback_long = signals['signal_strength'] == 'PULLBACK_BUY'
     pullback_short = signals['signal_strength'] == 'PULLBACK_SELL'
     
     entry_signals[long_entry] = 1
     entry_signals[short_entry] = -1
-    entry_signals[pullback_long] = 0.5   # Posición reducida en pullbacks
+    entry_signals[pullback_long] = 0.5   # Reduced position on pullbacks
     entry_signals[pullback_short] = -0.5
     
     return {
@@ -280,10 +282,10 @@ def supertrend_following_strategy(df: pd.DataFrame, st_length: int = 14, st_fact
 
 def supertrend_rsi_strategy(df: pd.DataFrame, st_length: int = 14, st_factor: float = 3.0):
     """
-    Combinar SuperTendencia con RSI - estrategia mencionada en referencia
+    Combine SuperTrend with RSI - strategy mentioned in reference
     """
-    # SuperTendencia
-    st = SuperTendencia(df, longitud=st_length, factor=st_factor)
+    # SuperTrend
+    st = SuperTrend(df, length=st_length, factor=st_factor)
     signals = analyze_supertrend_signals(df, st)
     
     # RSI
@@ -292,31 +294,31 @@ def supertrend_rsi_strategy(df: pd.DataFrame, st_length: int = 14, st_factor: fl
     
     entry_signals = pd.Series(0, index=signals.index)
     
-    # Long setup: ST alcista + RSI cruza arriba de 50
+    # Long setup: ST bullish + RSI crosses above 50
     long_setup = (
-        signals['buy_signal'] &  # Cambio a tendencia alcista en ST
-        (aligned_rsi > 50) &     # RSI por encima de 50
-        (aligned_rsi.shift(1) <= 50)  # RSI estaba por debajo de 50
+        signals['buy_signal'] &  # Change to bullish trend in ST
+        (aligned_rsi > 50) &     # RSI above 50
+        (aligned_rsi.shift(1) <= 50)  # RSI was below 50
     )
     
-    # Short setup: ST bajista + RSI cruza abajo de 50  
+    # Short setup: ST bearish + RSI crosses below 50  
     short_setup = (
-        signals['sell_signal'] &  # Cambio a tendencia bajista en ST
-        (aligned_rsi < 50) &      # RSI por debajo de 50
-        (aligned_rsi.shift(1) >= 50)  # RSI estaba por encima de 50
+        signals['sell_signal'] &  # Change to bearish trend in ST
+        (aligned_rsi < 50) &      # RSI below 50
+        (aligned_rsi.shift(1) >= 50)  # RSI was above 50
     )
     
-    # Entries adicionales en pullbacks con RSI
+    # Additional pullback entries with RSI
     rsi_pullback_long = (
-        (signals['trend'] == 1) &  # ST en tendencia alcista
+        (signals['trend'] == 1) &  # ST in bullish trend
         (aligned_rsi < 40) &       # RSI oversold
-        (aligned_rsi > aligned_rsi.shift(1))  # RSI empezando a recuperar
+        (aligned_rsi > aligned_rsi.shift(1))  # RSI starting to recover
     )
     
     rsi_pullback_short = (
-        (signals['trend'] == -1) &  # ST en tendencia bajista
+        (signals['trend'] == -1) &  # ST in bearish trend
         (aligned_rsi > 60) &        # RSI overbought
-        (aligned_rsi < aligned_rsi.shift(1))  # RSI empezando a caer
+        (aligned_rsi < aligned_rsi.shift(1))  # RSI starting to fall
     )
     
     entry_signals[long_setup] = 1
@@ -333,7 +335,7 @@ def supertrend_rsi_strategy(df: pd.DataFrame, st_length: int = 14, st_factor: fl
     }
 
 def calculate_rsi(series: pd.Series, period: int = 14) -> pd.Series:
-    """Helper function para calcular RSI"""
+    """Helper function to calculate RSI"""
     delta = series.diff()
     gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
     loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
@@ -345,13 +347,13 @@ def calculate_rsi(series: pd.Series, period: int = 14) -> pd.Series:
 ```python
 def small_cap_supertrend_strategy(df: pd.DataFrame, gap_threshold: float = 0.03):
     """
-    Estrategia SuperTendencia específica para small caps
+    SuperTrend strategy specific to small caps
     """
-    # SuperTendencia más sensible para small caps
-    st = SuperTendencia(df, longitud=10, factor=2.5)  # Más reactivo
+    # More sensitive SuperTrend for small caps
+    st = SuperTrend(df, length=10, factor=2.5)  # More reactive
     signals = analyze_supertrend_signals(df, st)
     
-    # Detectar gaps
+    # Detect gaps
     gap_up = (df['Open'] / df['Close'].shift(1) - 1) > gap_threshold
     gap_down = (df['Open'] / df['Close'].shift(1) - 1) < -gap_threshold
     aligned_gap_up = gap_up.loc[signals.index]
@@ -364,39 +366,39 @@ def small_cap_supertrend_strategy(df: pd.DataFrame, gap_threshold: float = 0.03)
     
     entry_signals = pd.Series(0, index=signals.index)
     
-    # Gap & Go con SuperTendencia
+    # Gap & Go with SuperTrend
     gap_and_go_long = (
         aligned_gap_up &
-        (signals['trend'] == 1) &  # ST confirma alcista
-        (aligned_rvol > 3) &       # Alto volumen relativo
-        (signals['price'] > signals['price'].shift(1))  # Momentum continúa
+        (signals['trend'] == 1) &  # ST confirms bullish
+        (aligned_rvol > 3) &       # High relative volume
+        (signals['price'] > signals['price'].shift(1))  # Momentum continues
     )
     
-    # Gap fill con SuperTendencia
+    # Gap fill with SuperTrend
     gap_fill_long = (
         aligned_gap_down &
-        signals['buy_signal'] &    # ST cambia a alcista
-        (aligned_rvol > 2) &       # Volumen confirmatorio
-        (signals['price'] > df['Open'].loc[signals.index])  # Precio recupera sobre apertura
+        signals['buy_signal'] &    # ST changes to bullish
+        (aligned_rvol > 2) &       # Confirmatory volume
+        (signals['price'] > df['Open'].loc[signals.index])  # Price recovers above open
     )
     
-    # Breakout con SuperTendencia
+    # Breakout with SuperTrend
     high_20 = df['High'].rolling(20).max()
     aligned_high_20 = high_20.loc[signals.index]
     
     breakout_long = (
         signals['buy_signal'] &
-        (signals['high'] >= aligned_high_20.shift(1)) &  # Nuevo high 20 días
+        (signals['high'] >= aligned_high_20.shift(1)) &  # New 20-day high
         (aligned_rvol > 2.5) &
-        (signals['trend_duration'] <= 2)  # Cambio reciente de tendencia
+        (signals['trend_duration'] <= 2)  # Recent trend change
     )
     
     # Short setups
     gap_fade_short = (
         aligned_gap_up &
-        signals['sell_signal'] &   # ST cambia a bajista
+        signals['sell_signal'] &   # ST changes to bearish
         (aligned_rvol > 2) &
-        (signals['price'] < df['Open'].loc[signals.index])  # Precio bajo apertura
+        (signals['price'] < df['Open'].loc[signals.index])  # Price below open
     )
     
     entry_signals[gap_and_go_long] = 1
@@ -418,26 +420,26 @@ def small_cap_supertrend_strategy(df: pd.DataFrame, gap_threshold: float = 0.03)
 
 def adaptive_supertrend_parameters(df: pd.DataFrame, volatility_period: int = 20):
     """
-    Parámetros adaptativos basados en volatilidad
+    Adaptive parameters based on volatility
     """
-    # Medir volatilidad actual
+    # Measure current volatility
     atr = calculate_atr_simple(df, period=14)
     current_atr = atr.iloc[-1]
     price = df['Close'].iloc[-1]
     atr_pct = current_atr / price
     
-    # Parámetros base
+    # Base parameters
     base_length = 14
     base_factor = 3.0
     
-    # Ajustar según volatilidad
-    if atr_pct > 0.03:  # Alta volatilidad (>3%)
-        length = base_length + 3  # Más suavizado
-        factor = base_factor * 1.2  # Bandas más amplias
+    # Adjust based on volatility
+    if atr_pct > 0.03:  # High volatility (>3%)
+        length = base_length + 3  # More smoothing
+        factor = base_factor * 1.2  # Wider bands
         regime = "HIGH_VOLATILITY"
-    elif atr_pct < 0.015:  # Baja volatilidad (<1.5%)
-        length = base_length - 2  # Más reactivo
-        factor = base_factor * 0.8  # Bandas más estrechas
+    elif atr_pct < 0.015:  # Low volatility (<1.5%)
+        length = base_length - 2  # More reactive
+        factor = base_factor * 0.8  # Narrower bands
         regime = "LOW_VOLATILITY"
     else:
         length = base_length
@@ -445,14 +447,14 @@ def adaptive_supertrend_parameters(df: pd.DataFrame, volatility_period: int = 20
         regime = "NORMAL_VOLATILITY"
     
     return {
-        'length': max(length, 5),  # Mínimo 5 períodos
-        'factor': max(factor, 1.5),  # Mínimo factor 1.5
+        'length': max(length, 5),  # Minimum 5 periods
+        'factor': max(factor, 1.5),  # Minimum factor 1.5
         'atr_pct': atr_pct,
         'regime': regime
     }
 
 def calculate_atr_simple(df: pd.DataFrame, period: int = 14) -> pd.Series:
-    """Helper function para calcular ATR simple"""
+    """Helper function to calculate simple ATR"""
     high_low = df['High'] - df['Low']
     high_close = np.abs(df['High'] - df['Close'].shift())
     low_close = np.abs(df['Low'] - df['Close'].shift())
@@ -461,27 +463,27 @@ def calculate_atr_simple(df: pd.DataFrame, period: int = 14) -> pd.Series:
     return true_range.rolling(period).mean()
 ```
 
-## Optimización y Multi-Timeframe
+## Optimization and Multi-Timeframe
 
 ```python
 def multi_timeframe_supertrend(symbol: str, primary_tf: str = '1d', secondary_tf: str = '4h'):
     """
-    Análisis SuperTendencia en múltiples timeframes
+    Multi-timeframe SuperTrend analysis
     """
     import yfinance as yf
     
-    # Obtener datos
+    # Get data
     df_primary = yf.download(symbol, period="6mo", interval=primary_tf)
     df_secondary = yf.download(symbol, period="2mo", interval=secondary_tf)
     
-    # SuperTendencia en cada timeframe
-    st_primary = SuperTendencia(df_primary, longitud=14, factor=3.0)
-    st_secondary = SuperTendencia(df_secondary, longitud=14, factor=2.5)  # Más sensible en TF menor
+    # SuperTrend on each timeframe
+    st_primary = SuperTrend(df_primary, length=14, factor=3.0)
+    st_secondary = SuperTrend(df_secondary, length=14, factor=2.5)  # More sensitive on lower TF
     
     signals_primary = analyze_supertrend_signals(df_primary, st_primary)
     signals_secondary = analyze_supertrend_signals(df_secondary, st_secondary)
     
-    # Estado actual
+    # Current state
     current_primary = signals_primary.iloc[-1]
     current_secondary = signals_secondary.iloc[-1]
     
@@ -496,7 +498,7 @@ def multi_timeframe_supertrend(symbol: str, primary_tf: str = '1d', secondary_tf
         'setup_quality': None
     }
     
-    # Análisis de confluencia
+    # Confluence analysis
     if current_primary['trend'] == current_secondary['trend']:
         if current_primary['trend'] == 1:
             analysis['confluence'] = 'BULLISH_ALIGNMENT'
@@ -512,7 +514,7 @@ def multi_timeframe_supertrend(symbol: str, primary_tf: str = '1d', secondary_tf
         analysis['confluence'] = 'MIXED_SIGNALS'
         analysis['setup_quality'] = 'CONFLICTED'
     
-    # Detectar setups de alta probabilidad
+    # Detect high probability setups
     if (current_primary['buy_signal'] and 
         current_secondary['trend'] == 1 and 
         current_secondary['trend_duration'] > 2):
@@ -526,11 +528,11 @@ def multi_timeframe_supertrend(symbol: str, primary_tf: str = '1d', secondary_tf
 
 def supertrend_parameter_optimization(df: pd.DataFrame, length_range: tuple = (10, 20), factor_range: tuple = (2.0, 4.0)):
     """
-    Optimización simple de parámetros SuperTendencia
+    Simple SuperTrend parameter optimization
     """
     import itertools
     
-    # Rangos de parámetros a probar
+    # Parameter ranges to test
     lengths = range(length_range[0], length_range[1] + 1, 2)
     factors = np.arange(factor_range[0], factor_range[1] + 0.1, 0.5)
     
@@ -538,16 +540,16 @@ def supertrend_parameter_optimization(df: pd.DataFrame, length_range: tuple = (1
     
     for length, factor in itertools.product(lengths, factors):
         try:
-            # Calcular SuperTendencia con parámetros
-            st = SuperTendencia(df, longitud=length, factor=factor)
+            # Calculate SuperTrend with parameters
+            st = SuperTrend(df, length=length, factor=factor)
             signals = analyze_supertrend_signals(df, st)
             
-            # Métricas simples de evaluación
+            # Simple evaluation metrics
             total_signals = signals['buy_signal'].sum() + signals['sell_signal'].sum()
             if total_signals == 0:
                 continue
                 
-            # Simular returns simples
+            # Simulate simple returns
             position = 0
             returns = []
             
@@ -573,13 +575,13 @@ def supertrend_parameter_optimization(df: pd.DataFrame, length_range: tuple = (1
                     'win_rate': win_rate,
                     'sharpe': sharpe,
                     'total_signals': total_signals,
-                    'score': sharpe * total_return  # Score compuesto
+                    'score': sharpe * total_return  # Composite score
                 })
         
         except Exception as e:
             continue
     
-    # Encontrar mejores parámetros
+    # Find best parameters
     if results:
         best_result = max(results, key=lambda x: x['score'])
         return best_result, results
@@ -587,26 +589,26 @@ def supertrend_parameter_optimization(df: pd.DataFrame, length_range: tuple = (1
         return None, []
 ```
 
-## Visualización Completa
+## Complete Visualization
 
 ```python
-def plot_supertrend_analysis(df: pd.DataFrame, st_data: pd.DataFrame, signals: pd.DataFrame, title: str = "SuperTendencia Analysis"):
+def plot_supertrend_analysis(df: pd.DataFrame, st_data: pd.DataFrame, signals: pd.DataFrame, title: str = "SuperTrend Analysis"):
     """
-    Crear gráfico completo de análisis SuperTendencia
+    Create complete SuperTrend analysis chart
     """
     import matplotlib.pyplot as plt
     import matplotlib.dates as mdates
     
-    # Alinear datos
+    # Align data
     aligned_df = df.loc[st_data.index]
     
     fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(15, 12),
                                         gridspec_kw={'height_ratios': [3, 1, 1]})
     
-    # Chart 1: Precio + SuperTendencia
+    # Chart 1: Price + SuperTrend
     ax1.plot(aligned_df.index, aligned_df['Close'], 'k-', linewidth=2, label='Price', zorder=1)
     
-    # SuperTendencia líneas
+    # SuperTrend lines
     bullish_mask = ~pd.isna(st_data['FinalLowerB'])
     bearish_mask = ~pd.isna(st_data['FinalUpperB'])
     
@@ -615,7 +617,7 @@ def plot_supertrend_analysis(df: pd.DataFrame, st_data: pd.DataFrame, signals: p
     ax1.plot(st_data.index[bearish_mask], st_data['FinalUpperB'][bearish_mask], 
              'r-', linewidth=3, label='SuperTrend (Bearish)', zorder=2)
     
-    # Marcar señales
+    # Mark signals
     buy_signals = signals.index[signals['buy_signal']]
     sell_signals = signals.index[signals['sell_signal']]
     
@@ -655,7 +657,7 @@ def plot_supertrend_analysis(df: pd.DataFrame, st_data: pd.DataFrame, signals: p
     ax3.set_ylabel('Distance %')
     ax3.grid(True, alpha=0.3)
     
-    # Formato fechas
+    # Date formatting
     for ax in [ax1, ax2, ax3]:
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
         ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
@@ -666,118 +668,114 @@ def plot_supertrend_analysis(df: pd.DataFrame, st_data: pd.DataFrame, signals: p
 
 def supertrend_complete_example():
     """
-    Ejemplo completo de análisis con SuperTendencia
+    Complete analysis example with SuperTrend
     """
     import yfinance as yf
     
-    # Obtener datos
+    # Get data
     ticker = "AAPL"
     df = yf.download(ticker, start="2023-01-01", end="2024-01-01", interval="1d")
     
-    print(f"=== ANÁLISIS SUPERTENDENCIA: {ticker} ===\n")
+    print(f"=== SUPERTREND ANALYSIS: {ticker} ===\n")
     
-    # Parámetros adaptativos
+    # Adaptive parameters
     adaptive_params = adaptive_supertrend_parameters(df)
-    print(f"📊 PARÁMETROS ADAPTATIVOS:")
-    print(f"   Régimen de Volatilidad: {adaptive_params['regime']}")
+    print(f"ADAPTIVE PARAMETERS:")
+    print(f"   Volatility Regime: {adaptive_params['regime']}")
     print(f"   ATR %: {adaptive_params['atr_pct']:.2%}")
-    print(f"   Longitud: {adaptive_params['length']}")
+    print(f"   Length: {adaptive_params['length']}")
     print(f"   Factor: {adaptive_params['factor']:.1f}")
     
-    # Calcular SuperTendencia
-    st = SuperTendencia(df, 
-                       longitud=adaptive_params['length'],
-                       factor=adaptive_params['factor'])
+    # Calculate SuperTrend
+    st = SuperTrend(df, 
+                   length=adaptive_params['length'],
+                   factor=adaptive_params['factor'])
     signals = analyze_supertrend_signals(df, st)
     
-    # Estadísticas
+    # Statistics
     buy_signals_count = signals['buy_signal'].sum()
     sell_signals_count = signals['sell_signal'].sum()
     avg_trend_duration = signals['trend_duration'].mean()
     strong_signals = signals['signal_strength'].str.contains('STRONG').sum()
     
-    print(f"\n📈 ESTADÍSTICAS DEL PERÍODO:")
-    print(f"   Señales de Compra: {buy_signals_count}")
-    print(f"   Señales de Venta: {sell_signals_count}")
-    print(f"   Señales Fuertes: {strong_signals}")
-    print(f"   Duración Promedio de Tendencia: {avg_trend_duration:.1f} días")
+    print(f"\nPERIOD STATISTICS:")
+    print(f"   Buy Signals: {buy_signals_count}")
+    print(f"   Sell Signals: {sell_signals_count}")
+    print(f"   Strong Signals: {strong_signals}")
+    print(f"   Average Trend Duration: {avg_trend_duration:.1f} days")
     
-    # Análisis actual
+    # Current analysis
     current = signals.iloc[-1]
-    trend_name = "ALCISTA" if current['trend'] == 1 else "BAJISTA"
+    trend_name = "BULLISH" if current['trend'] == 1 else "BEARISH"
     
-    print(f"\n🎯 ANÁLISIS ACTUAL:")
-    print(f"   Precio: ${current['price']:.2f}")
+    print(f"\nCURRENT ANALYSIS:")
+    print(f"   Price: ${current['price']:.2f}")
     print(f"   SuperTrend: ${current['supertrend']:.2f}")
-    print(f"   Tendencia: {trend_name}")
-    print(f"   Duración Tendencia: {current['trend_duration']} días")
-    print(f"   Distancia al ST: {current['price_st_distance']:.2%}")
-    print(f"   Fuerza de Señal: {current['signal_strength']}")
+    print(f"   Trend: {trend_name}")
+    print(f"   Trend Duration: {current['trend_duration']} days")
+    print(f"   Distance to ST: {current['price_st_distance']:.2%}")
+    print(f"   Signal Strength: {current['signal_strength']}")
     
     if current['buy_signal']:
-        print("   🟢 SEÑAL: BUY - Cambio a tendencia alcista")
+        print("   SIGNAL: BUY - Change to bullish trend")
     elif current['sell_signal']:
-        print("   🔴 SEÑAL: SELL - Cambio a tendencia bajista")
+        print("   SIGNAL: SELL - Change to bearish trend")
     elif current['trend'] == 1:
-        print(f"   🟢 MANTENER LONG - Soporte en ${current['supertrend']:.2f}")
+        print(f"   HOLD LONG - Support at ${current['supertrend']:.2f}")
     else:
-        print(f"   🔴 MANTENER SHORT - Resistencia en ${current['supertrend']:.2f}")
+        print(f"   HOLD SHORT - Resistance at ${current['supertrend']:.2f}")
     
     # Multi-timeframe
     mtf_analysis = multi_timeframe_supertrend(ticker)
-    print(f"\n🔄 ANÁLISIS MULTI-TIMEFRAME:")
-    print(f"   Confluencia: {mtf_analysis['confluence']}")
-    print(f"   Calidad Setup: {mtf_analysis['setup_quality']}")
+    print(f"\nMULTI-TIMEFRAME ANALYSIS:")
+    print(f"   Confluence: {mtf_analysis['confluence']}")
+    print(f"   Setup Quality: {mtf_analysis['setup_quality']}")
     
-    # Optimización
+    # Optimization
     best_params, all_results = supertrend_parameter_optimization(df)
     if best_params:
-        print(f"\n⚙️ PARÁMETROS ÓPTIMOS:")
-        print(f"   Longitud: {best_params['length']}")
+        print(f"\nOPTIMAL PARAMETERS:")
+        print(f"   Length: {best_params['length']}")
         print(f"   Factor: {best_params['factor']}")
         print(f"   Sharpe: {best_params['sharpe']:.2f}")
         print(f"   Win Rate: {best_params['win_rate']:.1%}")
     
-    # Crear gráfico
+    # Create chart
     plot_supertrend_analysis(df, st, signals, f"SuperTrend Analysis - {ticker}")
     
     return st, signals
 
-# Ejecutar ejemplo
+# Run example
 if __name__ == "__main__":
     supertrend_complete_example()
 ```
 
-## Mejores Prácticas
+## Best Practices
 
-### ✅ **Do's (Hacer)**
+### ✅ **Do's**
 
-1. **Úsalo como soporte/resistencia dinámico**: ST excelente para trailing stops
-2. **Combina con RSI**: La combinación ST + RSI es muy efectiva
-3. **Ajusta parámetros según volatilidad**: Factor más alto para activos volátiles
-4. **Filtra señales con volumen**: Confirma cambios de tendencia con volumen
+1. **Use as dynamic support/resistance**: ST excellent for trailing stops
+2. **Combine with RSI**: The ST + RSI combination is very effective
+3. **Adjust parameters based on volatility**: Higher factor for volatile assets
+4. **Filter signals with volume**: Confirm trend changes with volume
 
-### ❌ **Don'ts (No Hacer)**
+### ❌ **Don'ts**
 
-1. **No uses en mercados muy choppy**: ST genera whipsaws en rangos estrechos
-2. **No ignores la tendencia mayor**: Confirma con timeframes superiores
-3. **No uses factor muy bajo**: Puede generar señales excesivas
-4. **No trades contra contexto**: Una línea verde no garantiza rally
+1. **Don't use in very choppy markets**: ST generates whipsaws in tight ranges
+2. **Don't ignore the larger trend**: Confirm with higher timeframes
+3. **Don't use a very low factor**: Can generate excessive signals
+4. **Don't trade against context**: A green line doesn't guarantee a rally
 
-### 🎯 **Parámetros Recomendados**
+### 🎯 **Recommended Parameters**
 
 ```python
 SUPERTREND_SETTINGS = {
-    'conservative': {'length': 21, 'factor': 4.0},    # Menos señales, más confiables
-    'standard': {'length': 14, 'factor': 3.0},       # Parámetros clásicos
-    'aggressive': {'length': 10, 'factor': 2.5},     # Más señales, mayor riesgo
-    'small_caps': {'length': 12, 'factor': 2.8},     # Adaptado a volatilidad
-    'scalping': {'length': 7, 'factor': 2.0}         # Para timeframes cortos
+    'conservative': {'length': 21, 'factor': 4.0},    # Fewer signals, more reliable
+    'standard': {'length': 14, 'factor': 3.0},       # Classic parameters
+    'aggressive': {'length': 10, 'factor': 2.5},     # More signals, higher risk
+    'small_caps': {'length': 12, 'factor': 2.8},     # Adapted to volatility
+    'scalping': {'length': 7, 'factor': 2.0}         # For short timeframes
 }
 ```
 
-## Siguiente Paso
-
-<function_calls>
-<invoke name="TodoWrite">
-<parameter name="todos">[{"id": "1", "content": "Analizar estructura y contenido de la carpeta referencia", "status": "completed", "priority": "high"}, {"id": "2", "content": "Identificar gaps en documentaci\u00f3n actual vs referencia", "status": "completed", "priority": "high"}, {"id": "3", "content": "Proponer mejoras espec\u00edficas para integrar conocimiento", "status": "completed", "priority": "medium"}, {"id": "4", "content": "Analizar como mejorar documentaci\u00f3n existente", "status": "completed", "priority": "high"}, {"id": "5", "content": "Mejorar docs/backtesting/metrics.md con f\u00f3rmulas espec\u00edficas", "status": "completed", "priority": "high"}, {"id": "6", "content": "Agregar indicadores t\u00e9cnicos faltantes a docs/indicators/", "status": "completed", "priority": "high"}, {"id": "7", "content": "Crear docs/strategies/strategy_framework.md", "status": "pending", "priority": "high"}, {"id": "8", "content": "Agregar docs/analysis/fundamental_analysis.md", "status": "pending", "priority": "medium"}]
+## Next Step

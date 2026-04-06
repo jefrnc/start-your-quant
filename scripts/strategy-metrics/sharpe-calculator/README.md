@@ -1,29 +1,31 @@
-# Calculadora de Sharpe Ratio
+> 🇪🇸 [Leer en Español](README.es.md) | 🇺🇸 **English**
 
-Script completo para calcular Sharpe ratio y métricas relacionadas de estrategias de trading cuantitativo.
+# Sharpe Ratio Calculator
 
-## Características
+A complete script to calculate the Sharpe ratio and related metrics for quantitative trading strategies.
 
-✅ **Múltiples formatos de entrada**: Returns directos o trades con P&L
-✅ **Análisis completo**: Sharpe, Sortino, Calmar, Information Ratio
-✅ **Comparación con benchmarks**: SPY, QQQ, sector ETFs
-✅ **Sharpe ratio rodante**: Para análisis temporal
-✅ **Validaciones robustas**: Manejo de datos faltantes y outliers
+## Features
 
-## Uso Rápido
+- **Multiple input formats**: Direct returns or trades with P&L
+- **Comprehensive analysis**: Sharpe, Sortino, Calmar, Information Ratio
+- **Benchmark comparison**: SPY, QQQ, sector ETFs
+- **Rolling Sharpe ratio**: For temporal analysis
+- **Robust validations**: Missing data and outlier handling
+
+## Quick Usage
 
 ```bash
-# Análisis básico desde returns
+# Basic analysis from returns
 python calculate_sharpe.py --returns daily_returns.csv
 
-# Análisis desde trades
+# Analysis from trades
 python calculate_sharpe.py --trades my_trades.csv --capital 10000
 
-# Comparación con benchmark
+# Comparison with benchmark
 python calculate_sharpe.py --returns strategy.csv --benchmark spy.csv
 ```
 
-## Formato de Datos
+## Data Format
 
 ### Returns CSV
 ```csv
@@ -41,26 +43,26 @@ date,pnl
 2024-01-03,200.00
 ```
 
-## Métricas Calculadas
+## Calculated Metrics
 
-| Métrica | Descripción | Interpretación |
-|---------|-------------|----------------|
-| **Sharpe Ratio** | Return ajustado por riesgo | > 1.0 = Bueno, > 2.0 = Excelente |
-| **Sortino Ratio** | Solo considera downside risk | Mejor para estrategias asimétricas |
-| **Calmar Ratio** | Return anual / Max Drawdown | Eficiencia vs pérdida máxima |
-| **Information Ratio** | Excess return vs benchmark | Skill del trader vs mercado |
+| Metric | Description | Interpretation |
+|--------|-------------|----------------|
+| **Sharpe Ratio** | Risk-adjusted return | > 1.0 = Good, > 2.0 = Excellent |
+| **Sortino Ratio** | Only considers downside risk | Better for asymmetric strategies |
+| **Calmar Ratio** | Annual return / Max Drawdown | Efficiency vs maximum loss |
+| **Information Ratio** | Excess return vs benchmark | Trader skill vs market |
 
-## Interpretación Sharpe Ratio
+## Sharpe Ratio Interpretation
 
 ```
-> 2.0   : Excelente 🚀
-1.0-2.0 : Muy bueno ✅
-0.5-1.0 : Bueno 👍
-0.0-0.5 : Pobre ⚠️
-< 0.0   : Destruye valor ❌
+> 2.0   : Excellent
+1.0-2.0 : Very good
+0.5-1.0 : Good
+0.0-0.5 : Poor
+< 0.0   : Destroys value
 ```
 
-## Ejemplos Prácticos
+## Practical Examples
 
 ### Gap & Go Strategy Analysis
 ```bash
@@ -71,7 +73,7 @@ python calculate_sharpe.py \
   --rf-rate 0.045
 ```
 
-### Rolling Sharpe para Monitoring
+### Rolling Sharpe for Monitoring
 ```bash
 python calculate_sharpe.py \
   --returns daily_returns.csv \
@@ -79,56 +81,56 @@ python calculate_sharpe.py \
   --period daily
 ```
 
-## Consideraciones Importantes
+## Important Considerations
 
-⚠️ **Limitaciones del Sharpe Ratio**:
-- Asume distribución normal de returns
-- Sensible a outliers extremos
-- No captura tail risk
-- Período de medición afecta el resultado
+**Sharpe Ratio Limitations**:
+- Assumes normal distribution of returns
+- Sensitive to extreme outliers
+- Does not capture tail risk
+- Measurement period affects the result
 
-💡 **Mejores Prácticas**:
-- Usar múltiples métricas (Sharpe + Sortino + Calmar)
-- Comparar siempre con benchmarks relevantes
-- Analizar Sharpe rolling para detectar degradación
-- Considerar régimen de mercado (bull vs bear)
+**Best Practices**:
+- Use multiple metrics (Sharpe + Sortino + Calmar)
+- Always compare with relevant benchmarks
+- Analyze rolling Sharpe to detect degradation
+- Consider market regime (bull vs bear)
 
-## Configuración Avanzada
+## Advanced Configuration
 
 ```python
 from calculate_sharpe import SharpeCalculator
 
-# Personalizar risk-free rate
+# Customize risk-free rate
 calc = SharpeCalculator(risk_free_rate=0.045)
 
-# Análisis detallado
+# Detailed analysis
 analysis = calc.detailed_analysis(returns, period='daily')
 print(f"Sharpe: {analysis['sharpe_ratio']:.4f}")
 print(f"Max DD: {analysis['max_drawdown']:.2%}")
 ```
 
-## Integración con Otros Scripts
+## Integration with Other Scripts
 
-Este script es parte del **Quant Playbook** y se integra con:
+This script is part of the **Quant Playbook** and integrates with:
 
-- `../max-drawdown/`: Análisis de drawdown detallado
-- `../profit-factor/`: Cálculo de profit factor
-- `../../backtesting/`: Validación de estrategias
-- `../../data-collection/`: Pipelines de datos
+- `../max-drawdown/`: Detailed drawdown analysis
+- `../profit-factor/`: Profit factor calculation
+- `../../backtesting/`: Strategy validation
+- `../../data-collection/`: Data pipelines
 
 ## Troubleshooting
 
-### Error: "Datos insuficientes"
-- Mínimo 2 observaciones válidas
-- Verificar formato de fechas
-- Remover filas con NaN
+### Error: "Insufficient data"
+- Minimum 2 valid observations
+- Verify date format
+- Remove rows with NaN
 
-### Sharpe ratio = ∞
-- Volatilidad = 0 (todos los returns iguales)
-- Usar período más largo
-- Verificar calidad de datos
+### Sharpe ratio = infinity
+- Volatility = 0 (all returns equal)
+- Use a longer period
+- Verify data quality
 
-### Comparación con benchmark falla
-- Alinear fechas entre strategy y benchmark
-- Usar mismo período de tiempo
-- Verificar formato de columnas
+### Benchmark comparison fails
+- Align dates between strategy and benchmark
+- Use the same time period
+- Verify column format

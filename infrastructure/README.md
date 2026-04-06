@@ -1,67 +1,69 @@
-# Infraestructura para Trading Cuantitativo
+> 🇪🇸 [Leer en Español](README.es.md) | 🇺🇸 **English**
 
-Este directorio contiene templates y configuraciones para la infraestructura tecnológica necesaria para operar sistemas de trading cuantitativo a escala profesional.
+# Infrastructure for Quantitative Trading
 
-## Estructura
+This directory contains templates and configurations for the technology infrastructure needed to operate quantitative trading systems at a professional scale.
+
+## Structure
 
 ```
 infrastructure/
-├── docker/              # Contenedores Docker para servicios
-├── kubernetes/          # Orquestación y escalamiento
-├── monitoring/          # Monitoreo y alertas
-├── data-pipeline/       # Pipelines de datos en tiempo real
+├── docker/              # Docker containers for services
+├── kubernetes/          # Orchestration and scaling
+├── monitoring/          # Monitoring and alerts
+├── data-pipeline/       # Real-time data pipelines
 └── README.md
 ```
 
-## Componentes Principales
+## Main Components
 
-### 1. Contenedores Docker
-- **Trading Engine**: Núcleo de ejecución de estrategias
-- **Market Data**: Recolección y normalización de datos
-- **Risk Management**: Sistema de gestión de riesgo en tiempo real
-- **Backtesting**: Motor de backtesting distribuido
-- **Analytics**: Análisis de performance y reporting
+### 1. Docker Containers
+- **Trading Engine**: Core strategy execution engine
+- **Market Data**: Data collection and normalization
+- **Risk Management**: Real-time risk management system
+- **Backtesting**: Distributed backtesting engine
+- **Analytics**: Performance analysis and reporting
 
-### 2. Orquestación Kubernetes
-- **Auto-scaling**: Escalamiento automático basado en carga
-- **High Availability**: Configuraciones para alta disponibilidad
-- **Service Mesh**: Comunicación segura entre servicios
-- **Config Management**: Gestión centralizada de configuraciones
+### 2. Kubernetes Orchestration
+- **Auto-scaling**: Automatic load-based scaling
+- **High Availability**: High availability configurations
+- **Service Mesh**: Secure inter-service communication
+- **Config Management**: Centralized configuration management
 
-### 3. Monitoreo y Observabilidad
-- **Métricas**: Prometheus + Grafana para métricas
-- **Logs**: ELK Stack para agregación de logs
-- **Tracing**: Jaeger para distributed tracing
-- **Alertas**: Sistema de alertas multi-canal
+### 3. Monitoring and Observability
+- **Metrics**: Prometheus + Grafana for metrics
+- **Logs**: ELK Stack for log aggregation
+- **Tracing**: Jaeger for distributed tracing
+- **Alerts**: Multi-channel alert system
 
-### 4. Pipeline de Datos
+### 4. Data Pipeline
 - **Stream Processing**: Apache Kafka + Kafka Streams
 - **Real-time Analytics**: Apache Flink
-- **Data Lake**: MinIO para almacenamiento
-- **Time Series DB**: InfluxDB para datos de mercado
+- **Data Lake**: MinIO for storage
+- **Time Series DB**: InfluxDB for market data
 
 ## Quick Start
 
-1. **Desarrollo Local**:
+1. **Local Development**:
    ```bash
    cd docker/
    docker-compose up -d
    ```
 
-2. **Producción Kubernetes**:
+2. **Kubernetes Production**:
    ```bash
    cd kubernetes/
    kubectl apply -f namespace.yaml
    kubectl apply -f .
    ```
 
-3. **Monitoreo**:
+3. **Monitoring**:
    ```bash
    cd monitoring/
    helm install monitoring ./charts/monitoring
    ```
 
-## Requisitos
+## Requirements
 
 - Docker 20.10+
 - Kubernetes 1.21+
@@ -69,26 +71,26 @@ infrastructure/
 - MinIO/S3 compatible storage
 - PostgreSQL/TimescaleDB
 
-## Configuración
+## Configuration
 
-Cada componente incluye:
-- Variables de entorno
+Each component includes:
+- Environment variables
 - Secrets management
 - Health checks
 - Resource limits
 - Security policies
 
-## Escalabilidad
+## Scalability
 
-- **Horizontal**: Auto-scaling de pods basado en CPU/memoria
-- **Vertical**: Ajuste automático de recursos
-- **Storage**: Persistent volumes con auto-provisioning
-- **Network**: Service mesh para comunicación eficiente
+- **Horizontal**: Auto-scaling of pods based on CPU/memory
+- **Vertical**: Automatic resource adjustment
+- **Storage**: Persistent volumes with auto-provisioning
+- **Network**: Service mesh for efficient communication
 
-## Seguridad
+## Security
 
-- RBAC para control de acceso
-- Network policies para aislamiento
-- Secrets encryption en reposo
-- TLS para todas las comunicaciones
-- Compliance con regulaciones financieras
+- RBAC for access control
+- Network policies for isolation
+- Secrets encryption at rest
+- TLS for all communications
+- Compliance with financial regulations

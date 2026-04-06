@@ -1,23 +1,25 @@
+> 🇪🇸 [Leer en Español](gap_and_go.es.md) | 🇺🇸 **English**
+
 # Gap & Go Strategy
 
-## La Estrategia Rey de Small Caps
+## The King Strategy of Small Caps
 
-Gap & Go es la estrategia más conocida y rentable para small caps. Cuando un stock gappea arriba con volumen y continúa, puedes capturar movimientos explosivos. La clave está en el screening y timing.
+Gap & Go is the best-known and most profitable strategy for small caps. When a stock gaps up with volume and continues, you can capture explosive moves. The key lies in screening and timing.
 
-> **⚠️ DISCLAIMER**: Small caps son extremadamente volátiles. Esta estrategia requiere experiencia, capital suficiente y gestión de riesgo estricta. Los ejemplos son educativos, no consejos financieros.
+> **⚠️ DISCLAIMER**: Small caps are extremely volatile. This strategy requires experience, sufficient capital, and strict risk management. Examples are educational, not financial advice.
 
-## Filosofía del Gap & Go
+## Gap & Go Philosophy
 
-### ¿Por Qué Funciona?
-- **FOMO Retail**: Gaps grandes atraen compradores retail
-- **Momentum Cascade**: Un gap con volumen crea más compradores
-- **Short Squeeze**: Shorts atrapados cubren posiciones
-- **Algorithmic Following**: Bots siguen momentum con volumen
+### Why Does It Work?
+- **Retail FOMO**: Large gaps attract retail buyers
+- **Momentum Cascade**: A gap with volume creates more buyers
+- **Short Squeeze**: Trapped shorts cover their positions
+- **Algorithmic Following**: Bots follow momentum with volume
 
-### Tipos de Gaps
+### Types of Gaps
 ```python
 def classify_gap_type(gap_pct, volume_ratio, float_shares, catalyst):
-    """Clasificar tipo de gap para strategy selection"""
+    """Classify gap type for strategy selection"""
     
     gap_types = {
         'explosive': {
@@ -84,7 +86,7 @@ class GapAndGoScanner:
         self.max_price = 50.00
         
     def scan_premarket_gaps(self, scan_time='08:00'):
-        """Scan pre-market para gap candidates"""
+        """Scan pre-market for gap candidates"""
         candidates = []
         
         # Get pre-market movers
@@ -377,7 +379,7 @@ class GapVWAPStrategy:
         self.alerts = []
         
     def analyze_gap_vwap_setup(self, ticker, data):
-        """Analyze gap stock usando VWAP"""
+        """Analyze gap stock using VWAP"""
         
         analysis = {
             'ticker': ticker,
@@ -429,12 +431,12 @@ class GapVWAPStrategy:
         return analysis
 ```
 
-## Risk Management para Gap & Go
+## Gap & Go Risk Management
 
-### 1. Position Sizing Específico
+### 1. Gap-Specific Position Sizing
 ```python
 def calculate_gap_position_size(account_value, gap_data, risk_tolerance=0.015):
-    """Position sizing específico para gaps"""
+    """Gap-specific position sizing"""
     
     base_risk = account_value * risk_tolerance
     
@@ -492,7 +494,7 @@ def calculate_gap_position_size(account_value, gap_data, risk_tolerance=0.015):
     shares = int(adjusted_risk / risk_per_share)
     
     # Position limits
-    max_position_value = account_value * 0.10  # 10% max en small caps volátiles
+    max_position_value = account_value * 0.10  # 10% max on volatile small caps
     max_shares = int(max_position_value / entry_price)
     
     return min(shares, max_shares)
@@ -775,7 +777,7 @@ def simulate_gap_trade(candidate, intraday_data):
     }
 ```
 
-## Mi Setup Personal
+## My Personal Setup
 
 ```python
 # gap_and_go_config.py
@@ -796,11 +798,11 @@ GAP_CONFIG = {
         'max_entry_time': '11:00'
     },
     'risk_management': {
-        'base_risk_pct': 0.015,        # 1.5% para principiantes, 2.5% para avanzados
-        'max_position_pct': 0.10,      # 10% max en small caps volátiles
+        'base_risk_pct': 0.015,        # 1.5% for beginners, 2.5% for advanced
+        'max_position_pct': 0.10,      # 10% max on volatile small caps
         'stop_strategy': 'adaptive',
         'time_stop': '15:45',
-        'beginner_mode': True          # Usar parámetros conservadores
+        'beginner_mode': True          # Use conservative parameters
     },
     'profit_targets': {
         'quick_profit': 0.08,   # 8% quick scalp
@@ -811,7 +813,7 @@ GAP_CONFIG = {
 }
 
 def my_gap_and_go_workflow():
-    """Mi workflow completo de Gap & Go"""
+    """My complete Gap & Go workflow"""
     
     # 1. Pre-market scan (7:30 AM)
     scanner = GapAndGoScanner()
@@ -828,6 +830,6 @@ def my_gap_and_go_workflow():
     return execute_gap_strategy(top_candidates)
 ```
 
-## Siguiente Paso
+## Next Step
 
-Continuemos con [VWAP Reclaim](vwap_reclaim.md), otra estrategia fundamental para small caps.
+Let's continue with [VWAP Reclaim](vwap_reclaim.md), another fundamental strategy for small caps.

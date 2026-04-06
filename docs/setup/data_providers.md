@@ -1,16 +1,18 @@
-# Configuración de Data Providers
+> 🇪🇸 [Leer en Español](data_providers.es.md) | 🇺🇸 **English**
+
+# Data Provider Configuration
 
 ## Yahoo Finance - Free Tier
 
-### Ventajas y Limitaciones
-- ✅ **Gratuito** para uso personal
-- ✅ **Históricos** disponibles por años
-- ✅ **Fácil implementación** con yfinance
-- ❌ **Rate limits** no documentados
-- ❌ **No real-time** verdadero (15-20 min delay)
-- ❌ **No level 2** data
+### Advantages and Limitations
+- **Free** for personal use
+- **Historical data** available for years
+- **Easy implementation** with yfinance
+- **Rate limits** undocumented
+- **Not truly real-time** (15-20 min delay)
+- **No Level 2** data
 
-### Implementación Yahoo Finance
+### Yahoo Finance Implementation
 
 ```python
 # src/data_acquisition/yahoo_provider.py
@@ -27,7 +29,7 @@ class YahooDataProvider:
         self.last_request_time = 0
         
     def _rate_limit(self):
-        """Control de rate limiting"""
+        """Rate limiting control"""
         elapsed = time.time() - self.last_request_time
         if elapsed < self.rate_limit_delay:
             time.sleep(self.rate_limit_delay - elapsed)
@@ -35,7 +37,7 @@ class YahooDataProvider:
     
     def get_historical_data(self, symbol: str, period: str = "1y", 
                            interval: str = "1d") -> pd.DataFrame:
-        """Obtener datos históricos"""
+        """Get historical data"""
         self._rate_limit()
         
         try:
@@ -46,10 +48,10 @@ class YahooDataProvider:
                 logging.warning(f"No data found for {symbol}")
                 return pd.DataFrame()
             
-            # Limpiar nombres de columnas
+            # Clean column names
             data.columns = [col.lower() for col in data.columns]
             
-            # Agregar símbolo
+            # Add symbol
             data['symbol'] = symbol
             
             return data
@@ -59,7 +61,7 @@ class YahooDataProvider:
             return pd.DataFrame()
     
     def get_multiple_symbols(self, symbols: List[str], period: str = "1y") -> Dict[str, pd.DataFrame]:
-        """Obtener datos para múltiples símbolos"""
+        """Get data for multiple symbols"""
         results = {}
         
         for symbol in symbols:
@@ -68,13 +70,13 @@ class YahooDataProvider:
             if not data.empty:
                 results[symbol] = data
             
-            # Rate limiting entre requests
+            # Rate limiting between requests
             time.sleep(self.rate_limit_delay)
         
         return results
     
     def get_current_price(self, symbol: str) -> Optional[float]:
-        """Obtener precio actual (delayed)"""
+        """Get current price (delayed)"""
         self._rate_limit()
         
         try:
@@ -86,7 +88,7 @@ class YahooDataProvider:
             return None
     
     def get_fundamentals(self, symbol: str) -> Dict:
-        """Obtener datos fundamentales"""
+        """Get fundamental data"""
         self._rate_limit()
         
         try:
@@ -110,9 +112,9 @@ class YahooDataProvider:
             return {}
     
     def scan_by_criteria(self, criteria: Dict) -> List[str]:
-        """Screening básico usando Yahoo Finance"""
-        # Yahoo Finance no tiene screening API público
-        # Esta es una implementación básica usando símbolos conocidos
+        """Basic screening using Yahoo Finance"""
+        # Yahoo Finance doesn't have a public screening API
+        # This is a basic implementation using known symbols
         
         popular_symbols = [
             'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'META', 'NVDA', 'AMD',
@@ -125,7 +127,7 @@ class YahooDataProvider:
             try:
                 fundamentals = self.get_fundamentals(symbol)
                 
-                # Aplicar criterios básicos
+                # Apply basic criteria
                 if criteria.get('min_market_cap'):
                     if not fundamentals.get('market_cap') or fundamentals['market_cap'] < criteria['min_market_cap']:
                         continue
@@ -141,22 +143,22 @@ class YahooDataProvider:
         
         return filtered_symbols
 
-# Ejemplo de uso
+# Usage example
 def demo_yahoo_provider():
-    """Demo del provider de Yahoo Finance"""
+    """Yahoo Finance provider demo"""
     provider = YahooDataProvider()
     
-    # Obtener datos históricos
-    print("📊 Obteniendo datos históricos de AAPL...")
+    # Get historical data
+    print("Fetching AAPL historical data...")
     aapl_data = provider.get_historical_data('AAPL', period='3mo', interval='1d')
-    print(f"Datos obtenidos: {len(aapl_data)} días")
+    print(f"Data retrieved: {len(aapl_data)} days")
     print(aapl_data.tail())
     
-    # Obtener precio actual
-    print(f"\n💰 Precio actual AAPL: ${provider.get_current_price('AAPL')}")
+    # Get current price
+    print(f"\nCurrent AAPL price: ${provider.get_current_price('AAPL')}")
     
-    # Obtener fundamentales
-    print(f"\n📈 Fundamentales AAPL:")
+    # Get fundamentals
+    print(f"\nAAPL Fundamentals:")
     fundamentals = provider.get_fundamentals('AAPL')
     for key, value in fundamentals.items():
         if value:
@@ -168,15 +170,15 @@ if __name__ == "__main__":
 
 ## Polygon.io - Professional Tier
 
-### Ventajas
-- ✅ **Real-time data** sub-second
-- ✅ **Level 2** market data
-- ✅ **Extensive API** con múltiples endpoints
-- ✅ **WebSocket** feeds para streaming
-- ✅ **Historical** data de alta calidad
-- 💰 **Paid service** ($99-249/month)
+### Advantages
+- **Real-time data** sub-second
+- **Level 2** market data
+- **Extensive API** with multiple endpoints
+- **WebSocket** feeds for streaming
+- **Historical** high-quality data
+- **Paid service** ($99-249/month)
 
-### Implementación Polygon.io
+### Polygon.io Implementation
 
 ```python
 # src/data_acquisition/polygon_provider.py
@@ -199,7 +201,7 @@ class PolygonDataProvider:
     def get_historical_bars(self, symbol: str, timespan: str = "day", 
                            from_date: str = None, to_date: str = None,
                            limit: int = 5000) -> pd.DataFrame:
-        """Obtener barras históricas"""
+        """Get historical bars"""
         
         if not from_date:
             from_date = (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d')
@@ -241,7 +243,7 @@ class PolygonDataProvider:
             return pd.DataFrame()
     
     def get_real_time_quote(self, symbol: str) -> Dict:
-        """Obtener quote en tiempo real"""
+        """Get real-time quote"""
         try:
             quote = self.client.get_last_quote(ticker=symbol)
             
@@ -259,7 +261,7 @@ class PolygonDataProvider:
             return {}
     
     def get_real_time_trade(self, symbol: str) -> Dict:
-        """Obtener último trade"""
+        """Get last trade"""
         try:
             trade = self.client.get_last_trade(ticker=symbol)
             
@@ -276,7 +278,7 @@ class PolygonDataProvider:
             return {}
     
     def get_stock_details(self, symbol: str) -> Dict:
-        """Obtener detalles del stock"""
+        """Get stock details"""
         try:
             details = self.client.get_ticker_details(symbol)
             
@@ -301,7 +303,7 @@ class PolygonDataProvider:
             return {}
     
     def get_market_holidays(self, year: int = None) -> List[Dict]:
-        """Obtener días feriados del mercado"""
+        """Get market holidays"""
         if not year:
             year = datetime.now().year
             
@@ -321,7 +323,7 @@ class PolygonDataProvider:
             return []
     
     def get_market_status(self) -> Dict:
-        """Obtener status del mercado"""
+        """Get market status"""
         try:
             status = self.client.get_market_status()
             
@@ -344,7 +346,7 @@ class PolygonDataProvider:
     
     def search_tickers(self, search_term: str, market: str = "stocks", 
                       active: bool = True, limit: int = 100) -> List[Dict]:
-        """Buscar tickers"""
+        """Search tickers"""
         try:
             tickers = self.client.list_tickers(
                 market=market,
@@ -375,7 +377,7 @@ class PolygonDataProvider:
             return []
     
     def setup_websocket(self, symbols: List[str], callback: Callable):
-        """Configurar WebSocket para datos en tiempo real"""
+        """Set up WebSocket for real-time data"""
         
         def on_message(ws, message):
             try:
@@ -393,21 +395,21 @@ class PolygonDataProvider:
         def on_open(ws):
             logging.info("WebSocket connection opened")
             
-            # Autenticarse
+            # Authenticate
             auth_msg = {
                 "action": "auth",
                 "params": self.api_key
             }
             ws.send(json.dumps(auth_msg))
             
-            # Suscribirse a símbolos
+            # Subscribe to symbols
             subscribe_msg = {
                 "action": "subscribe",
                 "params": ",".join([f"T.{symbol}" for symbol in symbols])  # Trades
             }
             ws.send(json.dumps(subscribe_msg))
         
-        # Crear conexión WebSocket
+        # Create WebSocket connection
         ws_url = "wss://socket.polygon.io/stocks"
         self.ws = websocket.WebSocketApp(
             ws_url,
@@ -420,40 +422,40 @@ class PolygonDataProvider:
         return self.ws
     
     def start_real_time_feed(self, symbols: List[str], callback: Callable):
-        """Iniciar feed de datos en tiempo real"""
+        """Start real-time data feed"""
         ws = self.setup_websocket(symbols, callback)
         ws.run_forever()
 
-# Ejemplo de uso
+# Usage example
 def demo_polygon_provider():
-    """Demo del provider de Polygon"""
+    """Polygon provider demo"""
     from config.api_keys import APIKeys
     
     if not APIKeys.POLYGON_API_KEY:
-        print("❌ Polygon API key no configurada")
+        print("Polygon API key not configured")
         return
     
     provider = PolygonDataProvider(APIKeys.POLYGON_API_KEY)
     
     # Test market status
-    print("📊 Market Status:")
+    print("Market Status:")
     status = provider.get_market_status()
     print(f"Server time: {status.get('server_time')}")
     print(f"NASDAQ: {status.get('exchanges', {}).get('nasdaq')}")
     
     # Test historical data
-    print("\n📈 Historical Data (AAPL):")
+    print("\nHistorical Data (AAPL):")
     historical = provider.get_historical_bars('AAPL', timespan='hour', 
                                              from_date='2024-01-01', limit=10)
     print(historical.head())
     
     # Test real-time quote
-    print(f"\n💰 Real-time Quote (AAPL):")
+    print(f"\nReal-time Quote (AAPL):")
     quote = provider.get_real_time_quote('AAPL')
     print(f"Bid: ${quote.get('bid')}, Ask: ${quote.get('ask')}")
     
     # Test stock details
-    print(f"\n📋 Stock Details (AAPL):")
+    print(f"\nStock Details (AAPL):")
     details = provider.get_stock_details('AAPL')
     print(f"Name: {details.get('name')}")
     print(f"Market Cap: ${details.get('market_cap'):,}" if details.get('market_cap') else "Market Cap: N/A")
@@ -464,7 +466,7 @@ if __name__ == "__main__":
 
 ## IEX Cloud - Balanced Option
 
-### Implementación IEX Cloud
+### IEX Cloud Implementation
 
 ```python
 # src/data_acquisition/iex_provider.py
@@ -480,7 +482,7 @@ class IEXCloudProvider:
         self.base_url = base_url
         
     def _make_request(self, endpoint: str, params: Dict = None) -> Dict:
-        """Hacer request a IEX API"""
+        """Make request to IEX API"""
         if params is None:
             params = {}
         
@@ -495,7 +497,7 @@ class IEXCloudProvider:
             return {}
     
     def get_quote(self, symbol: str) -> Dict:
-        """Obtener quote actual"""
+        """Get current quote"""
         data = self._make_request(f"stock/{symbol}/quote")
         
         if data:
@@ -516,7 +518,7 @@ class IEXCloudProvider:
         return {}
     
     def get_historical_prices(self, symbol: str, range_period: str = "1y") -> pd.DataFrame:
-        """Obtener precios históricos"""
+        """Get historical prices"""
         data = self._make_request(f"stock/{symbol}/chart/{range_period}")
         
         if data:
@@ -529,7 +531,7 @@ class IEXCloudProvider:
         return pd.DataFrame()
     
     def get_intraday_prices(self, symbol: str) -> pd.DataFrame:
-        """Obtener precios intraday"""
+        """Get intraday prices"""
         data = self._make_request(f"stock/{symbol}/intraday-prices")
         
         if data:
@@ -543,7 +545,7 @@ class IEXCloudProvider:
         return pd.DataFrame()
     
     def get_company_info(self, symbol: str) -> Dict:
-        """Obtener información de la empresa"""
+        """Get company information"""
         data = self._make_request(f"stock/{symbol}/company")
         
         return {
@@ -566,7 +568,7 @@ class IEXCloudProvider:
         }
     
     def get_key_stats(self, symbol: str) -> Dict:
-        """Obtener estadísticas clave"""
+        """Get key statistics"""
         data = self._make_request(f"stock/{symbol}/advanced-stats")
         
         return {
@@ -608,7 +610,7 @@ class IEXCloudProvider:
         }
     
     def get_news(self, symbol: str, count: int = 10) -> List[Dict]:
-        """Obtener noticias"""
+        """Get news"""
         data = self._make_request(f"stock/{symbol}/news/last/{count}")
         
         news = []
@@ -626,7 +628,7 @@ class IEXCloudProvider:
         return news
     
     def search_symbols(self, query: str) -> List[Dict]:
-        """Buscar símbolos"""
+        """Search symbols"""
         data = self._make_request(f"search/{query}")
         
         results = []
@@ -642,7 +644,7 @@ class IEXCloudProvider:
         return results
     
     def get_gainers_losers(self, list_type: str = "gainers") -> List[Dict]:
-        """Obtener gainers/losers"""
+        """Get gainers/losers"""
         data = self._make_request(f"stock/market/list/{list_type}")
         
         results = []
@@ -661,30 +663,30 @@ class IEXCloudProvider:
 
 # Unified Data Provider
 class UnifiedDataProvider:
-    """Provider unificado que combina múltiples fuentes"""
+    """Unified provider that combines multiple sources"""
     
     def __init__(self):
         self.providers = {}
         self.primary_provider = None
         
     def add_provider(self, name: str, provider, is_primary: bool = False):
-        """Agregar proveedor de datos"""
+        """Add data provider"""
         self.providers[name] = provider
         if is_primary:
             self.primary_provider = name
     
     def get_quote(self, symbol: str, provider_name: str = None) -> Dict:
-        """Obtener quote con fallback automático"""
+        """Get quote with automatic fallback"""
         provider_name = provider_name or self.primary_provider
         
-        # Intentar con provider primario
+        # Try with primary provider
         if provider_name in self.providers:
             try:
                 return self.providers[provider_name].get_quote(symbol)
             except Exception as e:
                 logging.warning(f"Error with primary provider {provider_name}: {e}")
         
-        # Fallback a otros providers
+        # Fallback to other providers
         for name, provider in self.providers.items():
             if name != provider_name:
                 try:
@@ -699,10 +701,10 @@ class UnifiedDataProvider:
     
     def get_historical_data(self, symbol: str, period: str = "1y", 
                            provider_name: str = None) -> pd.DataFrame:
-        """Obtener datos históricos con fallback"""
+        """Get historical data with fallback"""
         provider_name = provider_name or self.primary_provider
         
-        # Mapear períodos entre providers
+        # Map periods between providers
         period_mapping = {
             'yahoo': {'1y': '1y', '6mo': '6mo', '3mo': '3mo'},
             'polygon': {'1y': 'day', '6mo': 'day', '3mo': 'day'},
@@ -728,4 +730,4 @@ class UnifiedDataProvider:
         return pd.DataFrame()
 ```
 
-Esta configuración te permite usar múltiples data providers con fallback automático, optimizando costos y reliability.
+This configuration allows you to use multiple data providers with automatic fallback, optimizing costs and reliability.

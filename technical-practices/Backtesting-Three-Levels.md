@@ -1,44 +1,46 @@
-# Backtesting: Del Clásico al Walk-Forward
+> 🇪🇸 [Leer en Español](Backtesting-Three-Levels.es.md) | 🇺🇸 **English**
 
-Hay tres formas de simular un sistema en datos históricos. Cada una tiene su momento y su utilidad. No son excluyentes — son progresivas.
+# Backtesting: From Classic to Walk-Forward
 
-## Nivel 1: Backtest Clásico
+There are three ways to simulate a system on historical data. Each has its time and purpose. They are not mutually exclusive -- they are progressive.
 
-Evaluar la estrategia en todo el histórico disponible, sin separar datos.
+## Level 1: Classic Backtest
 
-```
-[========== Todo el histórico ==========]
-         Optimizo y evalúo aquí
-```
-
-**Qué hace**: muestra cómo hubiera funcionado la estrategia en el pasado.
-
-**Para qué sirve**: evaluación preliminar. Descartar ideas que no tienen un mínimo de viabilidad antes de invertir tiempo en análisis más profundos.
-
-**Limitación**: es tremendamente fácil sobreajustar. Si optimizás todo el histórico y elegís los mejores parámetros, casi con seguridad estás ajustando el sistema a datos pasados que no se van a repetir.
-
-**Cuándo usarlo**: fase de investigación y evaluación preliminar. Si acá ya no funciona, no tiene sentido seguir.
-
-## Nivel 2: Forward Testing (Out-of-Sample)
-
-Optimizar en un período y evaluar en otro que el optimizador nunca vio.
+Evaluate the strategy on all available historical data, without separating datasets.
 
 ```
-[==== In-Sample (optimización) ====][==== Out-of-Sample (prueba) ====]
+[========== All historical data ==========]
+         Optimize and evaluate here
+```
+
+**What it does**: shows how the strategy would have performed in the past.
+
+**What it's for**: preliminary evaluation. Discard ideas that don't show a minimum of viability before investing time in deeper analysis.
+
+**Limitation**: it's extremely easy to overfit. If you optimize on the entire history and pick the best parameters, you're almost certainly fitting the system to past data that won't repeat.
+
+**When to use it**: research and preliminary evaluation phase. If it doesn't work here, there's no point continuing.
+
+## Level 2: Forward Testing (Out-of-Sample)
+
+Optimize on one period and evaluate on another that the optimizer never saw.
+
+```
+[==== In-Sample (optimization) ====][==== Out-of-Sample (test) ====]
          2000 - 2015                      2015 - 2024
 ```
 
-**Qué hace**: simula lo que pasaría si hubieras desarrollado el sistema en 2015 y lo hubieras dejado correr sin tocarlo.
+**What it does**: simulates what would have happened if you had developed the system in 2015 and let it run untouched.
 
-**Para qué sirve**: validación más realista. Si los resultados out-of-sample son consistentes con el in-sample (no idénticos — consistentes), la señal probablemente es real.
+**What it's for**: more realistic validation. If the out-of-sample results are consistent with the in-sample (not identical -- consistent), the signal is probably real.
 
-**Limitación**: una sola prueba forward no garantiza nada. Y es fácil hacerse trampas sin protocolos claros (ej: ajustar el punto de corte entre IS y OOS hasta que funcione).
+**Limitation**: a single forward test guarantees nothing. And it's easy to cheat without clear protocols (e.g., adjusting the cutoff point between IS and OOS until it works).
 
-**Cuándo usarlo**: después de que la evaluación preliminar muestre potencial.
+**When to use it**: after the preliminary evaluation shows potential.
 
-## Nivel 3: Walk-Forward Testing
+## Level 3: Walk-Forward Testing
 
-Múltiples ciclos de optimización + prueba, avanzando por el histórico.
+Multiple cycles of optimization + testing, advancing through the history.
 
 ```
 [IS-1][OOS-1]
@@ -48,36 +50,36 @@ Múltiples ciclos de optimización + prueba, avanzando por el histórico.
                         [IS-5][OOS-5]
 ```
 
-Cada bloque IS (In-Sample) se optimiza. Los parámetros ganadores se prueban en el OOS (Out-of-Sample) siguiente. Luego la ventana avanza y se repite.
+Each IS (In-Sample) block is optimized. The winning parameters are tested on the following OOS (Out-of-Sample) block. Then the window advances and it repeats.
 
-**Qué hace**: genera una curva completa de resultados out-of-sample a lo largo de casi todo el histórico. Es la prueba más cercana a simular lo que realmente hubiera pasado si hubieras ido reoptimizando periódicamente.
+**What it does**: generates a complete curve of out-of-sample results across nearly all the historical data. It's the closest test to simulating what would have actually happened if you had been re-optimizing periodically.
 
-**Para qué sirve**: es la prueba que mejor permite **medir objetivamente** la robustez. Si el sistema pasa un walk-forward bien hecho, la probabilidad de que funcione en real es significativamente mayor.
+**What it's for**: it's the test that best allows you to **objectively measure** robustness. If the system passes a well-executed walk-forward, the probability that it works in live trading is significantly higher.
 
-**Ventajas**:
-- Produce muchos datos fuera de muestra, no solo uno
-- Mide objetivamente la robustez
-- Permite elegir los parámetros para operar en real (los del último ciclo)
-- Reduce dramáticamente el riesgo de sobreoptimización
+**Advantages**:
+- Produces many out-of-sample data points, not just one
+- Objectively measures robustness
+- Allows you to choose the parameters for live trading (from the last cycle)
+- Dramatically reduces the risk of over-optimization
 
-**Limitaciones**:
-- Proceso largo, lento e intensivo computacionalmente
-- Pocos sistemas lo pasan — es una prueba muy dura
-- Aún así, no es infalible. Con mala praxis se pueden hacer trampas
+**Limitations**:
+- Long, slow, and computationally intensive process
+- Few systems pass it -- it's a very tough test
+- Even so, it's not infallible. With bad practice, you can still cheat
 
-**Cuándo usarlo**: cuando el sistema ya pasó la evaluación preliminar y el forward testing básico.
+**When to use it**: when the system has already passed preliminary evaluation and basic forward testing.
 
-## Resumen: Cuándo Usar Cada Uno
+## Summary: When to Use Each One
 
-| Fase | Método | Objetivo |
+| Phase | Method | Objective |
 |---|---|---|
-| Investigación / idea inicial | Backtest clásico | ¿Tiene un mínimo de viabilidad? |
-| Validación inicial | Forward testing | ¿Funciona en datos no vistos? |
-| Validación seria | Walk-forward | ¿Es robusto de verdad? |
-| Operativa real | Paper trading → live reducido | ¿Se ejecuta como el backtest predijo? |
+| Research / initial idea | Classic backtest | Does it show a minimum of viability? |
+| Initial validation | Forward testing | Does it work on unseen data? |
+| Serious validation | Walk-forward | Is it truly robust? |
+| Live trading | Paper trading -> reduced live | Does it execute as the backtest predicted? |
 
-No tiene sentido hacer walk-forward a un sistema que no pasa ni el backtest clásico. Usá cada nivel como filtro progresivo.
+There's no point running a walk-forward on a system that can't even pass a classic backtest. Use each level as a progressive filter.
 
-## La Regla de Oro
+## The Golden Rule
 
-Un backtest te dice cómo hubiera ido en el pasado. **No te dice cómo irá en el futuro.** Es condición necesaria para operar un sistema, pero nunca suficiente por sí sola. El walk-forward es lo más cercano a una garantía que podemos obtener — y aún así, no es una garantía.
+A backtest tells you how it would have gone in the past. **It doesn't tell you how it will go in the future.** It's a necessary condition for trading a system, but never sufficient on its own. Walk-forward is the closest thing to a guarantee we can get -- and even so, it's not a guarantee.

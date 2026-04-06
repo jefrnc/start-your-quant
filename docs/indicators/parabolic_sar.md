@@ -1,22 +1,24 @@
-# Parabolic SAR - El Sistema de Stop y Reversa
+> 🇪🇸 [Leer en Español](parabolic_sar.es.md) | 🇺🇸 **English**
 
-## Definición
+# Parabolic SAR - The Stop and Reverse System
 
-El Parabolic SAR (Stop and Reverse) es un indicador que determina la dirección de la tendencia y posibles reversiones usando un sistema de puntos que siguen el precio, funcionando como trailing stops dinámicos.
+## Definition
 
-## Filosofía del Indicador
+The Parabolic SAR (Stop and Reverse) is an indicator that determines trend direction and potential reversals using a system of dots that follow price, functioning as dynamic trailing stops.
 
-### ¿Por Qué Funciona?
-- **Trailing Stop Dinámico**: Se ajusta automáticamente según el momentum
-- **Aceleración Progresiva**: Factor que aumenta con el tiempo en tendencia
-- **Señales Claras**: Cambio de posición = cambio de tendencia
+## Indicator Philosophy
 
-### Conceptos Clave
-- **SAR**: Valor del stop actual
-- **Acceleration Factor (AF)**: Incremento progresivo (0.02 por defecto)
-- **Max Step**: Límite máximo del AF (0.20 por defecto)
+### Why Does It Work?
+- **Dynamic Trailing Stop**: Adjusts automatically based on momentum
+- **Progressive Acceleration**: Factor that increases over time in a trend
+- **Clear Signals**: Position change = trend change
 
-## Implementación de Referencia
+### Key Concepts
+- **SAR**: Current stop value
+- **Acceleration Factor (AF)**: Progressive increment (0.02 by default)
+- **Max Step**: Maximum AF limit (0.20 by default)
+
+## Reference Implementation
 
 ```python
 import pandas as pd
@@ -24,78 +26,78 @@ import numpy as np
 from copy import deepcopy
 import matplotlib.pyplot as plt
 
-def Parabolic_SAR(df: pd.DataFrame, incremento: float = 0.02, max_paso: float = 0.20) -> pd.DataFrame:
+def Parabolic_SAR(df: pd.DataFrame, increment: float = 0.02, max_step: float = 0.20) -> pd.DataFrame:
     """
-    Parabolic SAR - Implementación de referencia exacta
+    Parabolic SAR - Exact reference implementation
     
-    El indicador SAR utiliza un sistema de parada y reversa para identificar
-    puntos de entrada y salida basados en la aceleración del precio.
+    The SAR indicator uses a stop and reverse system to identify
+    entry and exit points based on price acceleration.
     
-    Parámetros
+    Parameters
     ----------
     df : pd.DataFrame
-        Datos históricos del activo (debe incluir High, Low, Close)
-    incremento : float, default 0.02
-        Incremento inicial del factor de aceleración (Alpha)
-    max_paso : float, default 0.20
-        Paso máximo que puede alcanzar el factor de aceleración
+        Historical asset data (must include High, Low, Close)
+    increment : float, default 0.02
+        Initial increment of the acceleration factor (Alpha)
+    max_step : float, default 0.20
+        Maximum step the acceleration factor can reach
     
     Returns
     -------
     pd.DataFrame
-        DataFrame con columnas: PSAR, UpTrend, DownTrend
+        DataFrame with columns: PSAR, UpTrend, DownTrend
         
-    Cómo Operarlo
-    -------------
-    - Señal de COMPRA: Puntos cambian de arriba a abajo del precio
-    - Señal de VENTA: Puntos cambian de abajo a arriba del precio
-    - Trailing Stop: Usar PSAR como stop loss dinámico
+    How to Trade It
+    ---------------
+    - BUY Signal: Dots change from above to below price
+    - SELL Signal: Dots change from below to above price
+    - Trailing Stop: Use PSAR as a dynamic stop loss
     
-    Ejemplo de Uso
+    Usage Example
     --------------
     >>> df = yf.download("AAPL", start="2023-01-01", end="2024-01-01")
-    >>> psar = Parabolic_SAR(df, incremento=0.02, max_paso=0.20)
+    >>> psar = Parabolic_SAR(df, increment=0.02, max_step=0.20)
     >>> print(psar.head())
     """
-    # Trabajar con copia para no modificar original
+    # Work with a copy to avoid modifying the original
     data = deepcopy(df)
     High, Low, Close = data["High"].values, data["Low"].values, data["Close"].values
     
-    # Inicializar arrays para tendencias
+    # Initialize arrays for trends
     psar_up = np.repeat(np.nan, Close.shape[0])
     psar_down = np.repeat(np.nan, Close.shape[0])
     
-    # Variables de estado inicial
-    up_trend = True  # Comenzar en tendencia alcista
-    up_trend_high = High[0]  # Máximo en tendencia alcista
-    down_trend_low = Low[0]  # Mínimo en tendencia bajista
-    acc_factor = incremento  # Factor de aceleración inicial
+    # Initial state variables
+    up_trend = True  # Start in uptrend
+    up_trend_high = High[0]  # High during uptrend
+    down_trend_low = Low[0]  # Low during downtrend
+    acc_factor = increment  # Initial acceleration factor
     
-    # Calcular PSAR para cada punto
+    # Calculate PSAR for each point
     for i in range(2, Close.shape[0]):
         reversal = False
         max_high = High[i]
         min_low = Low[i]
         
-        # === TENDENCIA ALCISTA ===
+        # === UPTREND ===
         if up_trend:
-            # Calcular nuevo PSAR para tendencia alcista
-            # PSAR = PSAR_anterior + AF * (EP - PSAR_anterior)
+            # Calculate new PSAR for uptrend
+            # PSAR = Previous_PSAR + AF * (EP - Previous_PSAR)
             Close[i] = Close[i - 1] + (acc_factor * (up_trend_high - Close[i - 1]))
             
-            # Verificar si se produce reversión (precio rompe PSAR)
+            # Check if reversal occurs (price breaks PSAR)
             if min_low < Close[i]:
                 reversal = True
-                Close[i] = up_trend_high  # PSAR se convierte en el máximo previo
-                down_trend_low = min_low  # Nuevo punto extremo para tendencia bajista
-                acc_factor = incremento  # Reiniciar factor de aceleración
+                Close[i] = up_trend_high  # PSAR becomes the previous high
+                down_trend_low = min_low  # New extreme point for downtrend
+                acc_factor = increment  # Reset acceleration factor
             else:
-                # Actualizar máximo y acelerar si hay nuevo high
+                # Update high and accelerate if new high
                 if max_high > up_trend_high:
                     up_trend_high = max_high
-                    acc_factor = min(acc_factor + incremento, max_paso)
+                    acc_factor = min(acc_factor + increment, max_step)
                 
-                # Regla SAR: No puede ser superior a low de períodos anteriores
+                # SAR rule: Cannot be higher than low of previous periods
                 low1 = Low[i - 1]
                 low2 = Low[i - 2]
                 if low2 < Close[i]:
@@ -103,24 +105,24 @@ def Parabolic_SAR(df: pd.DataFrame, incremento: float = 0.02, max_paso: float = 
                 elif low1 < Close[i]:
                     Close[i] = low1
         
-        # === TENDENCIA BAJISTA ===
+        # === DOWNTREND ===
         else:
-            # Calcular nuevo PSAR para tendencia bajista
+            # Calculate new PSAR for downtrend
             Close[i] = Close[i - 1] - (acc_factor * (Close[i - 1] - down_trend_low))
             
-            # Verificar si se produce reversión (precio rompe PSAR)
+            # Check if reversal occurs (price breaks PSAR)
             if max_high > Close[i]:
                 reversal = True
-                Close[i] = down_trend_low  # PSAR se convierte en el mínimo previo
-                up_trend_high = max_high  # Nuevo punto extremo para tendencia alcista
-                acc_factor = incremento  # Reiniciar factor de aceleración
+                Close[i] = down_trend_low  # PSAR becomes the previous low
+                up_trend_high = max_high  # New extreme point for uptrend
+                acc_factor = increment  # Reset acceleration factor
             else:
-                # Actualizar mínimo y acelerar si hay nuevo low
+                # Update low and accelerate if new low
                 if min_low < down_trend_low:
                     down_trend_low = min_low
-                    acc_factor = min(acc_factor + incremento, max_paso)
+                    acc_factor = min(acc_factor + increment, max_step)
                 
-                # Regla SAR: No puede ser inferior a high de períodos anteriores
+                # SAR rule: Cannot be lower than high of previous periods
                 high1 = High[i - 1]
                 high2 = High[i - 2]
                 if high2 > Close[i]:
@@ -128,16 +130,16 @@ def Parabolic_SAR(df: pd.DataFrame, incremento: float = 0.02, max_paso: float = 
                 elif high1 > Close[i]:
                     Close[i] = high1
         
-        # Actualizar dirección de tendencia
-        up_trend = up_trend != reversal  # XOR logic para cambio de estado
+        # Update trend direction
+        up_trend = up_trend != reversal  # XOR logic for state change
         
-        # Asignar puntos según tendencia
+        # Assign dots based on trend
         if up_trend:
             psar_up[i] = Close[i]
         else:
             psar_down[i] = Close[i]
     
-    # Crear DataFrame resultado
+    # Create result DataFrame
     data["PSAR"] = Close
     data["UpTrend"] = psar_up
     data["DownTrend"] = psar_down
@@ -146,19 +148,19 @@ def Parabolic_SAR(df: pd.DataFrame, incremento: float = 0.02, max_paso: float = 
 
 def analyze_psar_signals(df: pd.DataFrame, psar_data: pd.DataFrame) -> pd.DataFrame:
     """
-    Analizar señales de trading del Parabolic SAR
+    Analyze Parabolic SAR trading signals
     
-    Parámetros
+    Parameters
     ----------
     df : pd.DataFrame
-        Datos históricos originales
+        Original historical data
     psar_data : pd.DataFrame
-        Datos del PSAR (output de Parabolic_SAR)
+        PSAR data (output of Parabolic_SAR)
     
     Returns
     -------
     pd.DataFrame
-        DataFrame con señales y análisis
+        DataFrame with signals and analysis
     """
     signals = pd.DataFrame(index=df.index)
     signals['price'] = df['Close']
@@ -168,38 +170,38 @@ def analyze_psar_signals(df: pd.DataFrame, psar_data: pd.DataFrame) -> pd.DataFr
     signals['up_trend'] = psar_data['UpTrend']
     signals['down_trend'] = psar_data['DownTrend']
     
-    # Detectar cambios de tendencia
+    # Detect trend changes
     signals['trend'] = np.where(~pd.isna(psar_data['UpTrend']), 1, -1)
     signals['trend_change'] = signals['trend'].diff().fillna(0)
     
-    # Señales de entrada
-    signals['buy_signal'] = signals['trend_change'] == 2    # De bajista a alcista
-    signals['sell_signal'] = signals['trend_change'] == -2  # De alcista a bajista
+    # Entry signals
+    signals['buy_signal'] = signals['trend_change'] == 2    # From bearish to bullish
+    signals['sell_signal'] = signals['trend_change'] == -2  # From bullish to bearish
     
-    # Distancia del precio al SAR (momentum indicator)
+    # Distance from price to SAR (momentum indicator)
     signals['price_sar_distance'] = np.where(
         signals['trend'] == 1,
-        (signals['price'] - signals['psar']) / signals['price'],  # Alcista: precio sobre SAR
-        (signals['psar'] - signals['price']) / signals['price']   # Bajista: SAR sobre precio
+        (signals['price'] - signals['psar']) / signals['price'],  # Bullish: price above SAR
+        (signals['psar'] - signals['price']) / signals['price']   # Bearish: SAR above price
     )
     
-    # Fuerza de la tendencia (basada en duración)
+    # Trend strength (based on duration)
     trend_length = signals.groupby((signals['trend'] != signals['trend'].shift()).cumsum()).cumcount() + 1
     signals['trend_strength'] = trend_length
     
-    # Calidad de la señal
+    # Signal quality
     signals['signal_quality'] = 'NONE'
     
-    # Señales de alta calidad
+    # High quality signals
     high_quality_buy = (
         signals['buy_signal'] &
-        (signals['trend_strength'].shift(1) > 5) &  # Tendencia bajista previa duradera
-        (df['Volume'] > df['Volume'].rolling(20).mean())  # Volumen confirmatorio
+        (signals['trend_strength'].shift(1) > 5) &  # Lasting previous bearish trend
+        (df['Volume'] > df['Volume'].rolling(20).mean())  # Confirmatory volume
     )
     
     high_quality_sell = (
         signals['sell_signal'] &
-        (signals['trend_strength'].shift(1) > 5) &  # Tendencia alcista previa duradera
+        (signals['trend_strength'].shift(1) > 5) &  # Lasting previous bullish trend
         (df['Volume'] > df['Volume'].rolling(20).mean())
     )
     
@@ -211,23 +213,23 @@ def analyze_psar_signals(df: pd.DataFrame, psar_data: pd.DataFrame) -> pd.DataFr
     return signals
 ```
 
-## Estrategias de Trading con PSAR
+## Trading Strategies with PSAR
 
 ### 1. Trending Strategy
 ```python
 def psar_trending_strategy(df: pd.DataFrame, af_increment: float = 0.02, af_max: float = 0.20):
     """
-    Estrategia de seguimiento de tendencia usando PSAR
+    Trend following strategy using PSAR
     """
-    # Calcular PSAR
-    psar = Parabolic_SAR(df, incremento=af_increment, max_paso=af_max)
+    # Calculate PSAR
+    psar = Parabolic_SAR(df, increment=af_increment, max_step=af_max)
     signals = analyze_psar_signals(df, psar)
     
-    # Filtros adicionales para mejorar señales
+    # Additional filters to improve signals
     sma_50 = df['Close'].rolling(50).mean()
     sma_200 = df['Close'].rolling(200).mean()
     
-    # Solo trades en dirección de tendencia mayor
+    # Only trade in the direction of the larger trend
     bullish_context = sma_50 > sma_200
     bearish_context = sma_50 < sma_200
     
@@ -238,7 +240,7 @@ def psar_trending_strategy(df: pd.DataFrame, af_increment: float = 0.02, af_max:
         signals['buy_signal'] &
         bullish_context &
         (signals['signal_quality'].isin(['HIGH_QUALITY_BUY', 'MEDIUM_BUY'])) &
-        (df['Close'] > sma_50)  # Precio sobre media móvil
+        (df['Close'] > sma_50)  # Price above moving average
     )
     
     # Short entries  
@@ -246,7 +248,7 @@ def psar_trending_strategy(df: pd.DataFrame, af_increment: float = 0.02, af_max:
         signals['sell_signal'] &
         bearish_context &
         (signals['signal_quality'].isin(['HIGH_QUALITY_SELL', 'MEDIUM_SELL'])) &
-        (df['Close'] < sma_50)  # Precio bajo media móvil
+        (df['Close'] < sma_50)  # Price below moving average
     )
     
     entry_signals[long_entry] = 1
@@ -261,24 +263,24 @@ def psar_trending_strategy(df: pd.DataFrame, af_increment: float = 0.02, af_max:
 
 def psar_scalping_strategy(df: pd.DataFrame, timeframe: str = '15min'):
     """
-    Estrategia de scalping usando PSAR para small caps
+    Scalping strategy using PSAR for small caps
     """
-    # PSAR más sensible para scalping
-    psar = Parabolic_SAR(df, incremento=0.01, max_paso=0.10)  # Más conservador
+    # More sensitive PSAR for scalping
+    psar = Parabolic_SAR(df, increment=0.01, max_step=0.10)  # More conservative
     signals = analyze_psar_signals(df, psar)
     
-    # Filtros específicos para scalping
+    # Specific filters for scalping
     atr = calculate_atr(df, period=14)
-    bb = Bollinger_Bands(df, longitud=20, desviacion_std=2.0)
+    bb = Bollinger_Bands(df, length=20, std_deviation=2.0)
     
     entry_signals = pd.Series(0, index=df.index)
     
     # Long scalping setup
     long_scalp = (
         signals['buy_signal'] &
-        (atr > atr.rolling(20).mean() * 1.2) &  # Volatilidad elevada
-        (df['Close'] > bb['MA']) &  # Sobre media de Bollinger
-        (df['Volume'] > df['Volume'].rolling(10).mean() * 1.5)  # Volumen fuerte
+        (atr > atr.rolling(20).mean() * 1.2) &  # Elevated volatility
+        (df['Close'] > bb['MA']) &  # Above Bollinger middle band
+        (df['Volume'] > df['Volume'].rolling(10).mean() * 1.5)  # Strong volume
     )
     
     # Short scalping setup
@@ -297,11 +299,11 @@ def psar_scalping_strategy(df: pd.DataFrame, timeframe: str = '15min'):
         'psar_data': psar,
         'analysis': signals,
         'strategy_type': 'scalping',
-        'stop_loss': signals['psar']  # PSAR como stop dinámico
+        'stop_loss': signals['psar']  # PSAR as dynamic stop
     }
 
 def calculate_atr(df: pd.DataFrame, period: int = 14) -> pd.Series:
-    """Helper function para calcular ATR"""
+    """Helper function to calculate ATR"""
     high_low = df['High'] - df['Low']
     high_close = np.abs(df['High'] - df['Close'].shift())
     low_close = np.abs(df['Low'] - df['Close'].shift())
@@ -310,27 +312,27 @@ def calculate_atr(df: pd.DataFrame, period: int = 14) -> pd.Series:
     return true_range.rolling(period).mean()
 ```
 
-### 2. Small Cap Gap & Go con PSAR
+### 2. Small Cap Gap & Go with PSAR
 ```python
 def gap_and_go_psar_strategy(df: pd.DataFrame, gap_threshold: float = 0.05):
     """
-    Combinar Gap & Go con PSAR para small caps
+    Combine Gap & Go with PSAR for small caps
     """
-    # Detectar gaps
+    # Detect gaps
     gap_up = (df['Open'] / df['Close'].shift(1) - 1) > gap_threshold
     gap_down = (df['Open'] / df['Close'].shift(1) - 1) < -gap_threshold
     
-    # PSAR adaptativo para gaps
-    psar = Parabolic_SAR(df, incremento=0.03, max_paso=0.25)  # Más agresivo
+    # Adaptive PSAR for gaps
+    psar = Parabolic_SAR(df, increment=0.03, max_step=0.25)  # More aggressive
     signals = analyze_psar_signals(df, psar)
     
-    # Pre-market high/low simulation (usando datos intraday si disponible)
+    # Pre-market high/low simulation (using intraday data if available)
     premarket_high = df['High'].rolling(3).max()  # Approximation
     premarket_low = df['Low'].rolling(3).min()
     
     entry_signals = pd.Series(0, index=df.index)
     
-    # Gap up continuation con PSAR
+    # Gap up continuation with PSAR
     gap_up_continuation = (
         gap_up &
         signals['buy_signal'] &
@@ -338,7 +340,7 @@ def gap_and_go_psar_strategy(df: pd.DataFrame, gap_threshold: float = 0.05):
         (df['Volume'] > df['Volume'].rolling(20).mean() * 3)  # Heavy volume
     )
     
-    # Gap down reversal con PSAR
+    # Gap down reversal with PSAR
     gap_down_reversal = (
         gap_down &
         signals['buy_signal'] &
@@ -346,7 +348,7 @@ def gap_and_go_psar_strategy(df: pd.DataFrame, gap_threshold: float = 0.05):
         (df['Volume'] > df['Volume'].rolling(20).mean() * 2)
     )
     
-    # Gap fade con PSAR
+    # Gap fade with PSAR
     gap_fade = (
         gap_up &
         signals['sell_signal'] &
@@ -373,33 +375,33 @@ def gap_and_go_psar_strategy(df: pd.DataFrame, gap_threshold: float = 0.05):
     }
 ```
 
-## Optimización de Parámetros
+## Parameter Optimization
 
-### Parámetros Adaptativos
+### Adaptive Parameters
 ```python
 def adaptive_psar_parameters(df: pd.DataFrame, volatility_period: int = 20):
     """
-    Calcular parámetros PSAR adaptativos basados en volatilidad
+    Calculate adaptive PSAR parameters based on volatility
     """
-    # Medir volatilidad actual
+    # Measure current volatility
     returns = df['Close'].pct_change()
     rolling_vol = returns.rolling(volatility_period).std() * np.sqrt(252)
     current_vol = rolling_vol.iloc[-1]
     
-    # Parámetros base
+    # Base parameters
     base_increment = 0.02
     base_max = 0.20
     
-    # Ajustar según volatilidad
-    if current_vol > 0.5:  # Alta volatilidad
-        increment = base_increment * 0.5  # Más conservador
+    # Adjust based on volatility
+    if current_vol > 0.5:  # High volatility
+        increment = base_increment * 0.5  # More conservative
         max_step = base_max * 0.75
         regime = "HIGH_VOLATILITY"
-    elif current_vol < 0.2:  # Baja volatilidad
-        increment = base_increment * 1.5  # Más agresivo
+    elif current_vol < 0.2:  # Low volatility
+        increment = base_increment * 1.5  # More aggressive
         max_step = base_max * 1.25
         regime = "LOW_VOLATILITY"
-    else:  # Volatilidad normal
+    else:  # Normal volatility
         increment = base_increment
         max_step = base_max
         regime = "NORMAL_VOLATILITY"
@@ -413,26 +415,26 @@ def adaptive_psar_parameters(df: pd.DataFrame, volatility_period: int = 20):
 
 def multi_timeframe_psar(symbol: str, primary_tf: str = '1d', secondary_tf: str = '1h'):
     """
-    Análisis PSAR en múltiples timeframes
+    Multi-timeframe PSAR analysis
     """
     import yfinance as yf
     
-    # Obtener datos
+    # Get data
     df_primary = yf.download(symbol, period="3mo", interval=primary_tf)
     df_secondary = yf.download(symbol, period="1mo", interval=secondary_tf)
     
-    # PSAR en cada timeframe
+    # PSAR on each timeframe
     psar_primary = Parabolic_SAR(df_primary)
     psar_secondary = Parabolic_SAR(df_secondary)
     
     signals_primary = analyze_psar_signals(df_primary, psar_primary)
     signals_secondary = analyze_psar_signals(df_secondary, psar_secondary)
     
-    # Estado actual en ambos timeframes
+    # Current state on both timeframes
     current_primary = signals_primary.iloc[-1]
     current_secondary = signals_secondary.iloc[-1]
     
-    # Análisis de confluencia
+    # Confluence analysis
     analysis = {
         'primary_trend': current_primary['trend'],
         'secondary_trend': current_secondary['trend'],
@@ -441,7 +443,7 @@ def multi_timeframe_psar(symbol: str, primary_tf: str = '1d', secondary_tf: str 
         'confluence': None
     }
     
-    # Detectar confluencia de tendencias
+    # Detect trend confluence
     if current_primary['trend'] == current_secondary['trend']:
         if current_primary['trend'] == 1:
             analysis['confluence'] = 'BULLISH_CONFLUENCE'
@@ -450,7 +452,7 @@ def multi_timeframe_psar(symbol: str, primary_tf: str = '1d', secondary_tf: str 
     else:
         analysis['confluence'] = 'MIXED_SIGNALS'
     
-    # Detectar posibles reversiones
+    # Detect possible reversals
     if (current_primary['buy_signal'] and 
         current_secondary['trend'] == 1 and 
         current_secondary['trend_strength'] > 3):
@@ -465,12 +467,12 @@ def multi_timeframe_psar(symbol: str, primary_tf: str = '1d', secondary_tf: str 
     return analysis
 ```
 
-## Visualización y Análisis
+## Visualization and Analysis
 
 ```python
 def plot_psar_analysis(df: pd.DataFrame, psar_data: pd.DataFrame, signals: pd.DataFrame, title: str = "Parabolic SAR Analysis"):
     """
-    Crear gráfico completo de análisis PSAR
+    Create complete PSAR analysis chart
     """
     import matplotlib.pyplot as plt
     import matplotlib.dates as mdates
@@ -478,10 +480,10 @@ def plot_psar_analysis(df: pd.DataFrame, psar_data: pd.DataFrame, signals: pd.Da
     fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(15, 12),
                                         gridspec_kw={'height_ratios': [3, 1, 1]})
     
-    # Chart 1: Precio + PSAR
+    # Chart 1: Price + PSAR
     ax1.plot(df.index, df['Close'], 'k-', linewidth=2, label='Price', zorder=1)
     
-    # PSAR points - diferentes colores para up/down trend
+    # PSAR points - different colors for up/down trend
     up_trend_mask = ~pd.isna(psar_data['UpTrend'])
     down_trend_mask = ~pd.isna(psar_data['DownTrend'])
     
@@ -490,7 +492,7 @@ def plot_psar_analysis(df: pd.DataFrame, psar_data: pd.DataFrame, signals: pd.Da
     ax1.scatter(df.index[down_trend_mask], psar_data['DownTrend'][down_trend_mask], 
                color='red', s=20, label='PSAR (Bearish)', zorder=3)
     
-    # Marcar señales de cambio de tendencia
+    # Mark trend change signals
     buy_signals = df.index[signals['buy_signal']]
     sell_signals = df.index[signals['sell_signal']]
     
@@ -521,7 +523,7 @@ def plot_psar_analysis(df: pd.DataFrame, psar_data: pd.DataFrame, signals: pd.Da
     ax3.set_ylabel('Distance %')
     ax3.grid(True, alpha=0.3)
     
-    # Formato fechas
+    # Date formatting
     for ax in [ax1, ax2, ax3]:
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
         ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
@@ -532,102 +534,102 @@ def plot_psar_analysis(df: pd.DataFrame, psar_data: pd.DataFrame, signals: pd.Da
 
 def psar_complete_example():
     """
-    Ejemplo completo de análisis con Parabolic SAR
+    Complete analysis example with Parabolic SAR
     """
     import yfinance as yf
     
-    # Obtener datos
+    # Get data
     ticker = "AAPL"
     df = yf.download(ticker, start="2023-01-01", end="2024-01-01", interval="1d")
     
-    print(f"=== ANÁLISIS PARABOLIC SAR: {ticker} ===\n")
+    print(f"=== PARABOLIC SAR ANALYSIS: {ticker} ===\n")
     
-    # Parámetros adaptativos
+    # Adaptive parameters
     adaptive_params = adaptive_psar_parameters(df)
-    print(f"📊 PARÁMETROS ADAPTATIVOS:")
-    print(f"   Régimen de Volatilidad: {adaptive_params['regime']}")
-    print(f"   Volatilidad Actual: {adaptive_params['volatility']:.1%}")
-    print(f"   Incremento AF: {adaptive_params['increment']:.3f}")
-    print(f"   Máximo AF: {adaptive_params['max_step']:.2f}")
+    print(f"ADAPTIVE PARAMETERS:")
+    print(f"   Volatility Regime: {adaptive_params['regime']}")
+    print(f"   Current Volatility: {adaptive_params['volatility']:.1%}")
+    print(f"   AF Increment: {adaptive_params['increment']:.3f}")
+    print(f"   Max AF: {adaptive_params['max_step']:.2f}")
     
-    # Calcular PSAR con parámetros adaptativos
+    # Calculate PSAR with adaptive parameters
     psar = Parabolic_SAR(df, 
-                        incremento=adaptive_params['increment'],
-                        max_paso=adaptive_params['max_step'])
+                        increment=adaptive_params['increment'],
+                        max_step=adaptive_params['max_step'])
     signals = analyze_psar_signals(df, psar)
     
-    # Estadísticas del período
+    # Period statistics
     buy_signals_count = signals['buy_signal'].sum()
     sell_signals_count = signals['sell_signal'].sum()
     avg_trend_length = signals['trend_strength'].mean()
     
-    print(f"\n📈 ESTADÍSTICAS DEL PERÍODO:")
-    print(f"   Señales de Compra: {buy_signals_count}")
-    print(f"   Señales de Venta: {sell_signals_count}")
-    print(f"   Duración Promedio de Tendencia: {avg_trend_length:.1f} días")
+    print(f"\nPERIOD STATISTICS:")
+    print(f"   Buy Signals: {buy_signals_count}")
+    print(f"   Sell Signals: {sell_signals_count}")
+    print(f"   Average Trend Duration: {avg_trend_length:.1f} days")
     
-    # Análisis actual
+    # Current analysis
     current = signals.iloc[-1]
-    print(f"\n🎯 ANÁLISIS ACTUAL:")
-    print(f"   Precio: ${current['price']:.2f}")
+    print(f"\nCURRENT ANALYSIS:")
+    print(f"   Price: ${current['price']:.2f}")
     print(f"   PSAR: ${current['psar']:.2f}")
-    print(f"   Tendencia: {'ALCISTA' if current['trend'] == 1 else 'BAJISTA'}")
-    print(f"   Fuerza de Tendencia: {current['trend_strength']} días")
-    print(f"   Distancia Precio-SAR: {current['price_sar_distance']:.2%}")
+    print(f"   Trend: {'BULLISH' if current['trend'] == 1 else 'BEARISH'}")
+    print(f"   Trend Strength: {current['trend_strength']} days")
+    print(f"   Price-SAR Distance: {current['price_sar_distance']:.2%}")
     
     if current['buy_signal']:
-        print("   🟢 SEÑAL: BUY - Cambio a tendencia alcista")
+        print("   SIGNAL: BUY - Change to bullish trend")
     elif current['sell_signal']:
-        print("   🔴 SEÑAL: SELL - Cambio a tendencia bajista")
+        print("   SIGNAL: SELL - Change to bearish trend")
     elif current['trend'] == 1:
-        print(f"   🟢 MANTENER LONG - SAR en ${current['psar']:.2f}")
+        print(f"   HOLD LONG - SAR at ${current['psar']:.2f}")
     else:
-        print(f"   🔴 MANTENER SHORT - SAR en ${current['psar']:.2f}")
+        print(f"   HOLD SHORT - SAR at ${current['psar']:.2f}")
     
     # Multi-timeframe analysis
     mtf_analysis = multi_timeframe_psar(ticker)
-    print(f"\n🔄 ANÁLISIS MULTI-TIMEFRAME:")
-    print(f"   Confluencia: {mtf_analysis['confluence']}")
+    print(f"\nMULTI-TIMEFRAME ANALYSIS:")
+    print(f"   Confluence: {mtf_analysis['confluence']}")
     print(f"   Setup: {mtf_analysis['setup']}")
     
-    # Crear gráfico
+    # Create chart
     plot_psar_analysis(df, psar, signals, f"Parabolic SAR Analysis - {ticker}")
     
     return psar, signals
 
-# Ejecutar ejemplo
+# Run example
 if __name__ == "__main__":
     psar_complete_example()
 ```
 
-## Mejores Prácticas
+## Best Practices
 
-### ✅ **Do's (Hacer)**
+### ✅ **Do's**
 
-1. **Usa como trailing stop**: PSAR excelente para proteger ganancias
-2. **Combina con tendencia**: Confirma dirección con MA o ADX
-3. **Ajusta parámetros**: Adapta AF según volatilidad del activo
-4. **Filtra con volumen**: Señales más confiables con volumen confirmatorio
+1. **Use as trailing stop**: PSAR excellent for protecting profits
+2. **Combine with trend**: Confirm direction with MA or ADX
+3. **Adjust parameters**: Adapt AF based on asset volatility
+4. **Filter with volume**: More reliable signals with confirmatory volume
 
-### ❌ **Don'ts (No Hacer)**
+### ❌ **Don'ts**
 
-1. **No uses en mercados laterales**: PSAR genera muchas señales falsas
-2. **No ignores el contexto**: Una señal no es suficiente para entrar
-3. **No uses AF muy altos**: Puede generar whipsaws en volatilidad
-4. **No trades todas las señales**: Filtra calidad según contexto
+1. **Don't use in sideways markets**: PSAR generates many false signals
+2. **Don't ignore context**: A single signal is not enough to enter
+3. **Don't use very high AF**: Can generate whipsaws in volatility
+4. **Don't trade every signal**: Filter quality based on context
 
-### 🎯 **Parámetros para Diferentes Estilos**
+### 🎯 **Parameters for Different Styles**
 
 ```python
 PSAR_PARAMETERS = {
-    'conservative': {'increment': 0.01, 'max_step': 0.15},    # Menos señales, más confiables
-    'standard': {'increment': 0.02, 'max_step': 0.20},       # Parámetros clásicos
-    'aggressive': {'increment': 0.03, 'max_step': 0.25},     # Más señales, mayor riesgo
-    'scalping': {'increment': 0.005, 'max_step': 0.10},      # Muy sensible para scalping
-    'small_caps': {'increment': 0.025, 'max_step': 0.30}     # Adaptado a volatilidad alta
+    'conservative': {'increment': 0.01, 'max_step': 0.15},    # Fewer signals, more reliable
+    'standard': {'increment': 0.02, 'max_step': 0.20},       # Classic parameters
+    'aggressive': {'increment': 0.03, 'max_step': 0.25},     # More signals, higher risk
+    'scalping': {'increment': 0.005, 'max_step': 0.10},      # Very sensitive for scalping
+    'small_caps': {'increment': 0.025, 'max_step': 0.30}     # Adapted to high volatility
 }
 ```
 
-## Siguiente Paso
+## Next Step
 
-Con Parabolic SAR dominado, continuemos con [SuperTendencia](super_tendencia.md) para análisis de tendencias avanzado.
+With Parabolic SAR mastered, let's continue with [SuperTrend](super_tendencia.md) for advanced trend analysis.

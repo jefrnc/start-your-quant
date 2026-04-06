@@ -1,18 +1,20 @@
-# Medias Móviles (EMA/SMA)
+> 🇪🇸 [Leer en Español](moving_averages.es.md) | 🇺🇸 **English**
 
-## Lo Básico que Funciona
+# Moving Averages (EMA/SMA)
 
-Las medias móviles son simples pero poderosas. En small caps, uso principalmente:
-- **9 EMA**: Para momentum intraday
-- **20 SMA**: Soporte/resistencia key
-- **50 SMA**: Tendencia intermedia
-- **200 SMA**: La línea en la arena institucional
+## The Basics That Work
+
+Moving averages are simple yet powerful. For small caps, I primarily use:
+- **9 EMA**: For intraday momentum
+- **20 SMA**: Key support/resistance
+- **50 SMA**: Intermediate trend
+- **200 SMA**: The institutional line in the sand
 
 ## SMA vs EMA
 
 ```python
 def calculate_moving_averages(df):
-    """Calcular SMA y EMA comunes"""
+    """Calculate common SMA and EMA"""
     # Simple Moving Average
     df['sma_9'] = df['close'].rolling(window=9).mean()
     df['sma_20'] = df['close'].rolling(window=20).mean()
@@ -27,24 +29,24 @@ def calculate_moving_averages(df):
     return df
 ```
 
-## EMA para Day Trading
+## EMA for Day Trading
 
-La 9 EMA es mi go-to para entries en small caps.
+The 9 EMA is my go-to for small cap entries.
 
 ```python
 def ema_momentum_setup(df):
-    """Setup usando 9 EMA para momentum"""
-    # Calcular 9 EMA
+    """Setup using 9 EMA for momentum"""
+    # Calculate 9 EMA
     df['ema_9'] = df['close'].ewm(span=9, adjust=False).mean()
     
-    # Precio respecto a EMA
+    # Price relative to EMA
     df['above_ema9'] = df['close'] > df['ema_9']
     df['ema9_distance'] = (df['close'] - df['ema_9']) / df['ema_9'] * 100
     
-    # Detectar bounces
+    # Detect bounces
     df['ema9_touch'] = (df['low'] <= df['ema_9']) & (df['close'] > df['ema_9'])
     
-    # Momentum: precio acelerando desde EMA
+    # Momentum: price accelerating from EMA
     df['ema9_momentum'] = df['ema9_distance'] - df['ema9_distance'].shift(1)
     df['bullish_momentum'] = (df['above_ema9'] & 
                              (df['ema9_momentum'] > 0) & 
@@ -55,15 +57,15 @@ def ema_momentum_setup(df):
 
 ## Moving Average Ribbons
 
-Múltiples EMAs para ver la "textura" del trend.
+Multiple EMAs to see the "texture" of the trend.
 
 ```python
 def create_ema_ribbon(df, periods=[3, 5, 8, 10, 12, 15, 30, 35, 40, 45, 50, 60]):
-    """Crear ribbon de EMAs"""
+    """Create EMA ribbon"""
     for period in periods:
         df[f'ema_{period}'] = df['close'].ewm(span=period, adjust=False).mean()
     
-    # Calcular expansión/compresión del ribbon
+    # Calculate ribbon expansion/compression
     ema_cols = [f'ema_{p}' for p in periods]
     df['ribbon_max'] = df[ema_cols].max(axis=1)
     df['ribbon_min'] = df[ema_cols].min(axis=1)
@@ -80,18 +82,18 @@ def create_ema_ribbon(df, periods=[3, 5, 8, 10, 12, 15, 30, 35, 40, 45, 50, 60])
 
 ## Hull Moving Average (HMA)
 
-Menos lag, mejor para entries precisos.
+Less lag, better for precise entries.
 
 ```python
 def calculate_hma(df, period=20):
-    """Hull Moving Average - menos lag"""
-    # WMA de período/2
+    """Hull Moving Average - less lag"""
+    # WMA of period/2
     half_period = int(period / 2)
     wma_half = df['close'].rolling(half_period).apply(
         lambda x: np.sum(x * np.arange(1, len(x) + 1)) / np.sum(np.arange(1, len(x) + 1))
     )
     
-    # WMA de período completo
+    # WMA of full period
     wma_full = df['close'].rolling(period).apply(
         lambda x: np.sum(x * np.arange(1, len(x) + 1)) / np.sum(np.arange(1, len(x) + 1))
     )
@@ -110,8 +112,8 @@ def calculate_hma(df, period=20):
 
 ```python
 def ma_crossover_signals(df, fast_period=9, slow_period=20, ma_type='ema'):
-    """Sistema de cruces de medias"""
-    # Calcular medias
+    """Moving average crossover system"""
+    # Calculate averages
     if ma_type == 'ema':
         df['fast_ma'] = df['close'].ewm(span=fast_period, adjust=False).mean()
         df['slow_ma'] = df['close'].ewm(span=slow_period, adjust=False).mean()
@@ -119,15 +121,15 @@ def ma_crossover_signals(df, fast_period=9, slow_period=20, ma_type='ema'):
         df['fast_ma'] = df['close'].rolling(fast_period).mean()
         df['slow_ma'] = df['close'].rolling(slow_period).mean()
     
-    # Detectar cruces
+    # Detect crossovers
     df['fast_above'] = df['fast_ma'] > df['slow_ma']
     df['golden_cross'] = (df['fast_above'] & ~df['fast_above'].shift(1))
     df['death_cross'] = (~df['fast_above'] & df['fast_above'].shift(1))
     
-    # Fuerza del cruce
+    # Crossover strength
     df['cross_strength'] = abs(df['fast_ma'] - df['slow_ma']) / df['slow_ma'] * 100
     
-    # Filtrar cruces débiles
+    # Filter weak crossovers
     df['strong_golden'] = df['golden_cross'] & (df['cross_strength'] > 0.5)
     df['strong_death'] = df['death_cross'] & (df['cross_strength'] > 0.5)
     
@@ -136,22 +138,22 @@ def ma_crossover_signals(df, fast_period=9, slow_period=20, ma_type='ema'):
 
 ## Dynamic Moving Averages
 
-Adaptar el período según volatilidad.
+Adapt the period based on volatility.
 
 ```python
 def adaptive_moving_average(df, base_period=20):
-    """Media móvil que se adapta a la volatilidad"""
-    # Calcular volatilidad
+    """Moving average that adapts to volatility"""
+    # Calculate volatility
     df['returns'] = df['close'].pct_change()
     df['volatility'] = df['returns'].rolling(20).std()
     df['vol_rank'] = df['volatility'].rolling(100).rank(pct=True)
     
-    # Ajustar período según volatilidad
-    # Alta volatilidad = período más corto (más responsive)
+    # Adjust period based on volatility
+    # High volatility = shorter period (more responsive)
     df['adaptive_period'] = base_period * (2 - df['vol_rank'])
     df['adaptive_period'] = df['adaptive_period'].clip(lower=5, upper=50).astype(int)
     
-    # Calcular AMA
+    # Calculate AMA
     df['ama'] = df['close'].copy()
     for i in range(20, len(df)):
         period = int(df['adaptive_period'].iloc[i])
@@ -164,25 +166,25 @@ def adaptive_moving_average(df, base_period=20):
 
 ```python
 def identify_ma_levels(df):
-    """Identificar MAs actuando como soporte/resistencia"""
-    # Calcular todas las MAs
+    """Identify MAs acting as support/resistance"""
+    # Calculate all MAs
     ma_periods = [9, 20, 50, 200]
     for period in ma_periods:
         df[f'sma_{period}'] = df['close'].rolling(period).mean()
         df[f'ema_{period}'] = df['close'].ewm(span=period, adjust=False).mean()
     
-    # Detectar toques
+    # Detect touches
     tolerance = 0.002  # 0.2%
     
     for period in ma_periods:
-        # Soporte: low toca MA pero cierra arriba
+        # Support: low touches MA but closes above
         df[f'sma_{period}_support'] = (
             (df['low'] <= df[f'sma_{period}'] * (1 + tolerance)) &
             (df['low'] >= df[f'sma_{period}'] * (1 - tolerance)) &
             (df['close'] > df[f'sma_{period}'])
         )
         
-        # Resistencia: high toca MA pero cierra abajo
+        # Resistance: high touches MA but closes below
         df[f'sma_{period}_resistance'] = (
             (df['high'] >= df[f'sma_{period}'] * (1 - tolerance)) &
             (df['high'] <= df[f'sma_{period}'] * (1 + tolerance)) &
@@ -194,28 +196,28 @@ def identify_ma_levels(df):
 
 ## MA Slope Analysis
 
-La dirección importa tanto como el precio.
+Direction matters as much as price.
 
 ```python
 def ma_slope_analysis(df, period=20):
-    """Analizar pendiente de las medias móviles"""
-    # Calcular MA
+    """Analyze moving average slope"""
+    # Calculate MA
     df[f'sma_{period}'] = df['close'].rolling(period).mean()
     
-    # Slope (cambio porcentual)
+    # Slope (percentage change)
     lookback = 5
     df[f'sma_{period}_slope'] = (
         df[f'sma_{period}'] - df[f'sma_{period}'].shift(lookback)
     ) / df[f'sma_{period}'].shift(lookback) * 100
     
-    # Categorizar slope
+    # Categorize slope
     df['trend_strength'] = pd.cut(
         df[f'sma_{period}_slope'],
         bins=[-np.inf, -2, -0.5, 0.5, 2, np.inf],
         labels=['strong_down', 'down', 'flat', 'up', 'strong_up']
     )
     
-    # Aceleración
+    # Acceleration
     df[f'sma_{period}_acceleration'] = df[f'sma_{period}_slope'].diff()
     
     return df
@@ -225,8 +227,8 @@ def ma_slope_analysis(df, period=20):
 
 ```python
 def ma_volume_confirmation(df):
-    """Combinar señales de MA con volumen"""
-    # MAs básicas
+    """Combine MA signals with volume"""
+    # Basic MAs
     df['ema_9'] = df['close'].ewm(span=9, adjust=False).mean()
     df['sma_20'] = df['close'].rolling(20).mean()
     
@@ -234,7 +236,7 @@ def ma_volume_confirmation(df):
     df['volume_sma'] = df['volume'].rolling(20).mean()
     df['high_volume'] = df['volume'] > df['volume_sma'] * 1.5
     
-    # Señales confirmadas
+    # Confirmed signals
     df['confirmed_break_9ema'] = (
         (df['close'] > df['ema_9']) & 
         (df['open'] < df['ema_9']) & 
@@ -250,7 +252,7 @@ def ma_volume_confirmation(df):
     return df
 ```
 
-## MA para Risk Management
+## MA for Risk Management
 
 ```python
 class MABasedStops:
@@ -259,18 +261,18 @@ class MABasedStops:
         self.period = period
         
     def calculate_stop(self, df, buffer=0.02):
-        """Stop dinámico basado en MA"""
-        # Calcular MA
+        """Dynamic stop based on MA"""
+        # Calculate MA
         if self.ma_type == 'ema':
             df['stop_ma'] = df['close'].ewm(span=self.period, adjust=False).mean()
         else:
             df['stop_ma'] = df['close'].rolling(self.period).mean()
         
-        # Stop con buffer
+        # Stop with buffer
         df['long_stop'] = df['stop_ma'] * (1 - buffer)
         df['short_stop'] = df['stop_ma'] * (1 + buffer)
         
-        # Trailing stop que solo sube (para longs)
+        # Trailing stop that only moves up (for longs)
         df['trailing_stop'] = df['long_stop'].cummax()
         
         return df
@@ -280,7 +282,7 @@ class MABasedStops:
 
 ```python
 def backtest_ma_strategy(df, initial_capital=10000):
-    """Backtest de estrategia simple con MAs"""
+    """Backtest simple MA strategy"""
     # Setup
     df = ma_crossover_signals(df, fast_period=9, slow_period=20)
     
@@ -288,7 +290,7 @@ def backtest_ma_strategy(df, initial_capital=10000):
     position = 0
     trades = []
     
-    for i in range(20, len(df)):  # Empezar después de tener MAs
+    for i in range(20, len(df)):  # Start after MAs are available
         row = df.iloc[i]
         
         # Entry: Golden cross
@@ -303,7 +305,7 @@ def backtest_ma_strategy(df, initial_capital=10000):
                 'shares': shares
             })
         
-        # Exit: Death cross o stop loss
+        # Exit: Death cross or stop loss
         elif position > 0:
             if row['strong_death'] or row['close'] < row['slow_ma'] * 0.98:
                 capital += position * row['close']
@@ -318,15 +320,15 @@ def backtest_ma_strategy(df, initial_capital=10000):
     return pd.DataFrame(trades)
 ```
 
-## Tips Prácticos
+## Practical Tips
 
 ### 1. MA Confluence
 ```python
 def find_ma_confluence(df, tolerance=0.01):
-    """Encontrar donde múltiples MAs convergen"""
+    """Find where multiple MAs converge"""
     mas = ['sma_20', 'sma_50', 'ema_9', 'ema_20']
     
-    # Calcular distancia entre MAs
+    # Calculate distance between MAs
     for i, ma1 in enumerate(mas):
         for ma2 in mas[i+1:]:
             distance = abs(df[ma1] - df[ma2]) / df[ma1]
@@ -338,9 +340,9 @@ def find_ma_confluence(df, tolerance=0.01):
 ```python
 def guppy_multiple_ma(df):
     """Guppy Multiple Moving Average"""
-    # Corto plazo
+    # Short term
     short_periods = [3, 5, 8, 10, 12, 15]
-    # Largo plazo
+    # Long term
     long_periods = [30, 35, 40, 45, 50, 60]
     
     for p in short_periods:
@@ -349,26 +351,26 @@ def guppy_multiple_ma(df):
         df[f'ema_long_{p}'] = df['close'].ewm(span=p).mean()
 ```
 
-## Alertas
+## Alerts
 
 ```python
 def ma_alerts(df, ticker):
-    """Generar alertas basadas en MAs"""
+    """Generate MA-based alerts"""
     alerts = []
     
     latest = df.iloc[-1]
     
-    # Alerta de cruce
+    # Crossover alert
     if latest['golden_cross']:
         alerts.append(f"{ticker}: GOLDEN CROSS {latest['fast_ma']:.2f} > {latest['slow_ma']:.2f}")
     
-    # Alerta de soporte
+    # Support alert
     if latest['sma_20_support']:
-        alerts.append(f"{ticker}: BOUNCE en 20 SMA @ ${latest['sma_20']:.2f}")
+        alerts.append(f"{ticker}: BOUNCE at 20 SMA @ ${latest['sma_20']:.2f}")
     
     return alerts
 ```
 
-## Siguiente Paso
+## Next Step
 
-Continuemos con [Volumen y RVol](volume_rvol.md), el combustible de los movimientos.
+Let's continue with [Volume and RVol](volume_rvol.md), the fuel behind the moves.

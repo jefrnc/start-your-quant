@@ -1,8 +1,10 @@
-# Estrategias de Automatización
+> 🇪🇸 [Leer en Español](automation_strategies.es.md) | 🇺🇸 **English**
 
-## Automatización de Estrategias de Trading
+# Automation Strategies
 
-### Framework de Estrategia Automatizada
+## Trading Strategy Automation
+
+### Automated Strategy Framework
 ```python
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -15,7 +17,7 @@ import pandas as pd
 from enum import Enum
 
 class SignalType(Enum):
-    """Tipos de señales"""
+    """Signal types"""
     BUY = "buy"
     SELL = "sell" 
     HOLD = "hold"
@@ -23,7 +25,7 @@ class SignalType(Enum):
     CLOSE_SHORT = "close_short"
 
 class SignalStrength(Enum):
-    """Fuerza de señales"""
+    """Signal strength"""
     WEAK = 1
     MODERATE = 2
     STRONG = 3
@@ -31,7 +33,7 @@ class SignalStrength(Enum):
 
 @dataclass
 class TradingSignal:
-    """Señal de trading"""
+    """Trading signal"""
     symbol: str
     signal_type: SignalType
     strength: SignalStrength
@@ -46,7 +48,7 @@ class TradingSignal:
 
 @dataclass
 class MarketData:
-    """Datos de mercado"""
+    """Market data"""
     symbol: str
     timestamp: datetime
     open_price: float
@@ -60,7 +62,7 @@ class MarketData:
     indicators: Dict[str, float] = field(default_factory=dict)
 
 class AutomatedStrategy(ABC):
-    """Clase base para estrategias automatizadas"""
+    """Base class for automated strategies"""
     
     def __init__(self, name: str, config: Dict):
         self.name = name
@@ -87,17 +89,17 @@ class AutomatedStrategy(ABC):
     
     @abstractmethod
     async def analyze_market_data(self, data: MarketData) -> List[TradingSignal]:
-        """Analizar datos de mercado y generar señales"""
+        """Analyze market data and generate signals"""
         pass
     
     @abstractmethod
     async def calculate_position_size(self, signal: TradingSignal, 
                                     account_equity: float) -> int:
-        """Calcular tamaño de posición"""
+        """Calculate position size"""
         pass
     
     def should_generate_signal(self, symbol: str) -> bool:
-        """Verificar si debe generar señal (cooldown)"""
+        """Check if signal should be generated (cooldown)"""
         if symbol not in self.last_signal_time:
             return True
         
@@ -105,7 +107,7 @@ class AutomatedStrategy(ABC):
         return time_since_last >= timedelta(minutes=self.signal_cooldown)
     
     def record_signal(self, signal: TradingSignal):
-        """Registrar señal generada"""
+        """Record generated signal"""
         self.signals_history.append(signal)
         self.last_signal_time[signal.symbol] = signal.timestamp
         self.performance_metrics['total_signals'] += 1
@@ -116,7 +118,7 @@ class AutomatedStrategy(ABC):
                                if s.timestamp >= cutoff_time]
     
     def update_performance(self, signal: TradingSignal, pnl: float):
-        """Actualizar métricas de performance"""
+        """Update performance metrics"""
         if pnl > 0:
             self.performance_metrics['successful_signals'] += 1
         
@@ -129,7 +131,7 @@ class AutomatedStrategy(ABC):
             )
     
     def get_performance_summary(self) -> Dict:
-        """Obtener resumen de performance"""
+        """Get performance summary"""
         return {
             'strategy_name': self.name,
             'is_active': self.is_active,
@@ -140,7 +142,7 @@ class AutomatedStrategy(ABC):
         }
 
 class GapAndGoAutomated(AutomatedStrategy):
-    """Estrategia Gap and Go automatizada"""
+    """Automated Gap and Go strategy"""
     
     def __init__(self, config: Dict):
         super().__init__("GapAndGo", config)
@@ -157,7 +159,7 @@ class GapAndGoAutomated(AutomatedStrategy):
         self.vix_level = 20.0
     
     async def analyze_market_data(self, data: MarketData) -> List[TradingSignal]:
-        """Analizar datos para Gap and Go"""
+        """Analyze data for Gap and Go"""
         
         signals = []
         
@@ -231,7 +233,7 @@ class GapAndGoAutomated(AutomatedStrategy):
     
     def _calculate_signal_quality(self, data: MarketData, 
                                 gap_percent: float, volume_ratio: float) -> Tuple[SignalStrength, float]:
-        """Calcular calidad de señal"""
+        """Calculate signal quality"""
         
         score = 0
         
@@ -282,7 +284,7 @@ class GapAndGoAutomated(AutomatedStrategy):
         return strength, confidence
     
     def _calculate_stop_loss(self, data: MarketData) -> float:
-        """Calcular stop loss"""
+        """Calculate stop loss"""
         # Stop loss below VWAP or previous day low
         vwap = data.vwap or data.close_price
         prev_low = data.indicators.get('prev_low', data.low_price)
@@ -293,7 +295,7 @@ class GapAndGoAutomated(AutomatedStrategy):
         return min(vwap_stop, prev_low_stop)
     
     def _calculate_take_profit(self, data: MarketData, gap_percent: float) -> float:
-        """Calcular take profit"""
+        """Calculate take profit"""
         # Target based on gap size
         if gap_percent >= 0.10:
             target_percent = 0.15  # 15% target for large gaps
@@ -304,7 +306,7 @@ class GapAndGoAutomated(AutomatedStrategy):
     
     async def calculate_position_size(self, signal: TradingSignal, 
                                     account_equity: float) -> int:
-        """Calcular tamaño de posición para Gap and Go"""
+        """Calculate position size for Gap and Go"""
         
         # Base risk amount
         base_risk = account_equity * 0.02  # 2% base risk
@@ -331,7 +333,7 @@ class GapAndGoAutomated(AutomatedStrategy):
         return min(max_shares, max_shares_by_limit)
 
 class VWAPReclaimAutomated(AutomatedStrategy):
-    """Estrategia VWAP Reclaim automatizada"""
+    """Automated VWAP Reclaim strategy"""
     
     def __init__(self, config: Dict):
         super().__init__("VWAPReclaim", config)
@@ -345,7 +347,7 @@ class VWAPReclaimAutomated(AutomatedStrategy):
         self.symbols_below_vwap = {}
     
     async def analyze_market_data(self, data: MarketData) -> List[TradingSignal]:
-        """Analizar datos para VWAP Reclaim"""
+        """Analyze data for VWAP Reclaim"""
         
         signals = []
         
@@ -426,7 +428,7 @@ class VWAPReclaimAutomated(AutomatedStrategy):
         return signals
     
     def _is_active_time(self, timestamp: datetime) -> bool:
-        """Verificar si es tiempo activo para la estrategia"""
+        """Check if it is active time for the strategy"""
         market_open = timestamp.replace(hour=9, minute=30, second=0, microsecond=0)
         market_close = timestamp.replace(hour=15, minute=30, second=0, microsecond=0)
         
@@ -434,7 +436,7 @@ class VWAPReclaimAutomated(AutomatedStrategy):
     
     def _calculate_vwap_signal_quality(self, data: MarketData, distance: float,
                                      volume_ratio: float, time_below: timedelta) -> Tuple[SignalStrength, float]:
-        """Calcular calidad de señal VWAP"""
+        """Calculate VWAP signal quality"""
         
         score = 0
         
@@ -487,7 +489,7 @@ class VWAPReclaimAutomated(AutomatedStrategy):
     
     async def calculate_position_size(self, signal: TradingSignal, 
                                     account_equity: float) -> int:
-        """Calcular tamaño de posición para VWAP Reclaim"""
+        """Calculate position size for VWAP Reclaim"""
         
         base_risk = account_equity * 0.015  # 1.5% base risk
         
@@ -519,7 +521,7 @@ class VWAPReclaimAutomated(AutomatedStrategy):
         return min(shares, max_shares_by_limit)
 
 class StrategyOrchestrator:
-    """Orquestador de estrategias automatizadas"""
+    """Automated strategies orchestrator"""
     
     def __init__(self, account_equity: float):
         self.account_equity = account_equity
@@ -535,18 +537,18 @@ class StrategyOrchestrator:
         self.logger = logging.getLogger("StrategyOrchestrator")
     
     def add_strategy(self, strategy: AutomatedStrategy):
-        """Agregar estrategia"""
+        """Add strategy"""
         self.strategies[strategy.name] = strategy
         self.logger.info(f"Added strategy: {strategy.name}")
     
     def remove_strategy(self, strategy_name: str):
-        """Remover estrategia"""
+        """Remove strategy"""
         if strategy_name in self.strategies:
             del self.strategies[strategy_name]
             self.logger.info(f"Removed strategy: {strategy_name}")
     
     async def process_market_data(self, data: MarketData):
-        """Procesar datos de mercado con todas las estrategias"""
+        """Process market data with all strategies"""
         
         all_signals = []
         
@@ -581,7 +583,7 @@ class StrategyOrchestrator:
     
     async def _filter_and_prioritize_signals(self, signals: List[TradingSignal], 
                                            symbol: str) -> List[TradingSignal]:
-        """Filtrar y priorizar señales"""
+        """Filter and prioritize signals"""
         
         if not signals:
             return []
@@ -630,7 +632,7 @@ class StrategyOrchestrator:
         return final_signals
     
     async def get_next_signal(self) -> Optional[TradingSignal]:
-        """Obtener próxima señal de la cola"""
+        """Get next signal from the queue"""
         try:
             signal = await asyncio.wait_for(self.signal_queue.get(), timeout=1.0)
             return signal
@@ -638,7 +640,7 @@ class StrategyOrchestrator:
             return None
     
     def update_position_opened(self, signal: TradingSignal):
-        """Actualizar cuando se abre posición"""
+        """Update when position is opened"""
         self.active_signals.append(signal)
         signal_exposure = (signal.quantity * signal.price) / self.account_equity
         self.current_exposure += signal_exposure
@@ -646,7 +648,7 @@ class StrategyOrchestrator:
         self.logger.info(f"Position opened: {signal.symbol} exposure={signal_exposure:.2%} total={self.current_exposure:.2%}")
     
     def update_position_closed(self, signal: TradingSignal, pnl: float):
-        """Actualizar cuando se cierra posición"""
+        """Update when position is closed"""
         # Remove from active signals
         self.active_signals = [s for s in self.active_signals if s != signal]
         
@@ -663,7 +665,7 @@ class StrategyOrchestrator:
         self.logger.info(f"Position closed: {signal.symbol} PnL={pnl:.2f} exposure={self.current_exposure:.2%}")
     
     def get_portfolio_summary(self) -> Dict:
-        """Obtener resumen del portfolio"""
+        """Get portfolio summary"""
         
         strategy_summaries = {}
         for name, strategy in self.strategies.items():
@@ -684,11 +686,11 @@ class StrategyOrchestrator:
             'strategies': strategy_summaries
         }
 
-# Demo del sistema de automatización
+# Automation system demo
 async def demo_automation_system():
-    """Demo del sistema de automatización"""
+    """Automation system demo"""
     
-    # Configurar estrategias
+    # Configure strategies
     gap_config = {
         'min_gap_percent': 0.05,
         'max_gap_percent': 0.15,
@@ -705,16 +707,16 @@ async def demo_automation_system():
         'min_confidence': 0.60
     }
     
-    # Crear estrategias
+    # Create strategies
     gap_strategy = GapAndGoAutomated(gap_config)
     vwap_strategy = VWAPReclaimAutomated(vwap_config)
     
-    # Crear orquestador
+    # Create orchestrator
     orchestrator = StrategyOrchestrator(account_equity=100000)
     orchestrator.add_strategy(gap_strategy)
     orchestrator.add_strategy(vwap_strategy)
     
-    # Simular datos de mercado
+    # Simulate market data
     market_data = MarketData(
         symbol="AAPL",
         timestamp=datetime.now().replace(hour=10, minute=0),
@@ -731,7 +733,7 @@ async def demo_automation_system():
         }
     )
     
-    # Procesar datos
+    # Process data
     signals = await orchestrator.process_market_data(market_data)
     
     print(f"📊 Generated {len(signals)} signals:")
@@ -739,7 +741,7 @@ async def demo_automation_system():
         print(f"  {signal.strategy_name}: {signal.symbol} {signal.signal_type.value} "
               f"qty={signal.quantity} confidence={signal.confidence:.2f}")
     
-    # Obtener resumen
+    # Get summary
     portfolio_summary = orchestrator.get_portfolio_summary()
     print(f"\n📈 Portfolio Summary:")
     print(f"Total exposure: {portfolio_summary['total_exposure_pct']:.2%}")
@@ -756,12 +758,12 @@ if __name__ == "__main__":
     asyncio.run(demo_automation_system())
 ```
 
-## Gestión de Riesgo Automatizada
+## Automated Risk Management
 
-### Sistema de Risk Management Automatizado
+### Automated Risk Management System
 ```python
 class AutomatedRiskManager:
-    """Sistema de gestión de riesgo automatizado"""
+    """Automated risk management system"""
     
     def __init__(self, config: Dict):
         self.config = config
@@ -786,7 +788,7 @@ class AutomatedRiskManager:
         
     async def evaluate_signal_risk(self, signal: TradingSignal, 
                                  account_equity: float) -> Tuple[bool, str]:
-        """Evaluar riesgo de una señal"""
+        """Evaluate risk of a signal"""
         
         self.current_equity = account_equity
         
@@ -826,7 +828,7 @@ class AutomatedRiskManager:
         return True, "Risk checks passed"
     
     async def monitor_position_risk(self, symbol: str, current_price: float):
-        """Monitorear riesgo de posición existente"""
+        """Monitor risk of existing position"""
         
         if symbol not in self.positions:
             return
@@ -862,7 +864,7 @@ class AutomatedRiskManager:
             await self._consider_profit_protection(symbol, unrealized_pnl_pct)
     
     async def _trigger_daily_loss_protection(self):
-        """Activar protección por pérdida diaria"""
+        """Activate daily loss protection"""
         
         self.trading_halted = True
         self.logger.critical("Daily loss protection triggered - halting trading")
@@ -879,7 +881,7 @@ class AutomatedRiskManager:
         })
     
     async def _trigger_stop_loss(self, symbol: str, reason: str):
-        """Activar stop loss"""
+        """Activate stop loss"""
         
         self.logger.warning(f"Stop loss triggered for {symbol}: {reason}")
         
@@ -887,7 +889,7 @@ class AutomatedRiskManager:
         await self._trigger_emergency_exit(symbol, reason)
     
     async def _trigger_emergency_exit(self, symbol: str, reason: str):
-        """Activar salida de emergencia"""
+        """Activate emergency exit"""
         
         if symbol in self.positions:
             position = self.positions[symbol]
@@ -908,7 +910,7 @@ class AutomatedRiskManager:
             await self._send_emergency_order(exit_order)
     
     async def _consider_profit_protection(self, symbol: str, profit_pct: float):
-        """Considerar protección de ganancias"""
+        """Consider profit protection"""
         
         position = self.positions[symbol]
         
@@ -929,7 +931,7 @@ class AutomatedRiskManager:
         self.logger.info(f"Profit protection activated for {symbol}: stop moved to ${new_stop:.2f}")
     
     async def _get_symbol_sector(self, symbol: str) -> str:
-        """Obtener sector del símbolo"""
+        """Get symbol's sector"""
         # This would typically query a database or API
         # For demo purposes, using a simple mapping
         sector_mapping = {
@@ -944,7 +946,7 @@ class AutomatedRiskManager:
         return sector_mapping.get(symbol, 'Unknown')
     
     async def _send_risk_alert(self, title: str, data: Dict):
-        """Enviar alerta de riesgo"""
+        """Send risk alert"""
         
         alert = {
             'type': 'risk_alert',
@@ -958,14 +960,14 @@ class AutomatedRiskManager:
         self.logger.critical(f"Risk Alert: {title} - {data}")
     
     async def _send_emergency_order(self, order: Dict):
-        """Enviar orden de emergencia"""
+        """Send emergency order"""
         
         self.logger.critical(f"Emergency order: {order}")
         # Implementation would send to execution engine
     
     def update_position(self, symbol: str, side: str, quantity: int, 
                        entry_price: float, stop_loss: float = None):
-        """Actualizar posición"""
+        """Update position"""
         
         self.positions[symbol] = {
             'side': side,
@@ -981,21 +983,21 @@ class AutomatedRiskManager:
         # This is simplified - in real implementation, you'd await this properly
     
     def remove_position(self, symbol: str, exit_price: float, pnl: float):
-        """Remover posición"""
+        """Remove position"""
         
         if symbol in self.positions:
             del self.positions[symbol]
             self.daily_pnl += pnl
     
     def set_start_of_day_equity(self, equity: float):
-        """Establecer equity al inicio del día"""
+        """Set equity at start of day"""
         self.start_of_day_equity = equity
         self.daily_pnl = 0
         self.emergency_stop_triggered = False
         self.trading_halted = False
     
     def get_risk_metrics(self) -> Dict:
-        """Obtener métricas de riesgo"""
+        """Get risk metrics"""
         
         current_exposure = 0
         position_count = len(self.positions)
@@ -1026,11 +1028,11 @@ class AutomatedRiskManager:
             }
         }
 
-# Demo del risk manager
+# Risk manager demo
 async def demo_risk_manager():
-    """Demo del sistema de risk management"""
+    """Risk management system demo"""
     
-    # Configuración
+    # Configuration
     risk_config = {
         'max_daily_loss_pct': 0.05,
         'max_portfolio_exposure': 0.80,
@@ -1038,11 +1040,11 @@ async def demo_risk_manager():
         'max_correlation_exposure': 0.30
     }
     
-    # Crear risk manager
+    # Create risk manager
     risk_manager = AutomatedRiskManager(risk_config)
     risk_manager.set_start_of_day_equity(100000)
     
-    # Simular señal
+    # Simulate signal
     signal = TradingSignal(
         symbol="AAPL",
         signal_type=SignalType.BUY,
@@ -1054,7 +1056,7 @@ async def demo_risk_manager():
         confidence=0.8
     )
     
-    # Evaluar riesgo
+    # Evaluate risk
     approved, reason = await risk_manager.evaluate_signal_risk(signal, 100000)
     
     print(f"📊 Risk Evaluation:")
@@ -1062,15 +1064,15 @@ async def demo_risk_manager():
     print(f"Reason: {reason}")
     
     if approved:
-        # Simular apertura de posición
+        # Simulate opening position
         risk_manager.update_position(
             signal.symbol, 'long', signal.quantity, signal.price, 140.0
         )
         
-        # Simular monitoreo
+        # Simulate monitoring
         await risk_manager.monitor_position_risk("AAPL", 145.0)  # Price moving down
         
-        # Obtener métricas
+        # Get metrics
         metrics = risk_manager.get_risk_metrics()
         print(f"\n📈 Risk Metrics:")
         for key, value in metrics.items():
@@ -1086,4 +1088,4 @@ if __name__ == "__main__":
     asyncio.run(demo_risk_manager())
 ```
 
-Este sistema de automatización proporciona un framework robusto para ejecutar estrategias de trading de forma completamente automatizada, con gestión de riesgo integrada y monitoreo continuo.
+This automation system provides a robust framework for executing trading strategies in a fully automated manner, with integrated risk management and continuous monitoring.

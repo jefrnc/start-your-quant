@@ -1,47 +1,49 @@
-# Estructura de un Sistema: Entradas, Salidas y Stops
+> 🇪🇸 [Leer en Español](System-Structure-Entries-Exits.es.md) | 🇺🇸 **English**
 
-Un sistema de trading se descompone en tres partes: **cómo entrás**, **cómo salís con pérdida**, y **cómo salís con ganancia**. Separarlos no es solo una formalidad — es lo que te permite evaluarlos con el [método científico](./Scientific-Method-System-Development.md), aislar qué funciona y qué no, y optimizar sin contaminar los resultados.
+# System Structure: Entries, Exits, and Stops
 
-## Principio Fundamental: Simplicidad
+A trading system breaks down into three parts: **how you enter**, **how you exit with a loss**, and **how you exit with a profit**. Separating them isn't just a formality -- it's what lets you evaluate them with the [scientific method](./Scientific-Method-System-Development.md), isolate what works and what doesn't, and optimize without contaminating results.
 
-Si no podés explicar en dos minutos a cualquier persona por qué tu sistema compra y por qué vende, probablemente sea demasiado complejo. No necesitás machine learning ni miles de líneas de código. Las cosas simples funcionan en el mercado algorítmico — y son más robustas.
+## Fundamental Principle: Simplicity
 
-Una entrada, un filtro como máximo. En salidas sí podés (y conviene) usar múltiples métodos combinados.
+If you can't explain in two minutes to anyone why your system buys and why it sells, it's probably too complex. You don't need machine learning or thousands of lines of code. Simple things work in algorithmic markets -- and they're more robust.
 
-## Tipos de Órdenes para Entradas
+One entry, one filter at most. For exits, you can (and should) use multiple combined methods.
 
-### Stop (para Entrar en Tendencia)
+## Order Types for Entries
 
-Se activa cuando el precio supera un nivel por arriba (compra) o cae por debajo (venta). Es la entrada natural de sistemas de ruptura y seguimiento de tendencia.
+### Stop (for Trend Entries)
+
+Triggers when price exceeds a level upward (buy) or falls below (sell). The natural entry for breakout and trend-following systems.
 
 ```python
 def entry_stop_order(current_price, stop_level, side='long'):
     """
-    Entrada por stop: compra si supera un nivel, vende si lo pierde.
-    Siempre stop market — queremos garantizar la ejecución.
+    Stop entry: buy if it exceeds a level, sell if it breaks below.
+    Always stop market -- we want to guarantee execution.
     """
     if side == 'long' and current_price >= stop_level:
-        return 'BUY_MARKET'  # ejecuta al mejor precio disponible
+        return 'BUY_MARKET'  # executes at best available price
     elif side == 'short' and current_price <= stop_level:
         return 'SELL_MARKET'
     return None
 
-# Ventaja: garantiza la entrada, el filtro va implícito
-# Desventaja: desliza (slippage) porque entrás a favor del movimiento
-# y puede haber muchas órdenes saltando en el mismo nivel
+# Advantage: guarantees the entry, the filter is implicit
+# Disadvantage: slippage because you enter in the direction of the move
+# and many orders may be triggering at the same level
 ```
 
-**Siempre stop market, nunca stop limit para entradas.** Si usás stop es porque querés garantizar la ejecución. Un stop limit puede no ejecutar si el precio salta rápido.
+**Always stop market, never stop limit for entries.** If you're using a stop it's because you want guaranteed execution. A stop limit may not fill if price jumps quickly.
 
-### Limit (para Entrar Contra Tendencia)
+### Limit (for Counter-Trend Entries)
 
-Comprás cuando el precio cae hacia tu precio. Vendés cuando sube hacia tu precio. La entrada natural de sistemas de soporte/resistencia y reversión a la media.
+You buy when price falls to your price. You sell when it rises to your price. The natural entry for support/resistance and mean-reversion systems.
 
 ```python
 def entry_limit_order(current_price, limit_level, side='long'):
     """
-    Entrada por limit: compra si el precio cae a mi nivel o mejor.
-    No desliza negativamente, pero puede no ejecutar.
+    Limit entry: buy if price falls to my level or better.
+    No negative slippage, but may not fill.
     """
     if side == 'long' and current_price <= limit_level:
         return 'BUY_LIMIT'
@@ -49,93 +51,93 @@ def entry_limit_order(current_price, limit_level, side='long'):
         return 'SELL_LIMIT'
     return None
 
-# Ventaja: sin slippage negativo — comprás al precio que querés o mejor
-# Desventaja: puede no ejecutar si no llega al precio exacto
+# Advantage: no negative slippage -- you buy at your price or better
+# Disadvantage: may not fill if price doesn't reach the exact level
 ```
 
-**Problema para backtesting**: que el precio haya tocado tu nivel en el histórico no garantiza que hubieras ejecutado. Puede haber habido miles de órdenes delante en la cola. Y los trades que "no ejecutan" suelen ser positivos, lo que sobreestima tu backtest.
+**Backtesting problem**: the fact that price touched your level in historical data doesn't guarantee you would have been filled. There may have been thousands of orders ahead in the queue. And the trades that "don't fill" tend to be winners, which overestimates your backtest.
 
-### A Mercado (Next Bar Open)
+### Market Order (Next Bar Open)
 
-Ejecuta al mejor precio disponible inmediatamente. Usada cuando la señal no tiene un precio implícito (ej: un oscilador cruza un umbral).
+Executes at the best available price immediately. Used when the signal doesn't have an implicit price (e.g., an oscillator crosses a threshold).
 
 ```python
-# Patrón típico: señal al cierre de la barra → entrada en la apertura siguiente
+# Typical pattern: signal at bar close -> entry at next bar open
 if signal_at_close:
     order = 'BUY_MARKET_NEXT_BAR'
-    # El sistema marca el precio teórico como el open de la siguiente barra
-    # En real, ejecutarás un poco arriba o abajo (slippage bidireccional)
+    # The system marks the theoretical price as the next bar's open
+    # In live trading, you'll execute slightly above or below (bidirectional slippage)
 ```
 
-### Cuándo Usar Cada Tipo
+### When to Use Each Type
 
-| Modelo de entrada | Orden recomendada |
+| Entry model | Recommended order |
 |---|---|
-| Ruptura de máximos/mínimos | Stop |
-| Soporte/resistencia, pivots | Limit |
-| Cruce de medias, ruptura de canal | Stop |
-| Oscilador (RSI, estocástico) sin precio implícito | A mercado (next bar) |
-| Reversión a la media | Limit |
+| High/low breakout | Stop |
+| Support/resistance, pivots | Limit |
+| Moving average crossover, channel breakout | Stop |
+| Oscillator (RSI, stochastic) without implicit price | Market (next bar) |
+| Mean reversion | Limit |
 
-## Setups de Entrada Clásicos
+## Classic Entry Setups
 
-### Canales de Donchian (Ruptura de N barras)
+### Donchian Channels (N-Bar Breakout)
 
-Comprar cuando el precio supera el máximo de N barras. Vender cuando pierde el mínimo. Creado en los años 60, base del sistema de las Tortugas de Richard Dennis. Sigue funcionando en activos tendenciales.
+Buy when price exceeds the high of N bars. Sell when it breaks the low. Created in the 1960s, the basis of Richard Dennis's Turtle system. Still works on trending assets.
 
 ```python
 def donchian_entry(highs, lows, close, period=20):
     upper = highs.rolling(period).max()
     lower = lows.rolling(period).min()
 
-    if close.iloc[-1] > upper.iloc[-2]:  # supera máximo de ayer
+    if close.iloc[-1] > upper.iloc[-2]:  # exceeds yesterday's high
         return 'LONG'
     elif close.iloc[-1] < lower.iloc[-2]:
         return 'SHORT'
     return None
 ```
 
-### Medias Móviles
+### Moving Averages
 
-El indicador más usado. Tres variantes de entrada:
-- **Cruce de una media**: precio cruza la media → señal
-- **Cruce de dos medias**: media rápida cruza la lenta
-- **Pendiente de la media**: cambio de dirección → señal
+The most widely used indicator. Three entry variants:
+- **Single MA crossover**: price crosses the MA -> signal
+- **Dual MA crossover**: fast MA crosses the slow MA
+- **MA slope**: direction change -> signal
 
-No hay evidencia clara de que una media (simple, exponencial, ponderada) sea consistentemente mejor que otra. Probá en tu sistema específico.
+There's no clear evidence that one type of moving average (simple, exponential, weighted) is consistently better than another. Test on your specific system.
 
-### Bandas de Bollinger
+### Bollinger Bands
 
-Media de 20 períodos ± 2 desviaciones estándar. Dos usos opuestos:
+20-period moving average +/- 2 standard deviations. Two opposite uses:
 
-- **Tendencial**: comprar cuando rompe la banda superior (expansión de volatilidad). Entra tarde, con stops amplios, pero captura movimientos grandes
-- **Reversión**: comprar cuando recupera la banda inferior después de haberla perdido. Entrada más precisa, stop más corto
+- **Trend**: buy when it breaks the upper band (volatility expansion). Enters late, with wide stops, but captures big moves
+- **Reversion**: buy when it recovers the lower band after losing it. More precise entry, tighter stop
 
-### Indicadores de Momentum
+### Momentum Indicators
 
-**RSI** (Wilder): mide la magnitud de ganancias vs pérdidas en cierres sucesivos, normalizado de 0 a 100. Por encima de 50 = presión compradora dominante. También se usa como oscilador de sobrecompra/sobreventa.
+**RSI** (Wilder): measures the magnitude of gains vs losses in successive closes, normalized from 0 to 100. Above 50 = dominant buying pressure. Also used as an overbought/oversold oscillator.
 
-**MACD** (Gerald Appel): diferencia entre dos EMAs. Indicador de aceleración — mide si las medias se separan o convergen.
+**MACD** (Gerald Appel): the difference between two EMAs. An acceleration indicator -- measures whether the averages are diverging or converging.
 
-**Estocástico** (George Lane): normaliza el precio respecto al rango del período, de 0 a 100. Más suave que el RSI por incluir suavizado. Típicamente para sobrecompra/sobreventa, pero explorá su uso tendencial con valores de período altos.
+**Stochastic** (George Lane): normalizes price relative to the period's range, from 0 to 100. Smoother than RSI because it includes smoothing. Typically for overbought/oversold, but explore its trend use with high period values.
 
-**ATR** (Wilder): no es un indicador de señal sino de volatilidad. Mide el rango promedio incluyendo gaps. Fundamental para dimensionar stops y profits.
+**ATR** (Wilder): not a signal indicator but a volatility one. Measures the average range including gaps. Essential for sizing stops and profits.
 
-> No te quedes con el uso típico de los indicadores. Un RSI no es solo para sobrecompra/sobreventa — puede funcionar como filtro de tendencia. Un canal de Donchian no es solo para ruptura — puede usarse para reversión comprando en la banda inferior. Cuestioná todo y probá.
+> Don't stick to the typical use of indicators. RSI isn't just for overbought/oversold -- it can work as a trend filter. A Donchian channel isn't just for breakouts -- it can be used for reversion by buying at the lower band. Question everything and test.
 
-## Setups de Salida
+## Exit Setups
 
-### La Asimetría Entrada-Salida
+### The Entry-Exit Asymmetry
 
-Para entradas: un setup simple, sin muchas reglas. Para salidas: múltiples métodos combinados. Podés (y conviene) salir por stop, por take profit, por señal contraria Y por tiempo, todo en el mismo sistema.
+For entries: a simple setup, not many rules. For exits: multiple combined methods. You can (and should) exit by stop, by take profit, by opposing signal AND by time, all in the same system.
 
-### Salida por Take Profit
+### Take Profit Exit
 
-Tres formas de calcularlo:
+Three ways to calculate it:
 
 ```python
 def take_profit(entry_price, method='volatility', **kwargs):
-    """Calcular nivel de take profit."""
+    """Calculate take profit level."""
     if method == 'fixed':
         return entry_price + kwargs['amount']
 
@@ -143,17 +145,17 @@ def take_profit(entry_price, method='volatility', **kwargs):
         return entry_price * (1 + kwargs['pct'])
 
     elif method == 'volatility':
-        # ATR ajusta el TP a la volatilidad actual del mercado
+        # ATR adjusts the TP to current market volatility
         return entry_price + kwargs['atr'] * kwargs['multiplier']
 ```
 
-**Recomendación**: ajustar por volatilidad. Un TP fijo de $1,000 no significa lo mismo cuando el activo se mueve 3% al día que cuando se mueve 0.5%.
+**Recommendation**: adjust by volatility. A fixed $1,000 TP doesn't mean the same thing when the asset moves 3% per day versus when it moves 0.5%.
 
-### Salida por Stop Loss
+### Stop Loss Exit
 
-El stop loss **no es para ganar dinero — es para protegerlo**. Si un stop loss aumenta el beneficio de tu sistema, es mala señal: probablemente hay overfitting.
+The stop loss **is not for making money -- it's for protecting it**. If a stop loss increases your system's profit, that's a bad sign: there's probably overfitting.
 
-**El stop loss no es gratis.** Casi siempre, un sistema gana menos con stop que sin stop. Lo que el stop te da es protección contra eventos aberrantes.
+**The stop loss is not free.** Almost always, a system earns less with a stop than without one. What the stop gives you is protection against aberrant events.
 
 ```python
 def stop_loss(entry_price, method='volatility', **kwargs):
@@ -165,99 +167,99 @@ def stop_loss(entry_price, method='volatility', **kwargs):
         return entry_price - kwargs['atr'] * kwargs['multiplier']
 ```
 
-### Salida por Señal Contraria
+### Opposing Signal Exit
 
-En casi todos los sistemas, la señal opuesta a la entrada te saca del mercado. Si compraste cuando la media cruzó al alza y ahora cruza a la baja, cerrás.
+In almost all systems, the signal opposite to the entry takes you out of the market. If you bought when the MA crossed up and now it crosses down, you close.
 
-Puede ser el mismo indicador de la entrada u otro diferente, aunque agregar indicadores diferentes aumenta la complejidad y el riesgo de overfitting.
+It can be the same indicator as the entry or a different one, although adding different indicators increases complexity and overfitting risk.
 
-### Salida Temporal
+### Time-Based Exit
 
-Suena raro pero funciona: salir después de N barras si el trade no se movió lo suficiente. La lógica es simple — estar invertido es un riesgo. Si lográs el mismo beneficio estando menos tiempo en el mercado, tu ratio riesgo/retorno mejora.
+Sounds strange but it works: exit after N bars if the trade hasn't moved enough. The logic is simple -- being invested is a risk. If you achieve the same profit while spending less time in the market, your risk/return ratio improves.
 
 ```python
 def temporal_exit(bars_in_trade, max_bars, current_pnl=None):
     """
-    Salida temporal: si después de N barras el trade no fue a ningún lado,
-    salí. Reducís riesgo sin perder beneficio.
+    Time-based exit: if after N bars the trade hasn't gone anywhere,
+    exit. Reduce risk without losing profit.
     """
     if bars_in_trade >= max_bars:
         return True
-    # Variante: si está en pérdida después de N barras, salir antes
+    # Variant: if at a loss after N bars, exit earlier
     if current_pnl is not None and current_pnl < 0 and bars_in_trade >= max_bars // 2:
         return True
     return False
 ```
 
-También podés usar ciclos estacionales: no operar los lunes, cerrar antes de noticias macro, evitar determinados meses.
+You can also use seasonal cycles: don't trade on Mondays, close before macro news, avoid certain months.
 
 ### Trailing Stop
 
-Acompaña al precio a favor de tu posición. Suena ideal en teoría — protegés el beneficio acumulado. En la práctica, **son difíciles de calibrar correctamente** y tienden a acoplarse (overfitting) a los datos del backtest.
+Follows price in favor of your position. Sounds ideal in theory -- you protect accumulated profit. In practice, **they are hard to calibrate correctly** and tend to overfit to backtest data.
 
-El problema principal en sistemas tendenciales: el trailing te puede sacar de los trades con mayor recorrido. El precio retrocede un poco (normal en cualquier tendencia), salta el trailing, y el precio sigue subiendo sin vos. En mercados con retrocesos suaves, pueden funcionar mejor.
+The main problem in trend-following systems: the trailing can take you out of the trades with the biggest moves. Price pulls back a little (normal in any trend), the trailing triggers, and price keeps going up without you. In markets with gentle pullbacks, they can work better.
 
-Si los usás, ajustá por volatilidad o porcentaje — nunca por valor absoluto, porque un trailing fijo de $500 no tiene el mismo significado con precios altos que con precios bajos.
+If you use them, adjust by volatility or percentage -- never by absolute value, because a fixed $500 trailing doesn't have the same meaning at high prices versus low prices.
 
-### Stop Catastrófico
+### Catastrophic Stop
 
-Un stop que idealmente nunca se activa. Cubre cisnes negros — eventos que no están en tus datos históricos.
+A stop that ideally never triggers. It covers black swans -- events that aren't in your historical data.
 
-No todo está en el backtest. Un gap del 9% en el DAX por el Brexit fue tres veces mayor que cualquier gap anterior en los datos. Ningún backtest lo hubiera capturado.
+Not everything is in the backtest. A 9% gap in the DAX from Brexit was three times larger than any previous gap in the data. No backtest would have captured it.
 
-**Consideraciones**:
-- Los circuit breakers (7%, 14%, 20% en US) existen pero no garantizan ejecución — en pánico puede no haber contrapartida
-- Un stop catastrófico no mejora el beneficio del sistema — está ahí para que sobrevivas al evento que tu modelo no previó
-- En un portfolio de 15+ sistemas, algunos pueden no tener stop explícito si salen por señal contraria rápidamente. Con 1-2 sistemas, el stop es imprescindible
+**Considerations**:
+- Circuit breakers (7%, 14%, 20% in US) exist but don't guarantee execution -- in a panic there may be no counterparty
+- A catastrophic stop doesn't improve the system's profit -- it's there so you survive the event your model didn't foresee
+- In a portfolio of 15+ systems, some may not have an explicit stop if they exit by opposing signal quickly. With 1-2 systems, the stop is essential
 
-## Money Management Básico desde el Inicio
+## Basic Money Management from the Start
 
-Antes de evaluar cualquier cosa, incorporá un money management básico para ecualizar los resultados a lo largo del tiempo.
+Before evaluating anything, incorporate basic money management to equalize results over time.
 
 ```python
 def equalized_position_size(account_value, price, atr, risk_per_trade_pct=0.01):
     """
-    Position sizing ajustado por volatilidad para que los resultados
-    sean comparables a lo largo de todo el histórico.
+    Volatility-adjusted position sizing so that results
+    are comparable across the entire history.
 
-    Sin esto, los trades de 2024 (Nasdaq a 18,000) dominan el backtest
-    vs los de 2009 (Nasdaq a 1,500). Eso sesga la optimización.
+    Without this, 2024 trades (Nasdaq at 18,000) dominate the backtest
+    vs 2009 trades (Nasdaq at 1,500). That biases the optimization.
     """
     risk_dollars = account_value * risk_per_trade_pct
     shares = int(risk_dollars / atr) if atr > 0 else 0
     return shares
 ```
 
-**No es lo mismo $1,000 con el Nasdaq a 5,000 que con el Nasdaq a 15,000.** Si no ecualizás, las operaciones recientes (con precios más altos) dominan el análisis y sesgan la optimización. Este money management es solo para ecualizar datos — el algoritmo final de gestión monetaria se elige al final del proceso.
+**$1,000 is not the same with the Nasdaq at 5,000 versus 15,000.** If you don't equalize, recent trades (with higher prices) dominate the analysis and bias the optimization. This money management is only for equalizing data -- the final money management algorithm is chosen at the end of the process.
 
-## Evaluación Aislada: Entradas y Salidas por Separado
+## Isolated Evaluation: Entries and Exits Separately
 
-El método científico exige aislar variables. Pero no podés evaluar una entrada sin una salida (necesitás trades completos para medir).
+The scientific method requires isolating variables. But you can't evaluate an entry without an exit (you need complete trades to measure).
 
-**Para evaluar entradas**: poné salidas estandarizadas (stop y TP fijos ajustados por ATR) y no las toques. Compará diferentes entradas con las mismas salidas.
+**To evaluate entries**: use standardized exits (fixed stop and TP adjusted by ATR) and don't touch them. Compare different entries with the same exits.
 
-**Para evaluar salidas**: usá las entradas ya validadas, o mejor aún, entradas aleatorias. Si tu salida no supera las entradas aleatorias, no tiene edge.
+**To evaluate exits**: use already-validated entries, or better yet, random entries. If your exit doesn't beat random entries, it has no edge.
 
 ```python
 import random
 
 def random_entry(data, probability=0.05):
     """
-    Entrada aleatoria: en cada barra, 5% de probabilidad de entrar.
-    Cualquier método de entrada debería superar esto.
-    Si no lo supera, tu entrada no tiene ventaja.
+    Random entry: on each bar, 5% probability of entering.
+    Any entry method should beat this.
+    If it doesn't beat it, your entry has no edge.
     """
     return random.random() < probability
 ```
 
-## El Proceso Completo
+## The Complete Process
 
-1. Definí tu perfil → qué tipo de sistema buscás
-2. Investigá ideas → libros, plataformas, experiencia propia
-3. Diseñá la entrada → un setup simple, un solo indicador principal
-4. Evaluá la entrada con salidas estandarizadas
-5. Diseñá las salidas → múltiples: TP, stop, señal contraria, temporal
-6. Evaluá cada salida aisladamente
-7. Combiná todo → entrada + salidas + money management básico
-8. Optimizá con protocolo (in-sample, validación, out-of-sample)
-9. Evaluá stop loss al final → no al principio, para no sesgar la evaluación de la ventaja pura
+1. Define your profile -> what type of system you're looking for
+2. Research ideas -> books, platforms, your own experience
+3. Design the entry -> a simple setup, one primary indicator
+4. Evaluate the entry with standardized exits
+5. Design the exits -> multiple: TP, stop, opposing signal, time-based
+6. Evaluate each exit in isolation
+7. Combine everything -> entry + exits + basic money management
+8. Optimize with protocol (in-sample, validation, out-of-sample)
+9. Evaluate stop loss last -> not first, so you don't bias the evaluation of the pure edge

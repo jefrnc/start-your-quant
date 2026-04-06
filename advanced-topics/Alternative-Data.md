@@ -1,16 +1,18 @@
-# Integración de Datos Alternativos
+> 🇪🇸 [Leer en Español](Alternative-Data.es.md) | 🇺🇸 **English**
 
-## ¿Por qué Datos Alternativos en Small Caps?
+# Alternative Data Integration
 
-Los datos alternativos proporcionan **ventajas informacionales críticas** en small caps porque:
+## Why Alternative Data for Small Caps?
 
-- **Menor cobertura analítica**: Wall Street ignora la mayoría de small caps
-- **Information gaps**: Retail e institutional investors tienen información asimétrica
-- **News impact amplificado**: Small caps reaccionan más violentamente a noticias
-- **Social sentiment relevante**: Retail trading influye significativamente en precios
-- **Early warning signals**: Datos alternativos pueden predecir movimientos institucionales
+Alternative data provides **critical informational advantages** in small caps because:
 
-### Edge Único para Small Caps
+- **Less analyst coverage**: Wall Street ignores the majority of small caps
+- **Information gaps**: Retail and institutional investors have asymmetric information
+- **Amplified news impact**: Small caps react more violently to news
+- **Relevant social sentiment**: Retail trading significantly influences prices
+- **Early warning signals**: Alternative data can predict institutional moves
+
+### Unique Edge for Small Caps
 
 ```python
 ALTERNATIVE_DATA_EDGE = {
@@ -37,7 +39,7 @@ ALTERNATIVE_DATA_EDGE = {
 }
 ```
 
-## Framework de Datos Alternativos
+## Alternative Data Framework
 
 ### 1. Social Sentiment Analysis Pipeline
 
@@ -56,9 +58,9 @@ import re
 
 class SocialSentimentAnalyzer:
     """
-    Analyzer completo de social sentiment para small caps
+    Comprehensive social sentiment analyzer for small caps
 
-    Integra múltiples fuentes de social data:
+    Integrates multiple social data sources:
     - StockTwits API
     - Reddit API (wallstreetbets, pennystocks, etc.)
     - Twitter API v2
@@ -81,7 +83,7 @@ class SocialSentimentAnalyzer:
     def get_comprehensive_sentiment(self, symbol: str,
                                   lookback_hours: int = 24) -> Dict:
         """
-        Obtiene sentiment comprehensive para un símbolo
+        Gets comprehensive sentiment for a symbol
         """
 
         sentiment_data = {
@@ -130,7 +132,7 @@ class SocialSentimentAnalyzer:
 
     def _aggregate_sentiment_scores(self, sources: Dict) -> Dict:
         """
-        Agrega scores de múltiples fuentes con weights
+        Aggregates scores from multiple sources with weights
         """
 
         weights = {
@@ -181,7 +183,7 @@ class SocialSentimentAnalyzer:
 
     def _calculate_sentiment_velocity(self, sources: Dict) -> float:
         """
-        Calcula velocity of sentiment change (momentum)
+        Calculates velocity of sentiment change (momentum)
         """
         velocity_scores = []
 
@@ -198,7 +200,7 @@ class SocialSentimentAnalyzer:
 
     def generate_sentiment_signal(self, symbol: str) -> Optional[Dict]:
         """
-        Genera trading signal basado en sentiment analysis
+        Generates a trading signal based on sentiment analysis
         """
 
         sentiment_data = self.get_comprehensive_sentiment(symbol)
@@ -501,13 +503,13 @@ class TwitterAPI:
             return {'sentiment_score': 0.5, 'message_volume': 0}
 
 
-# Ejemplo de uso
+# Usage example
 def example_sentiment_analysis():
     """
-    Ejemplo completo de sentiment analysis para small caps
+    Complete sentiment analysis example for small caps
     """
 
-    # Configurar APIs (usar tus propias keys)
+    # Configure APIs (use your own keys)
     config = {
         'stocktwits_token': 'your_stocktwits_token',
         'reddit_config': {
@@ -561,9 +563,9 @@ import re
 
 class SECFilingsMonitor:
     """
-    Monitor SEC filings para small caps con automated analysis
+    SEC filings monitor for small caps with automated analysis
 
-    Key filings para small caps:
+    Key filings for small caps:
     - 8-K: Current events (often price-moving)
     - 10-Q/K: Quarterly/Annual reports
     - 13D/G: Beneficial ownership (5%+ positions)
@@ -577,7 +579,7 @@ class SECFilingsMonitor:
             'User-Agent': 'QuantTrading research@example.com'  # SEC requires identification
         }
 
-        # Filing types que típicamente mueven precios en small caps
+        # Filing types that typically move prices in small caps
         self.price_moving_filings = {
             '8-K': 'Current Report - often contains material news',
             '8-K/A': 'Amended Current Report',
@@ -595,7 +597,7 @@ class SECFilingsMonitor:
 
     def get_recent_filings(self, symbol: str, days_back: int = 7) -> List[Dict]:
         """
-        Obtiene recent filings para un símbolo específico
+        Gets recent filings for a specific symbol
         """
 
         # Get CIK (Central Index Key) for the symbol
@@ -643,7 +645,7 @@ class SECFilingsMonitor:
 
     def _search_company_filings(self, cik: str, days_back: int) -> List[Dict]:
         """
-        Search company filings usando SEC EDGAR API
+        Search company filings using SEC EDGAR API
         """
         try:
             # Company facts endpoint provides recent filings
@@ -684,7 +686,7 @@ class SECFilingsMonitor:
 
     def _analyze_filing(self, filing: Dict) -> Dict:
         """
-        Analyze filing content para extract key information
+        Analyze filing content to extract key information
         """
         analysis = {
             'form_type': filing['form_type'],
@@ -794,7 +796,7 @@ class SECFilingsMonitor:
 
     def generate_filing_alert(self, symbol: str) -> Optional[Dict]:
         """
-        Generate trading alert basado en recent SEC filings
+        Generate trading alert based on recent SEC filings
         """
 
         recent_filings = self.get_recent_filings(symbol, days_back=3)
@@ -829,7 +831,7 @@ class SECFilingsMonitor:
 
     def _determine_action(self, filing: Dict) -> str:
         """
-        Determine recommended action basado en filing type
+        Determine recommended action based on filing type
         """
 
         form_type = filing['form_type']
@@ -849,10 +851,10 @@ class SECFilingsMonitor:
             return "MONITOR - Review filing for material information"
 
 
-# Ejemplo de uso
+# Usage example
 def example_sec_monitor():
     """
-    Ejemplo de monitoring de SEC filings
+    SEC filings monitoring example
     """
 
     monitor = SECFilingsMonitor()
@@ -891,7 +893,7 @@ if __name__ == "__main__":
 ```python
 class AlternativeDataSignalGenerator:
     """
-    Integrated signal generator que combina múltiples fuentes de alternative data
+    Integrated signal generator that combines multiple alternative data sources
     """
 
     def __init__(self, config: Dict):
@@ -1025,7 +1027,7 @@ class AlternativeDataSignalGenerator:
 # Example implementation
 def example_alternative_data_integration():
     """
-    Ejemplo completo de alternative data integration
+    Complete alternative data integration example
     """
 
     config = {
@@ -1070,11 +1072,11 @@ if __name__ == "__main__":
     # example_alternative_data_integration()
 ```
 
-## Integration con Trading Strategies
+## Integration with Trading Strategies
 
-Los datos alternativos se integran con nuestras estrategias existentes:
+Alternative data integrates with our existing strategies:
 
-### 1. **Gap & Go con Sentiment Overlay**
+### 1. **Gap & Go with Sentiment Overlay**
 ```python
 # Add sentiment confirmation to gap and go signals
 if gap_signal and sentiment_score > 0.7:
@@ -1103,9 +1105,9 @@ if (technical_signal and
 ---
 
 **Next Steps**:
-- Configurar APIs para datos alternativos
-- Integrar con [Strategy Development](../technical-practices/Strategy-Development.md)
-- Crear dashboards para monitoreo en tiempo real
-- Backtest strategies con alternative data overlays
+- Configure APIs for alternative data
+- Integrate with [Strategy Development](../technical-practices/Strategy-Development.md)
+- Create dashboards for real-time monitoring
+- Backtest strategies with alternative data overlays
 
-Esta framework de datos alternativos proporciona **ventajas informacionales críticas** que son especialmente valiosas en el trading de small caps donde la información asimétrica puede generar alpha significativo.
+This alternative data framework provides **critical informational advantages** that are especially valuable in small cap trading where asymmetric information can generate significant alpha.

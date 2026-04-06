@@ -1,136 +1,138 @@
-# Expected Growth: La Métrica que Casi Nadie Usa
+> 🇪🇸 [Leer en Español](Expected-Growth-Metrics-Hierarchy.es.md) | 🇺🇸 **English**
 
-La mayoría de traders evalúan sus sistemas con Sharpe ratio, profit factor, o win rate. Estas métricas son útiles pero incompletas — ninguna captura lo que realmente importa: **cuánto crece tu cuenta trade a trade cuando reinvertís las ganancias**.
+# Expected Growth: The Metric Almost Nobody Uses
 
-El Expected Growth (EG) sí lo captura. Y revela una verdad contraintuitiva: dos sistemas con la misma expectancy aritmética pueden tener resultados radicalmente distintos cuando se componen.
+Most traders evaluate their systems with Sharpe ratio, profit factor, or win rate. These metrics are useful but incomplete -- none of them captures what really matters: **how much your account grows trade by trade when you reinvest profits**.
 
-## La Jerarquía de Métricas
+Expected Growth (EG) does capture this. And it reveals a counterintuitive truth: two systems with the same arithmetic expectancy can produce radically different results when compounded.
+
+## The Metrics Hierarchy
 
 ```
 Expected Growth (EG)  >  Expectancy (Edge)  >  Win Rate  >  Profit Ratio
        ↑                      ↑                    ↑              ↑
-   Crecimiento real      Ganancia promedio     Frecuencia    Tamaño relativo
-   con compounding       por trade             de aciertos   de ganancias
+   Real growth           Average gain         Frequency     Relative size
+   with compounding      per trade            of winners    of gains
 ```
 
-Cada métrica de la derecha alimenta a la siguiente de la izquierda, pero **no la determina**. Podés tener excelente profit ratio y win rate, buena expectancy, y aún así crecer poco geométricamente. La razón es que el compounding no es lineal.
+Each metric on the right feeds into the next one on the left, but **does not determine it**. You can have an excellent profit ratio and win rate, good expectancy, and still grow very little geometrically. The reason is that compounding is not linear.
 
-## Las Métricas Paso a Paso
+## The Metrics Step by Step
 
-Antes de llegar al EG, necesitás entender las tres métricas que lo alimentan. Cada una mide algo distinto, y cada una sola es insuficiente.
+Before getting to EG, you need to understand the three metrics that feed into it. Each one measures something different, and each one alone is insufficient.
 
-### Win Rate (Tasa de Acierto)
+### Win Rate
 
-**Qué mide**: el porcentaje de trades que terminan en ganancia.
+**What it measures**: the percentage of trades that end in profit.
 
-**Cómo se calcula**:
+**How it's calculated**:
 
 ```python
-win_rate = trades_ganadores / trades_totales
-# 75 ganadores de 100 trades → win_rate = 0.75 (75%)
+win_rate = winning_trades / total_trades
+# 75 winners out of 100 trades -> win_rate = 0.75 (75%)
 ```
 
-**Cómo se interpreta**: indica la frecuencia con la que el sistema acierta. Un win rate del 60% significa que de cada 10 trades, aproximadamente 6 son ganadores y 4 son perdedores.
+**How to interpret it**: it indicates how frequently the system is right. A 60% win rate means that out of every 10 trades, approximately 6 are winners and 4 are losers.
 
-**Valores típicos por tipo de sistema**:
-- Sistemas tendenciales (trend following): 30-45%
-- Sistemas de reversión a la media (mean reversion): 55-70%
-- Sistemas de breakout / volatilidad: 40-55%
+**Typical values by system type**:
+- Trend following systems: 30-45%
+- Mean reversion systems: 55-70%
+- Breakout / volatility systems: 40-55%
 
-**Por qué sola no alcanza**: un sistema con 90% de acierto puede perder dinero si las 10% de pérdidas son catastróficas (ej: gana $1 nueve veces, pierde $20 una vez → pierde $11 neto). Un sistema con 30% puede ser muy rentable si las ganadoras son enormes. El win rate no dice nada sobre el **tamaño** de las ganancias y pérdidas.
+**Why it's not enough on its own**: a system with 90% accuracy can lose money if the 10% of losses are catastrophic (e.g., wins $1 nine times, loses $20 once -> loses $11 net). A system with 30% can be highly profitable if the winners are huge. Win rate says nothing about the **size** of wins and losses.
 
-### Profit Ratio (Ratio de Ganancia/Pérdida)
+### Profit Ratio (Win/Loss Ratio)
 
-**Qué mide**: la relación entre lo que ganás cuando acertás y lo que perdés cuando errás. También se lo conoce como **reward-to-risk ratio** o **payoff ratio**.
+**What it measures**: the relationship between what you gain when you're right and what you lose when you're wrong. Also known as **reward-to-risk ratio** or **payoff ratio**.
 
-**Cómo se calcula**:
+**How it's calculated**:
 
 ```python
-profit_ratio = ganancia_promedio / perdida_promedio
-# Si en promedio ganás $200 y perdés $100 → profit_ratio = 2.0 (2:1)
+profit_ratio = average_win / average_loss
+# If on average you win $200 and lose $100 -> profit_ratio = 2.0 (2:1)
 ```
 
-**Cómo se interpreta**: un ratio de 2:1 significa que cada trade ganador recupera lo que dos trades perdedores sacaron. Un ratio de 0.5:1 significa que necesitás ganar el doble de veces que perdés solo para quedar en cero.
+**How to interpret it**: a 2:1 ratio means each winning trade recovers what two losing trades took away. A 0.5:1 ratio means you need to win twice as often as you lose just to break even.
 
-**Valores típicos**:
-- Sistemas tendenciales: 2:1 a 5:1 (pocas ganadoras pero grandes)
-- Sistemas de reversión: 0.5:1 a 1.5:1 (muchas ganadoras pero chicas)
-- Breakout: 1:1 a 3:1
+**Typical values**:
+- Trend following systems: 2:1 to 5:1 (few winners but large)
+- Mean reversion systems: 0.5:1 to 1.5:1 (many winners but small)
+- Breakout: 1:1 to 3:1
 
-**Por qué solo no alcanza**: un ratio de 10:1 suena espectacular, pero si tu win rate es 5%, perdés 95 de cada 100 trades. 95 × $100 perdidos = $9,500 de pérdida, 5 × $1,000 ganados = $5,000. Ratio increíble, resultado desastroso.
+**Why it's not enough on its own**: a 10:1 ratio sounds spectacular, but if your win rate is 5%, you lose 95 out of every 100 trades. 95 x $100 lost = $9,500 in losses, 5 x $1,000 won = $5,000. Incredible ratio, disastrous result.
 
-### Expectancy / Edge (Esperanza Matemática)
+### Expectancy / Edge
 
-**Qué mide**: la ganancia promedio esperada por cada dólar que arriesgás. Es la primera métrica que combina win rate y profit ratio en un solo número. También se la conoce como **esperanza matemática**, **edge**, o simplemente **expectancy**.
+**What it measures**: the average expected gain for every dollar you risk. It's the first metric that combines win rate and profit ratio into a single number. Also known as **mathematical expectation**, **edge**, or simply **expectancy**.
 
-**Cómo se calcula**:
+**How it's calculated**:
 
 ```python
 def expectancy(win_rate, profit_ratio):
     """
-    Ganancia esperada por dólar arriesgado.
-    Positivo = ventaja. Negativo = el mercado te come.
-    Cero = juego neutral (como un casino sin ventaja de la casa).
+    Expected gain per dollar risked.
+    Positive = edge. Negative = the market eats you alive.
+    Zero = neutral game (like a casino with no house edge).
     """
     return win_rate * profit_ratio - (1 - win_rate)
 
-# Ejemplos:
-expectancy(0.50, 2.0)  # = 0.50 → ganás $0.50 por cada $1 arriesgado
-expectancy(0.75, 1.0)  # = 0.50 → ganás $0.50 por cada $1 arriesgado
-expectancy(0.40, 1.0)  # = -0.20 → PERDÉS $0.20 por cada $1 (no operar)
-expectancy(0.30, 5.0)  # = 0.80 → ganás $0.80 por cada $1 arriesgado
+# Examples:
+expectancy(0.50, 2.0)  # = 0.50 -> you gain $0.50 per $1 risked
+expectancy(0.75, 1.0)  # = 0.50 -> you gain $0.50 per $1 risked
+expectancy(0.40, 1.0)  # = -0.20 -> you LOSE $0.20 per $1 (don't trade)
+expectancy(0.30, 5.0)  # = 0.80 -> you gain $0.80 per $1 risked
 ```
 
-**Cómo se interpreta**:
-- **Positivo**: el sistema tiene ventaja estadística. A largo plazo, ganás dinero
-- **Cero**: juego neutral. Las comisiones te van a hacer perder
-- **Negativo**: el sistema pierde dinero sistemáticamente. No hay position sizing ni gestión de riesgo que lo salve
+**How to interpret it**:
+- **Positive**: the system has a statistical edge. In the long run, you make money
+- **Zero**: neutral game. Commissions will make you lose
+- **Negative**: the system loses money systematically. No position sizing or risk management can save it
 
-**Umbral práctico**: una expectancy de al menos 0.10-0.20 (10-20 centavos por dólar arriesgado) es necesaria para cubrir costos de transacción y slippage. Por debajo de eso, los costos reales se comen la ventaja.
+**Practical threshold**: an expectancy of at least 0.10-0.20 (10-20 cents per dollar risked) is needed to cover transaction costs and slippage. Below that, real-world costs eat up the edge.
 
-**Por qué sola no alcanza**: la expectancy es una media aritmética. Asume que apostás siempre la misma cantidad fija. Pero si reinvertís ganancias (compounding), el tamaño de tus posiciones crece con tu cuenta. Y cuando componés, la frecuencia de las ganancias (win rate) importa de una manera que la expectancy aritmética no captura. Eso es exactamente lo que mide el Expected Growth.
+**Why it's not enough on its own**: expectancy is an arithmetic mean. It assumes you always bet the same fixed amount. But if you reinvest profits (compounding), your position sizes grow with your account. And when you compound, the frequency of wins (win rate) matters in a way that arithmetic expectancy doesn't capture. That's exactly what Expected Growth measures.
 
 ### Expected Growth (EG)
 
-**Qué mide**: la tasa de crecimiento geométrico esperada por trade cuando el tamaño de posición se ajusta al capital disponible. Es la métrica que captura el **crecimiento real de tu cuenta con compounding**.
+**What it measures**: the expected geometric growth rate per trade when position size is adjusted to available capital. It's the metric that captures the **real growth of your account with compounding**.
 
-**Por qué es diferente a la expectancy**: la expectancy te dice "en promedio ganás X por trade". El EG te dice "tu cuenta crece X% por trade cuando reinvertís". La diferencia es enorme porque el compounding no es lineal — una pérdida del 50% requiere una ganancia del 100% para recuperar.
+**Why it's different from expectancy**: expectancy tells you "on average you gain X per trade." EG tells you "your account grows X% per trade when you reinvest." The difference is enormous because compounding is not linear -- a 50% loss requires a 100% gain to recover.
 
-**Cómo se calcula**: usa la fracción de Kelly (la proporción óptima de capital a arriesgar por trade) y la aplica a la fórmula de crecimiento geométrico.
+**How it's calculated**: it uses the Kelly fraction (the optimal proportion of capital to risk per trade) and applies it to the geometric growth formula.
 
 ```python
 def expected_growth(win_rate, profit_ratio):
     """
-    Crecimiento geométrico esperado por trade con Kelly sizing.
+    Expected geometric growth per trade with Kelly sizing.
     
-    Fórmula: EG = (1 + f*R)^p * (1 - f)^(1-p) - 1
-    donde f = Kelly fraction = expectancy / profit_ratio
+    Formula: EG = (1 + f*R)^p * (1 - f)^(1-p) - 1
+    where f = Kelly fraction = expectancy / profit_ratio
     """
     p = win_rate
     R = profit_ratio
     edge = p * R - (1 - p)
     
     if edge <= 0:
-        return 0  # sin ventaja, no hay crecimiento
+        return 0  # no edge, no growth
     
-    f = edge / R  # fracción de Kelly
+    f = edge / R  # Kelly fraction
     eg = (1 + f * R) ** p * (1 - f) ** (1 - p) - 1
     return eg
 ```
 
-## El Ejemplo que Cambia Todo
+## The Example That Changes Everything
 
-Dos sistemas con **exactamente la misma expectancy aritmética** (0.50 por dólar arriesgado):
+Two systems with **exactly the same arithmetic expectancy** (0.50 per dollar risked):
 
 ```python
-# Sistema 1: pocas ganadoras pero grandes
+# System 1: few winners but large
 eg1 = expected_growth(win_rate=0.50, profit_ratio=2.0)
 
-# Sistema 2: muchas ganadoras pero chicas  
+# System 2: many winners but small  
 eg2 = expected_growth(win_rate=0.75, profit_ratio=1.0)
 ```
 
-| Métrica | Sistema 1 | Sistema 2 |
+| Metric | System 1 | System 2 |
 |---|---|---|
 | Win Rate | 50% | 75% |
 | Profit Ratio | 2:1 | 1:1 |
@@ -138,63 +140,63 @@ eg2 = expected_growth(win_rate=0.75, profit_ratio=1.0)
 | Kelly fraction | 25% | 50% |
 | **Expected Growth** | **6.1%** | **14.0%** |
 
-Misma expectancy, pero el Sistema 2 crece **2.3 veces más rápido**.
+Same expectancy, but System 2 grows **2.3 times faster**.
 
-### Por Qué Pasa Esto
+### Why This Happens
 
-El win rate entra en la fórmula de EG como **exponente**, no como multiplicador:
+The win rate enters the EG formula as an **exponent**, not as a multiplier:
 
 ```
 EG = (1 + f*R)^p * (1 - f)^(1-p) - 1
                  ↑              ↑
-              exponente       exponente
+              exponent        exponent
 ```
 
-Cuando el win rate es alto (75%), el primer término `(1 + f*R)^p` domina — ganás frecuentemente y cada ganancia se compone sobre la anterior. El segundo término `(1 - f)^(1-p)` tiene poco impacto porque las pérdidas son infrecuentes.
+When the win rate is high (75%), the first term `(1 + f*R)^p` dominates -- you win frequently and each gain compounds on top of the previous one. The second term `(1 - f)^(1-p)` has little impact because losses are infrequent.
 
-Cuando el win rate es bajo (50%), aunque las ganancias individuales son mayores (ratio 2:1), las pérdidas intermedias frenan el compounding. Cada pérdida reduce la base sobre la cual la siguiente ganancia se calcula.
+When the win rate is low (50%), even though individual gains are larger (2:1 ratio), the intervening losses slow down compounding. Each loss reduces the base on which the next gain is calculated.
 
-**En compounding, la frecuencia de las ganancias importa más que su tamaño.**
+**In compounding, the frequency of gains matters more than their size.**
 
-### Las Rachas Ganadoras como Motor del Compounding
+### Winning Streaks as the Engine of Compounding
 
-El win rate como exponente tiene una consecuencia directa: determina la probabilidad de rachas ganadoras consecutivas. Y las rachas son el motor del crecimiento geométrico.
+The win rate as an exponent has a direct consequence: it determines the probability of consecutive winning streaks. And streaks are the engine of geometric growth.
 
-| Win Rate | P(10 wins consecutivos) | Efecto en compounding |
+| Win Rate | P(10 consecutive wins) | Effect on compounding |
 |---|---|---|
-| 50% | 0.1% — casi nunca pasa | Plano, crece lento |
-| 75% | 5.6% — pasa regularmente | Fuerte, curva exponencial |
-| 83% | ~15% — pasa seguido | Explosivo |
+| 50% | 0.1% -- almost never happens | Flat, grows slowly |
+| 75% | 5.6% -- happens regularly | Strong, exponential curve |
+| 83% | ~15% -- happens often | Explosive |
 
-Con 75% de WR, una racha de 10 ganadoras consecutivas ocurre 1 de cada ~18 secuencias de 10 trades. Cada una de esas rachas es un "boost" de compounding donde el capital crece sin interrupciones de pérdidas. Con 50% de WR, esas rachas prácticamente no existen.
+With a 75% WR, a streak of 10 consecutive winners occurs in 1 out of every ~18 sequences of 10 trades. Each of those streaks is a compounding "boost" where capital grows without interruption from losses. With a 50% WR, those streaks practically don't exist.
 
-### La Trampa: EG por Trade vs EG por Día
+### The Trap: EG per Trade vs EG per Day
 
-Un sistema con 14% de EG por trade que opera 0.5 veces por día produce menos crecimiento real que uno con 6% de EG que opera 3 veces por día:
+A system with 14% EG per trade that trades 0.5 times per day produces less real growth than one with 6% EG that trades 3 times per day:
 
 ```python
-# Crecimiento diario real = (1 + EG_per_trade) ^ trades_per_day - 1
-daily_growth_A = (1 + 0.14) ** 0.5 - 1   # ≈ 6.8% diario
-daily_growth_B = (1 + 0.06) ** 3 - 1     # ≈ 19.1% diario
-# El sistema B crece ~3x más rápido a pesar de tener menos EG por trade
+# Real daily growth = (1 + EG_per_trade) ^ trades_per_day - 1
+daily_growth_A = (1 + 0.14) ** 0.5 - 1   # ≈ 6.8% daily
+daily_growth_B = (1 + 0.06) ** 3 - 1     # ≈ 19.1% daily
+# System B grows ~3x faster despite having lower EG per trade
 ```
 
-**EG por trade × frecuencia de trades = crecimiento real del portfolio.** Cuando comparás sistemas, no mires solo el EG — multiplicalo por la frecuencia de operación.
+**EG per trade x trade frequency = real portfolio growth.** When comparing systems, don't just look at EG -- multiply it by the trading frequency.
 
-## Simulación: 1000 Trades
+## Simulation: 1000 Trades
 
 ```python
 import numpy as np
 
 def simulate_system(win_rate, profit_ratio, trades=1000, simulations=10000):
     """
-    Simula el crecimiento de cuenta con Kelly sizing.
-    Muestra la distribución real, no solo el promedio.
+    Simulates account growth with Kelly sizing.
+    Shows the real distribution, not just the average.
     """
     edge = win_rate * profit_ratio - (1 - win_rate)
     kelly_fraction = edge / profit_ratio
     
-    # Usar half-Kelly (más conservador, estándar en la práctica)
+    # Use half-Kelly (more conservative, standard in practice)
     f = kelly_fraction * 0.5
     
     final_values = []
@@ -215,77 +217,77 @@ def simulate_system(win_rate, profit_ratio, trades=1000, simulations=10000):
         'worst_5pct': np.percentile(final_values, 5),
     }
 
-# Con half-Kelly (más conservador que Kelly completo):
-# Sistema 1 (50% WR, 2:1): crecimiento mediano moderado
-# Sistema 2 (75% WR, 1:1): crecimiento mediano significativamente mayor
+# With half-Kelly (more conservative than full Kelly):
+# System 1 (50% WR, 2:1): moderate median growth
+# System 2 (75% WR, 1:1): significantly higher median growth
 ```
 
-La simulación confirma lo que la fórmula predice: el Sistema 2 no solo crece más rápido en promedio — tiene menor varianza y mayor probabilidad de ser rentable en cualquier ventana de N trades.
+The simulation confirms what the formula predicts: System 2 not only grows faster on average -- it has lower variance and a higher probability of being profitable in any window of N trades.
 
-## Implicaciones Prácticas
+## Practical Implications
 
-### 1. No Descartes Sistemas de Win Rate Alto con Ratio Bajo
+### 1. Don't Dismiss High Win Rate Systems with Low Ratios
 
-La sabiduría convencional dice "buscá ratio 2:1 o más". Pero un sistema con 70% de acierto y ratio 1:1 puede ser superior a uno con 40% de acierto y ratio 3:1, incluso si la expectancy aritmética es similar. El EG lo revela.
+Conventional wisdom says "aim for a 2:1 ratio or better." But a system with 70% accuracy and a 1:1 ratio can be superior to one with 40% accuracy and a 3:1 ratio, even if the arithmetic expectancy is similar. EG reveals this.
 
-### 2. Ojo con los Sistemas "Espectaculares" de Bajo Win Rate
+### 2. Watch Out for "Spectacular" Low Win Rate Systems
 
-Un sistema tendencial con 30% de acierto y ratio 5:1 tiene buena expectancy (0.80). Pero el EG puede ser modesto porque las rachas de pérdidas frenan el compounding. Necesitás sobrevivir 7-10 pérdidas consecutivas antes de que llegue la ganadora grande — y cada pérdida reduce tu base de capital.
+A trend following system with 30% accuracy and a 5:1 ratio has good expectancy (0.80). But its EG can be modest because losing streaks slow down compounding. You need to survive 7-10 consecutive losses before the big winner arrives -- and each loss reduces your capital base.
 
 ```python
-# Tendencial agresivo: 30% WR, 5:1 ratio
+# Aggressive trend following: 30% WR, 5:1 ratio
 eg_trend = expected_growth(0.30, 5.0)  # Edge=0.80, EG≈7.8%
 
-# Mean reversion conservador: 65% WR, 1.2:1 ratio
+# Conservative mean reversion: 65% WR, 1.2:1 ratio
 eg_mr = expected_growth(0.65, 1.2)     # Edge=0.43, EG≈6.6%
 
-# El tendencial tiene CASI DOBLE de expectancy (0.80 vs 0.43)
-# pero solo 18% más de EG (7.8% vs 6.6%)
-# El compounding "castiga" el bajo win rate
+# The trend system has NEARLY DOUBLE the expectancy (0.80 vs 0.43)
+# but only 18% more EG (7.8% vs 6.6%)
+# Compounding "penalizes" the low win rate
 ```
 
-### 3. El EG como Criterio de Selección de Portfolio
+### 3. EG as a Portfolio Selection Criterion
 
-Cuando tenés que elegir entre sistemas para tu portfolio, el EG es mejor criterio que el Sharpe ratio o el profit factor:
+When you need to choose between systems for your portfolio, EG is a better criterion than Sharpe ratio or profit factor:
 
-- **Sharpe ratio**: penaliza la volatilidad al alza (una ganancia enorme baja el Sharpe, lo cual es absurdo)
-- **Profit factor**: no distingue entre frecuencia y tamaño de trades
-- **EG**: captura exactamente lo que querés maximizar — el crecimiento geométrico de tu cuenta
+- **Sharpe ratio**: penalizes upside volatility (a huge gain lowers the Sharpe, which is absurd)
+- **Profit factor**: doesn't distinguish between frequency and size of trades
+- **EG**: captures exactly what you want to maximize -- the geometric growth of your account
 
-## Kelly Criterion: Cuánto Arriesgar por Trade
+## Kelly Criterion: How Much to Risk per Trade
 
-El EG depende de cuánto arriesgás por trade. Arriesgar muy poco desaprovecha la ventaja. Arriesgar demasiado la destruye. El **Kelly Criterion** (John Kelly, 1956, Bell Labs) te da la fracción óptima de capital a arriesgar para maximizar el crecimiento geométrico a largo plazo.
+EG depends on how much you risk per trade. Risking too little wastes the edge. Risking too much destroys it. The **Kelly Criterion** (John Kelly, 1956, Bell Labs) gives you the optimal fraction of capital to risk in order to maximize long-term geometric growth.
 
-### La Fórmula Básica
+### The Basic Formula
 
 ```python
 def kelly_fraction(win_rate, profit_ratio):
     """
-    Fracción óptima del capital a arriesgar por trade.
-    Maximiza el crecimiento geométrico a largo plazo.
+    Optimal fraction of capital to risk per trade.
+    Maximizes long-term geometric growth.
     """
     edge = win_rate * profit_ratio - (1 - win_rate)
     if edge <= 0:
-        return 0  # sin ventaja, no arriesgar nada
+        return 0  # no edge, don't risk anything
     return edge / profit_ratio
 
-# Sistema con 60% WR y ratio 1.5:1
+# System with 60% WR and 1.5:1 ratio
 f = kelly_fraction(0.60, 1.5)
 # Edge = 0.60*1.5 - 0.40 = 0.50
-# Kelly = 0.50 / 1.5 = 0.333 → arriesgar 33% del capital por trade
+# Kelly = 0.50 / 1.5 = 0.333 -> risk 33% of capital per trade
 ```
 
-**Qué significa**: si tu sistema tiene 60% de acierto con ratio 1.5:1, Kelly te dice que arriesgues el 33% de tu capital en cada trade para crecer lo más rápido posible.
+**What it means**: if your system has 60% accuracy with a 1.5:1 ratio, Kelly tells you to risk 33% of your capital on each trade to grow as fast as possible.
 
-33% suena enorme. Y lo es. Esa es exactamente la trampa de Kelly completo.
+33% sounds enormous. And it is. That's exactly the trap of full Kelly.
 
-### Por Qué Kelly Completo es Peligroso
+### Why Full Kelly Is Dangerous
 
-La relación entre tamaño de posición y volatilidad **no es lineal — es exponencial**. Duplicar el tamaño no duplica la volatilidad; la cuadruplica o más.
+The relationship between position size and volatility **is not linear -- it's exponential**. Doubling the size doesn't double the volatility; it quadruples it or more.
 
 ```python
 def eg_at_fraction(win_rate, profit_ratio, fraction):
-    """EG para cualquier fracción de capital (no solo Kelly óptimo)."""
+    """EG for any fraction of capital (not just Kelly optimal)."""
     p = win_rate
     R = profit_ratio
     f = fraction
@@ -293,7 +295,7 @@ def eg_at_fraction(win_rate, profit_ratio, fraction):
         return 0
     return (1 + f * R) ** p * (1 - f) ** (1 - p) - 1
 
-# Sistema: 60% WR, 1.5:1 ratio, Kelly óptimo = 33%
+# System: 60% WR, 1.5:1 ratio, Kelly optimal = 33%
 wr, ratio = 0.60, 1.5
 kelly = kelly_fraction(wr, ratio)  # 0.333
 
@@ -301,60 +303,60 @@ fractions = [0.05, 0.10, 0.167, 0.25, 0.333, 0.50, 0.667]
 for f in fractions:
     eg = eg_at_fraction(wr, ratio, f)
     label = ""
-    if abs(f - kelly) < 0.01: label = " ← KELLY ÓPTIMO"
-    if abs(f - kelly*0.5) < 0.01: label = " ← HALF KELLY"
-    if abs(f - kelly*1.5) < 0.02: label = " ← 1.5x KELLY"
+    if abs(f - kelly) < 0.01: label = " <- KELLY OPTIMAL"
+    if abs(f - kelly*0.5) < 0.01: label = " <- HALF KELLY"
+    if abs(f - kelly*1.5) < 0.02: label = " <- 1.5x KELLY"
     print(f"  f={f:.1%}: EG={eg*100:.2f}%{label}")
 
-# Resultado:
+# Result:
 #   f=5.0%:  EG=2.31%
 #   f=10.0%: EG=4.26%
-#   f=16.7%: EG=6.29%  ← HALF KELLY
+#   f=16.7%: EG=6.29%  <- HALF KELLY
 #   f=25.0%: EG=7.90%
-#   f=33.3%: EG=8.45%  ← KELLY ÓPTIMO
-#   f=50.0%: EG=6.03%  ← 1.5x KELLY (¡SIMILAR EG que Half Kelly!)
-#   f=66.7%: EG=-2.33% ← 2x KELLY (¡PÉRDIDA!)
+#   f=33.3%: EG=8.45%  <- KELLY OPTIMAL
+#   f=50.0%: EG=6.03%  <- 1.5x KELLY (SIMILAR EG to Half Kelly!)
+#   f=66.7%: EG=-2.33% <- 2x KELLY (LOSS!)
 ```
 
-Mirá lo que pasa:
+Look at what happens:
 
-| Fracción | Relación a Kelly | EG | Observación |
+| Fraction | Relation to Kelly | EG | Observation |
 |---|---|---|---|
-| 5% | 0.15x Kelly | 2.3% | Muy conservador, crece lento |
-| 16.7% | **Half Kelly** | 6.3% | **~74% del EG óptimo, volatilidad manejable** |
-| 33.3% | **Kelly completo** | 8.5% | Máximo teórico, volatilidad extrema |
-| 50% | 1.5x Kelly | 6.0% | **Similar EG a Half Kelly, pero con volatilidad masiva** |
-| 66.7% | 2x Kelly | -2.3% | **Perdés dinero.** Oversizing destruye el edge |
+| 5% | 0.15x Kelly | 2.3% | Very conservative, grows slowly |
+| 16.7% | **Half Kelly** | 6.3% | **~74% of optimal EG, manageable volatility** |
+| 33.3% | **Full Kelly** | 8.5% | Theoretical maximum, extreme volatility |
+| 50% | 1.5x Kelly | 6.0% | **Similar EG to Half Kelly, but with massive volatility** |
+| 66.7% | 2x Kelly | -2.3% | **You lose money.** Oversizing destroys the edge |
 
-### Los Tres Insights Clave
+### The Three Key Insights
 
-**1. A 1.5x Kelly obtenés el mismo retorno que a 0.5x Kelly, pero con volatilidad brutal.**
+**1. At 1.5x Kelly you get the same return as at 0.5x Kelly, but with brutal volatility.**
 
-Esto es la asimetría mortal del sizing. Pasarte de Kelly es mucho peor que quedarte corto. Si errás por debajo, crecés más lento. Si errás por arriba, podés destruir la cuenta.
+This is the deadly asymmetry of sizing. Going above Kelly is far worse than staying below it. If you err on the low side, you grow slower. If you err on the high side, you can blow up the account.
 
-**2. La volatilidad escala exponencialmente con el tamaño.**
+**2. Volatility scales exponentially with size.**
 
-No es que duplicar la posición duplique el riesgo. Lo cuadruplica. Por eso un pequeño error en la estimación de tus parámetros (win rate, ratio) puede ser catastrófico con Kelly completo — si tu win rate real es 55% en vez de 60%, pasaste de estar en Kelly óptimo a estar sobredimensionado.
+It's not that doubling the position doubles the risk. It quadruples it. That's why a small error in estimating your parameters (win rate, ratio) can be catastrophic with full Kelly -- if your actual win rate is 55% instead of 60%, you've gone from optimal Kelly to being oversized.
 
-**3. El max drawdown esperado es aproximadamente igual al porcentaje de Kelly.**
+**3. The expected max drawdown is approximately equal to the Kelly percentage.**
 
-Si usás half Kelly (16.7% del capital por trade), esperá drawdowns de hasta ~16-17%. Si usás Kelly completo (33%), esperá drawdowns de ~33%. Esta es una regla empírica, no exacta, pero es útil para calibrar expectativas.
+If you use half Kelly (16.7% of capital per trade), expect drawdowns of up to ~16-17%. If you use full Kelly (33%), expect drawdowns of ~33%. This is a rule of thumb, not exact, but useful for calibrating expectations.
 
-### Half Kelly: El Estándar de la Industria
+### Half Kelly: The Industry Standard
 
-La mayoría de practitioners usan **half Kelly** (la mitad de la fracción óptima). La math justifica por qué:
+Most practitioners use **half Kelly** (half the optimal fraction). The math justifies why:
 
-- Obtenés **~74% del crecimiento** del Kelly óptimo (varía según el sistema, pero consistentemente entre 70-80%)
-- Con **volatilidad significativamente menor**
-- El drawdown esperado se reduce a la mitad
-- Tenés margen de error: si tus estimaciones de win rate o ratio están off, seguís del lado seguro de la curva
+- You get **~74% of the growth** of optimal Kelly (varies by system, but consistently between 70-80%)
+- With **significantly lower volatility**
+- Expected drawdown is cut in half
+- You have a margin of error: if your estimates of win rate or ratio are off, you're still on the safe side of the curve
 
 ```python
 def practical_kelly(win_rate, profit_ratio, fraction_of_kelly=0.5):
     """
-    Kelly ajustado para uso real.
-    fraction_of_kelly=0.50 → half Kelly (estándar)
-    fraction_of_kelly=0.25 → quarter Kelly (para datos limitados)
+    Kelly adjusted for real-world use.
+    fraction_of_kelly=0.50 -> half Kelly (standard)
+    fraction_of_kelly=0.25 -> quarter Kelly (for limited data)
     """
     edge = win_rate * profit_ratio - (1 - win_rate)
     if edge <= 0:
@@ -362,32 +364,32 @@ def practical_kelly(win_rate, profit_ratio, fraction_of_kelly=0.5):
     full_kelly = edge / profit_ratio
     return full_kelly * fraction_of_kelly
 
-# Half Kelly para un sistema 60% WR, 1.5:1
+# Half Kelly for a 60% WR, 1.5:1 system
 f = practical_kelly(0.60, 1.5, fraction_of_kelly=0.50)
-# = 0.333 * 0.5 = 0.167 → arriesgar 16.7% por trade
+# = 0.333 * 0.5 = 0.167 -> risk 16.7% per trade
 ```
 
-### Quarter Kelly: Para Cuando No Estás Seguro
+### Quarter Kelly: For When You're Not Sure
 
-Si tenés datos limitados (pocas operaciones en el backtest), parámetros estimados con incertidumbre, o un sistema nuevo que todavía no validaste en vivo, **quarter Kelly** (25% del óptimo) es más prudente:
+If you have limited data (few trades in the backtest), parameters estimated with uncertainty, or a new system you haven't yet validated live, **quarter Kelly** (25% of optimal) is more prudent:
 
-- Crecés más lento (~56% del EG óptimo)
-- Pero sobrevivís a errores de estimación mucho mayores
-- Ideal para los primeros 6-12 meses de un sistema nuevo en producción
+- You grow slower (~56% of optimal EG)
+- But you survive much larger estimation errors
+- Ideal for the first 6-12 months of a new system in production
 
-### Kelly con Stop Loss: Ajustar por el Riesgo Real
+### Kelly with Stop Loss: Adjusting for Real Risk
 
-El Kelly básico asume que perdés el 100% de lo arriesgado en cada trade perdedor. Pero si usás stop loss, tu pérdida real es menor. Eso permite posiciones más grandes:
+Basic Kelly assumes you lose 100% of what you risked on each losing trade. But if you use a stop loss, your actual loss is smaller. That allows for larger positions:
 
 ```python
 def kelly_stop_adjusted(win_rate, profit_ratio, stop_loss_pct):
     """
-    Kelly ajustado por stop loss.
-    Si tu stop es del 2% del precio, podés tener posiciones más grandes
-    que si arriesgás el 100%.
+    Kelly adjusted for stop loss.
+    If your stop is 2% of price, you can have larger positions
+    than if you were risking 100%.
     
-    Parámetros:
-    - stop_loss_pct: pérdida máxima por trade como fracción (0.02 = 2%)
+    Parameters:
+    - stop_loss_pct: max loss per trade as a fraction (0.02 = 2%)
     """
     edge = win_rate * profit_ratio - (1 - win_rate)
     if edge <= 0:
@@ -397,99 +399,99 @@ def kelly_stop_adjusted(win_rate, profit_ratio, stop_loss_pct):
     kelly_adjusted = kelly_base / stop_loss_pct
     return kelly_adjusted
 
-# Sistema 60% WR, 1.5:1 ratio, stop del 2%
+# System 60% WR, 1.5:1 ratio, 2% stop
 position = kelly_stop_adjusted(0.60, 1.5, stop_loss_pct=0.02)
 # Kelly base = 33.3%
-# Ajustado = 33.3% / 2% = 16.67x del capital
-# Es decir: con stops del 2%, podés apalancar hasta ~16x
+# Adjusted = 33.3% / 2% = 16.67x capital
+# That is: with 2% stops, you can lever up to ~16x
 
-# En la práctica, con half Kelly ajustado:
+# In practice, with half Kelly adjusted:
 position_half = position * 0.5  # ~8x
 ```
 
-**La lógica**: un stop más ajustado limita la pérdida por trade, lo que permite posiciones más grandes para la misma cantidad de riesgo en dólares. Esto te mantiene más frecuentemente expuesto cuando el trade va a favor.
+**The logic**: a tighter stop limits the loss per trade, allowing larger positions for the same dollar amount of risk. This keeps you more frequently exposed when the trade moves in your favor.
 
-**Precaución**: esto asume que el stop siempre se ejecuta al precio exacto. En la realidad, hay slippage, gaps overnight, y mercados que se saltan tu stop. Nunca dimensiones asumiendo ejecución perfecta del stop.
+**Caution**: this assumes the stop always executes at the exact price. In reality, there's slippage, overnight gaps, and markets that skip right past your stop. Never size assuming perfect stop execution.
 
-### Escalamiento por Tamaño de Cuenta
+### Scaling by Account Size
 
-Kelly teórico no considera restricciones de mercado. En la práctica, el tamaño de la cuenta limita cuánto Kelly podés usar:
+Theoretical Kelly doesn't consider market constraints. In practice, account size limits how much Kelly you can use:
 
-| Tamaño de cuenta | Kelly práctico | Por qué |
+| Account Size | Practical Kelly | Why |
 |---|---|---|
-| < $25K | Hasta 50% de Kelly | Poca diversificación, cada trade pesa mucho |
-| $25K - $100K | 33-50% | Empezás a tener margen para diversificar |
-| $100K - $200K | 25-33% | Slippage empieza a importar en small caps |
-| $200K - $500K | 12.5-25% | Fill probability baja, movés precio al entrar |
-| $500K+ | Stake fijo o < 12.5% | En small caps, tu orden ES el mercado |
+| < $25K | Up to 50% of Kelly | Little diversification, each trade weighs heavily |
+| $25K - $100K | 33-50% | You start to have room to diversify |
+| $100K - $200K | 25-33% | Slippage starts to matter in small caps |
+| $200K - $500K | 12.5-25% | Fill probability drops, you move price on entry |
+| $500K+ | Fixed stake or < 12.5% | In small caps, your order IS the market |
 
-La razón: slippage, probabilidad de ejecución y restricciones de liquidez escalan con el tamaño de posición. Una posición de $500K en una small cap de $2 va a mover el precio significativamente al entrar y al salir. Kelly teórico no sabe esto.
+The reason: slippage, fill probability, and liquidity constraints scale with position size. A $500K position in a $2 small cap will move the price significantly on entry and exit. Theoretical Kelly doesn't know this.
 
-### Error Común: Ajustar Kelly por "Calidad del Setup"
+### Common Mistake: Adjusting Kelly by "Setup Quality"
 
-"Uso 50% Kelly en setups A+ y 25% en setups B." Esto es incorrecto.
+"I use 50% Kelly on A+ setups and 25% on B setups." This is incorrect.
 
-Kelly **ya incorpora la calidad del setup** a través del win rate y el profit ratio. Un setup A+ naturalmente tiene mejor WR y/o mejor ratio, lo que produce un Kelly fraction más alto. Un setup B tiene peores métricas, lo que produce un Kelly más bajo.
+Kelly **already incorporates setup quality** through the win rate and profit ratio. An A+ setup naturally has a better WR and/or better ratio, which produces a higher Kelly fraction. A B setup has worse metrics, which produces a lower Kelly.
 
-Si ajustás manualmente encima de eso, estás sobreescribiendo la matemática con tu opinión. La única razón válida para reducir Kelly es incertidumbre en los parámetros (pocos datos, sistema nuevo) — y para eso están half Kelly y quarter Kelly.
+If you manually adjust on top of that, you're overriding the math with your opinion. The only valid reason to reduce Kelly is uncertainty in the parameters (limited data, new system) -- and that's what half Kelly and quarter Kelly are for.
 
-### Alternativa: Optimal-f de Ralph Vince
+### Alternative: Ralph Vince's Optimal-f
 
-Kelly asume distribución binaria (ganás R o perdés 1). **Optimal-f** de Ralph Vince usa la distribución completa de retornos históricos para encontrar la fracción óptima. Es conceptualmente superior porque no simplifica la distribución, pero es computacionalmente más costoso y requiere suficientes trades históricos para que la distribución empírica sea representativa.
+Kelly assumes a binary distribution (you win R or lose 1). **Optimal-f** by Ralph Vince uses the complete distribution of historical returns to find the optimal fraction. It's conceptually superior because it doesn't simplify the distribution, but it's computationally more expensive and requires enough historical trades for the empirical distribution to be representative.
 
-En la práctica, Kelly con half/quarter adjustment es suficiente para la mayoría de los sistemas. Optimal-f es relevante si operás con distribuciones muy asimétricas (shorts en small caps, por ejemplo).
+In practice, Kelly with half/quarter adjustment is sufficient for most systems. Optimal-f is relevant if you trade with highly asymmetric distributions (shorting small caps, for example).
 
-## Cómo Incorporar EG y Kelly en tu Proceso
+## How to Incorporate EG and Kelly into Your Process
 
-1. **Calculá EG para todos tus sistemas** y compará contra su expectancy aritmética. Vas a encontrar sorpresas — sistemas que parecían equivalentes por expectancy no lo son por EG
+1. **Calculate EG for all your systems** and compare against their arithmetic expectancy. You'll find surprises -- systems that looked equivalent by expectancy are not equivalent by EG
 
-2. **Usá EG como función objetivo en optimización** en lugar de net profit o Sharpe. El optimizador buscará parámetros que maximicen el crecimiento geométrico real
+2. **Use EG as the objective function in optimization** instead of net profit or Sharpe. The optimizer will seek parameters that maximize real geometric growth
 
-3. **Compará sistemas con EG antes de armar un portfolio**. Un portfolio de sistemas con EG alto individualmente, y baja correlación entre sí, es la combinación más potente
+3. **Compare systems by EG before building a portfolio**. A portfolio of systems with individually high EG, and low correlation between them, is the most powerful combination
 
-4. **Recordá que EG asume Kelly sizing**. Si usás position sizing fijo (siempre el mismo monto), la expectancy aritmética es suficiente. El EG importa cuando componés — y si no estás componiendo, estás dejando crecimiento sobre la mesa
+4. **Remember that EG assumes Kelly sizing**. If you use fixed position sizing (always the same amount), arithmetic expectancy is sufficient. EG matters when you compound -- and if you're not compounding, you're leaving growth on the table
 
-## Anti-Scalping: La Matemática de No Cortar Ganadores
+## Anti-Scalping: The Math of Not Cutting Winners
 
-La mayoría de los traders (y muchos algos) cortan las ganancias demasiado temprano. El instinto dice "asegurá la ganancia". La matemática dice lo contrario.
+Most traders (and many algos) cut profits too early. Instinct says "lock in the gain." The math says the opposite.
 
-### Halfway Probability: Probabilidades Condicionales en Acción
+### Halfway Probability: Conditional Probabilities in Action
 
-Si tu sistema tiene un win rate del 80% y un trade ya está en +5%, ¿cuál es la probabilidad de que llegue a +10%?
+If your system has an 80% win rate and a trade is already at +5%, what's the probability it reaches +10%?
 
-La intuición dice "ya gané 5%, mejor cierro". Pero la matemática dice lo contrario. Cada tick a tu favor es **evidencia bayesiana** de que la tesis del trade es correcta. La probabilidad condicional (dado que ya estás en ganancia) de llegar al target **aumenta** a medida que el trade avanza:
+Intuition says "I've already made 5%, better close it." But the math says the opposite. Every tick in your favor is **Bayesian evidence** that the trade thesis is correct. The conditional probability (given that you're already in profit) of reaching the target **increases** as the trade progresses:
 
-Ejemplo con datos empíricos de un sistema con ~80% WR en small caps:
+Example with empirical data from a system with ~80% WR in small caps:
 
-| Tu ganancia actual | P(duplicar al siguiente nivel) | Implicación |
+| Your Current Gain | P(doubling to the next level) | Implication |
 |---|---|---|
-| +5% | ~94% de llegar a +10% | Cubrir es tirar dinero |
-| +7.5% | ~80% de llegar a +15% | Todavía extremadamente probable |
-| +10% | ~70% de llegar a +20% | Mantener |
-| +15% | La probabilidad se estabiliza | Home runs — HOLD |
+| +5% | ~94% of reaching +10% | Covering is throwing money away |
+| +7.5% | ~80% of reaching +15% | Still extremely likely |
+| +10% | ~70% of reaching +20% | Hold |
+| +15% | Probability stabilizes | Home runs -- HOLD |
 
-*Estos valores son específicos de un sistema particular. Calculá los tuyos con la función de simulación condicional más abajo.*
+*These values are specific to a particular system. Calculate your own using the conditional simulation function below.*
 
-Esto es **Bayesian updating** aplicado a trading: cada movimiento a favor actualiza tu estimación de la probabilidad de éxito hacia arriba.
+This is **Bayesian updating** applied to trading: each move in your favor updates your estimate of the probability of success upward.
 
-Estos valores vienen de simulaciones con datos reales de sistemas con ~80% de WR. No hay una fórmula cerrada simple que los reproduzca — dependen de la distribución específica de retornos del sistema. La forma de calcularlos para tu sistema es con **simulación condicional**:
+These values come from simulations with real data from systems with ~80% WR. There's no simple closed-form formula that reproduces them -- they depend on the specific return distribution of the system. The way to calculate them for your system is with **conditional simulation**:
 
 ```python
 import numpy as np
 
 def estimate_conditional_probability(trade_returns, current_pct, target_pct, n_sims=50000):
     """
-    Estima la probabilidad de alcanzar target_pct dado que
-    ya estás en current_pct, usando la distribución real de trades.
+    Estimates the probability of reaching target_pct given that
+    you're already at current_pct, using the real trade distribution.
     
-    Simula trayectorias que empiezan en current_pct y cuenta
-    cuántas alcanzan target_pct antes de volver a 0%.
+    Simulates trajectories starting at current_pct and counts
+    how many reach target_pct before returning to 0%.
     """
     reached_target = 0
     for _ in range(n_sims):
         pnl = current_pct
-        for _ in range(50):  # máximo 50 trades para llegar
-            trade = np.random.choice(trade_returns) * 100  # a porcentaje
+        for _ in range(50):  # max 50 trades to get there
+            trade = np.random.choice(trade_returns) * 100  # to percentage
             pnl += trade
             if pnl >= target_pct:
                 reached_target += 1
@@ -498,39 +500,39 @@ def estimate_conditional_probability(trade_returns, current_pct, target_pct, n_s
                 break
     return reached_target / n_sims
 
-# Uso: estimate_conditional_probability(mis_trades, 5.0, 10.0)
-# Con tus datos reales, vas a obtener las probabilidades específicas
-# de tu sistema — no una aproximación genérica.
+# Usage: estimate_conditional_probability(my_trades, 5.0, 10.0)
+# With your real data, you'll get the specific probabilities
+# for your system -- not a generic approximation.
 ```
 
-### El Sesgo de Cortar Ganadores
+### The Bias of Cutting Winners
 
-Pensá en 100 trades de tu sistema. Algunos van a ser perdedores grandes (max loss). Otros van a ser ganadores grandes (home runs). La distribución natural del sistema produce ambos.
+Think about 100 trades from your system. Some will be big losers (max loss). Others will be big winners (home runs). The system's natural distribution produces both.
 
-Si absorbés los max losses completos (porque el stop se ejecuta y no podés evitarlos) pero cortás los home runs prematuramente (porque "asegurás ganancia"), estás haciendo algo muy específico: **sesgando la distribución de resultados en tu contra**.
+If you absorb the full max losses (because the stop executes and you can't avoid them) but cut the home runs prematurely (because you "lock in profits"), you're doing something very specific: **skewing the distribution of outcomes against yourself**.
 
 ```
-Distribución natural del sistema:
-[pérdida grande] [pérdida chica] [ganancia chica] [ganancia grande]
-      ← los absorbés completos →      ← los cortás temprano →
+Natural distribution of the system:
+[big loss] [small loss] [small gain] [big gain]
+    <- you absorb these fully ->    <- you cut these short ->
 
-Resultado: tu sistema real tiene peores métricas que el backtest
-porque eliminaste las colas positivas pero mantuviste las negativas.
+Result: your real system has worse metrics than the backtest
+because you eliminated the positive tails but kept the negative ones.
 ```
 
-### La Probabilidad Acumulada
+### Cumulative Probability
 
-La probabilidad de no tener ni un solo home run en N trades es `(1 - P_homerun)^N`. Esto cae exponencialmente:
+The probability of not having a single home run in N trades is `(1 - P_homerun)^N`. This drops exponentially:
 
 ```python
 def prob_at_least_one_homerun(p_homerun_per_trade, n_trades):
-    """P(al menos 1 home run en N trades)"""
+    """P(at least 1 home run in N trades)"""
     return 1 - (1 - p_homerun_per_trade) ** n_trades
 
-# Si cada trade tiene 20% de probabilidad de ser home run:
+# If each trade has a 20% probability of being a home run:
 for n in [5, 10, 20, 50]:
     p = prob_at_least_one_homerun(0.20, n)
-    print(f"  {n} trades: {p:.0%} de probabilidad de al menos 1 home run")
+    print(f"  {n} trades: {p:.0%} probability of at least 1 home run")
 
 # 5 trades: 67%
 # 10 trades: 89%
@@ -538,69 +540,69 @@ for n in [5, 10, 20, 50]:
 # 50 trades: 99.99%
 ```
 
-En 10 trades, tenés ~90% de probabilidad de al menos un home run. Pero si cortás todos los trades a +5% en vez de dejarlos llegar a +10%, ese home run nunca se materializa en tu cuenta.
+In 10 trades, you have ~90% probability of at least one home run. But if you cut every trade at +5% instead of letting them run to +10%, that home run never materializes in your account.
 
-### Implicaciones para Trailing Stops y Targets
+### Implications for Trailing Stops and Targets
 
-1. **Trailing stops muy ajustados matan los home runs.** Si tu trailing protege el +3% pero el sistema produce trades de +15% regularmente, el trailing te saca antes de que la cola positiva se materialice
+1. **Very tight trailing stops kill home runs.** If your trailing protects the +3% but the system regularly produces +15% trades, the trailing takes you out before the positive tail materializes
 
-2. **Targets fijos limitan el upside.** Un TP en 2:1 cuando el sistema naturalmente produce trades de 5:1 está regalando la diferencia
+2. **Fixed targets limit upside.** A TP at 2:1 when the system naturally produces 5:1 trades is giving away the difference
 
-3. **La solución no es "no usar stops/targets"** — es calibrarlos con la distribución real de tu sistema. Si el backtest muestra que el 15% de tus trades producen ganancias > 3R, tu trailing o target no debería cortar en 2R
+3. **The solution is not "don't use stops/targets"** -- it's calibrating them with the real distribution of your system. If the backtest shows that 15% of your trades produce gains > 3R, your trailing or target shouldn't cut at 2R
 
-4. **Evaluá el costo de oportunidad**: ¿cuánto EG estás sacrificando por la "tranquilidad" de asegurar ganancias temprano? Calculalo con la fórmula de EG usando el profit ratio real vs el profit ratio cortado
+4. **Evaluate the opportunity cost**: how much EG are you sacrificing for the "peace of mind" of locking in gains early? Calculate it using the EG formula with the real profit ratio vs the truncated profit ratio
 
-### Scalping Produce Expectativa Negativa
+### Scalping Produces Negative Expectancy
 
-El dato más duro contra el scalping: en simulaciones con datos reales, cubrir sistemáticamente al +5% produce **Sim-EG negativo**. Literalmente perdés dinero a largo plazo haciendo scalping en un sistema que es rentable si lo dejás correr.
+The hardest data point against scalping: in simulations with real data, systematically covering at +5% produces **negative Sim-EG**. You literally lose money in the long run by scalping a system that's profitable if you let it run.
 
-| Estrategia de salida | Resultado |
+| Exit Strategy | Result |
 |---|---|
-| Cubrir todo al +5% | Sim-EG **negativo** — perdés dinero |
-| Cubrir todo al +10% | ~2% profit, Sim-EG ~0.4% — marginal |
-| Set and forget (mantener al cierre) | Mejor resultado posible |
+| Cover everything at +5% | Sim-EG **negative** -- you lose money |
+| Cover everything at +10% | ~2% profit, Sim-EG ~0.4% -- marginal |
+| Set and forget (hold to close) | Best possible result |
 
-La conclusión empírica es consistente: **no se encontró una estrategia de cobertura parcial que supere al full-day hold**. El costo de asegurar ganancias temprano supera al beneficio de evitar los retrocesos.
+The empirical conclusion is consistent: **no partial covering strategy was found that beats the full-day hold**. The cost of locking in gains early exceeds the benefit of avoiding pullbacks.
 
-Esto no significa que nunca debas cerrar un trade antes del target. Significa que si tu sistema tiene edge, la decisión por defecto debería ser mantener, y la carga de la prueba está en demostrar que cerrar antes mejora el Sim-EG — no al revés.
+This doesn't mean you should never close a trade before the target. It means that if your system has edge, the default decision should be to hold, and the burden of proof is on demonstrating that closing early improves Sim-EG -- not the other way around.
 
-## Sim-EG: Monte Carlo como Métrica
+## Sim-EG: Monte Carlo as a Metric
 
-La fórmula cerrada de EG asume distribución binaria (ganás R o perdés 1). Tu sistema real tiene una distribución continua de resultados — trades que ganan poco, trades que ganan mucho, trades que pierden distinto cada vez. Para capturar esto, usamos **simulación de Monte Carlo no como validación, sino como la métrica misma**.
+The closed-form EG formula assumes a binary distribution (you win R or lose 1). Your real system has a continuous distribution of outcomes -- trades that win a little, trades that win a lot, trades that lose different amounts each time. To capture this, we use **Monte Carlo simulation not as validation, but as the metric itself**.
 
-### El Proceso
+### The Process
 
 ```python
 import numpy as np
 
 def sim_eg(trade_returns, n_simulated_trades=10000, n_runs=3):
     """
-    Simulated Expected Growth: estima el EG real del sistema
-    usando la distribución empírica de trades (no la teórica).
+    Simulated Expected Growth: estimates the real EG of the system
+    using the empirical trade distribution (not the theoretical one).
     
-    Más robusto que la fórmula cerrada cuando:
-    - La distribución no es binaria (la mayoría de los casos)
-    - Hay asimetría (skew) en los retornos
-    - Hay fat tails
+    More robust than the closed-form formula when:
+    - The distribution is not binary (most cases)
+    - There is skew in the returns
+    - There are fat tails
     
-    Parámetros:
-    - trade_returns: array de retornos por trade del backtest
-      (ej: [0.02, -0.01, 0.05, -0.008, ...])
-    - n_simulated_trades: trades a simular por corrida (10K es estándar)
-    - n_runs: corridas para promediar (3 es suficiente con 10K trades)
+    Parameters:
+    - trade_returns: array of per-trade returns from the backtest
+      (e.g., [0.02, -0.01, 0.05, -0.008, ...])
+    - n_simulated_trades: trades to simulate per run (10K is standard)
+    - n_runs: runs to average (3 is sufficient with 10K trades)
     """
     eg_estimates = []
 
     for _ in range(n_runs):
-        # Resamplear con reemplazo de la distribución real
+        # Resample with replacement from the real distribution
         sampled = np.random.choice(trade_returns, size=n_simulated_trades, replace=True)
 
-        # Calcular crecimiento geométrico
-        # Cada trade multiplica el capital por (1 + retorno)
+        # Calculate geometric growth
+        # Each trade multiplies capital by (1 + return)
         growth_factors = 1 + sampled
         final_value = np.prod(growth_factors)
 
-        # EG = crecimiento por trade = raíz N-ésima del valor final - 1
+        # EG = growth per trade = Nth root of final value - 1
         eg = final_value ** (1 / n_simulated_trades) - 1
         eg_estimates.append(eg)
 
@@ -610,40 +612,40 @@ def sim_eg(trade_returns, n_simulated_trades=10000, n_runs=3):
         'eg_runs': eg_estimates,
     }
 
-# Ejemplo de uso:
-# trades = np.array([resultados de tu backtest])
+# Example usage:
+# trades = np.array([results from your backtest])
 # result = sim_eg(trades)
-# print(f"Sim-EG: {result['sim_eg']*100:.2f}% por trade")
+# print(f"Sim-EG: {result['sim_eg']*100:.2f}% per trade")
 ```
 
-### Por Qué 10,000 Trades
+### Why 10,000 Trades
 
-Con 1,000-2,000 trades simulados, los resultados varían bastante entre corridas (ej: 3.8%, 5.1%, 4.2%). Con 10,000, convergen (ej: 5.0%, 5.2%, 5.07%). Tres corridas de 10K dan 30K trades efectivos, suficiente para que el estimador sea estable.
+With 1,000-2,000 simulated trades, results vary considerably between runs (e.g., 3.8%, 5.1%, 4.2%). With 10,000, they converge (e.g., 5.0%, 5.2%, 5.07%). Three runs of 10K give 30K effective trades, enough for the estimator to be stable.
 
-### Por Qué Sim-EG > Fórmula Cerrada
+### Why Sim-EG > Closed-Form Formula
 
-La fórmula cerrada de EG asume que cada trade gana exactamente R o pierde exactamente 1. En la realidad:
+The closed-form EG formula assumes each trade wins exactly R or loses exactly 1. In reality:
 
-- Un trade puede ganar 0.5R, 1R, 2R, o 5R
-- Un trade puede perder 0.3R, 0.7R, o 1R (si tiene stop)
-- La distribución puede tener skew positivo (cola derecha más larga)
-- Puede haber fat tails que la fórmula binaria no captura
+- A trade can win 0.5R, 1R, 2R, or 5R
+- A trade can lose 0.3R, 0.7R, or 1R (if it has a stop)
+- The distribution can have positive skew (longer right tail)
+- There can be fat tails that the binary formula doesn't capture
 
-El Sim-EG usa la **distribución empírica real** de tus trades. Es esencialmente un **bootstrap resampling** aplicado al crecimiento compuesto. No hace supuestos sobre la forma de la distribución — usa directamente lo que tu sistema produjo.
+Sim-EG uses the **real empirical distribution** of your trades. It's essentially **bootstrap resampling** applied to compound growth. It makes no assumptions about the shape of the distribution -- it directly uses what your system produced.
 
-### Sim-EG como Quality Gate
+### Sim-EG as a Quality Gate
 
-Usá Sim-EG como filtro mínimo de calidad: **si Sim-EG < 2% en 10K trades, el edge es demasiado frágil para operar.** Los costos reales (slippage, comisiones, errores de ejecución) van a consumir un edge tan fino.
+Use Sim-EG as a minimum quality filter: **if Sim-EG < 2% over 10K trades, the edge is too fragile to trade.** Real-world costs (slippage, commissions, execution errors) will consume such a thin edge.
 
-### Simulaciones del Peor Caso
+### Worst-Case Simulations
 
-El poder real del Sim-EG es explorar los extremos. Con miles de corridas de bootstrap, podés encontrar el peor escenario posible con tu distribución de trades:
+The real power of Sim-EG is exploring the extremes. With thousands of bootstrap runs, you can find the worst possible scenario with your trade distribution:
 
 ```python
 def sim_eg_worst_case(trade_returns, n_trades=100, n_simulations=10000):
     """
-    ¿Cuál es el peor escenario plausible para N trades?
-    Busca entre miles de simulaciones la peor trayectoria.
+    What is the worst plausible scenario for N trades?
+    Searches through thousands of simulations for the worst trajectory.
     """
     final_values = []
     for _ in range(n_simulations):
@@ -659,27 +661,27 @@ def sim_eg_worst_case(trade_returns, n_trades=100, n_simulations=10000):
         'pct_profitable': np.mean(np.array(final_values) > 1.0) * 100,
     }
 
-# Si en 10,000 simulaciones de 100 trades, el PEOR caso
-# todavía duplica el capital, tenés convicción real.
-# Si el peor caso pierde dinero, el edge es frágil.
+# If in 10,000 simulations of 100 trades, the WORST case
+# still doubles capital, you have real conviction.
+# If the worst case loses money, the edge is fragile.
 ```
 
-Esto da un nivel de confianza que ninguna otra métrica provee: "incluso en el peor escenario del bootstrap, ¿sobrevivo?"
+This provides a level of confidence no other metric offers: "even in the worst bootstrap scenario, do I survive?"
 
-### Block Bootstrap: Preservar Rachas
+### Block Bootstrap: Preserving Streaks
 
-El bootstrap estándar (i.i.d.) asume que cada trade es independiente del anterior. Pero en la realidad puede haber **autocorrelación temporal** — rachas ganadoras o perdedoras que dependen del régimen de mercado.
+Standard bootstrap (i.i.d.) assumes each trade is independent of the previous one. But in reality there can be **temporal autocorrelation** -- winning or losing streaks that depend on market regime.
 
-El **block bootstrap** resuelve esto: en vez de resamplear trades individuales, resamplea bloques de trades consecutivos (ej: bloques de 5-10 trades). Esto preserva la estructura temporal.
+**Block bootstrap** solves this: instead of resampling individual trades, it resamples blocks of consecutive trades (e.g., blocks of 5-10 trades). This preserves the temporal structure.
 
 ```python
 def sim_eg_block_bootstrap(trade_returns, block_size=5, n_trades=10000, n_runs=3):
     """
-    Block bootstrap: resamplea bloques consecutivos de trades
-    para preservar autocorrelación temporal.
+    Block bootstrap: resamples consecutive blocks of trades
+    to preserve temporal autocorrelation.
     
-    Si hay regime dependency (el mercado alterna fases buenas/malas),
-    el bootstrap iid lo esconde. El block bootstrap lo preserva.
+    If there is regime dependency (the market alternates good/bad phases),
+    i.i.d. bootstrap hides it. Block bootstrap preserves it.
     """
     n = len(trade_returns)
     eg_estimates = []
@@ -697,29 +699,29 @@ def sim_eg_block_bootstrap(trade_returns, block_size=5, n_trades=10000, n_runs=3
 
     return np.mean(eg_estimates)
 
-# Si Sim-EG iid ≈ Sim-EG block → no hay autocorrelación significativa
-# Si Sim-EG block << Sim-EG iid → hay regime dependency que inflaba el resultado
+# If Sim-EG i.i.d. ≈ Sim-EG block -> no significant autocorrelation
+# If Sim-EG block << Sim-EG i.i.d. -> regime dependency was inflating the result
 ```
 
-Si la diferencia entre Sim-EG estándar y block bootstrap es grande, tu sistema probablemente depende de un régimen de mercado específico y va a sufrir cuando el régimen cambie.
+If the difference between standard Sim-EG and block bootstrap is large, your system likely depends on a specific market regime and will suffer when the regime changes.
 
-### Cuándo Usar Cada Uno
+### When to Use Each One
 
-| Situación | Usar |
+| Situation | Use |
 |---|---|
-| Comparar ideas rápidamente | Fórmula cerrada de EG |
-| Evaluar un sistema con backtest completo | Sim-EG |
-| Pocos trades (< 100) | Fórmula cerrada (Sim-EG no tiene suficientes datos para resamplear) |
-| Distribución con fat tails o skew | Sim-EG (captura la forma real) |
-| Optimización (miles de evaluaciones) | Fórmula cerrada (más rápida) |
+| Compare ideas quickly | Closed-form EG formula |
+| Evaluate a system with a complete backtest | Sim-EG |
+| Few trades (< 100) | Closed-form (Sim-EG doesn't have enough data to resample) |
+| Distribution with fat tails or skew | Sim-EG (captures the real shape) |
+| Optimization (thousands of evaluations) | Closed-form (faster) |
 
-### Integración Práctica
+### Practical Integration
 
-Agregá Sim-EG como una columna más en tu evaluación de sistemas, junto con Sharpe, profit factor, y max drawdown:
+Add Sim-EG as another column in your system evaluation, alongside Sharpe, profit factor, and max drawdown:
 
 ```python
 def full_system_evaluation(trade_returns):
-    """Evaluación completa de un sistema."""
+    """Complete system evaluation."""
     wins = trade_returns[trade_returns > 0]
     losses = trade_returns[trade_returns < 0]
 
@@ -731,7 +733,7 @@ def full_system_evaluation(trade_returns):
     edge = wr * profit_ratio - (1 - wr)
     pf = wins.sum() / abs(losses.sum()) if losses.sum() != 0 else float('inf')
 
-    # Sim-EG captura lo que las otras métricas no pueden
+    # Sim-EG captures what the other metrics cannot
     seg = sim_eg(trade_returns)
 
     return {
@@ -740,14 +742,14 @@ def full_system_evaluation(trade_returns):
         'profit_ratio': f"{profit_ratio:.2f}",
         'expectancy': f"{edge:.3f}",
         'profit_factor': f"{pf:.2f}",
-        'sim_eg': f"{seg['sim_eg']*100:.2f}% por trade",
+        'sim_eg': f"{seg['sim_eg']*100:.2f}% per trade",
     }
 ```
 
-## Limitaciones del EG y Sim-EG
+## Limitations of EG and Sim-EG
 
-- **Fórmula cerrada de EG**: asume distribución binaria, conocimiento perfecto de parámetros, independencia entre trades. Útil para comparar rápido, no para decisiones finales
-- **Sim-EG**: más robusto pero necesita suficientes trades históricos (mínimo ~200 para que el resampleo sea representativo). No captura cambios de régimen de mercado
-- **Ambos**: no capturan correlación temporal entre trades (rachas), ni el impacto de costos variables, ni eventos que no están en los datos históricos (cisnes negros)
+- **Closed-form EG**: assumes binary distribution, perfect knowledge of parameters, independence between trades. Useful for quick comparisons, not for final decisions
+- **Sim-EG**: more robust but needs enough historical trades (minimum ~200 for the resampling to be representative). Doesn't capture market regime changes
+- **Both**: don't capture temporal correlation between trades (streaks), nor the impact of variable costs, nor events that aren't in the historical data (black swans)
 
-Aún con estas limitaciones, EG y Sim-EG son métricas más informativas que expectancy aritmética, Sharpe ratio o profit factor para cualquier sistema que opere con position sizing proporcional al capital. La razón es simple: son las únicas que miden lo que realmente querés maximizar — el crecimiento geométrico de tu cuenta.
+Even with these limitations, EG and Sim-EG are more informative metrics than arithmetic expectancy, Sharpe ratio, or profit factor for any system that operates with position sizing proportional to capital. The reason is simple: they are the only ones that measure what you actually want to maximize -- the geometric growth of your account.

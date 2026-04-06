@@ -1,29 +1,31 @@
-# Dynamic Position Sizing con Volatility Clustering
+> 🇪🇸 [Leer en Español](Dynamic-Position-Sizing.es.md) | 🇺🇸 **English**
 
-## ¿Por qué Position Sizing Dinámico?
+# Dynamic Position Sizing with Volatility Clustering
 
-El position sizing tradicional (fijo por trade) ignora una realidad fundamental de los mercados financieros: **la volatilidad no es constante**. En small caps, esto es especialmente crítico porque:
+## Why Dynamic Position Sizing?
 
-- **Volatility clustering**: Períodos de alta volatilidad se agrupan
-- **Regime shifts**: Market conditions cambian dramáticamente
-- **Liquidity cycles**: Available liquidity varía en el tiempo
-- **News-driven spikes**: Small caps reaccionan violentamente a noticias
-- **Float dynamics**: Changes en float afectan price volatility
+Traditional position sizing (fixed per trade) ignores a fundamental reality of financial markets: **volatility is not constant**. In small caps, this is especially critical because:
 
-### El Problema con Position Sizing Fijo
+- **Volatility clustering**: Periods of high volatility tend to cluster together
+- **Regime shifts**: Market conditions change dramatically
+- **Liquidity cycles**: Available liquidity varies over time
+- **News-driven spikes**: Small caps react violently to news
+- **Float dynamics**: Changes in float affect price volatility
+
+### The Problem with Fixed Position Sizing
 
 ```python
-# Position sizing fijo - PROBLEMÁTICO
-FIXED_RISK_PER_TRADE = 10.0  # $10 por trade siempre
+# Fixed position sizing - PROBLEMATIC
+FIXED_RISK_PER_TRADE = 10.0  # $10 per trade always
 
-# Problemas:
-# 1. En low volatility: Leaving money on the table
-# 2. En high volatility: Taking excessive risk
-# 3. Durante crisis: No adjustment for market stress
+# Problems:
+# 1. In low volatility: Leaving money on the table
+# 2. In high volatility: Taking excessive risk
+# 3. During crisis: No adjustment for market stress
 # 4. Earnings season: Same size despite elevated risk
 ```
 
-## Framework de Position Sizing Dinámico
+## Dynamic Position Sizing Framework
 
 ### 1. Volatility-Based Position Sizing
 
@@ -38,7 +40,7 @@ warnings.filterwarnings('ignore')
 
 
 class VolatilityRegime(Enum):
-    """Regímenes de volatilidad para position sizing"""
+    """Volatility regimes for position sizing"""
     ULTRA_LOW = "ultra_low"      # < 10th percentile
     LOW = "low"                  # 10th-30th percentile
     NORMAL = "normal"            # 30th-70th percentile
@@ -48,7 +50,7 @@ class VolatilityRegime(Enum):
 
 @dataclass
 class PositionSizingConfig:
-    """Configuración para dynamic position sizing"""
+    """Configuration for dynamic position sizing"""
 
     # Base parameters
     base_risk_per_trade: float = 10.0      # Base risk amount ($)
@@ -83,7 +85,7 @@ class PositionSizingConfig:
 
 class DynamicPositionSizer:
     """
-    Advanced position sizing que adapta a:
+    Advanced position sizing that adapts to:
     - Volatility regimes
     - Market correlation
     - Portfolio heat
@@ -104,7 +106,7 @@ class DynamicPositionSizer:
                                market_data: Dict,
                                current_positions: Dict = None) -> Dict:
         """
-        Calculate optimal position size basado en multiple factors
+        Calculate optimal position size based on multiple factors
 
         Args:
             symbol: Trading symbol
@@ -376,7 +378,7 @@ class DynamicPositionSizer:
                                       symbol: str,
                                       market_data: Dict) -> float:
         """
-        Adjust for liquidity constraints específico de small caps
+        Adjust for small cap-specific liquidity constraints
 
         Lower liquidity = smaller positions to avoid market impact
         """
@@ -449,7 +451,7 @@ class DynamicPositionSizer:
 # Kelly Criterion Implementation for Advanced Users
 class KellyCriterionSizer:
     """
-    Kelly Criterion position sizing con modifications para practical trading
+    Kelly Criterion position sizing with modifications for practical trading
 
     Kelly Criterion: f* = (bp - q) / b
     Where:
@@ -572,7 +574,7 @@ class KellyCriterionSizer:
 # Integrated Position Sizing System
 class IntegratedPositionSizingSystem:
     """
-    Sistema integrado que combina multiple position sizing approaches
+    Integrated system that combines multiple position sizing approaches
     """
 
     def __init__(self, config: PositionSizingConfig):
@@ -588,7 +590,7 @@ class IntegratedPositionSizingSystem:
                                  current_positions: Dict = None,
                                  account_value: float = 10000) -> Dict:
         """
-        Get optimal position size usando multiple approaches
+        Get optimal position size using multiple approaches
         """
 
         # 1. Dynamic volatility-based sizing
@@ -685,7 +687,7 @@ class IntegratedPositionSizingSystem:
 # Example usage
 def example_dynamic_position_sizing():
     """
-    Ejemplo completo de dynamic position sizing
+    Complete dynamic position sizing example
     """
 
     # Configure position sizing
@@ -758,14 +760,14 @@ if __name__ == "__main__":
     example_dynamic_position_sizing()
 ```
 
-## Integration con Trading Strategies
+## Integration with Trading Strategies
 
 ### 1. **Adaptive Strategy Implementation**
 
 ```python
 class VolatilityAdaptiveStrategy:
     """
-    Strategy que adapta position sizing basado en volatility clustering
+    Strategy that adapts position sizing based on volatility clustering
     """
 
     def __init__(self, base_strategy, position_sizer):
@@ -804,7 +806,7 @@ class VolatilityAdaptiveStrategy:
 ```python
 class RiskParityPositionSizer:
     """
-    Position sizing basado en risk parity principles
+    Position sizing based on risk parity principles
     Equal risk contribution from each position
     """
 
@@ -852,7 +854,7 @@ import joblib
 
 class MLPositionSizer:
     """
-    ML-enhanced position sizing que aprende optimal sizing decisions
+    ML-enhanced position sizing that learns optimal sizing decisions
     """
 
     def __init__(self):
@@ -862,7 +864,7 @@ class MLPositionSizer:
 
     def prepare_features(self, market_data: Dict, historical_data: pd.DataFrame) -> np.array:
         """
-        Prepare features para ML model
+        Prepare features for ML model
 
         Features include:
         - Current volatility vs historical
@@ -899,7 +901,7 @@ class MLPositionSizer:
 
     def train_model(self, historical_trades: pd.DataFrame):
         """
-        Train ML model en historical trade outcomes
+        Train ML model on historical trade outcomes
 
         Target variable: Optimal position size multiplier
         """
@@ -939,7 +941,7 @@ class MLPositionSizer:
         return np.clip(multiplier, 0.1, 3.0)
 ```
 
-## Performance Monitoring y Optimization
+## Performance Monitoring and Optimization
 
 ### 1. **Position Sizing Performance Tracker**
 
@@ -1013,4 +1015,4 @@ class PositionSizingTracker:
 - **[Regime Detection](./Regime-Detection.md)**: Regime-aware sizing
 - **[Portfolio Optimization](./Portfolio-Optimization.md)**: Multi-strategy coordination
 
-Esta framework de dynamic position sizing permite **adaptar automáticamente** el tamaño de posiciones basado en conditions reales del mercado, proporcionando mejor risk-adjusted returns y drawdown control.
+This dynamic position sizing framework enables **automatic adaptation** of position sizes based on real market conditions, delivering better risk-adjusted returns and drawdown control.

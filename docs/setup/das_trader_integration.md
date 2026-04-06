@@ -1,80 +1,82 @@
-# Integración con DAS Trader Pro
+> 🇪🇸 [Leer en Español](das_trader_integration.es.md) | 🇺🇸 **English**
 
-## Introducción
+# DAS Trader Pro Integration
 
-DAS Trader Pro es una **plataforma de trading profesional** (no un broker) muy popular entre day traders, especialmente para small caps. Se conecta a diversos brokers como Charles Schwab, Zimtra, Lightspeed, y otros.
+## Introduction
 
-Para integrar DAS con nuestras estrategias cuantitativas, utilizamos el **das-bridge** desarrollado específicamente para este propósito.
+DAS Trader Pro is a **professional trading platform** (not a broker) very popular among day traders, especially for small caps. It connects to various brokers such as Charles Schwab, Zimtra, Lightspeed, and others.
 
-## DAS Trader Pro: Plataforma vs Broker
+To integrate DAS with our quantitative strategies, we use the **das-bridge** developed specifically for this purpose.
 
-### ¿Qué es DAS Trader Pro?
-- **Plataforma de software** para trading profesional
-- Se **conecta a brokers** que soporten su protocolo
-- Provee **interfaz avanzada** con herramientas profesionales
-- **No maneja dinero** directamente (eso lo hace el broker)
+## DAS Trader Pro: Platform vs Broker
 
-### Brokers Compatibles Populares
-- **Charles Schwab** (muy popular con DAS)
-- **Zimtra Trading** (especialista en small caps)
+### What is DAS Trader Pro?
+- **Software platform** for professional trading
+- **Connects to brokers** that support its protocol
+- Provides an **advanced interface** with professional tools
+- **Does not handle money** directly (that's the broker's job)
+
+### Popular Compatible Brokers
+- **Charles Schwab** (very popular with DAS)
+- **Zimtra Trading** (small caps specialist)
 - **Lightspeed Trading** (low latency)
-- **Cobra Trading** (day trading enfocado)
-- **TradeZero** (sin PDT rule)
+- **Cobra Trading** (day trading focused)
+- **TradeZero** (no PDT rule)
 - **Vision Financial Markets**
 
-### Workflow Típico
+### Typical Workflow
 ```
-Tu Estrategia Python → das-bridge → DAS Trader Pro → Broker (ej: Schwab) → Mercado
+Your Python Strategy -> das-bridge -> DAS Trader Pro -> Broker (e.g., Schwab) -> Market
 ```
 
-1. **Tu código Python** genera señales de trading
-2. **das-bridge** traduce las órdenes al protocolo DAS
-3. **DAS Trader Pro** procesa la orden y la optimiza (routing, etc.)
-4. **El broker** (ej: Charles Schwab) ejecuta la orden en el mercado
-5. **Las confirmaciones** regresan por el mismo camino
+1. **Your Python code** generates trading signals
+2. **das-bridge** translates orders to the DAS protocol
+3. **DAS Trader Pro** processes the order and optimizes it (routing, etc.)
+4. **The broker** (e.g., Charles Schwab) executes the order on the market
+5. **Confirmations** return through the same path
 
-> **Nota:** El das-bridge está en desarrollo activo en: https://github.com/jefrnc/das-bridge
+> **Note:** The das-bridge is under active development at: https://github.com/jefrnc/das-bridge
 
-## ¿Por Qué Usar DAS Trader Pro?
+## Why Use DAS Trader Pro?
 
-### Ventajas para Small Caps
-- **Borrows amplios** para short selling
-- **Routing avanzado** para mejor ejecución
-- **Level 2 premium** con data de alta calidad
-- **Hotkeys configurables** para ejecución rápida
-- **Comisiones competitivas** para high-frequency trading
+### Advantages for Small Caps
+- **Extensive borrows** for short selling
+- **Advanced routing** for better execution
+- **Premium Level 2** with high-quality data
+- **Configurable hotkeys** for fast execution
+- **Competitive commissions** for high-frequency trading
 
-### Casos de Uso Ideales
-- Day trading en small caps volátiles
-- Short selling estrategias
-- Scalping con volumen alto
-- Trading con margin elevado
+### Ideal Use Cases
+- Day trading volatile small caps
+- Short selling strategies
+- High-volume scalping
+- Trading with high margin
 
-## Instalación del DAS Bridge
+## DAS Bridge Installation
 
-### Requisitos Previos
+### Prerequisites
 ```bash
-# DAS Trader Pro debe estar instalado y configurado
-# Cuenta activa con DAS
+# DAS Trader Pro must be installed and configured
+# Active DAS account
 # Python 3.8+
 ```
 
-### Instalación
+### Installation
 ```bash
-# Clonar el bridge
+# Clone the bridge
 git clone https://github.com/jefrnc/das-bridge.git
 cd das-bridge
 
-# Instalar dependencias
+# Install dependencies
 pip install -r requirements.txt
 
-# Instalar el package
+# Install the package
 pip install -e .
 ```
 
-### Configuración DAS
+### DAS Configuration
 ```ini
-# En DAS Trader Pro -> Setup -> API Setup
+# In DAS Trader Pro -> Setup -> API Setup
 [API Settings]
 Enable CMD API: True
 Port: 9910
@@ -82,42 +84,42 @@ Allow Localhost: True
 Authentication: Required
 ```
 
-## Configuración Básica
+## Basic Configuration
 
-### Variables de Entorno
+### Environment Variables
 ```bash
 # .env
 DAS_HOST=localhost
 DAS_PORT=9910
-DAS_USERNAME=tu_usuario
-DAS_PASSWORD=tu_password
-DAS_ACCOUNT=tu_cuenta
-DAS_PAPER_TRADING=True  # Para testing
+DAS_USERNAME=your_username
+DAS_PASSWORD=your_password
+DAS_ACCOUNT=your_account
+DAS_PAPER_TRADING=True  # For testing
 ```
 
-### Configuración por Broker
+### Broker-Specific Configuration
 
 #### Charles Schwab + DAS
 ```bash
-# .env para Schwab
-DAS_USERNAME=tu_usuario_schwab
-DAS_PASSWORD=tu_password_schwab
-DAS_ACCOUNT=12345678  # Tu cuenta Schwab
+# .env for Schwab
+DAS_USERNAME=your_schwab_username
+DAS_PASSWORD=your_schwab_password
+DAS_ACCOUNT=12345678  # Your Schwab account
 DAS_BROKER=schwab
 DAS_PAPER_TRADING=True
 ```
 
 #### Zimtra + DAS
 ```bash
-# .env para Zimtra
-DAS_USERNAME=tu_usuario_zimtra
-DAS_PASSWORD=tu_password_zimtra
-DAS_ACCOUNT=ZIM12345  # Tu cuenta Zimtra
+# .env for Zimtra
+DAS_USERNAME=your_zimtra_username
+DAS_PASSWORD=your_zimtra_password
+DAS_ACCOUNT=ZIM12345  # Your Zimtra account
 DAS_BROKER=zimtra
 DAS_PAPER_TRADING=True
 ```
 
-### Configuración Python
+### Python Configuration
 ```python
 # config/das_config.py
 import os
@@ -133,20 +135,20 @@ class DASConfig:
     broker: str = os.getenv('DAS_BROKER', 'unknown')  # schwab, zimtra, etc.
     paper_trading: bool = os.getenv('DAS_PAPER_TRADING', 'True').lower() == 'true'
     
-    # Configuraciones de trading
-    max_position_size: float = 10000.0  # $10k máximo por posición
-    max_daily_loss: float = 1000.0      # $1k pérdida máxima diaria
-    risk_per_trade: float = 0.02        # 2% riesgo por trade
+    # Trading settings
+    max_position_size: float = 10000.0  # $10k max per position
+    max_daily_loss: float = 1000.0      # $1k max daily loss
+    risk_per_trade: float = 0.02        # 2% risk per trade
     
-    # Timeouts y reconexión
+    # Timeouts and reconnection
     connection_timeout: int = 30
     order_timeout: int = 10
     max_reconnect_attempts: int = 5
 ```
 
-## Implementación del Cliente DAS
+## DAS Client Implementation
 
-### Cliente Unificado
+### Unified Client
 ```python
 # src/brokers/das_client.py
 import asyncio
@@ -178,7 +180,7 @@ class DASOrder:
     timestamp: datetime
 
 class DASBrokerIntegration:
-    """Integración completa con DAS Trader"""
+    """Full integration with DAS Trader"""
     
     def __init__(self, config: DASConfig):
         self.config = config
@@ -195,7 +197,7 @@ class DASBrokerIntegration:
         self.logger = logging.getLogger(__name__)
     
     async def connect(self) -> bool:
-        """Conectar a DAS Trader"""
+        """Connect to DAS Trader"""
         try:
             self.client = DASTraderClient(
                 host=self.config.host,
@@ -210,33 +212,33 @@ class DASBrokerIntegration:
             
             if success:
                 self.connected = True
-                self.logger.info("Conectado a DAS Trader exitosamente")
+                self.logger.info("Successfully connected to DAS Trader")
                 
-                # Configurar callbacks
+                # Set up callbacks
                 self.client.on_quote = self._handle_quote_update
                 self.client.on_order_update = self._handle_order_update
                 self.client.on_position_update = self._handle_position_update
                 
-                # Cargar estado inicial
+                # Load initial state
                 await self._load_initial_state()
                 return True
             else:
-                self.logger.error("Falló conexión a DAS Trader")
+                self.logger.error("Failed to connect to DAS Trader")
                 return False
                 
         except Exception as e:
-            self.logger.error(f"Error conectando a DAS: {e}")
+            self.logger.error(f"Error connecting to DAS: {e}")
             return False
     
     async def disconnect(self):
-        """Desconectar de DAS Trader"""
+        """Disconnect from DAS Trader"""
         if self.client and self.connected:
             await self.client.disconnect()
             self.connected = False
-            self.logger.info("Desconectado de DAS Trader")
+            self.logger.info("Disconnected from DAS Trader")
     
     async def get_buying_power(self) -> float:
-        """Obtener poder de compra disponible"""
+        """Get available buying power"""
         if not self.connected:
             return 0.0
         
@@ -244,11 +246,11 @@ class DASBrokerIntegration:
             bp_info = await self.client.get_buying_power()
             return bp_info.get('available', 0.0)
         except Exception as e:
-            self.logger.error(f"Error obteniendo buying power: {e}")
+            self.logger.error(f"Error getting buying power: {e}")
             return 0.0
     
     async def get_quote(self, symbol: str) -> Optional[Dict]:
-        """Obtener cotización de un símbolo"""
+        """Get quote for a symbol"""
         if not self.connected:
             return None
         
@@ -263,11 +265,11 @@ class DASBrokerIntegration:
                 'timestamp': datetime.now()
             }
         except Exception as e:
-            self.logger.error(f"Error obteniendo quote para {symbol}: {e}")
+            self.logger.error(f"Error getting quote for {symbol}: {e}")
             return None
     
     async def subscribe_quotes(self, symbols: List[str]):
-        """Suscribirse a quotes en tiempo real"""
+        """Subscribe to real-time quotes"""
         if not self.connected:
             return False
         
@@ -276,28 +278,28 @@ class DASBrokerIntegration:
                 await self.client.subscribe_quote(symbol)
             return True
         except Exception as e:
-            self.logger.error(f"Error suscribiendo quotes: {e}")
+            self.logger.error(f"Error subscribing to quotes: {e}")
             return False
     
     async def send_order(self, symbol: str, side: str, quantity: int,
                         order_type: str = "MARKET", price: Optional[float] = None,
                         stop_price: Optional[float] = None) -> Optional[str]:
-        """Enviar orden a DAS"""
+        """Send order to DAS"""
         
         if not self.connected:
-            self.logger.error("No conectado a DAS")
+            self.logger.error("Not connected to DAS")
             return None
         
-        # Validaciones previas
+        # Pre-validation
         if not await self._validate_order(symbol, side, quantity, price):
             return None
         
         try:
-            # Convertir tipos
+            # Convert types
             das_side = OrderSide.BUY if side.upper() == "BUY" else OrderSide.SELL
             das_type = getattr(OrderType, order_type.upper())
             
-            # Enviar orden
+            # Send order
             order_result = await self.client.send_order(
                 symbol=symbol,
                 side=das_side,
@@ -310,7 +312,7 @@ class DASBrokerIntegration:
             if order_result.success:
                 order_id = order_result.order_id
                 
-                # Registrar orden
+                # Record order
                 self.orders[order_id] = DASOrder(
                     order_id=order_id,
                     symbol=symbol,
@@ -323,18 +325,18 @@ class DASBrokerIntegration:
                     timestamp=datetime.now()
                 )
                 
-                self.logger.info(f"Orden enviada: {order_id} - {side} {quantity} {symbol}")
+                self.logger.info(f"Order sent: {order_id} - {side} {quantity} {symbol}")
                 return order_id
             else:
-                self.logger.error(f"Error enviando orden: {order_result.error}")
+                self.logger.error(f"Error sending order: {order_result.error}")
                 return None
                 
         except Exception as e:
-            self.logger.error(f"Error enviando orden: {e}")
+            self.logger.error(f"Error sending order: {e}")
             return None
     
     async def cancel_order(self, order_id: str) -> bool:
-        """Cancelar orden"""
+        """Cancel an order"""
         if not self.connected:
             return False
         
@@ -343,20 +345,20 @@ class DASBrokerIntegration:
             if result.success:
                 if order_id in self.orders:
                     self.orders[order_id].status = "CANCELLED"
-                self.logger.info(f"Orden cancelada: {order_id}")
+                self.logger.info(f"Order cancelled: {order_id}")
                 return True
             else:
-                self.logger.error(f"Error cancelando orden: {result.error}")
+                self.logger.error(f"Error cancelling order: {result.error}")
                 return False
         except Exception as e:
-            self.logger.error(f"Error cancelando orden {order_id}: {e}")
+            self.logger.error(f"Error cancelling order {order_id}: {e}")
             return False
     
     async def _validate_order(self, symbol: str, side: str, quantity: int, 
                             price: Optional[float]) -> bool:
-        """Validar orden antes de enviar"""
+        """Validate order before sending"""
         
-        # Validar buying power
+        # Validate buying power
         buying_power = await self.get_buying_power()
         estimated_cost = quantity * (price or 0)
         
@@ -364,12 +366,12 @@ class DASBrokerIntegration:
             self.logger.error(f"Insufficient buying power: ${buying_power:.2f} vs ${estimated_cost:.2f}")
             return False
         
-        # Validar tamaño máximo de posición
+        # Validate max position size
         if estimated_cost > self.config.max_position_size:
             self.logger.error(f"Position size too large: ${estimated_cost:.2f}")
             return False
         
-        # Validar si ya tenemos posición
+        # Check if we already have a position
         if symbol in self.positions:
             current_pos = self.positions[symbol]
             if (side.upper() == "BUY" and current_pos.side == "LONG") or \
@@ -379,9 +381,9 @@ class DASBrokerIntegration:
         return True
     
     async def _load_initial_state(self):
-        """Cargar estado inicial de posiciones y órdenes"""
+        """Load initial state of positions and orders"""
         try:
-            # Cargar posiciones
+            # Load positions
             positions = await self.client.get_positions()
             for pos_data in positions:
                 position = DASPosition(
@@ -394,7 +396,7 @@ class DASBrokerIntegration:
                 )
                 self.positions[pos_data.symbol] = position
             
-            # Cargar órdenes abiertas
+            # Load open orders
             open_orders = await self.client.get_open_orders()
             for order_data in open_orders:
                 order = DASOrder(
@@ -411,18 +413,18 @@ class DASBrokerIntegration:
                 self.orders[order_data.order_id] = order
                 
         except Exception as e:
-            self.logger.error(f"Error cargando estado inicial: {e}")
+            self.logger.error(f"Error loading initial state: {e}")
     
     def _handle_quote_update(self, quote_data):
-        """Manejar actualización de quote"""
+        """Handle quote update"""
         for callback in self.quote_callbacks:
             try:
                 callback(quote_data)
             except Exception as e:
-                self.logger.error(f"Error en quote callback: {e}")
+                self.logger.error(f"Error in quote callback: {e}")
     
     def _handle_order_update(self, order_data):
-        """Manejar actualización de orden"""
+        """Handle order update"""
         order_id = order_data.order_id
         
         if order_id in self.orders:
@@ -433,18 +435,18 @@ class DASBrokerIntegration:
             try:
                 callback(order_data)
             except Exception as e:
-                self.logger.error(f"Error en order callback: {e}")
+                self.logger.error(f"Error in order callback: {e}")
     
     def _handle_position_update(self, position_data):
-        """Manejar actualización de posición"""
+        """Handle position update"""
         symbol = position_data.symbol
         
         if position_data.quantity == 0:
-            # Posición cerrada
+            # Position closed
             if symbol in self.positions:
                 del self.positions[symbol]
         else:
-            # Actualizar posición
+            # Update position
             position = DASPosition(
                 symbol=symbol,
                 quantity=position_data.quantity,
@@ -459,22 +461,22 @@ class DASBrokerIntegration:
             try:
                 callback(position_data)
             except Exception as e:
-                self.logger.error(f"Error en position callback: {e}")
+                self.logger.error(f"Error in position callback: {e}")
     
     def add_quote_callback(self, callback: Callable):
-        """Agregar callback para quotes"""
+        """Add callback for quotes"""
         self.quote_callbacks.append(callback)
     
     def add_order_callback(self, callback: Callable):
-        """Agregar callback para órdenes"""
+        """Add callback for orders"""
         self.order_callbacks.append(callback)
     
     def add_position_callback(self, callback: Callable):
-        """Agregar callback para posiciones"""
+        """Add callback for positions"""
         self.position_callbacks.append(callback)
     
     def get_positions_summary(self) -> Dict:
-        """Obtener resumen de posiciones"""
+        """Get positions summary"""
         total_value = sum(pos.market_value for pos in self.positions.values())
         total_pnl = sum(pos.unrealized_pnl for pos in self.positions.values())
         
@@ -486,9 +488,9 @@ class DASBrokerIntegration:
         }
 ```
 
-## Integración con Estrategias
+## Strategy Integration
 
-### Adaptador para el Framework Principal
+### Adapter for the Main Framework
 ```python
 # src/brokers/das_adapter.py
 from typing import Dict, Optional
@@ -496,22 +498,22 @@ from .das_client import DASBrokerIntegration, DASConfig
 from ..core.broker_interface import BrokerInterface
 
 class DASBrokerAdapter(BrokerInterface):
-    """Adaptador para integrar DAS con el framework principal"""
+    """Adapter to integrate DAS with the main framework"""
     
     def __init__(self, config: DASConfig):
         self.das_client = DASBrokerIntegration(config)
         self.name = "DAS Trader"
     
     async def connect(self) -> bool:
-        """Conectar al broker"""
+        """Connect to the broker"""
         return await self.das_client.connect()
     
     async def disconnect(self):
-        """Desconectar del broker"""
+        """Disconnect from the broker"""
         await self.das_client.disconnect()
     
     async def get_account_info(self) -> Dict:
-        """Obtener información de cuenta"""
+        """Get account information"""
         buying_power = await self.das_client.get_buying_power()
         positions_summary = self.das_client.get_positions_summary()
         
@@ -526,25 +528,25 @@ class DASBrokerAdapter(BrokerInterface):
     
     async def place_order(self, symbol: str, side: str, quantity: int,
                          order_type: str = "MARKET", price: float = None) -> Optional[str]:
-        """Colocar orden"""
+        """Place an order"""
         return await self.das_client.send_order(symbol, side, quantity, order_type, price)
     
     async def cancel_order(self, order_id: str) -> bool:
-        """Cancelar orden"""
+        """Cancel an order"""
         return await self.das_client.cancel_order(order_id)
     
     async def get_quote(self, symbol: str) -> Optional[Dict]:
-        """Obtener cotización"""
+        """Get quote"""
         return await self.das_client.get_quote(symbol)
     
     def is_connected(self) -> bool:
-        """Verificar si está conectado"""
+        """Check if connected"""
         return self.das_client.connected
 ```
 
-## Ejemplo de Uso Completo
+## Complete Usage Example
 
-### Script de Ejemplo
+### Example Script
 ```python
 # examples/das_trading_example.py
 import asyncio
@@ -554,16 +556,16 @@ from config.das_config import DASConfig
 from src.brokers.das_client import DASBrokerIntegration
 
 async def main():
-    """Ejemplo completo de trading con DAS"""
+    """Complete DAS trading example"""
     
-    # Configurar logging
+    # Configure logging
     logging.basicConfig(level=logging.INFO)
     
-    # Configuración
+    # Configuration
     config = DASConfig()
     das_client = DASBrokerIntegration(config)
     
-    # Callbacks para eventos
+    # Event callbacks
     def on_quote_update(quote_data):
         print(f"Quote update: {quote_data.symbol} - ${quote_data.last:.2f}")
     
@@ -573,76 +575,76 @@ async def main():
     def on_position_update(position_data):
         print(f"Position update: {position_data.symbol} - {position_data.quantity} shares")
     
-    # Agregar callbacks
+    # Add callbacks
     das_client.add_quote_callback(on_quote_update)
     das_client.add_order_callback(on_order_update)
     das_client.add_position_callback(on_position_update)
     
     try:
-        # Conectar
-        print("Conectando a DAS Trader...")
+        # Connect
+        print("Connecting to DAS Trader...")
         connected = await das_client.connect()
         
         if not connected:
-            print("❌ No se pudo conectar a DAS")
+            print("Could not connect to DAS")
             return
         
-        print("✅ Conectado a DAS Trader")
+        print("Connected to DAS Trader")
         
-        # Obtener información de cuenta
+        # Get account information
         buying_power = await das_client.get_buying_power()
-        print(f"💰 Buying Power: ${buying_power:,.2f}")
+        print(f"Buying Power: ${buying_power:,.2f}")
         
-        # Suscribirse a quotes
+        # Subscribe to quotes
         symbols = ["AAPL", "TSLA", "NVDA"]
         await das_client.subscribe_quotes(symbols)
-        print(f"📊 Suscrito a quotes: {symbols}")
+        print(f"Subscribed to quotes: {symbols}")
         
-        # Obtener quotes individuales
+        # Get individual quotes
         for symbol in symbols:
             quote = await das_client.get_quote(symbol)
             if quote:
                 print(f"  {symbol}: ${quote['last']:.2f} (bid: ${quote['bid']:.2f}, ask: ${quote['ask']:.2f})")
         
-        # Ejemplo de orden (comentado para seguridad)
-        # print("\n📝 Enviando orden de ejemplo...")
+        # Order example (commented out for safety)
+        # print("\nSending example order...")
         # order_id = await das_client.send_order("AAPL", "BUY", 10, "LIMIT", price=150.00)
         # if order_id:
-        #     print(f"✅ Orden enviada: {order_id}")
+        #     print(f"Order sent: {order_id}")
         #     
-        #     # Esperar un poco y cancelar
+        #     # Wait a bit and cancel
         #     await asyncio.sleep(5)
         #     cancelled = await das_client.cancel_order(order_id)
         #     if cancelled:
-        #         print(f"🚫 Orden cancelada: {order_id}")
+        #         print(f"Order cancelled: {order_id}")
         
-        # Mostrar posiciones actuales
+        # Show current positions
         positions_summary = das_client.get_positions_summary()
-        print(f"\n📋 Posiciones actuales: {positions_summary['positions_count']}")
+        print(f"\nCurrent positions: {positions_summary['positions_count']}")
         for position in positions_summary['positions']:
             print(f"  {position.symbol}: {position.quantity} @ ${position.avg_price:.2f} "
                   f"(P&L: ${position.unrealized_pnl:+.2f})")
         
-        # Mantener conexión para recibir updates
-        print("\n🔄 Manteniendo conexión para updates... (Ctrl+C para salir)")
-        await asyncio.sleep(60)  # Esperar 1 minuto
+        # Keep connection alive for updates
+        print("\nKeeping connection alive for updates... (Ctrl+C to exit)")
+        await asyncio.sleep(60)  # Wait 1 minute
         
     except KeyboardInterrupt:
-        print("\n⏹️ Deteniendo...")
+        print("\nStopping...")
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"Error: {e}")
     finally:
-        # Desconectar
+        # Disconnect
         await das_client.disconnect()
-        print("📴 Desconectado de DAS Trader")
+        print("Disconnected from DAS Trader")
 
 if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-## Integración con Estrategias Cuantitativas
+## Quantitative Strategy Integration
 
-### Ejemplo con Gap & Go Strategy
+### Example with Gap & Go Strategy
 ```python
 # examples/das_gap_and_go.py
 import asyncio
@@ -651,26 +653,26 @@ from src.brokers.das_adapter import DASBrokerAdapter
 from config.das_config import DASConfig
 
 async def run_gap_and_go_with_das():
-    """Ejecutar estrategia Gap & Go con DAS"""
+    """Run Gap & Go strategy with DAS"""
     
-    # Configurar DAS
+    # Configure DAS
     das_config = DASConfig()
-    das_config.paper_trading = True  # Usar paper trading para testing
+    das_config.paper_trading = True  # Use paper trading for testing
     broker = DASBrokerAdapter(das_config)
     
-    # Configurar estrategia
+    # Configure strategy
     strategy = GapAndGoStrategy(broker)
     
     try:
-        # Conectar broker
+        # Connect broker
         if await broker.connect():
-            print("✅ Conectado a DAS Trader")
+            print("Connected to DAS Trader")
             
-            # Ejecutar estrategia
+            # Run strategy
             await strategy.run()
             
         else:
-            print("❌ No se pudo conectar a DAS")
+            print("Could not connect to DAS")
     
     finally:
         await broker.disconnect()
@@ -679,49 +681,49 @@ if __name__ == "__main__":
     asyncio.run(run_gap_and_go_with_das())
 ```
 
-## Consideraciones Importantes
+## Important Considerations
 
-### Ventajas del Stack DAS + Broker
-- **Routing avanzado** que DAS optimiza automáticamente
-- **Borrows amplios** (depende del broker subyacente)
-- **Latencia baja** para estrategias rápidas
-- **Data de calidad** Level 2 premium
-- **Herramientas profesionales** (hotkeys, scripts, etc.)
-- **Flexibilidad** para cambiar de broker manteniendo la plataforma
+### Advantages of the DAS + Broker Stack
+- **Advanced routing** that DAS optimizes automatically
+- **Extensive borrows** (depends on the underlying broker)
+- **Low latency** for fast strategies
+- **Quality data** with premium Level 2
+- **Professional tools** (hotkeys, scripts, etc.)
+- **Flexibility** to switch brokers while keeping the platform
 
-### Limitaciones y Costos
-- **Licencia DAS** (~$150-300/mes dependiendo del plan)
-- **Cuenta de broker** (Schwab, Zimtra, etc.) con sus propios requisitos
-- **Windows principalmente** (DAS Pro requiere Windows)
-- **Bridge en desarrollo** (puede tener bugs)
-- **Curva de aprendizaje** mayor vs APIs directas
+### Limitations and Costs
+- **DAS license** (~$150-300/month depending on the plan)
+- **Broker account** (Schwab, Zimtra, etc.) with its own requirements
+- **Primarily Windows** (DAS Pro requires Windows)
+- **Bridge under development** (may have bugs)
+- **Steeper learning curve** vs direct APIs
 
-### Estructura de Costos Típica
+### Typical Cost Structure
 ```
-Broker (ej: Schwab):        $0-25/mes + comisiones
-DAS Trader Pro:             $150-300/mes
-Market Data:                $50-100/mes (Level 2)
-das-bridge:                 Gratis (open source)
-Total mensual:              ~$200-425/mes
+Broker (e.g., Schwab):      $0-25/month + commissions
+DAS Trader Pro:              $150-300/month
+Market Data:                 $50-100/month (Level 2)
+das-bridge:                  Free (open source)
+Monthly total:               ~$200-425/month
 ```
 
-### Mejores Prácticas
-1. **Siempre usar paper trading** para testing inicial
-2. **Validar órdenes** antes de enviar
-3. **Manejar reconexiones** automáticamente
-4. **Logear todo** para debugging
-5. **Implementar circuit breakers** para emergencias
+### Best Practices
+1. **Always use paper trading** for initial testing
+2. **Validate orders** before sending
+3. **Handle reconnections** automatically
+4. **Log everything** for debugging
+5. **Implement circuit breakers** for emergencies
 
-### Troubleshooting Común
+### Common Troubleshooting
 ```python
-# Problemas comunes y soluciones
+# Common issues and solutions
 COMMON_ISSUES = {
-    "Connection refused": "Verificar que DAS Pro esté ejecutándose y API habilitada",
-    "Authentication failed": "Revisar credenciales en .env",
-    "Order rejected": "Verificar buying power y límites de cuenta",
-    "Symbol not found": "Verificar que el símbolo esté disponible en DAS",
-    "Position mismatch": "Sincronizar estado con get_positions()"
+    "Connection refused": "Verify that DAS Pro is running and API is enabled",
+    "Authentication failed": "Check credentials in .env",
+    "Order rejected": "Verify buying power and account limits",
+    "Symbol not found": "Verify the symbol is available in DAS",
+    "Position mismatch": "Sync state with get_positions()"
 }
 ```
 
-Este bridge para DAS Trader completa el ecosistema de trading, proporcionando acceso a una plataforma profesional con capacidades avanzadas de short selling y routing, especialmente valiosa para estrategias de small caps.
+This DAS Trader bridge completes the trading ecosystem, providing access to a professional platform with advanced short selling and routing capabilities, especially valuable for small cap strategies.

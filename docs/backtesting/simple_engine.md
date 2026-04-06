@@ -1,10 +1,12 @@
-# Motor de Backtest Simple
+> 🇪🇸 [Leer en Español](simple_engine.es.md) | 🇺🇸 **English**
 
-## Construyendo Tu Propio Engine
+# Simple Backtest Engine
 
-Antes de usar frameworks complejos, necesitas entender cómo funciona un motor de backtest por dentro. Aquí construimos uno desde cero que realmente funciona.
+## Building Your Own Engine
 
-## Arquitectura Básica
+Before using complex frameworks, you need to understand how a backtest engine works under the hood. Here we build one from scratch that actually works.
+
+## Basic Architecture
 
 ```python
 class SimpleBacktestEngine:
@@ -13,7 +15,7 @@ class SimpleBacktestEngine:
         self.commission = commission
         self.slippage = slippage
         
-        # Estado del portfolio
+        # Portfolio state
         self.cash = initial_capital
         self.positions = {}  # {ticker: shares}
         self.portfolio_value = initial_capital
@@ -24,7 +26,7 @@ class SimpleBacktestEngine:
         self.daily_returns = []
         
     def reset(self):
-        """Reset para nuevo backtest"""
+        """Reset for new backtest"""
         self.cash = self.initial_capital
         self.positions = {}
         self.portfolio_value = self.initial_capital
@@ -33,91 +35,91 @@ class SimpleBacktestEngine:
         self.daily_returns = []
 ```
 
-## Exportación de Resultados para Análisis
+## Exporting Results for Analysis
 
-### Integración con TraderVue
+### TraderVue Integration
 
-Una de las mejores formas de analizar tus resultados es usando plataformas especializadas como TraderVue. Nuestro sistema incluye exportación automática:
+One of the best ways to analyze your results is using specialized platforms like TraderVue. Our system includes automatic export:
 
 ```python
 from backtesting.trade_reporting import TradeReporter, export_backtest_results
 
-# Después de ejecutar tu backtest
+# After running your backtest
 results = backtester.run_backtest(data, strategy)
 
-# Exportar todos los reportes automáticamente
-export_backtest_results(results, output_dir="./mis_reportes/")
+# Export all reports automatically
+export_backtest_results(results, output_dir="./my_reports/")
 
-# O exportar específicamente para TraderVue
+# Or export specifically for TraderVue
 reporter = TradeReporter(results['trades'])
-reporter.to_tradervue_csv("trades_para_tradervue.csv", account_name="Mi_Backtest")
+reporter.to_tradervue_csv("trades_for_tradervue.csv", account_name="My_Backtest")
 ```
 
-### Formatos de Exportación Disponibles
+### Available Export Formats
 
-1. **TraderVue CSV**: Compatible directamente con la importación de TraderVue
-2. **Detalle de Trades**: CSV con todas las métricas de cada trade
-3. **Journal Diario**: Resumen por día para análisis de patrones
-4. **Reporte de Performance**: JSON/CSV con métricas completas
-5. **Curva de Equity**: Para graficar evolución del capital
+1. **TraderVue CSV**: Directly compatible with TraderVue import
+2. **Trade Detail**: CSV with all metrics for each trade
+3. **Daily Journal**: Summary by day for pattern analysis
+4. **Performance Report**: JSON/CSV with complete metrics
+5. **Equity Curve**: For plotting capital evolution
 
-### Análisis Post-Backtest
+### Post-Backtest Analysis
 
 ```python
-# Generar reporte detallado de performance
+# Generate detailed performance report
 reporter.generate_performance_report("performance_analysis.json")
 
-# Exportar para journal personal
-reporter.to_journal_format("mi_journal_trading.csv")
+# Export for personal journal
+reporter.to_journal_format("my_trading_journal.csv")
 
-# CSV genérico con todas las métricas
-reporter.to_generic_csv("trades_completos.csv")
+# Generic CSV with all metrics
+reporter.to_generic_csv("complete_trades.csv")
 ```
 
-### Ventajas del Análisis Externo
+### Benefits of External Analysis
 
-- **Visualizaciones avanzadas**: TraderVue genera gráficos profesionales
-- **Análisis por tags**: Categorizar trades por estrategia, hora, etc.
-- **Comparación**: Comparar diferentes backtests lado a lado
-- **Métricas adicionales**: MAE/MFE, análisis por hora del día, etc.
-- **Compartir resultados**: Exportar reportes para inversores
+- **Advanced visualizations**: TraderVue generates professional charts
+- **Tag-based analysis**: Categorize trades by strategy, time, etc.
+- **Comparison**: Compare different backtests side by side
+- **Additional metrics**: MAE/MFE, time-of-day analysis, etc.
+- **Share results**: Export reports for investors
 
-## Ejecución de Órdenes
+## Order Execution
 
 ```python
 def execute_order(self, ticker, shares, price, timestamp, order_type='market'):
-    """Ejecutar una orden con costos realistas"""
+    """Execute an order with realistic costs"""
     
-    # Validaciones básicas
+    # Basic validations
     if shares == 0:
         return False
         
-    # Calcular costos
+    # Calculate costs
     gross_value = abs(shares * price)
-    commission_cost = max(self.commission, gross_value * 0.0001)  # Min $5 o 1bp
+    commission_cost = max(self.commission, gross_value * 0.0001)  # Min $5 or 1bp
     
-    # Aplicar slippage
-    if shares > 0:  # Compra
+    # Apply slippage
+    if shares > 0:  # Buy
         execution_price = price * (1 + self.slippage)
-    else:  # Venta
+    else:  # Sell
         execution_price = price * (1 - self.slippage)
     
     net_cost = shares * execution_price + commission_cost
     
-    # Verificar si tenemos cash/shares suficientes
+    # Verify we have enough cash/shares
     if shares > 0 and net_cost > self.cash:
-        # No hay cash suficiente
+        # Not enough cash
         return False
         
     if shares < 0 and ticker in self.positions:
         if abs(shares) > self.positions[ticker]:
-            # No hay shares suficientes para vender
+            # Not enough shares to sell
             return False
     elif shares < 0 and ticker not in self.positions:
         # Trying to sell what we don't own
         return False
     
-    # Ejecutar la orden
+    # Execute the order
     self.cash -= net_cost
     
     if ticker in self.positions:
@@ -127,7 +129,7 @@ def execute_order(self, ticker, shares, price, timestamp, order_type='market'):
     else:
         self.positions[ticker] = shares
     
-    # Registrar trade
+    # Record trade
     trade_record = {
         'timestamp': timestamp,
         'ticker': ticker,
@@ -141,7 +143,7 @@ def execute_order(self, ticker, shares, price, timestamp, order_type='market'):
     return True
 
 def calculate_portfolio_value(self, current_prices):
-    """Calcular valor actual del portfolio"""
+    """Calculate current portfolio value"""
     positions_value = 0
     
     for ticker, shares in self.positions.items():
@@ -156,34 +158,34 @@ def calculate_portfolio_value(self, current_prices):
 
 ```python
 class Strategy:
-    """Base class para estrategias"""
+    """Base class for strategies"""
     
     def __init__(self, name):
         self.name = name
         self.parameters = {}
         
     def initialize(self, engine):
-        """Setup inicial"""
+        """Initial setup"""
         self.engine = engine
         
     def on_data(self, data, timestamp):
-        """Llamada en cada barra de datos"""
+        """Called on each data bar"""
         raise NotImplementedError
         
     def should_enter(self, data, ticker):
-        """Lógica de entrada"""
+        """Entry logic"""
         return False
         
     def should_exit(self, data, ticker):
-        """Lógica de salida"""
+        """Exit logic"""
         return False
         
     def calculate_position_size(self, ticker, price):
-        """Calcular tamaño de posición"""
+        """Calculate position size"""
         return 0
 
 class VWAPStrategy(Strategy):
-    """Ejemplo: Estrategia VWAP simple"""
+    """Example: Simple VWAP strategy"""
     
     def __init__(self, risk_per_trade=0.02, stop_loss_pct=0.03):
         super().__init__("VWAP Reclaim")
@@ -192,18 +194,18 @@ class VWAPStrategy(Strategy):
         self.entry_prices = {}
         
     def on_data(self, data, timestamp):
-        """Procesar cada barra"""
+        """Process each bar"""
         for ticker in data.columns.get_level_values(0).unique():
             if ticker not in ['SPY', 'QQQ']:  # Skip ETFs for this example
                 self.process_ticker(data, ticker, timestamp)
     
     def process_ticker(self, data, ticker, timestamp):
-        """Procesar un ticker específico"""
+        """Process a specific ticker"""
         try:
-            # Obtener datos del ticker
+            # Get ticker data
             ticker_data = data[ticker].loc[timestamp]
             
-            # Calcular VWAP si no existe
+            # Calculate VWAP if it doesn't exist
             if 'vwap' not in ticker_data:
                 return
             
@@ -212,7 +214,7 @@ class VWAPStrategy(Strategy):
             volume = ticker_data['volume']
             avg_volume = ticker_data.get('avg_volume', volume)
             
-            # Señales
+            # Signals
             above_vwap = current_price > vwap
             high_volume = volume > avg_volume * 1.5
             
@@ -254,21 +256,21 @@ class VWAPStrategy(Strategy):
                         del self.entry_prices[ticker]
         
         except KeyError as e:
-            # Datos no disponibles para este timestamp
+            # Data not available for this timestamp
             print(f"Warning: No data available for {ticker} at {timestamp}: {e}")
             pass
         except Exception as e:
-            # Error inesperado al procesar ticker
+            # Unexpected error processing ticker
             print(f"Error processing {ticker} at {timestamp}: {e}")
             pass
     
     def calculate_position_size(self, ticker, price):
-        """Calcular shares basado en risk management"""
+        """Calculate shares based on risk management"""
         risk_amount = self.engine.portfolio_value * self.risk_per_trade
         stop_distance = price * self.stop_loss_pct
         shares = int(risk_amount / stop_distance)
         
-        # No usar más del 20% del portfolio en una posición
+        # Don't use more than 20% of portfolio on one position
         max_position_value = self.engine.portfolio_value * 0.2
         max_shares = int(max_position_value / price)
         
@@ -279,9 +281,9 @@ class VWAPStrategy(Strategy):
 
 ```python
 def run_backtest(engine, strategy, data, start_date=None, end_date=None):
-    """Ejecutar backtest completo"""
+    """Run complete backtest"""
     
-    # Filter data por fechas
+    # Filter data by dates
     if start_date:
         data = data[data.index >= start_date]
     if end_date:
@@ -325,15 +327,15 @@ def run_backtest(engine, strategy, data, start_date=None, end_date=None):
     print(f"Backtest completed. Final value: ${portfolio_value:,.2f}")
     return engine
 
-# Ejemplo de uso
+# Usage example
 def example_backtest():
-    """Ejemplo completo de backtest"""
+    """Complete backtest example"""
     
-    # 1. Preparar datos
+    # 1. Prepare data
     tickers = ['AAPL', 'MSFT', 'TSLA']
     data = prepare_backtest_data(tickers, '2023-01-01', '2023-12-31')
     
-    # 2. Setup engine y strategy
+    # 2. Setup engine and strategy
     engine = SimpleBacktestEngine(initial_capital=50000)
     strategy = VWAPStrategy(risk_per_trade=0.02)
     
@@ -351,7 +353,7 @@ def example_backtest():
 
 ```python
 def prepare_backtest_data(tickers, start_date, end_date):
-    """Preparar datos multi-ticker para backtest"""
+    """Prepare multi-ticker data for backtest"""
     import yfinance as yf
     import pandas as pd
     
@@ -384,7 +386,7 @@ def prepare_backtest_data(tickers, start_date, end_date):
     return combined
 
 def calculate_indicators(df):
-    """Agregar indicadores técnicos"""
+    """Add technical indicators"""
     # VWAP
     df['vwap'] = (df['Close'] * df['Volume']).cumsum() / df['Volume'].cumsum()
     
@@ -405,7 +407,7 @@ def calculate_indicators(df):
 
 ```python
 def analyze_performance(engine):
-    """Análisis completo de performance"""
+    """Complete performance analysis"""
     
     if not engine.equity_curve:
         return {"error": "No equity curve data"}
@@ -505,11 +507,11 @@ def analyze_performance(engine):
     return performance
 ```
 
-## Visualización de Resultados
+## Results Visualization
 
 ```python
 def plot_backtest_results(engine):
-    """Crear gráficos de los resultados"""
+    """Create charts of the results"""
     import matplotlib.pyplot as plt
     
     # Equity curve
@@ -546,57 +548,57 @@ def plot_backtest_results(engine):
     plt.show()
 ```
 
-## Testing del Engine
+## Engine Testing
 
 ```python
 def test_engine():
-    """Tests unitarios para validar el engine"""
+    """Unit tests to validate the engine"""
     
-    # Test 1: Ejecución básica de órdenes
+    # Test 1: Basic order execution
     engine = SimpleBacktestEngine(initial_capital=10000)
     
-    # Comprar 100 shares a $50
+    # Buy 100 shares at $50
     success = engine.execute_order('TEST', 100, 50, pd.Timestamp('2023-01-01'))
     assert success == True
     assert engine.positions['TEST'] == 100
     assert engine.cash < 10000  # Reduced by purchase + commission
     
-    # Vender 50 shares
+    # Sell 50 shares
     success = engine.execute_order('TEST', -50, 55, pd.Timestamp('2023-01-02'))
     assert success == True
     assert engine.positions['TEST'] == 50
     
-    print("✅ Engine tests passed")
+    print("Engine tests passed")
 
 if __name__ == "__main__":
     test_engine()
     example_backtest()
 ```
 
-## Extensiones Avanzadas
+## Advanced Extensions
 
 ```python
-# Para agregar después:
+# To add later:
 class AdvancedFeatures:
-    """Features más avanzadas para el engine"""
+    """More advanced features for the engine"""
     
     def add_multiple_timeframes(self):
-        """Support para múltiples timeframes"""
+        """Support for multiple timeframes"""
         pass
     
     def add_options_support(self):
-        """Trading de options"""
+        """Options trading"""
         pass
     
     def add_portfolio_rebalancing(self):
-        """Rebalanceo automático"""
+        """Automatic rebalancing"""
         pass
     
     def add_risk_management(self):
-        """Risk management avanzado"""
+        """Advanced risk management"""
         pass
 ```
 
-## Siguiente Paso
+## Next Step
 
-Con nuestro motor básico funcionando, vamos a [Métricas Clave](metrics.md) para entender qué números realmente importan.
+With our basic engine working, let's move on to [Key Metrics](metrics.md) to understand which numbers truly matter.

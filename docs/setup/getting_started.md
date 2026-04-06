@@ -1,35 +1,37 @@
-# Guía de Setup Inicial
+> 🇪🇸 [Leer en Español](getting_started.es.md) | 🇺🇸 **English**
 
-## Prerrequisitos
+# Initial Setup Guide
 
-### Conocimientos Requeridos
-- **Python intermedio**: Control de flujo, OOP, manejo de librerías
-- **Fundamentos de trading**: Order types, bid/ask, volumen, charts básicos
-- **Estadística básica**: Media, desviación estándar, correlación
-- **Experiencia recomendada**: 6+ meses de paper trading o trading real
+## Prerequisites
 
-### Capital Mínimo Recomendado
+### Required Knowledge
+- **Intermediate Python**: Control flow, OOP, library management
+- **Trading fundamentals**: Order types, bid/ask, volume, basic charts
+- **Basic statistics**: Mean, standard deviation, correlation
+- **Recommended experience**: 6+ months of paper trading or live trading
+
+### Recommended Minimum Capital
 ```python
 CAPITAL_REQUIREMENTS = {
-    'absolute_minimum': 5_000,      # Para aprender sin riesgo real
+    'absolute_minimum': 5_000,      # To learn without real risk
     'recommended_minimum': 25_000,   # PDT rule compliance + diversification
-    'comfortable_start': 50_000,    # Múltiples posiciones simultáneas
+    'comfortable_start': 50_000,    # Multiple simultaneous positions
     'professional_level': 100_000   # Full strategy implementation
 }
 
-# Distribución recomendada del capital
+# Recommended capital distribution
 CAPITAL_ALLOCATION = {
-    'active_trading': 0.60,    # 60% para trading activo
-    'cash_buffer': 0.25,       # 25% cash para oportunidades
-    'emergency_fund': 0.15     # 15% nunca tocar
+    'active_trading': 0.60,    # 60% for active trading
+    'cash_buffer': 0.25,       # 25% cash for opportunities
+    'emergency_fund': 0.15     # 15% never touch
 }
 ```
 
-## Instalación del Entorno
+## Environment Installation
 
 ### 1. Python Environment Setup
 ```bash
-# Crear entorno virtual
+# Create virtual environment
 python -m venv quant_trading
 source quant_trading/bin/activate  # Linux/Mac
 # quant_trading\Scripts\activate    # Windows
@@ -37,7 +39,7 @@ source quant_trading/bin/activate  # Linux/Mac
 # Upgrade pip
 python -m pip install --upgrade pip
 
-# Instalar dependencias base
+# Install base dependencies
 pip install pandas numpy matplotlib seaborn
 pip install scipy scikit-learn statsmodels
 pip install yfinance polygon-api-client
@@ -45,7 +47,7 @@ pip install jupyter jupyterlab
 pip install ta-lib  # Technical Analysis Library
 ```
 
-### 2. Dependencias Específicas
+### 2. Specific Dependencies
 ```bash
 # Trading APIs
 pip install ib_insync              # Interactive Brokers
@@ -72,7 +74,7 @@ pip install mplfinance            # Financial charts
 
 ### 3. requirements.txt
 ```python
-# Crear archivo requirements.txt
+# Create requirements.txt file
 REQUIREMENTS_CONTENT = """
 pandas>=1.5.0
 numpy>=1.21.0
@@ -102,72 +104,72 @@ requests>=2.28.0
 python-dotenv>=0.20.0
 """
 
-# Guardar requirements.txt
+# Save requirements.txt
 with open('requirements.txt', 'w') as f:
     f.write(REQUIREMENTS_CONTENT)
 ```
 
-## Estructura de Proyecto
+## Project Structure
 
-### Directorio Recomendado
+### Recommended Directory Layout
 ```python
 PROJECT_STRUCTURE = """
 start-your-quant/
 │
 ├── config/
 │   ├── __init__.py
-│   ├── settings.py          # Configuraciones generales
-│   ├── api_keys.py          # API keys (no subir a git)
-│   └── broker_config.py     # Configuraciones de brokers
+│   ├── settings.py          # General settings
+│   ├── api_keys.py          # API keys (don't commit to git)
+│   └── broker_config.py     # Broker configurations
 │
 ├── data/
-│   ├── raw/                 # Datos crudos descargados
-│   ├── processed/           # Datos procesados
-│   ├── historical/          # Datos históricos
-│   └── live/               # Datos en tiempo real
+│   ├── raw/                 # Raw downloaded data
+│   ├── processed/           # Processed data
+│   ├── historical/          # Historical data
+│   └── live/               # Real-time data
 │
 ├── src/
 │   ├── __init__.py
-│   ├── data_acquisition/    # Módulos de obtención de datos
-│   ├── indicators/          # Indicadores técnicos
-│   ├── strategies/          # Estrategias de trading
-│   ├── backtesting/         # Framework de backtesting
-│   ├── risk_management/     # Gestión de riesgo
-│   ├── execution/           # Ejecución de trades
-│   └── utils/              # Utilidades generales
+│   ├── data_acquisition/    # Data fetching modules
+│   ├── indicators/          # Technical indicators
+│   ├── strategies/          # Trading strategies
+│   ├── backtesting/         # Backtesting framework
+│   ├── risk_management/     # Risk management
+│   ├── execution/           # Trade execution
+│   └── utils/              # General utilities
 │
 ├── notebooks/
-│   ├── exploration/         # Análisis exploratorio
-│   ├── strategy_development/# Desarrollo de estrategias
-│   └── backtesting/        # Notebooks de backtesting
+│   ├── exploration/         # Exploratory analysis
+│   ├── strategy_development/# Strategy development
+│   └── backtesting/        # Backtesting notebooks
 │
 ├── tests/
-│   ├── unit_tests/         # Tests unitarios
-│   ├── integration_tests/  # Tests de integración
-│   └── strategy_tests/     # Tests de estrategias
+│   ├── unit_tests/         # Unit tests
+│   ├── integration_tests/  # Integration tests
+│   └── strategy_tests/     # Strategy tests
 │
 ├── logs/
-│   ├── trading/            # Logs de trading
-│   ├── errors/             # Logs de errores
-│   └── performance/        # Logs de performance
+│   ├── trading/            # Trading logs
+│   ├── errors/             # Error logs
+│   └── performance/        # Performance logs
 │
-├── docs/                   # Documentación (ya creada)
-├── scripts/                # Scripts de automatización
-├── .env                    # Variables de entorno
+├── docs/                   # Documentation (already created)
+├── scripts/                # Automation scripts
+├── .env                    # Environment variables
 ├── .gitignore             # Git ignore file
-├── requirements.txt       # Dependencias
-└── README.md              # Documentación principal
+├── requirements.txt       # Dependencies
+└── README.md              # Main documentation
 """
 
 print(PROJECT_STRUCTURE)
 ```
 
-### Crear Estructura Automáticamente
+### Create Structure Automatically
 ```python
 import os
 
 def create_project_structure(base_path="start-your-quant"):
-    """Crear estructura de directorios del proyecto"""
+    """Create project directory structure"""
     
     directories = [
         "config",
@@ -198,21 +200,21 @@ def create_project_structure(base_path="start-your-quant"):
         full_path = os.path.join(base_path, directory)
         os.makedirs(full_path, exist_ok=True)
         
-        # Crear __init__.py en directorios de Python
+        # Create __init__.py in Python directories
         if directory.startswith("src/") or directory == "config":
             init_file = os.path.join(full_path, "__init__.py")
             with open(init_file, 'w') as f:
-                f.write(f'"""Módulo {directory.split("/")[-1]}"""\n')
+                f.write(f'"""Module {directory.split("/")[-1]}"""\n')
     
-    print("Estructura de proyecto creada exitosamente!")
+    print("Project structure created successfully!")
 
-# Ejecutar función
+# Run function
 create_project_structure()
 ```
 
-## Configuración Inicial
+## Initial Configuration
 
-### 1. Archivo de Configuración Principal
+### 1. Main Configuration File
 ```python
 # config/settings.py
 import os
@@ -221,17 +223,17 @@ from typing import Dict, Any
 
 @dataclass
 class TradingConfig:
-    """Configuración principal de trading"""
+    """Main trading configuration"""
     
     # Account settings
     ACCOUNT_SIZE: float = 50_000.0
-    MAX_POSITION_SIZE: float = 0.20        # 20% max en una posición
-    MAX_DAILY_LOSS: float = 0.02           # 2% max pérdida diaria
-    MAX_POSITIONS: int = 5                 # Máximo 5 posiciones simultáneas
+    MAX_POSITION_SIZE: float = 0.20        # 20% max in one position
+    MAX_DAILY_LOSS: float = 0.02           # 2% max daily loss
+    MAX_POSITIONS: int = 5                 # Maximum 5 simultaneous positions
     
     # Risk settings
-    DEFAULT_STOP_LOSS: float = 0.08        # 8% stop loss default
-    DEFAULT_POSITION_RISK: float = 0.02    # 2% riesgo por posición
+    DEFAULT_STOP_LOSS: float = 0.08        # 8% default stop loss
+    DEFAULT_POSITION_RISK: float = 0.02    # 2% risk per position
     
     # Trading hours (EST)
     MARKET_OPEN: str = "09:30"
@@ -240,8 +242,8 @@ class TradingConfig:
     AFTERHOURS_END: str = "20:00"
     
     # Data settings
-    DEFAULT_LOOKBACK_DAYS: int = 252       # 1 año de datos
-    UPDATE_FREQUENCY_SECONDS: int = 60     # Update cada minuto
+    DEFAULT_LOOKBACK_DAYS: int = 252       # 1 year of data
+    UPDATE_FREQUENCY_SECONDS: int = 60     # Update every minute
     
     # Paths
     DATA_PATH: str = "data/"
@@ -249,28 +251,28 @@ class TradingConfig:
     
     @classmethod
     def from_env(cls) -> 'TradingConfig':
-        """Cargar configuración desde variables de entorno"""
+        """Load configuration from environment variables"""
         return cls(
             ACCOUNT_SIZE=float(os.getenv('ACCOUNT_SIZE', 50000)),
             MAX_POSITION_SIZE=float(os.getenv('MAX_POSITION_SIZE', 0.20)),
             MAX_DAILY_LOSS=float(os.getenv('MAX_DAILY_LOSS', 0.02))
         )
 
-# Instancia global
+# Global instance
 CONFIG = TradingConfig()
 ```
 
-### 2. Configuración de APIs
+### 2. API Configuration
 ```python
 # config/api_keys.py
 import os
 from dotenv import load_dotenv
 
-# Cargar variables de entorno
+# Load environment variables
 load_dotenv()
 
 class APIKeys:
-    """Gestión centralizada de API keys"""
+    """Centralized API key management"""
     
     # Data providers
     POLYGON_API_KEY = os.getenv('POLYGON_API_KEY')
@@ -293,7 +295,7 @@ class APIKeys:
     
     @classmethod
     def validate_keys(cls) -> Dict[str, bool]:
-        """Validar que las API keys estén configuradas"""
+        """Validate that API keys are configured"""
         validation = {}
         
         # Data providers
@@ -309,7 +311,7 @@ class APIKeys:
         
         return validation
 
-# Ejemplo de archivo .env
+# Example .env file
 ENV_TEMPLATE = """
 # Data APIs
 POLYGON_API_KEY=your_polygon_key_here
@@ -337,7 +339,7 @@ MAX_POSITION_SIZE=0.20
 MAX_DAILY_LOSS=0.02
 """
 
-# Guardar template de .env
+# Save .env template
 with open('.env.example', 'w') as f:
     f.write(ENV_TEMPLATE)
 ```
@@ -350,25 +352,25 @@ import os
 from datetime import datetime
 
 def setup_logging():
-    """Configurar sistema de logging"""
+    """Configure logging system"""
     
-    # Crear directorios de logs si no existen
+    # Create log directories if they don't exist
     log_dirs = ['logs/trading', 'logs/errors', 'logs/performance']
     for log_dir in log_dirs:
         os.makedirs(log_dir, exist_ok=True)
     
-    # Configuración del formato
+    # Format configuration
     log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     date_format = '%Y-%m-%d %H:%M:%S'
     
-    # Logger principal
+    # Main logger
     logging.basicConfig(
         level=logging.INFO,
         format=log_format,
         datefmt=date_format
     )
     
-    # Logger para trading
+    # Trading logger
     trading_logger = logging.getLogger('trading')
     trading_handler = logging.FileHandler(
         f'logs/trading/trading_{datetime.now().strftime("%Y%m%d")}.log'
@@ -376,7 +378,7 @@ def setup_logging():
     trading_handler.setFormatter(logging.Formatter(log_format, date_format))
     trading_logger.addHandler(trading_handler)
     
-    # Logger para errores
+    # Error logger
     error_logger = logging.getLogger('errors')
     error_handler = logging.FileHandler(
         f'logs/errors/errors_{datetime.now().strftime("%Y%m%d")}.log'
@@ -384,7 +386,7 @@ def setup_logging():
     error_handler.setFormatter(logging.Formatter(log_format, date_format))
     error_logger.addHandler(error_handler)
     
-    # Logger para performance
+    # Performance logger
     performance_logger = logging.getLogger('performance')
     performance_handler = logging.FileHandler(
         f'logs/performance/performance_{datetime.now().strftime("%Y%m%d")}.log'
@@ -398,13 +400,13 @@ def setup_logging():
         'performance': performance_logger
     }
 
-# Configurar logging al importar
+# Configure logging on import
 LOGGERS = setup_logging()
 ```
 
-## Verificación del Setup
+## Setup Verification
 
-### Script de Verificación
+### Verification Script
 ```python
 # scripts/verify_setup.py
 import sys
@@ -413,7 +415,7 @@ from config.api_keys import APIKeys
 from config.settings import CONFIG
 
 def verify_python_packages():
-    """Verificar que todas las librerías estén instaladas"""
+    """Verify all libraries are installed"""
     required_packages = [
         'pandas', 'numpy', 'matplotlib', 'seaborn',
         'scipy', 'sklearn', 'statsmodels',
@@ -426,137 +428,137 @@ def verify_python_packages():
     for package in required_packages:
         try:
             importlib.import_module(package)
-            print(f"✅ {package}")
+            print(f"  {package}")
         except ImportError:
-            print(f"❌ {package} - NO ENCONTRADO")
+            print(f"  {package} - NOT FOUND")
             missing_packages.append(package)
     
     return missing_packages
 
 def verify_api_connections():
-    """Verificar conexiones a APIs"""
+    """Verify API connections"""
     validation = APIKeys.validate_keys()
     
-    print("\n🔑 API Keys Status:")
+    print("\nAPI Keys Status:")
     for service, is_valid in validation.items():
-        status = "✅" if is_valid else "❌"
-        print(f"{status} {service.upper()}")
+        status = "OK" if is_valid else "MISSING"
+        print(f"  {status} {service.upper()}")
     
     return validation
 
 def test_data_connection():
-    """Test de conexión a datos"""
+    """Data connection test"""
     try:
         import yfinance as yf
         
-        # Test básico con Yahoo Finance
+        # Basic test with Yahoo Finance
         ticker = yf.Ticker("SPY")
         data = ticker.history(period="1d")
         
         if len(data) > 0:
-            print("✅ Conexión a datos funcionando")
+            print("Data connection working")
             return True
         else:
-            print("❌ No se pudieron obtener datos")
+            print("Could not fetch data")
             return False
             
     except Exception as e:
-        print(f"❌ Error en conexión de datos: {e}")
+        print(f"Data connection error: {e}")
         return False
 
 def main():
-    """Función principal de verificación"""
-    print("🚀 Verificando Setup del Sistema de Trading Cuantitativo\n")
+    """Main verification function"""
+    print("Verifying Quantitative Trading System Setup\n")
     
-    # Verificar packages
-    print("📦 Verificando Python Packages:")
+    # Verify packages
+    print("Verifying Python Packages:")
     missing = verify_python_packages()
     
     if missing:
-        print(f"\n⚠️  Instalar packages faltantes: pip install {' '.join(missing)}")
+        print(f"\nInstall missing packages: pip install {' '.join(missing)}")
     
-    # Verificar API keys
+    # Verify API keys
     api_status = verify_api_connections()
     
-    # Test de conexión
-    print("\n🌐 Testing Data Connection:")
+    # Connection test
+    print("\nTesting Data Connection:")
     data_ok = test_data_connection()
     
-    # Verificar configuración
-    print(f"\n⚙️  Configuración:")
+    # Verify configuration
+    print(f"\nConfiguration:")
     print(f"Account Size: ${CONFIG.ACCOUNT_SIZE:,.2f}")
     print(f"Max Position Size: {CONFIG.MAX_POSITION_SIZE:.1%}")
     print(f"Max Daily Loss: {CONFIG.MAX_DAILY_LOSS:.1%}")
     
-    # Resumen final
-    print("\n📊 Resumen del Setup:")
+    # Final summary
+    print("\nSetup Summary:")
     packages_ok = len(missing) == 0
     apis_configured = any(api_status.values())
     
     if packages_ok and apis_configured and data_ok:
-        print("✅ Setup completo! Listo para trading.")
+        print("Setup complete! Ready for trading.")
     else:
-        print("⚠️  Setup incompleto. Revisar elementos marcados con ❌")
+        print("Setup incomplete. Review items marked above.")
         
         if not packages_ok:
-            print("   - Instalar packages faltantes")
+            print("   - Install missing packages")
         if not apis_configured:
-            print("   - Configurar al menos una API key en .env")
+            print("   - Configure at least one API key in .env")
         if not data_ok:
-            print("   - Verificar conexión a internet y APIs")
+            print("   - Verify internet connection and APIs")
 
 if __name__ == "__main__":
     main()
 ```
 
-## Primeros Pasos
+## First Steps
 
-### 1. Notebook de Exploración Inicial
+### 1. Initial Exploration Notebook
 ```python
 # notebooks/exploration/first_exploration.ipynb
 """
-Notebook para primeros pasos y verificación del setup
+Notebook for first steps and setup verification
 """
 
-# Importar librerías principales
+# Import main libraries
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
 
-# Verificar que todo funciona
-print("🎯 Iniciando Exploración Inicial")
+# Verify everything works
+print("Starting Initial Exploration")
 
-# 1. Obtener datos de ejemplo
+# 1. Get sample data
 ticker = "AAPL"
 data = yf.download(ticker, period="1y")
 
-print(f"✅ Datos obtenidos para {ticker}: {len(data)} días")
-print(f"📅 Período: {data.index[0].date()} a {data.index[-1].date()}")
+print(f"Data retrieved for {ticker}: {len(data)} days")
+print(f"Period: {data.index[0].date()} to {data.index[-1].date()}")
 
-# 2. Análisis básico
-print(f"\n📊 Estadísticas Básicas:")
-print(f"Precio promedio: ${data['Close'].mean():.2f}")
-print(f"Volatilidad (std): {data['Close'].pct_change().std():.4f}")
-print(f"Retorno total: {(data['Close'].iloc[-1] / data['Close'].iloc[0] - 1):.2%}")
+# 2. Basic analysis
+print(f"\nBasic Statistics:")
+print(f"Average price: ${data['Close'].mean():.2f}")
+print(f"Volatility (std): {data['Close'].pct_change().std():.4f}")
+print(f"Total return: {(data['Close'].iloc[-1] / data['Close'].iloc[0] - 1):.2%}")
 
-# 3. Gráfico básico
+# 3. Basic chart
 plt.figure(figsize=(12, 6))
 plt.plot(data.index, data['Close'])
-plt.title(f'{ticker} - Precio de Cierre (Último Año)')
-plt.xlabel('Fecha')
-plt.ylabel('Precio ($)')
+plt.title(f'{ticker} - Closing Price (Last Year)')
+plt.xlabel('Date')
+plt.ylabel('Price ($)')
 plt.grid(True, alpha=0.3)
 plt.show()
 
-print("\n🚀 Setup verificado! Listo para desarrollar estrategias.")
+print("\nSetup verified! Ready to develop strategies.")
 ```
 
-### 2. Primer Test de Strategy
+### 2. First Strategy Test
 ```python
 # scripts/first_strategy_test.py
 """
-Test básico de una estrategia simple para verificar que todo funciona
+Basic test of a simple strategy to verify everything works
 """
 
 import pandas as pd
@@ -564,50 +566,50 @@ import yfinance as yf
 from datetime import datetime, timedelta
 
 def simple_moving_average_strategy(symbol="SPY", short_window=20, long_window=50):
-    """Estrategia simple de moving average crossover"""
+    """Simple moving average crossover strategy"""
     
-    # Obtener datos
+    # Get data
     end_date = datetime.now()
     start_date = end_date - timedelta(days=365)
     
     data = yf.download(symbol, start=start_date, end=end_date)
     
-    # Calcular moving averages
+    # Calculate moving averages
     data['SMA_short'] = data['Close'].rolling(window=short_window).mean()
     data['SMA_long'] = data['Close'].rolling(window=long_window).mean()
     
-    # Generar señales
+    # Generate signals
     data['Signal'] = 0
     data['Signal'][short_window:] = np.where(
         data['SMA_short'][short_window:] > data['SMA_long'][short_window:], 1, 0
     )
     
-    # Calcular posiciones
+    # Calculate positions
     data['Position'] = data['Signal'].diff()
     
-    # Calcular retornos
+    # Calculate returns
     data['Returns'] = data['Close'].pct_change()
     data['Strategy_Returns'] = data['Signal'].shift(1) * data['Returns']
     
-    # Métricas básicas
+    # Basic metrics
     total_return = (1 + data['Strategy_Returns']).prod() - 1
     buy_hold_return = (data['Close'].iloc[-1] / data['Close'].iloc[0]) - 1
     
-    print(f"📊 Resultados para {symbol}:")
-    print(f"Retorno Estrategia: {total_return:.2%}")
-    print(f"Retorno Buy & Hold: {buy_hold_return:.2%}")
-    print(f"Exceso de retorno: {(total_return - buy_hold_return):.2%}")
+    print(f"Results for {symbol}:")
+    print(f"Strategy Return: {total_return:.2%}")
+    print(f"Buy & Hold Return: {buy_hold_return:.2%}")
+    print(f"Excess Return: {(total_return - buy_hold_return):.2%}")
     
-    # Número de trades
+    # Number of trades
     trades = len(data[data['Position'] != 0])
-    print(f"Número de trades: {trades}")
+    print(f"Number of trades: {trades}")
     
     return data
 
 if __name__ == "__main__":
-    print("🧪 Testing Estrategia Simple\n")
+    print("Testing Simple Strategy\n")
     results = simple_moving_average_strategy()
-    print("\n✅ Test completado exitosamente!")
+    print("\nTest completed successfully!")
 ```
 
-Con este setup inicial tendrás una base sólida para comenzar a desarrollar y testear estrategias de trading cuantitativo. El siguiente paso será configurar las APIs específicas y comenzar con el development de las estrategias documentadas.
+With this initial setup, you'll have a solid foundation to start developing and testing quantitative trading strategies. The next step will be configuring the specific APIs and beginning development of the documented strategies.

@@ -1,29 +1,31 @@
-# Machine Learning Aplicado al Trading Cuantitativo
+> 🇪🇸 [Leer en Español](machine_learning.es.md) | 🇺🇸 **English**
 
-## Introducción
+# Machine Learning Applied to Quantitative Trading
 
-El Machine Learning ofrece herramientas poderosas para detectar patrones no lineales en mercados financieros, identificar regímenes de mercado y crear modelos predictivos. Esta documentación cubre implementaciones prácticas específicamente validadas para trading cuantitativo.
+## Introduction
 
-## Modelos No Supervisados
+Machine Learning offers powerful tools for detecting non-linear patterns in financial markets, identifying market regimes, and creating predictive models. This documentation covers practical implementations specifically validated for quantitative trading.
 
-### Hidden Markov Models (HMM) para Detección de Regímenes
+## Unsupervised Models
 
-Los HMM son especialmente útiles para identificar estados ocultos del mercado (alcista/bajista, alta/baja volatilidad) que no son directamente observables pero influyen en el comportamiento de los precios.
+### Hidden Markov Models (HMM) for Regime Detection
 
-#### Conceptos Fundamentales
+HMMs are especially useful for identifying hidden market states (bullish/bearish, high/low volatility) that are not directly observable but influence price behavior.
 
-**¿Qué son los Estados de Markov?**
-- Representan condiciones discretas que un sistema puede ocupar
-- Solo importa el estado actual para predecir el siguiente paso
-- Los estados ocultos influyen en las observaciones (precios) que vemos
+#### Core Concepts
 
-**Aplicaciones en Trading:**
-- Detección de regímenes de mercado (alcista/bajista)
-- Identificación de períodos de alta/baja volatilidad
-- Cambios en la estructura del mercado
-- Señales de entrada/salida basadas en transiciones de estado
+**What Are Markov States?**
+- They represent discrete conditions a system can occupy
+- Only the current state matters for predicting the next step
+- Hidden states influence the observations (prices) we see
 
-#### Implementación Básica con HMM
+**Applications in Trading:**
+- Market regime detection (bullish/bearish)
+- Identifying high/low volatility periods
+- Changes in market structure
+- Entry/exit signals based on state transitions
+
+#### Basic Implementation with HMM
 
 ```python
 import numpy as np
@@ -35,19 +37,19 @@ from sklearn.preprocessing import StandardScaler
 
 class MarketRegimeDetector:
     """
-    Detector de regímenes de mercado usando Hidden Markov Models
+    Market regime detector using Hidden Markov Models
     """
     
     def __init__(self, n_components=2, covariance_type="full", random_state=42):
         """
-        Parámetros
+        Parameters
         ----------
         n_components : int
-            Número de estados ocultos (típicamente 2-4 para mercados)
+            Number of hidden states (typically 2-4 for markets)
         covariance_type : str
-            Tipo de matriz de covarianza ('full', 'diag', 'tied', 'spherical')
+            Covariance matrix type ('full', 'diag', 'tied', 'spherical')
         random_state : int
-            Semilla para reproducibilidad
+            Seed for reproducibility
         """
         self.n_components = n_components
         self.model = hmm.GaussianHMM(
@@ -60,43 +62,43 @@ class MarketRegimeDetector:
         
     def prepare_features(self, df):
         """
-        Preparar características para el modelo HMM
+        Prepare features for the HMM model
         
-        Parámetros
+        Parameters
         ----------
         df : pd.DataFrame
-            DataFrame con columnas OHLCV
+            DataFrame with OHLCV columns
             
         Returns
         -------
         np.array
-            Array de características normalizadas
+            Array of normalized features
         """
         features = pd.DataFrame(index=df.index)
         
-        # Retornos logarítmicos
+        # Log returns
         features['log_returns'] = np.log(df['Close'] / df['Close'].shift(1))
         
-        # Rango diario normalizado
+        # Range diario normalizado
         features['daily_range'] = (df['High'] / df['Low']) - 1
         
-        # Volatilidad realizada (ventana de 5 días)
+        # Realized volatility (5-day window)
         features['realized_vol'] = features['log_returns'].rolling(5).std()
         
-        # Volumen relativo
+        # Relative volume
         features['volume_ratio'] = df['Volume'] / df['Volume'].rolling(20).mean()
         
-        # RSI como proxy de momentum
+        # RSI as momentum proxy
         features['rsi'] = self.calculate_rsi(df['Close'], period=14)
         
-        # Eliminar NaN y normalizar
+        # Remove NaN and normalize
         features_clean = features.dropna()
         features_scaled = self.scaler.fit_transform(features_clean)
         
         return features_scaled, features_clean.index
     
     def calculate_rsi(self, series, period=14):
-        """Calcular RSI"""
+        """Calculate RSI"""
         delta = series.diff()
         gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
@@ -105,23 +107,23 @@ class MarketRegimeDetector:
     
     def fit(self, df):
         """
-        Entrenar el modelo HMM
+        Train the HMM model
         
-        Parámetros
+        Parameters
         ----------
         df : pd.DataFrame
-            Datos históricos con columnas OHLCV
+            Historical data with OHLCV columns
         """
         features, self.feature_index = self.prepare_features(df)
         
-        # Entrenar el modelo
+        # Train the model
         self.model.fit(features)
         self.is_fitted = True
         
-        # Predecir estados
+        # Predict states
         self.hidden_states = self.model.predict(features)
         
-        # Guardar datos para análisis
+        # Save data for analysis
         self.features = features
         self.original_data = df.loc[self.feature_index]
         
@@ -129,22 +131,22 @@ class MarketRegimeDetector:
     
     def predict_current_regime(self, df):
         """
-        Predecir el régimen actual del mercado
+        Predict the current market regime
         
         Returns
         -------
         dict
-            Información del régimen actual
+            Current regime information
         """
         if not self.is_fitted:
-            raise ValueError("Modelo no entrenado. Ejecuta fit() primero.")
+            raise ValueError("Model not trained. Run fit() first.")
         
         features, _ = self.prepare_features(df)
         
-        # Predecir estado actual
+        # Predict current state
         current_state = self.model.predict(features[-1:].reshape(1, -1))[0]
         
-        # Calcular probabilidades
+        # Calculate probabilities
         log_prob, state_sequence = self.model.decode(features[-10:], algorithm="viterbi")
         state_probs = np.exp(self.model.predict_proba(features[-1:].reshape(1, -1)))[0]
         
@@ -157,10 +159,10 @@ class MarketRegimeDetector:
     
     def analyze_regimes(self):
         """
-        Analizar las características de cada régimen
+        Analyze the characteristics of each regime
         """
         if not self.is_fitted:
-            raise ValueError("Modelo no entrenado.")
+            raise ValueError("Model not trained.")
         
         regime_analysis = {}
         
@@ -187,14 +189,14 @@ class MarketRegimeDetector:
     
     def plot_regimes(self, title="Market Regimes Detection"):
         """
-        Visualizar los regímenes detectados
+        Visualize the detected regimes
         """
         if not self.is_fitted:
-            raise ValueError("Modelo no entrenado.")
+            raise ValueError("Model not trained.")
         
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(15, 10))
         
-        # Plot 1: Precio con regímenes
+        # Plot 1: Price with regimes
         colors = ['green', 'red', 'blue', 'orange'][:self.n_components]
         
         for state in range(self.n_components):
@@ -211,7 +213,7 @@ class MarketRegimeDetector:
         ax1.legend()
         ax1.grid(True, alpha=0.3)
         
-        # Plot 2: Secuencia de estados
+        # Plot 2: State sequence
         ax2.plot(self.feature_index, self.hidden_states, 'k-', linewidth=2)
         ax2.fill_between(self.feature_index, 0, self.hidden_states, alpha=0.3)
         ax2.set_title('Hidden States Sequence')
@@ -226,16 +228,16 @@ class MarketRegimeDetector:
 
 def hmm_trading_strategy(df, detector, confidence_threshold=0.7):
     """
-    Estrategia de trading basada en HMM
+    HMM-based trading strategy
     
-    Parámetros
+    Parameters
     ----------
     df : pd.DataFrame
-        Datos históricos
+        Historical data
     detector : MarketRegimeDetector
-        Detector entrenado
+        Trained detector
     confidence_threshold : float
-        Umbral de confianza para generar señales
+        Confidence threshold for generating signals
     """
     signals = pd.DataFrame(index=df.index)
     signals['price'] = df['Close']
@@ -243,89 +245,89 @@ def hmm_trading_strategy(df, detector, confidence_threshold=0.7):
     signals['regime'] = np.nan
     signals['confidence'] = np.nan
     
-    # Ventana móvil para predicciones
-    window_size = 252  # 1 año de datos
+    # Rolling window for predictions
+    window_size = 252  # 1 year of data
     
     for i in range(window_size, len(df)):
-        # Datos para entrenamiento
+        # Training data
         train_data = df.iloc[i-window_size:i]
         
-        # Entrenar detector
+        # Train detector
         temp_detector = MarketRegimeDetector(n_components=2)
         temp_detector.fit(train_data)
         
-        # Predecir régimen actual
-        current_data = df.iloc[i-50:i+1]  # Últimos 50 días para contexto
+        # Predict current regime
+        current_data = df.iloc[i-50:i+1]  # Last 50 days for context
         regime_info = temp_detector.predict_current_regime(current_data)
         
         current_idx = df.index[i]
         signals.loc[current_idx, 'regime'] = regime_info['current_state']
         signals.loc[current_idx, 'confidence'] = regime_info['confidence']
         
-        # Generar señales solo con alta confianza
+        # Generate signals only with high confidence
         if regime_info['confidence'] > confidence_threshold:
-            # Analizar características del régimen
+            # Analyze regime characteristics
             regime_analysis = temp_detector.analyze_regimes()
             current_regime = f"State_{regime_info['current_state']}"
             
             if current_regime in regime_analysis:
                 regime_return = regime_analysis[current_regime]['average_return']
                 
-                # Señal basada en tipo de régimen
-                if regime_return > 0.001:  # Régimen alcista
+                # Signal based on regime type
+                if regime_return > 0.001:  # Bullish regime
                     signals.loc[current_idx, 'signal'] = 1
-                elif regime_return < -0.001:  # Régimen bajista
+                elif regime_return < -0.001:  # Bearish regime
                     signals.loc[current_idx, 'signal'] = -1
     
     return signals
 
-# Ejemplo de uso completo
+# Usage example completo
 def hmm_example_analysis():
     """
-    Ejemplo completo de análisis HMM para trading
+    Complete HMM analysis example for trading
     """
-    # Obtener datos
+    # Get data
     ticker = "SPY"
     df = yf.download(ticker, start="2020-01-01", end="2024-01-01", interval="1d")
     
-    print(f"=== ANÁLISIS HMM: {ticker} ===\n")
+    print(f"=== HMM ANALYSIS: {ticker} ===\n")
     
-    # Crear y entrenar detector
+    # Create and train detector
     detector = MarketRegimeDetector(n_components=2, random_state=42)
     detector.fit(df)
     
-    # Analizar regímenes
+    # Analyze regimes
     regime_analysis = detector.analyze_regimes()
     
-    print("📊 ANÁLISIS DE REGÍMENES:")
+    print("📊 REGIME ANALYSIS:")
     for regime, stats in regime_analysis.items():
         print(f"\n{regime} ({stats['regime_type']}):")
-        print(f"   Retorno Promedio: {stats['average_return']:.4f}")
-        print(f"   Volatilidad: {stats['volatility']:.4f}")
-        print(f"   Duración: {stats['duration_days']} días")
-        print(f"   % del Tiempo: {stats['percentage_time']:.1%}")
+        print(f"   Average Return: {stats['average_return']:.4f}")
+        print(f"   Volatility: {stats['volatility']:.4f}")
+        print(f"   Duration: {stats['duration_days']} days")
+        print(f"   % of Time: {stats['percentage_time']:.1%}")
     
-    # Predecir régimen actual
+    # Predict current regime
     current_regime = detector.predict_current_regime(df)
-    print(f"\n🎯 RÉGIMEN ACTUAL:")
-    print(f"   Estado: {current_regime['current_state']}")
-    print(f"   Confianza: {current_regime['confidence']:.1%}")
-    print(f"   Probabilidades: {current_regime['state_probabilities']}")
+    print(f"\n🎯 CURRENT REGIME:")
+    print(f"   State: {current_regime['current_state']}")
+    print(f"   Confidence: {current_regime['confidence']:.1%}")
+    print(f"   Probabilities: {current_regime['state_probabilities']}")
     
-    # Generar estrategia
+    # Generate strategy
     strategy_signals = hmm_trading_strategy(df, detector)
     
-    # Estadísticas de la estrategia
+    # Strategy statistics
     total_signals = strategy_signals['signal'].abs().sum()
     long_signals = (strategy_signals['signal'] == 1).sum()
     short_signals = (strategy_signals['signal'] == -1).sum()
     
-    print(f"\n📈 ESTADÍSTICAS DE ESTRATEGIA:")
-    print(f"   Total Señales: {total_signals}")
-    print(f"   Señales Long: {long_signals}")
-    print(f"   Señales Short: {short_signals}")
+    print(f"\n📈 STRATEGY STATISTICS:")
+    print(f"   Total Signals: {total_signals}")
+    print(f"   Long Signals: {long_signals}")
+    print(f"   Short Signals: {short_signals}")
     
-    # Visualizar
+    # Visualize
     detector.plot_regimes(f"HMM Regime Detection - {ticker}")
     
     return detector, strategy_signals
@@ -334,21 +336,21 @@ if __name__ == "__main__":
     hmm_example_analysis()
 ```
 
-#### Estrategia Avanzada: Multi-Estado HMM
+#### Advanced Strategy: Multi-State HMM
 
 ```python
 class AdvancedMarketRegimeDetector:
     """
-    Detector avanzado con múltiples estados para mercados complejos
+    Advanced detector with multiple states for complex markets
     """
     
     def __init__(self, n_components=4):
         """
-        4 Estados típicos:
-        0: Bull Market (alcista)
-        1: Bear Market (bajista)  
+        4 States típicos:
+        0: Bull Market
+        1: Bear Market  
         2: High Volatility (crisis)
-        3: Low Volatility (consolidación)
+        3: Low Volatility (consolidation)
         """
         self.n_components = n_components
         self.model = hmm.GaussianHMM(
@@ -359,16 +361,16 @@ class AdvancedMarketRegimeDetector:
         
     def prepare_advanced_features(self, df):
         """
-        Características avanzadas para detección multi-estado
+        Advanced features for multi-state detection
         """
         features = pd.DataFrame(index=df.index)
         
-        # Retornos en múltiples timeframes
+        # Returns across multiple timeframes
         features['returns_1d'] = df['Close'].pct_change()
         features['returns_5d'] = df['Close'].pct_change(5)
         features['returns_20d'] = df['Close'].pct_change(20)
         
-        # Volatilidades realizadas
+        # Volatilityes realizadas
         features['vol_5d'] = features['returns_1d'].rolling(5).std()
         features['vol_20d'] = features['returns_1d'].rolling(20).std()
         features['vol_60d'] = features['returns_1d'].rolling(60).std()
@@ -387,32 +389,32 @@ class AdvancedMarketRegimeDetector:
         return features.dropna()
     
     def calculate_macd(self, series, fast=12, slow=26, signal=9):
-        """Calcular MACD"""
+        """Calculate MACD"""
         ema_fast = series.ewm(span=fast).mean()
         ema_slow = series.ewm(span=slow).mean()
         macd_line = ema_fast - ema_slow
         return macd_line
     
     def fit_advanced(self, df):
-        """Entrenar modelo avanzado"""
+        """Train advanced model"""
         features = self.prepare_advanced_features(df)
         
-        # Normalizar características
+        # Normalize features
         scaler = StandardScaler()
         features_scaled = scaler.fit_transform(features)
         
-        # Entrenar modelo
+        # Train model
         self.model.fit(features_scaled)
         self.hidden_states = self.model.predict(features_scaled)
         
-        # Interpretar estados
+        # Interpret states
         self.regime_interpretation = self.interpret_regimes(df, features)
         
         return self
     
     def interpret_regimes(self, df, features):
         """
-        Interpretar automáticamente qué representa cada estado
+        Automatically interpret what each state represents
         """
         interpretation = {}
         
@@ -425,7 +427,7 @@ class AdvancedMarketRegimeDetector:
                 avg_vol = state_features['vol_20d'].mean()
                 avg_rsi = state_features['rsi'].mean()
                 
-                # Clasificar estado basado en características
+                # Classify state based on features
                 if avg_return > 0.001 and avg_vol < state_features['vol_20d'].quantile(0.5):
                     regime_type = "Bull Market"
                 elif avg_return < -0.001 and avg_vol < state_features['vol_20d'].quantile(0.5):
@@ -447,12 +449,12 @@ class AdvancedMarketRegimeDetector:
 
 def small_cap_hmm_strategy(df, lookback_days=252):
     """
-    Estrategia HMM específica para small caps
+    Small cap-specific HMM strategy
     """
-    # Parámetros específicos para small caps
-    detector = MarketRegimeDetector(n_components=3)  # 3 estados: alcista, bajista, volátil
+    # Small cap-specific parameters
+    detector = MarketRegimeDetector(n_components=3)  # 3 states: bullish, bearish, volatile
     
-    # Características específicas para small caps
+    # Small cap-specific features
     features = pd.DataFrame(index=df.index)
     
     # Gap detection
@@ -488,11 +490,11 @@ def small_cap_hmm_strategy(df, lookback_days=252):
     }
 ```
 
-## Modelos Supervisados para Trading
+## Supervised Models for Trading
 
-### Predicción de Precios con XGBoost
+### Price Prediction with XGBoost
 
-Los modelos supervisados pueden predecir movimientos futuros de precios basándose en características históricas.
+Supervised models can predict future price movements based on historical features.
 
 ```python
 import pandas as pd
@@ -505,17 +507,17 @@ import matplotlib.pyplot as plt
 
 class TradingPredictor:
     """
-    Predictor de precios y direcciones usando XGBoost
+    Price and direction predictor using XGBoost
     """
     
     def __init__(self, prediction_type='price', target_days=1):
         """
-        Parámetros
+        Parameters
         ----------
         prediction_type : str
-            'price' para regresión, 'direction' para clasificación
+            'price' for regression, 'direction' for classification
         target_days : int
-            Días hacia adelante para predecir
+            Days ahead to predict
         """
         self.prediction_type = prediction_type
         self.target_days = target_days
@@ -537,7 +539,7 @@ class TradingPredictor:
     
     def create_features(self, df):
         """
-        Crear características para machine learning
+        Create features for machine learning
         """
         features = pd.DataFrame(index=df.index)
         
@@ -575,7 +577,7 @@ class TradingPredictor:
         return features.dropna()
     
     def calculate_rsi(self, series, period=14):
-        """Calcular RSI"""
+        """Calculate RSI"""
         delta = series.diff()
         gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
@@ -583,7 +585,7 @@ class TradingPredictor:
         return 100 - (100 / (1 + rs))
     
     def calculate_bb_position(self, series, period=20, std_mult=2):
-        """Calcular posición dentro de Bollinger Bands"""
+        """Calculate position within Bollinger Bands"""
         sma = series.rolling(period).mean()
         std = series.rolling(period).std()
         upper = sma + (std * std_mult)
@@ -592,44 +594,44 @@ class TradingPredictor:
     
     def create_targets(self, df):
         """
-        Crear variables objetivo
+        Create target variables
         """
         if self.prediction_type == 'price':
-            # Predecir precio futuro
+            # Predict future price
             target = df['Close'].shift(-self.target_days)
         else:
-            # Predecir dirección (clasificación)
+            # Predict direction (classification)
             future_return = df['Close'].pct_change(self.target_days).shift(-self.target_days)
-            target = (future_return > 0).astype(int)  # 1 si sube, 0 si baja
+            target = (future_return > 0).astype(int)  # 1 if up, 0 if down
         
         return target
     
     def fit(self, df, test_size=0.2):
         """
-        Entrenar el modelo
+        Train the model
         """
-        # Crear características y objetivos
+        # Create features and targets
         features = self.create_features(df)
         targets = self.create_targets(df)
         
-        # Alinear datos
+        # Align data
         aligned_data = pd.concat([features, targets], axis=1).dropna()
-        X = aligned_data.iloc[:, :-1]  # Todas las columnas excepto la última
+        X = aligned_data.iloc[:, :-1]  # All columns except the last one
         y = aligned_data.iloc[:, -1]   # Última columna (target)
         
-        # Split temporal (importante para series de tiempo)
+        # Temporal split (important for time series)
         split_point = int(len(X) * (1 - test_size))
         X_train, X_test = X.iloc[:split_point], X.iloc[split_point:]
         y_train, y_test = y.iloc[:split_point], y.iloc[split_point:]
         
-        # Entrenar modelo
+        # Train model
         self.model.fit(X_train, y_train)
         
-        # Evaluar
+        # Evaluate
         train_pred = self.model.predict(X_train)
         test_pred = self.model.predict(X_test)
         
-        # Métricas
+        # Metrics
         if self.prediction_type == 'price':
             train_mse = mean_squared_error(y_train, train_pred)
             test_mse = mean_squared_error(y_test, test_pred)
@@ -649,7 +651,7 @@ class TradingPredictor:
                 'test_accuracy': test_accuracy
             }
         
-        # Guardar datos para análisis
+        # Save data for analysis
         self.X_train, self.X_test = X_train, X_test
         self.y_train, self.y_test = y_train, y_test
         self.train_pred, self.test_pred = train_pred, test_pred
@@ -659,13 +661,13 @@ class TradingPredictor:
     
     def predict_next(self, df, periods=1):
         """
-        Predecir próximos períodos
+        Predict next periods
         """
         features = self.create_features(df)
         latest_features = features.iloc[-periods:].values
         
         if latest_features.shape[0] == 0:
-            raise ValueError("No hay suficientes datos para generar características")
+            raise ValueError("Not enough data to generate features")
         
         predictions = self.model.predict(latest_features)
         
@@ -673,10 +675,10 @@ class TradingPredictor:
     
     def get_feature_importance(self, top_n=10):
         """
-        Obtener importancia de características
+        Get feature importance
         """
         if not hasattr(self.model, 'feature_importances_'):
-            raise ValueError("Modelo no entrenado")
+            raise ValueError("Model not trained")
         
         importance_df = pd.DataFrame({
             'feature': self.feature_names,
@@ -687,7 +689,7 @@ class TradingPredictor:
     
     def plot_predictions(self, title="Predictions vs Reality"):
         """
-        Visualizar predicciones vs realidad
+        Visualize predicciones vs realidad
         """
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
         
@@ -715,46 +717,46 @@ class TradingPredictor:
         
         return fig
 
-# Estrategia de trading basada en ML
+# ML-based trading strategy
 def ml_trading_strategy(df, prediction_threshold=0.6):
     """
-    Estrategia de trading usando predicciones de ML
+    Trading strategy using ML predictions
     """
-    # Entrenar predictor de dirección
+    # Train direction predictor
     direction_predictor = TradingPredictor(prediction_type='direction', target_days=1)
     direction_predictor.fit(df)
     
-    # Entrenar predictor de precio
+    # Train price predictor
     price_predictor = TradingPredictor(prediction_type='price', target_days=1)
     price_predictor.fit(df)
     
-    # Generar señales
+    # Generate signals
     signals = pd.DataFrame(index=df.index)
     signals['price'] = df['Close']
     signals['signal'] = 0
     signals['confidence'] = 0
     
-    # Ventana móvil para predicciones
+    # Rolling window for predictions
     window_size = 252
     
     for i in range(window_size, len(df) - 1):
         train_data = df.iloc[i-window_size:i]
         
         try:
-            # Entrenar modelos con datos hasta el momento
+            # Train models with data up to this point
             temp_direction = TradingPredictor(prediction_type='direction')
             temp_direction.fit(train_data, test_size=0.3)
             
-            # Predecir dirección
+            # Predict direction
             direction_pred = temp_direction.predict_next(train_data)[0]
             
-            # Solo generar señal si hay confianza alta
+            # Only generate signal if confidence is high
             if temp_direction.metrics['test_accuracy'] > prediction_threshold:
                 current_idx = df.index[i]
                 
-                if direction_pred > 0.5:  # Predicción alcista
+                if direction_pred > 0.5:  # Bullish prediction
                     signals.loc[current_idx, 'signal'] = 1
-                else:  # Predicción bajista
+                else:  # Bearish prediction
                     signals.loc[current_idx, 'signal'] = -1
                 
                 signals.loc[current_idx, 'confidence'] = temp_direction.metrics['test_accuracy']
@@ -764,62 +766,62 @@ def ml_trading_strategy(df, prediction_threshold=0.6):
     
     return signals
 
-# Ejemplo de uso completo
+# Usage example completo
 def ml_example_analysis():
     """
-    Ejemplo completo de análisis ML para trading
+    Complete ML analysis example for trading
     """
-    # Obtener datos
+    # Get data
     ticker = "AAPL"
     df = yf.download(ticker, start="2020-01-01", end="2024-01-01", interval="1d")
     
-    print(f"=== ANÁLISIS ML: {ticker} ===\n")
+    print(f"=== ML ANALYSIS: {ticker} ===\n")
     
-    # Predictor de dirección
-    print("🎯 PREDICTOR DE DIRECCIÓN:")
+    # Direction predictor
+    print("🎯 DIRECTION PREDICTOR:")
     direction_model = TradingPredictor(prediction_type='direction', target_days=1)
     direction_model.fit(df)
     
-    print(f"   Precisión Entrenamiento: {direction_model.metrics['train_accuracy']:.1%}")
-    print(f"   Precisión Prueba: {direction_model.metrics['test_accuracy']:.1%}")
+    print(f"   Training Accuracy: {direction_model.metrics['train_accuracy']:.1%}")
+    print(f"   Test Accuracy: {direction_model.metrics['test_accuracy']:.1%}")
     
-    # Predictor de precio
-    print(f"\n📈 PREDICTOR DE PRECIO:")
+    # Price predictor
+    print(f"\n📈 PRICE PREDICTOR:")
     price_model = TradingPredictor(prediction_type='price', target_days=1)
     price_model.fit(df)
     
-    print(f"   RMSE Entrenamiento: ${price_model.metrics['train_rmse']:.2f}")
-    print(f"   RMSE Prueba: ${price_model.metrics['test_rmse']:.2f}")
+    print(f"   Training RMSE: ${price_model.metrics['train_rmse']:.2f}")
+    print(f"   Test RMSE: ${price_model.metrics['test_rmse']:.2f}")
     
     # Importancia de características
-    print(f"\n🔍 TOP CARACTERÍSTICAS:")
+    print(f"\n🔍 TOP FEATURES:")
     importance = direction_model.get_feature_importance(5)
     for _, row in importance.iterrows():
         print(f"   {row['feature']}: {row['importance']:.3f}")
     
-    # Predicciones actuales
+    # Current predictions
     latest_direction = direction_model.predict_next(df, 1)[0]
     latest_price = price_model.predict_next(df, 1)[0]
     current_price = df['Close'].iloc[-1]
     
-    print(f"\n🔮 PREDICCIONES:")
-    print(f"   Dirección Próximo Día: {'⬆️ Alcista' if latest_direction > 0.5 else '⬇️ Bajista'}")
-    print(f"   Precio Actual: ${current_price:.2f}")
-    print(f"   Precio Predicho: ${latest_price:.2f}")
-    print(f"   Cambio Esperado: {(latest_price/current_price - 1):.1%}")
+    print(f"\n🔮 PREDICTIONS:")
+    print(f"   Next Day Direction: {'Up' if latest_direction > 0.5 else 'Down'}")
+    print(f"   Current Price: ${current_price:.2f}")
+    print(f"   Predicted Price: ${latest_price:.2f}")
+    print(f"   Expected Change: {(latest_price/current_price - 1):.1%}")
     
-    # Generar estrategia
+    # Generate strategy
     strategy_signals = ml_trading_strategy(df)
     
-    # Estadísticas de estrategia
+    # Strategy statistics
     total_signals = strategy_signals['signal'].abs().sum()
     avg_confidence = strategy_signals[strategy_signals['confidence'] > 0]['confidence'].mean()
     
-    print(f"\n📊 ESTRATEGIA ML:")
-    print(f"   Total Señales: {total_signals}")
-    print(f"   Confianza Promedio: {avg_confidence:.1%}")
+    print(f"\n📊 ML STRATEGY:")
+    print(f"   Total Signals: {total_signals}")
+    print(f"   Confidence Promedio: {avg_confidence:.1%}")
     
-    # Visualizar
+    # Visualize
     direction_model.plot_predictions(f"Direction Prediction - {ticker}")
     price_model.plot_predictions(f"Price Prediction - {ticker}")
     
@@ -829,13 +831,13 @@ if __name__ == "__main__":
     ml_example_analysis()
 ```
 
-## Mejores Prácticas para ML en Trading
+## Best Practices for ML in Trading
 
-### 1. Validación Temporal
+### 1. Temporal Validation
 ```python
 def time_series_cross_validation(df, model_class, n_splits=5):
     """
-    Cross-validation específico para series de tiempo
+    Time series-specific cross-validation
     """
     tscv = TimeSeriesSplit(n_splits=n_splits)
     scores = []
@@ -847,18 +849,18 @@ def time_series_cross_validation(df, model_class, n_splits=5):
         model = model_class()
         model.fit(train_data)
         
-        # Evaluar en datos de prueba
+        # Evaluate on test data
         test_score = model.evaluate(test_data)
         scores.append(test_score)
     
     return np.array(scores)
 ```
 
-### 2. Feature Engineering Avanzado
+### 2. Advanced Feature Engineering
 ```python
 def create_advanced_features(df, market_data=None):
     """
-    Crear características avanzadas para ML
+    Create advanced features for ML
     """
     features = df.copy()
     
@@ -883,11 +885,11 @@ def create_advanced_features(df, market_data=None):
     return features
 ```
 
-### 3. Gestión de Overfitting
+### 3. Overfitting Management
 ```python
 class OverfittingDetector:
     """
-    Detector de overfitting para modelos de trading
+    Overfitting detector for trading models
     """
     
     def __init__(self):
@@ -895,19 +897,19 @@ class OverfittingDetector:
     
     def check_overfitting(self, train_score, test_score, threshold=0.1):
         """
-        Detectar overfitting comparando scores
+        Detect overfitting by comparing scores
         """
         if abs(train_score - test_score) > threshold:
             self.warnings.append("High difference between train/test scores")
         
-        if train_score > 0.95:  # Demasiado perfecto
+        if train_score > 0.95:  # Too perfect
             self.warnings.append("Training score suspiciously high")
         
         return len(self.warnings) == 0
     
     def suggest_fixes(self):
         """
-        Sugerir soluciones para overfitting
+        Suggest fixes for overfitting
         """
         suggestions = [
             "Reduce model complexity (max_depth, n_estimators)",
@@ -919,13 +921,13 @@ class OverfittingDetector:
         return suggestions
 ```
 
-## Aplicaciones Específicas para Small Caps
+## Specific Applications for Small Caps
 
-### 1. Predicción de Gaps
+### 1. Gap Prediction
 ```python
 def gap_prediction_model(df, gap_threshold=0.02):
     """
-    Modelo específico para predecir gaps en small caps
+    Model specifically for predicting gaps in small caps
     """
     features = pd.DataFrame(index=df.index)
     
@@ -949,7 +951,7 @@ def gap_prediction_model(df, gap_threshold=0.02):
 ```python
 def volatility_prediction_model(df, horizon=5):
     """
-    Predecir volatilidad futura para small caps
+    Predict future volatility for small caps
     """
     # GARCH-like features
     returns = df['Close'].pct_change()
@@ -966,12 +968,12 @@ def volatility_prediction_model(df, horizon=5):
     return features.dropna(), target.dropna()
 ```
 
-## Métricas de Evaluación para Trading
+## Evaluation Metrics for Trading
 
 ```python
 def evaluate_trading_model(predictions, actual_returns, transaction_cost=0.001):
     """
-    Evaluar modelo desde perspectiva de trading
+    Evaluate modelo desde perspectiva de trading
     """
     # Convert predictions to trading signals
     signals = np.where(predictions > 0.5, 1, -1)
@@ -993,12 +995,12 @@ def evaluate_trading_model(predictions, actual_returns, transaction_cost=0.001):
     }
 
 def calculate_max_drawdown(equity_curve):
-    """Calcular maximum drawdown"""
+    """Calculate maximum drawdown"""
     peak = equity_curve.cummax()
     drawdown = (equity_curve - peak) / peak
     return drawdown.min()
 ```
 
-## Siguiente Paso
+## Next Step
 
-Con Machine Learning dominado, continuemos con [Análisis de Sentimiento](sentiment_analysis.md) para incorporar datos alternativos en nuestras estrategias.
+With Machine Learning mastered, let's continue with [Sentiment Analysis](sentiment_analysis.md) to incorporate alternative data into our strategies.

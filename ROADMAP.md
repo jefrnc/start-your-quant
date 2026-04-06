@@ -1,42 +1,44 @@
-# Roadmap de Aprendizaje Quant Trading 2025
+> 🇪🇸 [Leer en Español](ROADMAP.es.md) | 🇺🇸 **English**
 
-## 🗺️ Ruta Interactiva de Trading Cuantitativo
+# Quant Trading Learning Roadmap 2025
+
+## Interactive Quantitative Trading Path
 
 ```mermaid
 graph TB
-    Start([Inicia tu Ruta Quant]) --> Foundations
+    Start([Start Your Quant Path]) --> Foundations
 
-    subgraph Foundations[1. Fundamentos]
-        A1[Python & Análisis de Datos]
-        A2[Mercados Financieros]
-        A3[Estadística & Probabilidad]
-        A4[Git & Versionado]
+    subgraph Foundations[1. Fundamentals]
+        A1[Python & Data Analysis]
+        A2[Financial Markets]
+        A3[Statistics & Probability]
+        A4[Git & Version Control]
     end
 
     Foundations --> Core
 
     subgraph Core[2. Core Quant]
-        B1[Backtesting & Validación]
-        B2[Gestión de Riesgo]
-        B3[APIs de Datos Financieros]
-        B4[Desarrollo de Estrategias]
+        B1[Backtesting & Validation]
+        B2[Risk Management]
+        B3[Financial Data APIs]
+        B4[Strategy Development]
     end
 
     Core --> Advanced
 
-    subgraph Advanced[3. Prácticas Avanzadas]
+    subgraph Advanced[3. Advanced Practices]
         C1[Machine Learning Trading]
-        C2[Optimización de Parámetros]
-        C3[Trading en Vivo]
-        C4[Microestructura de Mercado]
+        C2[Parameter Optimization]
+        C3[Live Trading]
+        C4[Market Microstructure]
     end
 
     Advanced --> Expert
 
-    subgraph Expert[4. Nivel Experto]
-        D1[Sistemas Multi-Broker]
-        D2[HFT & Ultra-Baja Latencia]
-        D3[Datos Alternativos]
+    subgraph Expert[4. Expert Level]
+        D1[Multi-Broker Systems]
+        D2[HFT & Ultra-Low Latency]
+        D3[Alternative Data]
         D4[Portfolio Management]
     end
 
@@ -46,379 +48,379 @@ graph TB
     style Leader fill:#9f9,stroke:#333,stroke-width:4px
 ```
 
-## ✅ Estado Actual (Completado)
+## Current Status (Completed)
 
-### 📚 **Documentación Completa**
-- ✅ **60+ archivos de documentación** organizados por categorías
-- ✅ **Guías paso a paso** desde principiante hasta avanzado
-- ✅ **Rutas de aprendizaje** estructuradas por nivel
-- ✅ **Referencias cruzadas** entre teoría y práctica
+### **Complete Documentation**
+- **60+ documentation files** organized by category
+- **Step-by-step guides** from beginner to advanced
+- **Structured learning paths** by level
+- **Cross-references** between theory and practice
 
-### 💻 **Código Base Implementado**
-- ✅ **Indicadores Técnicos**: Moving Averages, VWAP con bandas
-- ✅ **Estrategia Gap & Go**: Implementación completa con filtros de volumen
-- ✅ **Motor de Backtesting**: Sistema modular con métricas avanzadas
-- ✅ **Position Sizing**: Múltiples modelos (Kelly, ATR, Fixed %)
-- ✅ **Gestión de Datos**: APIs simuladas y gestión centralizada
-- ✅ **Ejemplo Completo**: Integración de todos los componentes
+### **Implemented Code Base**
+- **Technical Indicators**: Moving Averages, VWAP with bands
+- **Gap & Go Strategy**: Complete implementation with volume filters
+- **Backtesting Engine**: Modular system with advanced metrics
+- **Position Sizing**: Multiple models (Kelly, ATR, Fixed %)
+- **Data Management**: Simulated APIs and centralized management
+- **Complete Example**: Integration of all components
 
-### 🏗️ **Infraestructura Base**
-- ✅ **Arquitectura Modular**: Componentes independientes y reutilizables
-- ✅ **Documentación Técnica**: READMEs y ejemplos de uso
-- ✅ **GitHub Pages**: Sitio web con documentación navegable
+### **Base Infrastructure**
+- **Modular Architecture**: Independent and reusable components
+- **Technical Documentation**: READMEs and usage examples
+- **GitHub Pages**: Website with navigable documentation
 
-## 📊 Estrategias de Trading para Implementar
+## Trading Strategies to Implement
 
-### 🎯 Estrategias Core
-- **Gap & Go con Trailing Stop Dinámico** ⚡ *Parcialmente Implementado*
-  - ✅ Implementación básica con filtros de volumen y gaps
-  - 🔄 Stop loss adaptativo basado en ATR (en progreso)
-  - 📋 Ajuste automático según volatilidad intradiaria
-  - 📋 Machine learning para optimizar parámetros de trailing
+### Core Strategies
+- **Gap & Go with Dynamic Trailing Stop** - *Partially Implemented*
+  - Basic implementation with volume and gap filters
+  - ATR-based adaptive stop loss (in progress)
+  - Automatic adjustment based on intraday volatility
+  - Machine learning for trailing parameter optimization
 
-- **VWAP Bounce + Reclaim con Volumen Creciente** ⚡ *Base Implementada*
-  - ✅ Cálculo de VWAP y bandas implementado
-  - ✅ Señales básicas precio vs VWAP
-  - 📋 Detector de rechazo y reclaim del VWAP
-  - 📋 Análisis de volumen relativo en tiempo real
-  - 📋 Confirmación con divergencias en el tape
+- **VWAP Bounce + Reclaim with Rising Volume** - *Base Implemented*
+  - VWAP and bands calculation implemented
+  - Basic price vs VWAP signals
+  - VWAP rejection and reclaim detector
+  - Real-time relative volume analysis
+  - Confirmation with tape divergences
 
-- **Opening Range Breakout (ORB) Adaptado a Small Caps**
-  - ORB de 5, 15 y 30 minutos con filtros de volumen
-  - Detector de falsos breakouts usando order flow
-  - Ajuste dinámico del rango según la volatilidad pre-market
+- **Opening Range Breakout (ORB) Adapted for Small Caps**
+  - 5, 15, and 30 minute ORB with volume filters
+  - False breakout detector using order flow
+  - Dynamic range adjustment based on pre-market volatility
 
-### 🔥 Estrategias Avanzadas
-- **Mean Reversion con RSI < 20 + Análisis de Noticias**
-  - Integración con APIs de noticias en tiempo real
-  - NLP para determinar sentimiento y relevancia
-  - Entry timing basado en exhaustion patterns
+### Advanced Strategies
+- **Mean Reversion with RSI < 20 + News Analysis**
+  - Integration with real-time news APIs
+  - NLP for determining sentiment and relevance
+  - Entry timing based on exhaustion patterns
 
 - **Short Squeeze Detector**
-  - Análisis de float bajo + volumen inusual
-  - Monitoreo de short interest en tiempo real
-  - Predicción de movimientos parabólicos con ML
+  - Low float + unusual volume analysis
+  - Real-time short interest monitoring
+  - Parabolic movement prediction with ML
 
-- **Multi-Day Runners con Patrón ABCD**
-  - Identificación automática de patrones armónicos
-  - Análisis de continuación vs reversión
-  - Risk management específico para swings
+- **Multi-Day Runners with ABCD Pattern**
+  - Automatic harmonic pattern identification
+  - Continuation vs reversal analysis
+  - Specific risk management for swings
 
-### 🤖 Estrategias con Machine Learning
-- **Clasificación de Setups con Random Forest / XGBoost**
-  - Feature engineering automático desde raw data
-  - Validación cruzada temporal (walk-forward)
-  - Ensemble de modelos para mayor robustez
+### Machine Learning Strategies
+- **Setup Classification with Random Forest / XGBoost**
+  - Automatic feature engineering from raw data
+  - Temporal cross-validation (walk-forward)
+  - Model ensemble for greater robustness
 
-- **NLP en Tiempo Real**
-  - Análisis de sentimiento de Reddit (WSB, pennystocks)
-  - Twitter/X sentiment con filtros de influencers
-  - Correlación sentimiento-precio para timing
+- **Real-Time NLP**
+  - Reddit sentiment analysis (WSB, pennystocks)
+  - Twitter/X sentiment with influencer filters
+  - Sentiment-price correlation for timing
 
-## 🔬 Experimentos Cuantitativos
+## Quantitative Experiments
 
-### 📈 Optimización y AutoML
-- **Optimización Automática de Parámetros**
-  - Implementación de Optuna para hyperparameter tuning
+### Optimization and AutoML
+- **Automatic Parameter Optimization**
+  - Optuna implementation for hyperparameter tuning
   - Grid search vs Random search vs Bayesian optimization
-  - Backtesting paralelo en cloud
+  - Parallel backtesting in cloud
 
-- **Feature Engineering Automático**
-  - Generación de features técnicos (100+ indicadores)
-  - Features de microestructura (bid-ask spread, imbalance)
-  - Selección automática con importance scores
+- **Automatic Feature Engineering**
+  - Technical feature generation (100+ indicators)
+  - Microstructure features (bid-ask spread, imbalance)
+  - Automatic selection with importance scores
 
-### 🎮 Reinforcement Learning
-- **Gestión Dinámica de Posición**
-  - RL agent para sizing y scaling in/out
-  - Environment personalizado con costos reales
-  - Transfer learning entre estrategias similares
+### Reinforcement Learning
+- **Dynamic Position Management**
+  - RL agent for sizing and scaling in/out
+  - Custom environment with real costs
+  - Transfer learning between similar strategies
 
-- **Market Making Algorítmico**
-  - Deep Q-Learning para small cap liquidity provision
-  - Simulación de adverse selection
-  - Risk controls integrados
+- **Algorithmic Market Making**
+  - Deep Q-Learning for small cap liquidity provision
+  - Adverse selection simulation
+  - Integrated risk controls
 
-### 🛡️ Robustez y Validación
-- **Backtesting Adversarial**
-  - Generación de data sintética con condiciones extremas
-  - Stress testing con scenarios de black swan
-  - Monte Carlo para confidence intervals
+### Robustness and Validation
+- **Adversarial Backtesting**
+  - Synthetic data generation with extreme conditions
+  - Stress testing with black swan scenarios
+  - Monte Carlo for confidence intervals
 
-- **Auto-Tagging de Operaciones**
-  - Etiquetas automáticas: "late entry", "chase", "ideal", "FOMO"
-  - Análisis post-trade para mejorar execution
-  - Dashboard de patrones de error recurrentes
+- **Auto-Tagging of Operations**
+  - Automatic labels: "late entry", "chase", "ideal", "FOMO"
+  - Post-trade analysis for execution improvement
+  - Dashboard of recurring error patterns
 
-## ⚙️ Infraestructura y Desarrollo
+## Infrastructure and Development
 
-### 🏗️ Arquitectura Core
-- **Scheduler Inteligente**
-  - Orquestación de múltiples bots con prioridades
-  - Auto-scaling basado en condiciones de mercado
-  - Failover automático y redundancia
+### Core Architecture
+- **Intelligent Scheduler**
+  - Multi-bot orchestration with priorities
+  - Auto-scaling based on market conditions
+  - Automatic failover and redundancy
 
-- **API REST para Señales**
-  - Endpoints para recibir alertas de estrategias
-  - Webhooks para integración con TradingView
-  - Rate limiting y autenticación JWT
+- **REST API for Signals**
+  - Endpoints for receiving strategy alerts
+  - Webhooks for TradingView integration
+  - Rate limiting and JWT authentication
 
-- **Sistema de Monitoreo "Sentinel"**
-  - Detección de anomalías en comportamiento del bot
-  - Alertas automáticas vía Telegram/Discord
-  - Kill switch automático en caso de drawdown excesivo
+- **"Sentinel" Monitoring System**
+  - Anomaly detection in bot behavior
+  - Automatic alerts via Telegram/Discord
+  - Automatic kill switch on excessive drawdown
 
-### 💾 Data y Storage
-- **Base de Datos Centralizada**
-  - MongoDB para datos no estructurados (noticias, social)
-  - PostgreSQL + TimescaleDB para series temporales
-  - Redis para caching y queues
+### Data and Storage
+- **Centralized Database**
+  - MongoDB for unstructured data (news, social)
+  - PostgreSQL + TimescaleDB for time series
+  - Redis for caching and queues
 
-- **Data Pipeline Robusto**
-  - Apache Kafka para streaming de datos
-  - Data validation y cleaning automático
-  - Backup incremental a S3
+- **Robust Data Pipeline**
+  - Apache Kafka for data streaming
+  - Automatic data validation and cleaning
+  - Incremental backup to S3
 
-### ☁️ Cloud y Deployment
-- **Infraestructura Serverless**
-  - AWS Lambda para estrategias event-driven
-  - Step Functions para workflows complejos
-  - EventBridge para scheduling
+### Cloud and Deployment
+- **Serverless Infrastructure**
+  - AWS Lambda for event-driven strategies
+  - Step Functions for complex workflows
+  - EventBridge for scheduling
 
-- **Containerización y Orquestación**
-  - Docker para cada estrategia
-  - Kubernetes para scaling horizontal
-  - Helm charts para deployment templates
+- **Containerization and Orchestration**
+  - Docker for each strategy
+  - Kubernetes for horizontal scaling
+  - Helm charts for deployment templates
 
-## 📊 Visualización y Analytics
+## Visualization and Analytics
 
-### 📈 Dashboards Interactivos
-- **Heatmap de Performance**
-  - Visualización por estrategia, timeframe, y símbolo
-  - Drill-down a trades individuales
-  - Comparación con benchmarks
+### Interactive Dashboards
+- **Performance Heatmap**
+  - Visualization by strategy, timeframe, and symbol
+  - Drill-down to individual trades
+  - Benchmark comparison
 
-- **Análisis de Equity Curve**
-  - Comparación multi-estrategia
-  - Detección de régimen de mercado
-  - Drawdown analysis interactivo
+- **Equity Curve Analysis**
+  - Multi-strategy comparison
+  - Market regime detection
+  - Interactive drawdown analysis
 
-- **TreeMap de Setups Rentables**
-  - Agrupación por hora del día, día de la semana
-  - Size por profit, color por win rate
-  - Filtros dinámicos por período
+- **TreeMap of Profitable Setups**
+  - Grouped by time of day, day of week
+  - Size by profit, color by win rate
+  - Dynamic filters by period
 
-### 🤖 Analytics Avanzado
-- **Trade Review Automático con IA**
-  - Anotaciones generadas por GPT-4
-  - Screenshots con análisis técnico overlay
-  - Sugerencias de mejora personalizadas
+### Advanced Analytics
+- **Automated Trade Review with AI**
+  - GPT-4 generated annotations
+  - Screenshots with technical analysis overlay
+  - Personalized improvement suggestions
 
 - **Performance Attribution**
-  - Descomposición de P&L por factor
-  - Análisis de timing vs selection
-  - Benchmarking contra estrategias similares
+  - P&L decomposition by factor
+  - Timing vs selection analysis
+  - Benchmarking against similar strategies
 
-## 💡 Features Avanzadas y Experimentales
+## Advanced and Experimental Features
 
-### 🎮 Simulación y Testing
-- **Simulador de Mercado Ultra-Realista**
-  - Modelado de microestructura con agentes
-  - Simulación de halts, SSR, y circuit breakers
-  - Impacto de mercado realista para size grande
+### Simulation and Testing
+- **Ultra-Realistic Market Simulator**
+  - Agent-based microstructure modeling
+  - Simulation of halts, SSR, and circuit breakers
+  - Realistic market impact for large size
 
-- **Paper Trading Avanzado**
-  - Ejecución simulada con slippage real
-  - Modeling de partial fills
-  - Latencia variable según condiciones
+- **Advanced Paper Trading**
+  - Simulated execution with real slippage
+  - Partial fill modeling
+  - Variable latency based on conditions
 
-### 🔗 Integraciones
+### Integrations
 - **Multi-Broker Support**
-  - IBKR para stocks y opciones
-  - Alpaca para crypto y extended hours
-  - DAS Trader para day trading profesional
+  - IBKR for stocks and options
+  - Alpaca for crypto and extended hours
+  - DAS Trader for professional day trading
   - TD Ameritrade/Schwab API
 
-- **Plataformas de Trading**
+- **Trading Platforms**
   - TradingView webhook integration
-  - MetaTrader 5 para forex
-  - NinjaTrader para futures
-  - cTrader para ECN access
+  - MetaTrader 5 for forex
+  - NinjaTrader for futures
+  - cTrader for ECN access
 
-### 🏆 Comunidad y Gamificación
-- **Sistema de Votación Comunitario**
-  - Los usuarios votan la próxima estrategia a implementar
-  - Leaderboard de contributors
-  - Badges por performance y participación
+### Community and Gamification
+- **Community Voting System**
+  - Users vote on the next strategy to implement
+  - Contributor leaderboard
+  - Badges for performance and participation
 
-- **Coach Cuantitativo con IA**
-  - Evaluación automática del 1-10 por trade
-  - Análisis de consistencia con el plan
-  - Recomendaciones personalizadas de mejora
+- **Quantitative Coach with AI**
+  - Automatic 1-10 evaluation per trade
+  - Consistency analysis with the plan
+  - Personalized improvement recommendations
 
-## 📚 Contenido Educativo y Documentación
+## Educational Content and Documentation
 
-### 📖 Guías Fundamentales
-- **Trading Cuantitativo 101**
-  - Diferencia entre backtesting, paper trading y forward testing
-  - Cómo evitar overfitting: técnicas y ejemplos
-  - Walk-forward analysis explicado
+### Fundamental Guides
+- **Quantitative Trading 101**
+  - Difference between backtesting, paper trading, and forward testing
+  - How to avoid overfitting: techniques and examples
+  - Walk-forward analysis explained
 
-- **Comparativas Detalladas**
-  - IBKR vs Alpaca vs DAS: pros, contras, costos
-  - Python vs JavaScript vs C++ para HFT
-  - Cloud providers: AWS vs GCP vs Azure para trading
+- **Detailed Comparisons**
+  - IBKR vs Alpaca vs DAS: pros, cons, costs
+  - Python vs JavaScript vs C++ for HFT
+  - Cloud providers: AWS vs GCP vs Azure for trading
 
-### 🛠️ Tutoriales Técnicos
-- **Setup Completo por Sistema Operativo**
+### Technical Tutorials
+- **Complete Setup by Operating System**
   - Windows: WSL2 + Docker Desktop
-  - macOS: Homebrew + desarrollo nativo
-  - Linux: Optimizaciones kernel para low latency
+  - macOS: Homebrew + native development
+  - Linux: Kernel optimizations for low latency
 
-- **Indicadores Avanzados Explicados**
-  - CVD (Cumulative Volume Delta): construcción y uso
-  - Order Flow Imbalance: detección de agresores
-  - Footprint charts: lectura profesional
+- **Advanced Indicators Explained**
+  - CVD (Cumulative Volume Delta): construction and usage
+  - Order Flow Imbalance: aggressor detection
+  - Footprint charts: professional reading
 
-### 📊 Small Caps Mastery
-- **Diccionario Completo de Términos**
+### Small Caps Mastery
+- **Complete Glossary of Terms**
   - SSR, circuit breakers, T+2 settlement
   - Float rotation, squeeze mechanics
-  - Dark pools y hidden liquidity
+  - Dark pools and hidden liquidity
 
-- **Level 2 y Tape Reading**
-  - Identificación de spoofing y layering
-  - Lectura de prints grandes
-  - Detección de accumulation/distribution
+- **Level 2 and Tape Reading**
+  - Spoofing and layering identification
+  - Reading large prints
+  - Accumulation/distribution detection
 
-### 🧠 Psicología y Mejora Continua
-- **Psicología del Trading Algorítmico**
-  - Cómo manejar drawdowns del sistema
-  - Cuándo intervenir manualmente
-  - Trust en el proceso cuantitativo
+### Psychology and Continuous Improvement
+- **Psychology of Algorithmic Trading**
+  - How to handle system drawdowns
+  - When to intervene manually
+  - Trust in the quantitative process
 
-- **Framework de Post-Mortem**
-  - Template para análisis de cada operación
-  - Métricas clave a trackear
-  - Proceso de mejora iterativa
+- **Post-Mortem Framework**
+  - Template for analyzing each operation
+  - Key metrics to track
+  - Iterative improvement process
 
-### 🔧 DevOps para Trading
-- **Monitoring Profesional**
+### DevOps for Trading
+- **Professional Monitoring**
   - Prometheus + Grafana setup
-  - Alertas inteligentes con PagerDuty
-  - Logging estructurado con ELK stack
+  - Intelligent alerts with PagerDuty
+  - Structured logging with ELK stack
 
-- **Automatización y CI/CD**
-  - GitHub Actions para backtesting automático
-  - Deployment seguro de estrategias
-  - Rollback automático en caso de pérdidas
+- **Automation and CI/CD**
+  - GitHub Actions for automatic backtesting
+  - Secure strategy deployment
+  - Automatic rollback in case of losses
 
-## 🚀 Prioridades Inmediatas (Próximas 4-6 semanas)
+## Immediate Priorities (Next 4-6 weeks)
 
-### 🎯 **Expansión de Indicadores**
-- [ ] **Bollinger Bands**: Implementación completa con señales
-- [ ] **RSI**: Divergencias y niveles de sobrecompra/sobreventa  
-- [ ] **MACD**: Cruces y histograma
-- [ ] **Volume Profile**: Análisis de POC y VAH/VAL
+### **Indicator Expansion**
+- [ ] **Bollinger Bands**: Complete implementation with signals
+- [ ] **RSI**: Divergences and overbought/oversold levels  
+- [ ] **MACD**: Crosses and histogram
+- [ ] **Volume Profile**: POC and VAH/VAL analysis
 
-### 📊 **Nuevas Estrategias**
-- [ ] **VWAP Reclaim**: Completar implementación
-- [ ] **Opening Range Breakout**: ORB 5/15/30 min
+### **New Strategies**
+- [ ] **VWAP Reclaim**: Complete implementation
+- [ ] **Opening Range Breakout**: 5/15/30 min ORB
 - [ ] **Mean Reversion**: RSI oversold + volume confirmation
-- [ ] **Low Float Runners**: Detección automática
+- [ ] **Low Float Runners**: Automatic detection
 
-### 🔄 **Mejoras al Backtesting**
-- [ ] **Walk-Forward Analysis**: Validación temporal
-- [ ] **Monte Carlo**: Simulaciones de robustez
-- [ ] **Métricas Avanzadas**: Calmar ratio, Sortino ratio
-- [ ] **Reporte HTML**: Visualizaciones automáticas
+### **Backtesting Improvements**
+- [ ] **Walk-Forward Analysis**: Temporal validation
+- [ ] **Monte Carlo**: Robustness simulations
+- [ ] **Advanced Metrics**: Calmar ratio, Sortino ratio
+- [ ] **HTML Report**: Automatic visualizations
 
-### 🛠️ **APIs Reales**
-- [ ] **Yahoo Finance**: Integración con yfinance
+### **Real APIs**
+- [ ] **Yahoo Finance**: yfinance integration
 - [ ] **Alpha Vantage**: API key management
-- [ ] **IEX Cloud**: Datos intradiarios
-- [ ] **Polygon.io**: Datos de alta calidad
+- [ ] **IEX Cloud**: Intraday data
+- [ ] **Polygon.io**: High-quality data
 
-## 🎯 Roadmap a Largo Plazo
+## Long-Term Roadmap
 
 ### Q1 2025
-- [x] ~~Implementar Gap & Go básico~~ ✅ Completado
-- [x] ~~Setup inicial de infraestructura~~ ✅ Completado  
-- [x] ~~Primera versión del backtesting engine~~ ✅ Completado
-- [ ] Expansión de indicadores y estrategias
-- [ ] APIs reales y gestión de datos mejorada
-- [ ] Interfaz web básica para visualización
+- [x] ~~Implement basic Gap & Go~~ Completed
+- [x] ~~Initial infrastructure setup~~ Completed  
+- [x] ~~First version of backtesting engine~~ Completed
+- [ ] Indicator and strategy expansion
+- [ ] Real APIs and improved data management
+- [ ] Basic web interface for visualization
 
 ### Q2 2025
-- [ ] ML pipeline para clasificación de setups
-- [ ] API REST funcional
-- [ ] Dashboard interactivo con Streamlit/Dash
-- [ ] Sistema de alertas en tiempo real
-- [ ] Paper trading automatizado
+- [ ] ML pipeline for setup classification
+- [ ] Functional REST API
+- [ ] Interactive dashboard with Streamlit/Dash
+- [ ] Real-time alert system
+- [ ] Automated paper trading
 
 ### Q3 2025
-- [ ] Integración multi-broker (IBKR, Alpaca)
-- [ ] Sistema de paper trading robusto
-- [ ] Primeras estrategias con RL
-- [ ] Optimización automática de parámetros
-- [ ] Análisis de riesgo de cartera
+- [ ] Multi-broker integration (IBKR, Alpaca)
+- [ ] Robust paper trading system
+- [ ] First RL strategies
+- [ ] Automatic parameter optimization
+- [ ] Portfolio risk analysis
 
 ### Q4 2025
-- [ ] Lanzamiento de la plataforma comunitaria
-- [ ] Deployment en producción (cloud)
-- [ ] Trading en vivo con capital real
-- [ ] Documentación y tutoriales completos
-- [ ] Sistema de subscripciones y señales
+- [ ] Community platform launch
+- [ ] Production deployment (cloud)
+- [ ] Live trading with real capital
+- [ ] Complete documentation and tutorials
+- [ ] Subscription and signals system
 
-## 🤝 Cómo Contribuir
+## How to Contribute
 
-### 💻 **Para Desarrolladores**
-1. **Fork** el repositorio
-2. **Implementa** una nueva estrategia o indicador en `src/`
-3. **Añade documentación** correspondiente en `docs/`
-4. **Incluye ejemplos** de uso y tests
-5. **Abre un Pull Request** con descripción detallada
+### **For Developers**
+1. **Fork** the repository
+2. **Implement** a new strategy or indicator in `src/`
+3. **Add documentation** in `docs/`
+4. **Include examples** and tests
+5. **Open a Pull Request** with detailed description
 
-### 📚 **Para Educadores**
-1. **Mejora documentación** existente en `docs/`
-2. **Crea tutoriales** paso a paso
-3. **Añade casos de estudio** reales
-4. **Traduce contenido** a otros idiomas
+### **For Educators**
+1. **Improve existing documentation** in `docs/`
+2. **Create step-by-step tutorials**
+3. **Add real case studies**
+4. **Translate content** to other languages
 
-### 🧪 **Para Investigadores**
-1. **Implementa estrategias** de papers académicos
-2. **Añade métricas** de evaluación avanzadas
-3. **Valida resultados** con datos históricos
-4. **Documenta hallazgos** en formato reproducible
+### **For Researchers**
+1. **Implement strategies** from academic papers
+2. **Add advanced evaluation metrics**
+3. **Validate results** with historical data
+4. **Document findings** in reproducible format
 
-### 📊 **Áreas que Necesitan Atención**
-- [ ] **Testing**: Unit tests para todos los módulos
-- [ ] **Performance**: Optimización de backtesting
-- [ ] **Documentación**: Más ejemplos prácticos
-- [ ] **Validación**: Comparación con benchmarks conocidos
-- [ ] **Integración**: APIs de brokers reales
+### **Areas That Need Attention**
+- [ ] **Testing**: Unit tests for all modules
+- [ ] **Performance**: Backtesting optimization
+- [ ] **Documentation**: More practical examples
+- [ ] **Validation**: Comparison with known benchmarks
+- [ ] **Integration**: Real broker APIs
 
-## 📈 Métricas de Progreso
+## Progress Metrics
 
-### 📊 **Estado Actual del Proyecto**
-- **Documentación**: 60+ archivos ✅
-- **Código Base**: 7 módulos principales ✅
-- **Estrategias**: 1 implementada, 5+ documentadas
-- **Indicadores**: 2 implementados, 8+ documentados
-- **Tests**: 0% cobertura ⚠️
-- **APIs Reales**: 0% implementado ⚠️
+### **Current Project Status**
+- **Documentation**: 60+ files
+- **Code Base**: 7 main modules
+- **Strategies**: 1 implemented, 5+ documented
+- **Indicators**: 2 implemented, 8+ documented
+- **Tests**: 0% coverage
+- **Real APIs**: 0% implemented
 
-### 🎯 **Objetivos para Q1 2025**
-- **Estrategias**: 5 implementadas
-- **Indicadores**: 8 implementados
-- **Tests**: 80% cobertura
-- **APIs Reales**: 3 proveedores
-- **Usuarios**: 100+ stars en GitHub
+### **Q1 2025 Goals**
+- **Strategies**: 5 implemented
+- **Indicators**: 8 implemented
+- **Tests**: 80% coverage
+- **Real APIs**: 3 providers
+- **Users**: 100+ GitHub stars
 
 ---
 
-*Este roadmap es un documento vivo y se actualizará según el feedback de la comunidad y las prioridades del proyecto.*
+*This roadmap is a living document and will be updated based on community feedback and project priorities.*
 
-**📞 Contacto**: Para sugerencias o colaboraciones, abre un issue en GitHub o contacta al equipo.
+**Contact**: For suggestions or collaborations, open an issue on GitHub or contact the team.
 
-**🌟 ¡Tu contribución hace la diferencia!** Cada línea de código, cada mejora en documentación, cada bug reportado ayuda a construir la mejor plataforma de trading cuantitativo de código abierto.
+**Your contribution makes a difference!** Every line of code, every documentation improvement, every reported bug helps build the best open-source quantitative trading platform.

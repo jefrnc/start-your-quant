@@ -1,10 +1,12 @@
-# Stop Loss y Trailing Stops
+> 🇪🇸 [Leer en Español](stops.es.md) | 🇺🇸 **English**
 
-## Tu Póliza de Seguro en Cada Trade
+# Stop Loss and Trailing Stops
 
-Los stops son la diferencia entre una pérdida controlada y un desastre. En small caps, donde los movimientos pueden ser violentos, tener stops automáticos no es opcional - es supervivencia.
+## Your Insurance Policy on Every Trade
 
-## Tipos de Stop Loss
+Stops are the difference between a controlled loss and a disaster. In small caps, where moves can be violent, having automatic stops is not optional - it's survival.
+
+## Types of Stop Loss
 
 ### 1. Fixed Percentage Stop
 ```python
@@ -13,7 +15,7 @@ class FixedPercentageStop:
         self.stop_loss_pct = stop_loss_pct
         
     def calculate_stop_price(self, entry_price, position_type='long'):
-        """Calcular precio de stop loss"""
+        """Calculate stop loss price"""
         if position_type == 'long':
             stop_price = entry_price * (1 - self.stop_loss_pct)
         else:  # short
@@ -22,13 +24,13 @@ class FixedPercentageStop:
         return round(stop_price, 2)
     
     def is_stopped_out(self, current_price, stop_price, position_type='long'):
-        """¿Se activó el stop?"""
+        """Was the stop triggered?"""
         if position_type == 'long':
             return current_price <= stop_price
         else:  # short
             return current_price >= stop_price
 
-# Ejemplo
+# Example
 stop_manager = FixedPercentageStop(stop_loss_pct=0.03)  # 3% stop
 entry_price = 25.00
 stop_price = stop_manager.calculate_stop_price(entry_price)
@@ -38,8 +40,8 @@ print(f"Entry: ${entry_price}, Stop: ${stop_price}")  # Entry: $25.00, Stop: $24
 ### 2. ATR-Based Stop
 ```python
 def calculate_atr_stop(df, entry_price, atr_multiplier=1.5, position_type='long'):
-    """Stop basado en Average True Range"""
-    # Calcular ATR
+    """Stop based on Average True Range"""
+    # Calculate ATR
     df['tr1'] = df['high'] - df['low']
     df['tr2'] = abs(df['high'] - df['close'].shift(1))
     df['tr3'] = abs(df['low'] - df['close'].shift(1))
@@ -55,19 +57,19 @@ def calculate_atr_stop(df, entry_price, atr_multiplier=1.5, position_type='long'
     
     return round(stop_price, 2)
 
-# Ejemplo de uso
+# Usage example
 def smart_stop_calculation(ticker, entry_price, position_type='long'):
-    """Calcular stop inteligente basado en volatilidad"""
-    # Obtener datos históricos
+    """Calculate smart stop based on volatility"""
+    # Get historical data
     data = get_historical_data(ticker, period='3mo')
     
-    # Método 1: Fixed percentage (3%)
+    # Method 1: Fixed percentage (3%)
     fixed_stop = entry_price * (0.97 if position_type == 'long' else 1.03)
     
-    # Método 2: ATR-based
+    # Method 2: ATR-based
     atr_stop = calculate_atr_stop(data, entry_price, 1.5, position_type)
     
-    # Método 3: Support/Resistance
+    # Method 3: Support/Resistance
     if position_type == 'long':
         support_level = find_nearest_support(data, entry_price)
         sr_stop = support_level * 0.99  # 1% below support
@@ -75,7 +77,7 @@ def smart_stop_calculation(ticker, entry_price, position_type='long'):
         resistance_level = find_nearest_resistance(data, entry_price)
         sr_stop = resistance_level * 1.01  # 1% above resistance
     
-    # Usar el más conservador (closer to entry)
+    # Use the most conservative (closer to entry)
     if position_type == 'long':
         final_stop = max(fixed_stop, atr_stop, sr_stop)  # Highest stop for long
     else:
@@ -97,8 +99,8 @@ class VWAPStopManager:
         self.buffer_pct = buffer_pct  # 1% buffer below VWAP
         
     def calculate_vwap_stop(self, df, position_type='long'):
-        """Stop basado en VWAP con buffer"""
-        # Calcular VWAP
+        """Stop based on VWAP with buffer"""
+        # Calculate VWAP
         df['vwap'] = (df['close'] * df['volume']).cumsum() / df['volume'].cumsum()
         current_vwap = df['vwap'].iloc[-1]
         
@@ -110,7 +112,7 @@ class VWAPStopManager:
         return round(stop_price, 2)
     
     def is_vwap_intact(self, current_price, current_vwap, position_type='long'):
-        """¿Está el precio manteniendo VWAP?"""
+        """Is price holding VWAP?"""
         if position_type == 'long':
             return current_price > current_vwap
         else:  # short
@@ -128,7 +130,7 @@ class TrailingStopManager:
         self.positions = {}  # {ticker: position_info}
         
     def initialize_position(self, ticker, entry_price, shares, position_type='long'):
-        """Initialize nueva posición con trailing stop"""
+        """Initialize new position with trailing stop"""
         if position_type == 'long':
             initial_stop = entry_price * (1 - self.initial_stop_pct)
         else:  # short
@@ -148,7 +150,7 @@ class TrailingStopManager:
         return initial_stop
     
     def update_trailing_stop(self, ticker, current_price):
-        """Update trailing stop con nuevo precio"""
+        """Update trailing stop with new price"""
         if ticker not in self.positions:
             return None
         
@@ -194,7 +196,7 @@ class TrailingStopManager:
         return position['current_stop']
     
     def is_stopped_out(self, ticker, current_price):
-        """Check si se activó el trailing stop"""
+        """Check if trailing stop was triggered"""
         if ticker not in self.positions:
             return False
         
@@ -206,7 +208,7 @@ class TrailingStopManager:
             return current_price >= position['current_stop']
     
     def get_position_status(self, ticker):
-        """Get status completo de la posición"""
+        """Get complete position status"""
         if ticker not in self.positions:
             return None
         
@@ -222,14 +224,14 @@ class BreakevenStopManager:
         self.positions = {}
         
     def should_move_to_breakeven(self, ticker, current_price):
-        """¿Debería mover el stop a breakeven?"""
+        """Should we move the stop to breakeven?"""
         if ticker not in self.positions:
             return False
         
         position = self.positions[ticker]
         
         if position['breakeven_set']:
-            return False  # Ya está en breakeven
+            return False  # Already at breakeven
         
         entry_price = position['entry_price']
         
@@ -241,7 +243,7 @@ class BreakevenStopManager:
             return gain_pct >= self.breakeven_trigger_pct
     
     def set_breakeven_stop(self, ticker):
-        """Mover stop a breakeven"""
+        """Move stop to breakeven"""
         if ticker not in self.positions:
             return None
         
@@ -262,7 +264,7 @@ class BreakevenStopManager:
 ### 3. Parabolic SAR Stop
 ```python
 def calculate_parabolic_sar(df, acceleration=0.02, max_acceleration=0.2):
-    """Calcular Parabolic SAR para trailing stops"""
+    """Calculate Parabolic SAR for trailing stops"""
     df = df.copy()
     df['sar'] = df['close'].iloc[0]  # Initialize
     df['ep'] = df['high'].iloc[0]   # Extreme point
@@ -325,7 +327,7 @@ def calculate_parabolic_sar(df, acceleration=0.02, max_acceleration=0.2):
     return df
 ```
 
-## Stop Loss Avanzado para Small Caps
+## Advanced Stop Loss for Small Caps
 
 ### 1. Volatility-Adjusted Stops
 ```python
@@ -335,15 +337,15 @@ class VolatilityAdjustedStop:
         self.lookback_days = lookback_days
         
     def calculate_volatility_multiplier(self, ticker):
-        """Calcular multiplicador basado en volatilidad"""
-        # Obtener datos históricos
+        """Calculate multiplier based on volatility"""
+        # Get historical data
         data = get_historical_data(ticker, self.lookback_days)
         
-        # Calcular volatilidad diaria
+        # Calculate daily volatility
         returns = data['close'].pct_change().dropna()
         daily_vol = returns.std()
         
-        # Clasificar volatilidad
+        # Classify volatility
         if daily_vol > 0.08:      # >8% daily vol
             return 1.5            # Wider stops
         elif daily_vol > 0.05:    # 5-8% daily vol
@@ -354,7 +356,7 @@ class VolatilityAdjustedStop:
             return 0.75           # Tighter stops
     
     def calculate_adjusted_stop(self, ticker, entry_price, position_type='long'):
-        """Calculate stop ajustado por volatilidad"""
+        """Calculate volatility-adjusted stop"""
         vol_multiplier = self.calculate_volatility_multiplier(ticker)
         adjusted_stop_pct = self.base_stop_pct * vol_multiplier
         
@@ -384,7 +386,7 @@ class TimeBasedStopManager:
         }
     
     def get_time_period(self):
-        """Determinar período actual"""
+        """Determine current period"""
         current_time = pd.Timestamp.now().time()
         
         if pd.Timestamp('04:00').time() <= current_time < pd.Timestamp('09:30').time():
@@ -399,7 +401,7 @@ class TimeBasedStopManager:
             return 'after_hours'
     
     def adjust_stop_for_time(self, base_stop_pct):
-        """Ajustar stop según hora del día"""
+        """Adjust stop based on time of day"""
         time_period = self.get_time_period()
         multiplier = self.time_adjustments[time_period]
         
@@ -420,7 +422,7 @@ class RealTimeStopMonitor:
         self.alerts = []
         
     def add_stop_order(self, ticker, stop_price, shares, position_type, order_type='market'):
-        """Agregar stop order para monitoring"""
+        """Add stop order for monitoring"""
         self.active_stops[ticker] = {
             'stop_price': stop_price,
             'shares': shares,
@@ -431,7 +433,7 @@ class RealTimeStopMonitor:
         }
     
     def check_stops(self, market_data):
-        """Check all active stops contra market data"""
+        """Check all active stops against market data"""
         triggered_stops = []
         
         for ticker, stop_info in self.active_stops.items():
@@ -459,7 +461,7 @@ class RealTimeStopMonitor:
         return triggered_stops
     
     def is_stop_triggered(self, current_price, stop_info):
-        """Check si el stop se activó"""
+        """Check if the stop was triggered"""
         stop_price = stop_info['stop_price']
         position_type = stop_info['position_type']
         
@@ -469,7 +471,7 @@ class RealTimeStopMonitor:
             return current_price >= stop_price
     
     def generate_stop_alert(self, ticker, stop_info, trigger_price):
-        """Generar alerta de stop activado"""
+        """Generate triggered stop alert"""
         alert = f"🚨 STOP TRIGGERED: {ticker} @ ${trigger_price:.2f} (Stop: ${stop_info['stop_price']:.2f})"
         self.alerts.append({
             'timestamp': pd.Timestamp.now(),
@@ -537,7 +539,7 @@ class BracketOrderManager:
             return None
     
     def update_bracket_status(self, bracket_id):
-        """Update status del bracket order"""
+        """Update bracket order status"""
         if bracket_id not in self.active_brackets:
             return None
         
@@ -566,9 +568,9 @@ class StopLossStrategy:
         self.mental_stop_buffer_pct = mental_stop_buffer_pct
         
     def set_stop_strategy(self, ticker, entry_price, base_stop_pct):
-        """Decidir estrategia de stop"""
+        """Decide stop strategy"""
         if self.use_hard_stops:
-            # Hard stop: orden automática en el broker
+            # Hard stop: automatic order at the broker
             stop_price = entry_price * (1 - base_stop_pct)
             return {
                 'type': 'hard_stop',
@@ -576,7 +578,7 @@ class StopLossStrategy:
                 'automatic': True
             }
         else:
-            # Mental stop: monitoring manual
+            # Mental stop: manual monitoring
             mental_stop = entry_price * (1 - base_stop_pct)
             alert_level = mental_stop * (1 + self.mental_stop_buffer_pct)
             
@@ -588,10 +590,10 @@ class StopLossStrategy:
             }
     
     def should_use_hard_stop(self, ticker, volatility, float_size):
-        """Determinar si usar hard stop o mental"""
-        # Usar hard stops para:
-        # - Stocks muy volátiles
-        # - Low float (pueden gapear)
+        """Determine whether to use hard stop or mental"""
+        # Use hard stops for:
+        # - Very volatile stocks
+        # - Low float (can gap)
         # - When can't monitor constantly
         
         if volatility > 0.08:  # >8% daily volatility
@@ -603,7 +605,7 @@ class StopLossStrategy:
         return self.use_hard_stops  # Default setting
 ```
 
-## Mi Setup Personal de Stops
+## My Personal Stop Setup
 
 ```python
 # stop_config.py
@@ -640,7 +642,7 @@ class MyStopManager:
         self.time_adjuster = TimeBasedStopManager()
         
     def calculate_optimal_stop(self, ticker, entry_price, stock_info):
-        """Mi método principal para calcular stops"""
+        """My main method for calculating stops"""
         
         # 1. Base stop
         base_stop_pct = self.config['default_stop_pct']
@@ -688,6 +690,6 @@ class MyStopManager:
         }
 ```
 
-## Siguiente Paso
+## Next Step
 
-Con stops implementados, completemos la gestión de riesgo con [Riesgo Asimétrico](asymmetric_risk.md).
+With stops implemented, let's complete risk management with [Asymmetric Risk](asymmetric_risk.md).

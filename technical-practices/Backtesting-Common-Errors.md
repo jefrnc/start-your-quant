@@ -1,115 +1,117 @@
-# Errores Comunes en Backtesting
+> 🇪🇸 [Leer en Español](Backtesting-Common-Errors.es.md) | 🇺🇸 **English**
 
-Tu backtest solo es útil si es reproducible en real. Para los tres niveles de validación (clásico, forward, walk-forward), ver [Backtesting: Del Clásico al Walk-Forward](./Backtesting-Three-Levels.md). Para problemas específicos de datos, ver [Calidad de Datos y Ajustes](./Data-Quality-Adjustments.md). Un sistema que parece espectacular en el histórico pero tiene un error de configuración, un activo no operable, o una lectura a futuro, no vale nada. Estos son los errores más frecuentes y cómo detectarlos.
+# Common Backtesting Errors
 
-## 1. Operar un Activo No Operable
+Your backtest is only useful if it's reproducible in live trading. For the three levels of validation (classic, forward, walk-forward), see [Backtesting: From Classic to Walk-Forward](./Backtesting-Three-Levels.md). For data-specific issues, see [Data Quality and Adjustments](./Data-Quality-Adjustments.md). A system that looks spectacular on historical data but has a configuration error, a non-tradable asset, or a look-ahead bias is worthless. These are the most common errors and how to detect them.
 
-Los índices (VIX, S&P 500, IBEX 35, Nasdaq) son activos sintéticos — no se pueden comprar ni vender directamente. Para invertir necesitás un derivado: futuro, ETF, opción o CFD.
+## 1. Trading a Non-Tradable Asset
 
-**El caso del VIX**: un sistema de reversión a la media en el índice VIX puede verse espectacular (profit factor 5+, curva casi perfecta). Pero el índice VIX no es operable. Cuando pasás el mismo sistema al futuro del VIX, puede dejar de funcionar o requerir ajustes significativos.
+Indices (VIX, S&P 500, IBEX 35, Nasdaq) are synthetic assets -- they cannot be bought or sold directly. To invest, you need a derivative: futures, ETFs, options, or CFDs.
 
-**Por qué**: el futuro del VIX suele estar en **contango** fuerte — cada vencimiento sucesivo cotiza más caro que el actual (típicamente entre 2% y 8% entre meses, dependiendo de las condiciones de mercado). Esto crea una caída artificial persistente en el gráfico continuo que destruye la ciclicidad limpia que ves en el índice.
+**The VIX case**: a mean-reversion system on the VIX index can look spectacular (profit factor 5+, near-perfect equity curve). But the VIX index is not tradable. When you apply the same system to VIX futures, it may stop working or require significant adjustments.
 
-**Regla**: antes de backtestear, verificá que el activo sea operable. Si es un índice, usá el futuro o ETF correspondiente.
+**Why**: VIX futures are typically in strong **contango** -- each successive expiration trades at a premium to the current one (typically 2% to 8% between months, depending on market conditions). This creates a persistent artificial decline in the continuous chart that destroys the clean cyclicality you see in the index.
 
-### Contango y Backwardation
+**Rule**: before backtesting, verify that the asset is tradable. If it's an index, use the corresponding futures or ETF.
 
-- **Contango** (lo habitual): vencimientos futuros más caros que el spot. Refleja el costo del tiempo: tipos de interés, almacenamiento (en commodities), incertidumbre
-- **Backwardation**: vencimientos futuros más baratos que el spot. En commodities indica escasez actual o demanda inmediata fuerte. En el VIX, pasar a backwardation indica pánico de mercado (alta demanda de protección inmediata)
+### Contango and Backwardation
 
-El contango afecta a todos los futuros, pero en la mayoría es pequeño (~1% entre trimestres en índices de bolsa). En el VIX es extremo y destruye estrategias que funcionan en el índice puro.
+- **Contango** (the norm): future expirations are more expensive than spot. Reflects the cost of time: interest rates, storage (in commodities), uncertainty
+- **Backwardation**: future expirations are cheaper than spot. In commodities, it indicates current scarcity or strong immediate demand. In the VIX, a shift to backwardation signals market panic (high demand for immediate protection)
 
-## 2. Look-Ahead Bias (Lectura a Futuro)
+Contango affects all futures, but in most cases it's small (~1% between quarters for equity indices). In the VIX it's extreme and destroys strategies that work on the pure index.
 
-Usar información que no estaría disponible en el momento de la decisión.
+## 2. Look-Ahead Bias
 
-**Ejemplos comunes:**
+Using information that would not have been available at the time of the decision.
+
+**Common examples:**
 
 ```python
-# MAL: comprar en la apertura de hoy basándote en el cierre de hoy
-# Al cierre ya no podés comprar en la apertura — ya pasó
+# WRONG: buying at today's open based on today's close
+# By the close you can no longer buy at the open -- it already happened
 if close_today > sma200_today:
-    buy_at(open_today)  # IMPOSIBLE — open_today ya pasó cuando tenés close_today
+    buy_at(open_today)  # IMPOSSIBLE -- open_today already passed when you have close_today
 
-# BIEN: señal al cierre de hoy → comprar en la apertura de mañana
+# RIGHT: signal at today's close -> buy at tomorrow's open
 if close_today > sma200_today:
-    buy_at(open_tomorrow)  # CORRECTO — decisión hoy, ejecución mañana
+    buy_at(open_tomorrow)  # CORRECT -- decision today, execution tomorrow
 ```
 
-**Datos externos**: los COT (Commitment of Traders) se publican los viernes pero están fechados el martes anterior. Si tu sistema usa la fecha del dato (martes) en vez de la fecha de publicación (viernes), estás leyendo a futuro.
+**External data**: the COT (Commitment of Traders) report is published on Fridays but is dated the previous Tuesday. If your system uses the data date (Tuesday) instead of the publication date (Friday), you have look-ahead bias.
 
-Lo mismo con resultados empresariales, datos macro (PIB, empleo), o cualquier dato que tenga una fecha de referencia distinta a la fecha de disponibilidad.
+The same applies to earnings reports, macro data (GDP, employment), or any data where the reference date differs from the availability date.
 
-**Regla**: toda información que uses debe estar 100% disponible en el momento en que se evalúa. Si hay duda, usá la fecha de publicación, no la fecha del dato.
+**Rule**: all information you use must be 100% available at the time it's evaluated. When in doubt, use the publication date, not the data date.
 
-## 3. Look Inside Bar (Orden de Ejecución dentro de la Vela)
+## 3. Look Inside Bar (Execution Order Within the Bar)
 
-De una vela histórica solo conocés 4 datos: open, high, low, close. No sabés en qué orden se movió el precio internamente.
+From a historical bar you only know 4 values: open, high, low, close. You don't know the order in which price moved internally.
 
-**El problema**: si tenés un stop en 100 y un take profit en 105, y la vela tiene low=99 y high=106, ¿cuál saltó primero? Si bajó primero → stop. Si subió primero → TP. El resultado es opuesto según el orden.
+**The problem**: if you have a stop at 100 and a take profit at 105, and the bar has low=99 and high=106, which triggered first? If it went down first -> stop. If it went up first -> TP. The outcome is opposite depending on the order.
 
 ```
-Escenario A: baja → sube    →  stop loss salta primero  →  pérdida
-Escenario B: sube → baja    →  take profit salta primero →  ganancia
+Scenario A: drops -> rises    ->  stop loss triggers first  ->  loss
+Scenario B: rises -> drops    ->  take profit triggers first ->  profit
 ```
 
-El motor de backtest **deduce** el orden, pero puede equivocarse.
+The backtest engine **infers** the order, but it can be wrong.
 
-**Solución**: activar Look Inside Bar (TradeStation) o Bar Magnifier (MultiCharts), que carga un timeframe inferior (1 minuto) para simular cómo se formó cada vela.
+**Solution**: enable Look Inside Bar (TradeStation) or Bar Magnifier (MultiCharts), which loads a lower timeframe (1 minute) to simulate how each bar was formed.
 
-**Trampa**: incluso con 1 minuto, si tus stops son muy cercanos, pueden saltar dentro de una vela de 1 minuto y el problema se repite. Verificá que no haya órdenes que salten en la misma vela del timeframe inferior.
+**Trap**: even with 1-minute data, if your stops are very tight, they can trigger within a single 1-minute bar and the problem repeats. Verify that no orders trigger within the same bar on the lower timeframe.
 
-**Caso real**: un sistema con trailing stop muy ajustado mostraba una curva espectacular. Al activar Look Inside Bar, se convirtió en pérdidas. El trailing saltaba dentro de la vela antes de que el precio llegara al TP.
+**Real case**: a system with a very tight trailing stop showed a spectacular equity curve. When Look Inside Bar was enabled, it turned into losses. The trailing stop was triggering within the bar before price reached the TP.
 
-## 4. Normas del Mercado que No Conocés
+## 4. Market Rules You Don't Know
 
-Cada mercado tiene reglas específicas que pueden hacer que tu sistema sea inoperable.
+Each market has specific rules that can make your system inoperable.
 
-| Regla | Ejemplo |
+| Rule | Example |
 |---|---|
-| **Tipos de órdenes restringidos** | El VIX no acepta market orders ni stops en horario extendido — solo limit |
-| **Horarios de trading** | El Globex no acepta stops en premarket |
-| **Circuit breakers** | Acciones US se pausan en caídas del 7%, 14%, 20% |
-| **Position limits** | Cada futuro tiene un máximo de contratos permitido |
-| **Liquidez por horario** | Un activo puede tener spreads de 1 tick a las 10 AM y de 20 ticks a las 3 AM |
-| **Short selling** | Algunas acciones son Hard-To-Borrow (HTB) — no podés shortearlas o es caro |
+| **Restricted order types** | VIX does not accept market orders or stops in extended hours -- limit only |
+| **Trading hours** | Globex does not accept stops in premarket |
+| **Circuit breakers** | US stocks halt on declines of 7%, 14%, 20% |
+| **Position limits** | Each futures contract has a maximum number of contracts allowed |
+| **Liquidity by time of day** | An asset may have 1-tick spreads at 10 AM and 20-tick spreads at 3 AM |
+| **Short selling** | Some stocks are Hard-To-Borrow (HTB) -- you can't short them or it's expensive |
 
-**Dónde encontrar esta info**: páginas de los mercados (CME, CBOE, NYSE). Buscar "contract specifications" para futuros. El CME tiene cursos gratuitos excelentes.
+**Where to find this info**: exchange websites (CME, CBOE, NYSE). Search for "contract specifications" for futures. The CME has excellent free courses.
 
-**Regla**: antes de operar cualquier activo nuevo, leé las especificaciones del contrato. Es una vez — después ya lo sabés.
+**Rule**: before trading any new asset, read the contract specifications. It's a one-time effort -- after that, you know.
 
-## 5. Órdenes Limit en Backtest
+## 5. Limit Orders in Backtests
 
-Las órdenes limit tienen un problema que los stops y market orders no tienen: **puede que no ejecuten aunque el precio toque tu nivel**.
+Limit orders have a problem that stops and market orders don't: **they may not fill even though price touched your level**.
 
-En real, cuando ponés una limit a 100.00 para comprar, hay una cola de órdenes. Si hay 500 órdenes delante y solo se ejecutan 400, te quedás afuera. Pero el backtest marca la operación como ejecutada porque el precio tocó 100.00.
+In live trading, when you place a limit buy at 100.00, there's an order queue. If there are 500 orders ahead and only 400 fill, you get left out. But the backtest marks the trade as executed because price touched 100.00.
 
-**El sesgo**: los trades que "no ejecutan" casi siempre hubieran sido ganadores (el precio tocó tu nivel y rebotó). Esto infla el backtest.
+**The bias**: trades that "don't fill" would almost always have been winners (price touched your level and bounced). This inflates the backtest.
 
-**Solución conservadora**: configurar el backtest para que ejecute limits solo cuando el precio **excede** tu nivel (un tick más allá), no cuando lo toca. Es más pesimista pero más realista.
+**Conservative solution**: configure the backtest to fill limits only when price **exceeds** your level (one tick beyond), not when it touches it. It's more pessimistic but more realistic.
 
-## 6. Slippage y Comisiones
+## 6. Slippage and Commissions
 
-El slippage es la diferencia entre el precio teórico del sistema y el precio real de ejecución. Las comisiones son lo que cobra el broker.
+Slippage is the difference between the system's theoretical price and the actual execution price. Commissions are what the broker charges.
 
-**Regla general**: 1-2 ticks de slippage por operación en condiciones normales. Más en:
-- Momentos de alta volatilidad
-- Activos poco líquidos
-- Operativa en noticias o rupturas (muchos stops saltando al mismo tiempo)
+**General rule**: 1-2 ticks of slippage per trade under normal conditions. More in:
+- High-volatility moments
+- Illiquid assets
+- Trading around news or breakouts (many stops triggering at the same time)
 
-Si tu sistema tiene un profit promedio de 3 ticks por trade y el slippage + comisiones suman 2 ticks, te queda 1 tick — cualquier variación te pone en pérdidas. Los sistemas viables necesitan margen holgado sobre los costos de transacción.
+If your system has an average profit of 3 ticks per trade and slippage + commissions total 2 ticks, you're left with 1 tick -- any variation puts you in the red. Viable systems need comfortable margin above transaction costs.
 
-## Checklist de Evaluación Preliminar
+## Preliminary Evaluation Checklist
 
-Antes de pasar un sistema a optimización formal, verificá:
+Before moving a system to formal optimization, verify:
 
-- [ ] El activo es operable (no es un índice puro)
-- [ ] Conozco las especificaciones del contrato (horarios, órdenes permitidas, vencimientos, limits)
-- [ ] No hay lectura a futuro en el código (toda info disponible al momento de la decisión)
-- [ ] Los datos externos usan fecha de publicación, no fecha del dato
-- [ ] Look Inside Bar activado si uso stops/TPs cercanos
-- [ ] Limits configurados con ejecución en "excede" no en "toca"
-- [ ] Slippage y comisiones incluidos (aunque sea estimación)
-- [ ] He mirado el gráfico en distintos momentos: alta/baja volatilidad, tendencia, lateral, crash
-- [ ] Las señales son coherentes visualmente con lo que el sistema debería hacer
-- [ ] Todo es 100% reproducible en operativa real
+- [ ] The asset is tradable (not a pure index)
+- [ ] I know the contract specifications (hours, allowed orders, expirations, limits)
+- [ ] There is no look-ahead bias in the code (all info available at decision time)
+- [ ] External data uses publication date, not data date
+- [ ] Look Inside Bar enabled if using tight stops/TPs
+- [ ] Limits configured with "exceeds" fill logic, not "touches"
+- [ ] Slippage and commissions included (even if estimated)
+- [ ] I've reviewed the chart at different times: high/low volatility, trending, sideways, crash
+- [ ] Signals are visually consistent with what the system should be doing
+- [ ] Everything is 100% reproducible in live trading

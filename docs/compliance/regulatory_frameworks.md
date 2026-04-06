@@ -1,16 +1,18 @@
-# Frameworks Regulatorios para Trading Algorítmico
+> 🇪🇸 [Leer en Español](regulatory_frameworks.es.md) | 🇺🇸 **English**
 
-## Panorama Regulatorio Global
+# Regulatory Frameworks for Algorithmic Trading
 
-El trading algorítmico opera en un entorno regulatorio complejo y en constante evolución. Los reguladores de todo el mundo han desarrollado marcos específicos para abordar los riesgos únicos que presentan los algoritmos de trading, desde la estabilidad del mercado hasta la protección del inversor.
+## Global Regulatory Landscape
 
-## Principales Jurisdicciones Regulatorias
+Algorithmic trading operates in a complex and constantly evolving regulatory environment. Regulators around the world have developed specific frameworks to address the unique risks posed by trading algorithms, from market stability to investor protection.
 
-### Estados Unidos
+## Major Regulatory Jurisdictions
+
+### United States
 
 #### Securities and Exchange Commission (SEC)
 
-**Regulaciones Clave:**
+**Key Regulations:**
 ```python
 sec_regulations = {
     'regulation_nms': {
@@ -21,7 +23,7 @@ sec_regulations = {
             'Sub-Penny Rule',
             'Market Data Rules'
         ],
-        'impact_on_algo_trading': 'Requiere best execution y acceso equitativo'
+        'impact_on_algo_trading': 'Requires best execution and equitable access'
     },
     'market_access_rule': {
         'description': 'Rule 15c3-5',
@@ -31,7 +33,7 @@ sec_regulations = {
             'Regulatory and legal compliance',
             'Direct market access controls'
         ],
-        'impact_on_algo_trading': 'Controles de riesgo obligatorios pre-trade'
+        'impact_on_algo_trading': 'Mandatory pre-trade risk controls'
     },
     'volcker_rule': {
         'description': 'Proprietary trading restrictions',
@@ -41,12 +43,12 @@ sec_regulations = {
             'Hedging activities',
             'Trading in government securities'
         ],
-        'impact_on_algo_trading': 'Limita prop trading para bancos'
+        'impact_on_algo_trading': 'Limits prop trading for banks'
     }
 }
 ```
 
-**Implementación de Compliance SEC:**
+**SEC Compliance Implementation:**
 ```python
 class SECComplianceFramework:
     def __init__(self):
@@ -59,7 +61,7 @@ class SECComplianceFramework:
     
     def implement_market_access_controls(self, order):
         """
-        Implementa controles de Market Access Rule
+        Implements Market Access Rule controls
         """
         controls_passed = {
             'order_size_check': self.check_order_size(order),
@@ -79,16 +81,16 @@ class SECComplianceFramework:
     
     def ensure_best_execution(self, order_details):
         """
-        Asegura cumplimiento de best execution bajo Reg NMS
+        Ensures best execution compliance under Reg NMS
         """
         venue_analysis = self.analyze_execution_venues(order_details)
         
         best_venue = max(venue_analysis, key=lambda x: x['execution_quality_score'])
         
-        # Documentar decisión para audit trail
+        # Document decision for audit trail
         execution_rationale = {
             'selected_venue': best_venue['venue'],
-            'rationale': f"Mejor precio disponible: {best_venue['price']}",
+            'rationale': f"Best available price: {best_venue['price']}",
             'alternative_venues': [v for v in venue_analysis if v != best_venue],
             'compliance_timestamp': datetime.now()
         }
@@ -98,7 +100,7 @@ class SECComplianceFramework:
 
 #### Commodity Futures Trading Commission (CFTC)
 
-**Regulaciones para Derivatives:**
+**Derivatives Regulations:**
 ```python
 cftc_regulations = {
     'algorithmic_trading_rules': {
@@ -132,7 +134,7 @@ class CFTCComplianceFramework:
     
     def implement_algo_trading_controls(self):
         """
-        Implementa controles propuestos para algo trading
+        Implements proposed algo trading controls
         """
         controls = {
             'source_code_management': SourceCodeRepository(),
@@ -144,11 +146,11 @@ class CFTCComplianceFramework:
         return controls
 ```
 
-### Unión Europea
+### European Union
 
 #### Markets in Financial Instruments Directive II (MiFID II)
 
-**Requerimientos Específicos para Algo Trading:**
+**Specific Requirements for Algo Trading:**
 ```python
 mifid_ii_requirements = {
     'algorithmic_trading_definition': {
@@ -179,7 +181,7 @@ class MiFIDIIComplianceFramework:
         
     def ensure_algo_trading_compliance(self, strategy_info):
         """
-        Asegura compliance con MiFID II para algo trading
+        Ensures MiFID II compliance for algo trading
         """
         compliance_checklist = {
             'regulatory_notification': self.check_notification_status(),
@@ -200,7 +202,7 @@ class MiFIDIIComplianceFramework:
     
     def implement_market_making_obligations(self, mm_strategy):
         """
-        Implementa obligaciones de market making
+        Implements market making obligations
         """
         mm_controls = {
             'quote_continuity': ContinuousQuotingSystem(),
@@ -212,7 +214,7 @@ class MiFIDIIComplianceFramework:
         return mm_controls
 ```
 
-### Reino Unido
+### United Kingdom
 
 #### Financial Conduct Authority (FCA)
 
@@ -253,7 +255,7 @@ class FCAComplianceFramework:
         
     def implement_operational_resilience(self, trading_systems):
         """
-        Implementa framework de resistencia operacional
+        Implements operational resilience framework
         """
         resilience_measures = {
             'important_business_services': self.map_important_services(trading_systems),
@@ -267,7 +269,7 @@ class FCAComplianceFramework:
     
     def monitor_market_abuse_risk(self, trading_activity):
         """
-        Monitorea riesgo de abuso de mercado
+        Monitors market abuse risk
         """
         abuse_indicators = {
             'unusual_price_movements': self.detect_unusual_movements(trading_activity),
@@ -279,7 +281,7 @@ class FCAComplianceFramework:
         return abuse_indicators
 ```
 
-## Regulaciones Específicas por Estrategia
+## Strategy-Specific Regulations
 
 ### High-Frequency Trading (HFT)
 
@@ -306,7 +308,7 @@ class HFTRegulatoryFramework:
     
     def monitor_order_trade_ratio(self, daily_activity):
         """
-        Monitorea ratio de órdenes a trades para HFT
+        Monitors order-to-trade ratio for HFT
         """
         total_orders = daily_activity['orders_submitted']
         total_trades = daily_activity['trades_executed']
@@ -324,7 +326,7 @@ class HFTRegulatoryFramework:
     
     def implement_hft_risk_controls(self):
         """
-        Implementa controles de riesgo específicos para HFT
+        Implements HFT-specific risk controls
         """
         risk_controls = {
             'pre_trade_filters': {
@@ -368,7 +370,7 @@ class MarketMakingRegulations:
     
     def monitor_market_making_compliance(self, mm_activity):
         """
-        Monitorea compliance de obligaciones de market making
+        Monitors market making obligation compliance
         """
         compliance_metrics = {
             'quote_continuity': self.calculate_quote_continuity(mm_activity),
@@ -386,9 +388,9 @@ class MarketMakingRegulations:
         }
 ```
 
-## Implementación de Sistemas de Compliance
+## Implementing Compliance Systems
 
-### Architecture de Compliance Integrado
+### Integrated Compliance Architecture
 
 ```python
 class IntegratedComplianceSystem:
@@ -399,7 +401,7 @@ class IntegratedComplianceSystem:
         
     def initialize_compliance_engines(self):
         """
-        Inicializa engines de compliance por jurisdicción
+        Initializes compliance engines by jurisdiction
         """
         engines = {}
         
@@ -425,11 +427,11 @@ class IntegratedComplianceSystem:
     
     def real_time_compliance_check(self, trade_order):
         """
-        Verificación de compliance en tiempo real
+        Real-time compliance verification
         """
         compliance_results = {}
         
-        # Check compliance en todas las jurisdicciones relevantes
+        # Check compliance across all relevant jurisdictions
         for jurisdiction, engines in self.compliance_engines.items():
             jurisdiction_results = {}
             
@@ -439,7 +441,7 @@ class IntegratedComplianceSystem:
             
             compliance_results[jurisdiction] = jurisdiction_results
         
-        # Determinar aprobación general
+        # Determine overall approval
         overall_approval = self.determine_overall_approval(compliance_results)
         
         return {
@@ -450,7 +452,7 @@ class IntegratedComplianceSystem:
     
     def generate_compliance_dashboard(self):
         """
-        Genera dashboard de compliance en tiempo real
+        Generates a real-time compliance dashboard
         """
         dashboard_data = {
             'compliance_status_by_jurisdiction': {},
@@ -472,7 +474,7 @@ class AutomatedRegulatoryReporting:
         
     def generate_regulatory_reports(self, period='monthly'):
         """
-        Genera reportes regulatorios automáticamente
+        Automatically generates regulatory reports
         """
         reports = {}
         
@@ -496,7 +498,7 @@ class AutomatedRegulatoryReporting:
     
     def submit_reports_automatically(self, reports):
         """
-        Envía reportes automáticamente a reguladores
+        Automatically submits reports to regulators
         """
         submission_results = {}
         
@@ -518,7 +520,7 @@ class AutomatedRegulatoryReporting:
         return submission_results
 ```
 
-## Gestión de Cambios Regulatorios
+## Regulatory Change Management
 
 ### Regulatory Change Management
 
@@ -533,7 +535,7 @@ class RegulatoryChangeManager:
         
     def monitor_regulatory_changes(self):
         """
-        Monitorea cambios regulatorios continuamente
+        Continuously monitors regulatory changes
         """
         changes_detected = []
         
@@ -556,7 +558,7 @@ class RegulatoryChangeManager:
     
     def implement_regulatory_change(self, change_info):
         """
-        Implementa cambio regulatorio en sistemas
+        Implements regulatory change in systems
         """
         implementation_plan = {
             'systems_updates': self.identify_system_updates(change_info),
@@ -569,14 +571,14 @@ class RegulatoryChangeManager:
         return implementation_plan
 ```
 
-## Best Practices para Compliance
+## Best Practices for Compliance
 
 ### Compliance Culture Development
 
 ```python
 def build_compliance_culture():
     """
-    Framework para construir cultura de compliance
+    Framework for building a compliance culture
     """
     culture_elements = {
         'leadership_commitment': {
@@ -625,18 +627,18 @@ class ComplianceTrainingProgram:
     
     def design_training_curriculum(self, role, jurisdiction):
         """
-        Diseña curriculum de entrenamiento personalizado
+        Designs a personalized training curriculum
         """
         curriculum = []
         
-        # Módulos base
+        # Base modules
         curriculum.append(self.training_modules['foundational_compliance'])
         
-        # Módulos específicos por rol
+        # Role-specific modules
         if role in ['trader', 'quant', 'risk_manager']:
             curriculum.append(self.training_modules['advanced_regulatory_topics'])
         
-        # Módulos específicos por jurisdicción
+        # Jurisdiction-specific modules
         if jurisdiction in ['US', 'EU', 'UK']:
             jurisdiction_module = {
                 **self.training_modules['jurisdiction_specific'],
@@ -677,7 +679,7 @@ class ComplianceTechnologyStack:
     
     def assess_technology_gaps(self, current_systems):
         """
-        Evalúa gaps en stack tecnológico de compliance
+        Assesses gaps in compliance technology stack
         """
         gap_analysis = {}
         
@@ -701,4 +703,4 @@ class ComplianceTechnologyStack:
 
 ---
 
-*El cumplimiento regulatorio en trading algorítmico requiere un enfoque comprehensivo que combine tecnología robusta, procesos bien definidos y una cultura organizacional comprometida con el compliance. A medida que las regulaciones continúan evolucionando, especialmente en el área de IA y machine learning, las firmas deben mantener sistemas flexibles y adaptativos que puedan evolucionar con el panorama regulatorio.*
+*Regulatory compliance in algorithmic trading requires a comprehensive approach that combines robust technology, well-defined processes, and an organizational culture committed to compliance. As regulations continue to evolve, especially in the areas of AI and machine learning, firms must maintain flexible and adaptive systems that can evolve with the regulatory landscape.*

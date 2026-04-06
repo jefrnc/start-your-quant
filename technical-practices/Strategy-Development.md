@@ -1,22 +1,24 @@
-# Desarrollo Sistemático de Estrategias
+> 🇪🇸 [Leer en Español](Strategy-Development.es.md) | 🇺🇸 **English**
 
-## Filosofía: Research-Driven Development
+# Systematic Strategy Development
 
-El desarrollo de estrategias cuantitativas exitosas no es "prueba y error" - es un proceso **sistemático, reproducible y basado en evidencia**. Cada estrategia debe pasar por un pipeline riguroso desde la hipótesis inicial hasta la implementación en vivo.
+## Philosophy: Research-Driven Development
 
-### Principios Fundamentales
+Successful quantitative strategy development is not "trial and error" -- it's a **systematic, reproducible, and evidence-based** process. Every strategy must go through a rigorous pipeline from initial hypothesis to live implementation.
 
-1. **Hypothesis-First Approach**: Toda estrategia debe empezar con una hipótesis económica/estadística clara
-2. **Reproducible Research**: Todo el proceso debe estar documentado y ser reproducible
-3. **Out-of-Sample Validation**: Nunca optimizar en el mismo dataset que se usa para validar
-4. **Economic Intuition**: Las estrategias deben tener sentido económico, no solo estadístico
-5. **Implementation Reality**: Considerar costos de transacción, slippage y limitaciones técnicas desde el inicio
+### Core Principles
 
-## Pipeline de Desarrollo de Estrategias
+1. **Hypothesis-First Approach**: Every strategy must start with a clear economic/statistical hypothesis
+2. **Reproducible Research**: The entire process must be documented and reproducible
+3. **Out-of-Sample Validation**: Never optimize on the same dataset used for validation
+4. **Economic Intuition**: Strategies must make economic sense, not just statistical sense
+5. **Implementation Reality**: Consider transaction costs, slippage, and technical limitations from the start
 
-### Fase 1: Ideation y Hypothesis Formation
+## Strategy Development Pipeline
 
-#### 1.1 Fuentes de Ideas
+### Phase 1: Ideation and Hypothesis Formation
+
+#### 1.1 Idea Sources
 ```python
 IDEA_SOURCES = {
     'academic_research': [
@@ -25,8 +27,8 @@ IDEA_SOURCES = {
         'SSRN papers on market microstructure'
     ],
     'market_observations': [
-        'Price patterns específicos de small caps',
-        'Volume anomalies en premarket',
+        'Small cap-specific price patterns',
+        'Premarket volume anomalies',
         'News reaction patterns'
     ],
     'practitioner_insights': [
@@ -48,13 +50,13 @@ strategy_hypothesis:
   name: "VWAP Rejection Reversal"
 
   economic_rationale: |
-    "Cuando el precio de un small cap es rechazado en el VWAP durante
-    premarket, indica que hay resistance. Si posteriormente reclaim el
-    VWAP con volumen, indica shift en sentiment y momentum continuation."
+    "When a small cap's price is rejected at the VWAP during
+    premarket, it indicates resistance. If it subsequently reclaims
+    VWAP with volume, it signals a shift in sentiment and momentum continuation."
 
   statistical_hypothesis: |
-    "H0: Returns después de VWAP reclaim = random
-     H1: Returns después de VWAP reclaim > benchmark con significance"
+    "H0: Returns after VWAP reclaim = random
+     H1: Returns after VWAP reclaim > benchmark with significance"
 
   target_market: "Small caps $1-10, premarket hours 6-8 AM"
 
@@ -65,18 +67,18 @@ strategy_hypothesis:
     max_drawdown: "<10%"
 
   risk_factors:
-    - "Low volume puede causar false signals"
-    - "News events pueden override technical patterns"
+    - "Low volume can cause false signals"
+    - "News events can override technical patterns"
     - "Market regime changes affecting VWAP significance"
 ```
 
-### Fase 2: Data Collection y Exploration
+### Phase 2: Data Collection and Exploration
 
 #### 2.1 Data Requirements Framework
 ```python
 class StrategyDataRequirements:
     """
-    Framework para definir data requirements de estrategias
+    Framework for defining strategy data requirements
     """
 
     def __init__(self, strategy_name: str):
@@ -88,7 +90,7 @@ class StrategyDataRequirements:
             'price_data': {
                 'frequency': 'minute',  # tick, second, minute, daily
                 'fields': ['open', 'high', 'low', 'close', 'volume'],
-                'history_required': '2 years',  # Para backtesting robust
+                'history_required': '2 years',  # For robust backtesting
                 'live_feeds': ['polygon.io', 'alpaca', 'ibkr'],
                 'quality_filters': ['min_volume_1000', 'price_range_0.5_50']
             },
@@ -112,7 +114,7 @@ class StrategyDataRequirements:
             }
         }
 
-# Ejemplo de uso
+# Usage example
 vwap_strategy_data = StrategyDataRequirements("VWAP_Reclaim")
 data_spec = vwap_strategy_data.define_requirements()
 ```
@@ -122,7 +124,7 @@ data_spec = vwap_strategy_data.define_requirements()
 def conduct_strategy_eda(symbol_universe: List[str],
                         lookback_days: int = 252) -> Dict:
     """
-    EDA sistemático para desarrollo de estrategias
+    Systematic EDA for strategy development
     """
 
     eda_results = {
@@ -158,7 +160,7 @@ def conduct_strategy_eda(symbol_universe: List[str],
     return eda_results
 ```
 
-### Fase 3: Strategy Design y Implementation
+### Phase 3: Strategy Design and Implementation
 
 #### 3.1 Strategy Architecture Template
 ```python
@@ -169,7 +171,7 @@ import pandas as pd
 
 @dataclass
 class StrategySignal:
-    """Estructura estándar para señales de estrategia"""
+    """Standard structure for strategy signals"""
     action: str  # 'BUY', 'SELL', 'HOLD'
     symbol: str
     quantity: int
@@ -181,8 +183,8 @@ class StrategySignal:
 
 class BaseStrategy(ABC):
     """
-    Clase base para todas las estrategias
-    Enforce consistent interface y best practices
+    Base class for all strategies
+    Enforces consistent interface and best practices
     """
 
     def __init__(self, config: Dict):
@@ -195,14 +197,14 @@ class BaseStrategy(ABC):
     @abstractmethod
     def generate_signal(self, market_data: Dict) -> Optional[StrategySignal]:
         """
-        Core strategy logic - debe ser implementado por cada estrategia
+        Core strategy logic - must be implemented by each strategy
         """
         pass
 
     @abstractmethod
     def validate_signal(self, signal: StrategySignal) -> bool:
         """
-        Validaciones pre-trade (risk checks, market conditions, etc.)
+        Pre-trade validations (risk checks, market conditions, etc.)
         """
         pass
 
@@ -218,10 +220,10 @@ class BaseStrategy(ABC):
         """Strategy-specific performance calculation"""
         pass
 
-# Ejemplo: VWAP Reclaim Strategy Implementation
+# Example: VWAP Reclaim Strategy Implementation
 class VWAPReclaimStrategy(BaseStrategy):
     """
-    Implementación específica de VWAP Reclaim
+    Specific VWAP Reclaim implementation
     """
 
     def __init__(self, config: Dict):
@@ -270,7 +272,7 @@ class VWAPReclaimStrategy(BaseStrategy):
 
     def validate_signal(self, signal: StrategySignal) -> bool:
         """
-        Pre-trade validations específicas de VWAP Reclaim
+        VWAP Reclaim-specific pre-trade validations
         """
         validations = [
             self._check_market_hours(signal.timestamp),
@@ -287,7 +289,7 @@ class VWAPReclaimStrategy(BaseStrategy):
 ```python
 class FeatureEngineering:
     """
-    Systematic feature engineering para strategies
+    Systematic feature engineering for strategies
     """
 
     @staticmethod
@@ -323,7 +325,7 @@ class FeatureEngineering:
     @staticmethod
     def create_microstructure_features(tick_data: pd.DataFrame) -> pd.DataFrame:
         """
-        Market microstructure features para small caps
+        Market microstructure features for small caps
         """
         features = tick_data.copy()
 
@@ -347,7 +349,7 @@ class FeatureEngineering:
     @staticmethod
     def create_alternative_data_features(symbol: str, date: pd.Timestamp) -> Dict:
         """
-        Alternative data features específicas para small caps
+        Alternative data features specific to small caps
         """
         features = {}
 
@@ -360,19 +362,19 @@ class FeatureEngineering:
         # SEC filings features
         features.update(get_sec_filings_features(symbol, date))
 
-        # Options flow features (si available)
+        # Options flow features (if available)
         features.update(get_options_flow_features(symbol, date))
 
         return features
 ```
 
-### Fase 4: Backtesting Framework
+### Phase 4: Backtesting Framework
 
 #### 4.1 Realistic Backtesting Engine
 ```python
 class RealisticBacktester:
     """
-    Backtesting engine con realistic assumptions para small caps
+    Backtesting engine with realistic assumptions for small caps
     """
 
     def __init__(self, config: Dict):
@@ -387,7 +389,7 @@ class RealisticBacktester:
                     start_date: str,
                     end_date: str) -> Dict:
         """
-        Execute realistic backtest con proper cost modeling
+        Execute realistic backtest with proper cost modeling
         """
 
         # Initialize backtest state
@@ -437,7 +439,7 @@ class RealisticBacktester:
                                 portfolio: Portfolio,
                                 timestamp: pd.Timestamp) -> Dict:
         """
-        Execute trade con realistic transaction costs
+        Execute trade with realistic transaction costs
         """
 
         # 1. Check available buying power
@@ -481,16 +483,16 @@ class RealisticBacktester:
 
 class SmallCapSlippageModel:
     """
-    Realistic slippage model para small caps
+    Realistic slippage model for small caps
     """
 
     def calculate(self, signal: StrategySignal, timestamp: pd.Timestamp) -> float:
         """
-        Calculate slippage basado en:
-        - Tamaño del order vs average volume
-        - Spread actual del stock
-        - Hora del día
-        - Volatility reciente
+        Calculate slippage based on:
+        - Order size vs average volume
+        - Current stock spread
+        - Time of day
+        - Recent volatility
         """
 
         # Base slippage from spread
@@ -521,13 +523,13 @@ class SmallCapSlippageModel:
         return total_slippage * direction
 ```
 
-### Fase 5: Validation y Testing
+### Phase 5: Validation and Testing
 
 #### 5.1 Walk-Forward Analysis
 ```python
 class WalkForwardValidator:
     """
-    Walk-forward analysis para avoid lookahead bias
+    Walk-forward analysis to avoid lookahead bias
     """
 
     def __init__(self,
@@ -618,7 +620,7 @@ class WalkForwardValidator:
         return strategy_class.params_to_config(optimization_result.x)
 ```
 
-### Fase 6: Implementation y Monitoring
+### Phase 6: Implementation and Monitoring
 
 #### 6.1 Production Deployment Checklist
 ```yaml
@@ -626,7 +628,7 @@ production_deployment_checklist:
 
   pre_deployment:
     data_validation:
-      - [ ] Data feeds funcionando correctly
+      - [ ] Data feeds working correctly
       - [ ] Historical data quality verified
       - [ ] Real-time data latency < 100ms
       - [ ] Backup data sources configured
@@ -667,7 +669,7 @@ production_deployment_checklist:
 ```python
 class StrategyMonitor:
     """
-    Real-time monitoring de strategy performance
+    Real-time strategy performance monitoring
     """
 
     def __init__(self, strategy: BaseStrategy):
@@ -721,28 +723,28 @@ class StrategyMonitor:
         return False
 ```
 
-## Best Practices y Common Pitfalls
+## Best Practices and Common Pitfalls
 
-### ✅ Best Practices
+### Best Practices
 
 1. **Always Start with Economic Intuition**
-   - La estrategia debe tener sentido fundamental
-   - Explicar por qué debería funcionar en el mercado
-   - Identificar when it might NOT work
+   - The strategy must make fundamental sense
+   - Explain why it should work in the market
+   - Identify when it might NOT work
 
 2. **Robust Testing Framework**
-   - Out-of-sample testing siempre
+   - Always use out-of-sample testing
    - Walk-forward validation
    - Monte Carlo simulations
-   - Stress testing en diferentes market regimes
+   - Stress testing across different market regimes
 
 3. **Implementation Reality Check**
-   - Considerar transaction costs desde day 1
-   - Model realistic slippage y market impact
-   - Account for data latency y execution delays
-   - Plan for system failures y contingencies
+   - Consider transaction costs from day 1
+   - Model realistic slippage and market impact
+   - Account for data latency and execution delays
+   - Plan for system failures and contingencies
 
-### ❌ Common Pitfalls
+### Common Pitfalls
 
 1. **Overfitting**
    - Too many parameters
@@ -759,19 +761,19 @@ class StrategyMonitor:
    - Data leakage in feature engineering
    - Improper handling of announcements timing
 
-## Integration con el Quant Playbook
+## Integration with the Quant Playbook
 
-Esta metodología se integra con:
+This methodology integrates with:
 
-- **[Risk Management](../core-concepts/Risk-Management.md)**: Position sizing y risk controls
-- **[Performance Metrics](../core-concepts/Performance-Metrics.md)**: KPIs y evaluation frameworks
-- **[Backtesting Templates](../templates/backtesting/)**: Herramientas ready-to-use
-- **[Strategy Templates](../templates/strategies/)**: Ejemplos implementados
+- **[Risk Management](../core-concepts/Risk-Management.md)**: Position sizing and risk controls
+- **[Performance Metrics](../core-concepts/Performance-Metrics.md)**: KPIs and evaluation frameworks
+- **[Backtesting Templates](../templates/backtesting/)**: Ready-to-use tools
+- **[Strategy Templates](../templates/strategies/)**: Implemented examples
 
 ---
 
 **Next Steps**:
-- Implementar tu primera estrategia siguiendo este framework
-- Usar [Strategy Templates](../templates/strategies/) como starting point
+- Implement your first strategy following this framework
+- Use [Strategy Templates](../templates/strategies/) as a starting point
 - Set up [Performance Monitoring](../operations-monitoring/Strategy-Performance-Monitoring.md)
-- Scale con [Multi-Strategy Portfolio](../advanced-topics/Portfolio-Optimization.md)
+- Scale with [Multi-Strategy Portfolio](../advanced-topics/Portfolio-Optimization.md)

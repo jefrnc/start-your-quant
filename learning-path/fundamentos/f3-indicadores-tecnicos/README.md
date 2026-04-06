@@ -1,113 +1,115 @@
-# F3: Indicadores Técnicos 📊
+> 🇪🇸 [Leer en Español](README.es.md) | 🇺🇸 **English**
 
-**Módulo Fundamental 3 - Duración: 2-3 horas**
+# F3: Technical Indicators
 
-## 🎯 Objetivos del Módulo
+**Fundamental Module 3 - Duration: 2-3 hours**
 
-Al completar este módulo podrás:
-- ✅ Entender qué son y para qué sirven los indicadores técnicos
-- ✅ Calcular e interpretar los indicadores más importantes
-- ✅ Combinar múltiples indicadores para señales más fuertes
-- ✅ Evitar los errores comunes al usar indicadores
+## Module Objectives
 
-## 📚 ¿Qué son los Indicadores Técnicos?
+After completing this module you will be able to:
+- Understand what technical indicators are and what they are used for
+- Calculate and interpret the most important indicators
+- Combine multiple indicators for stronger signals
+- Avoid common mistakes when using indicators
 
-Los **indicadores técnicos** son cálculos matemáticos basados en precio y volumen que ayudan a:
-- 📈 **Identificar tendencias** (¿está subiendo o bajando?)
-- 🔄 **Detectar reversiones** (¿va a cambiar de dirección?)
-- 💪 **Medir momentum** (¿qué tan fuerte es el movimiento?)
-- 🎯 **Encontrar niveles** (¿dónde comprar/vender?)
+## What Are Technical Indicators?
 
-### Tipos de Indicadores
+**Technical indicators** are mathematical calculations based on price and volume that help to:
+- **Identify trends** (is it going up or down?)
+- **Detect reversals** (is it going to change direction?)
+- **Measure momentum** (how strong is the movement?)
+- **Find levels** (where to buy/sell?)
 
-| Tipo | Función | Ejemplos |
-|------|---------|----------|
-| **Tendencia** | Identificar dirección | SMA, EMA, MACD |
-| **Momentum** | Medir fuerza/velocidad | RSI, Stochastic |
-| **Volatilidad** | Medir variabilidad | Bollinger Bands, ATR |
-| **Volumen** | Confirmar movimientos | OBV, Volume Profile |
+### Types of Indicators
 
-## 🧮 Los 5 Indicadores Esenciales
+| Type | Function | Examples |
+|------|----------|----------|
+| **Trend** | Identify direction | SMA, EMA, MACD |
+| **Momentum** | Measure strength/speed | RSI, Stochastic |
+| **Volatility** | Measure variability | Bollinger Bands, ATR |
+| **Volume** | Confirm movements | OBV, Volume Profile |
 
-### 1️⃣ Media Móvil Simple (SMA)
+## The 5 Essential Indicators
 
-**¿Qué es?** El promedio de precio de los últimos N días.
+### 1. Simple Moving Average (SMA)
+
+**What is it?** The average price over the last N days.
 
 ```python
-# Código para Google Colab
+# Code for Google Colab
 !pip install yfinance matplotlib pandas
 
 import yfinance as yf
 import matplotlib.pyplot as plt
 import pandas as pd
 
-# Descargar datos
+# Download data
 symbol = 'AAPL'
 data = yf.download(symbol, period='6mo')
 
-# Calcular SMA de diferentes períodos
+# Calculate SMAs for different periods
 data['SMA_20'] = data['Close'].rolling(window=20).mean()
 data['SMA_50'] = data['Close'].rolling(window=50).mean()
 data['SMA_200'] = data['Close'].rolling(window=200).mean()
 
-# Visualizar
+# Visualize
 plt.figure(figsize=(14, 7))
-plt.plot(data.index, data['Close'], label='Precio', linewidth=2)
+plt.plot(data.index, data['Close'], label='Price', linewidth=2)
 plt.plot(data.index, data['SMA_20'], label='SMA 20', alpha=0.8)
 plt.plot(data.index, data['SMA_50'], label='SMA 50', alpha=0.8)
 plt.plot(data.index, data['SMA_200'], label='SMA 200', alpha=0.8)
-plt.title(f'{symbol} - Medias Móviles Simples')
+plt.title(f'{symbol} - Simple Moving Averages')
 plt.legend()
 plt.grid(True, alpha=0.3)
 plt.show()
 
-# Interpretación
-precio_actual = data['Close'].iloc[-1]
-sma20_actual = data['SMA_20'].iloc[-1]
+# Interpretation
+current_price = data['Close'].iloc[-1]
+sma20_current = data['SMA_20'].iloc[-1]
 
-if precio_actual > sma20_actual:
-    print(f"✅ Precio ({precio_actual:.2f}) > SMA20 ({sma20_actual:.2f}) = TENDENCIA ALCISTA")
+if current_price > sma20_current:
+    print(f"Price ({current_price:.2f}) > SMA20 ({sma20_current:.2f}) = UPTREND")
 else:
-    print(f"❌ Precio ({precio_actual:.2f}) < SMA20 ({sma20_actual:.2f}) = TENDENCIA BAJISTA")
+    print(f"Price ({current_price:.2f}) < SMA20 ({sma20_current:.2f}) = DOWNTREND")
 ```
 
-**📊 Interpretación:**
-- Precio > SMA = Tendencia alcista
-- Precio < SMA = Tendencia bajista
-- SMA corta > SMA larga = Golden Cross (muy alcista)
-- SMA corta < SMA larga = Death Cross (muy bajista)
+**Interpretation:**
+- Price > SMA = Uptrend
+- Price < SMA = Downtrend
+- Short SMA > Long SMA = Golden Cross (very bullish)
+- Short SMA < Long SMA = Death Cross (very bearish)
 
-### 2️⃣ RSI (Relative Strength Index)
+### 2. RSI (Relative Strength Index)
 
-**¿Qué es?** Mide si una acción está sobrecomprada o sobrevendida (escala 0-100).
+**What is it?** Measures whether a stock is overbought or oversold (scale 0-100).
 
 ```python
-def calcular_rsi(data, periodo=14):
-    """Calcula el RSI"""
+def calculate_rsi(data, period=14):
+    """Calculates the RSI"""
     delta = data['Close'].diff()
-    ganancia = (delta.where(delta > 0, 0)).rolling(window=periodo).mean()
-    perdida = (-delta.where(delta < 0, 0)).rolling(window=periodo).mean()
+    gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
 
-    rs = ganancia / perdida
+    rs = gain / loss
     rsi = 100 - (100 / (1 + rs))
     return rsi
 
-# Calcular RSI
-data['RSI'] = calcular_rsi(data)
+# Calculate RSI
+data['RSI'] = calculate_rsi(data)
 
-# Visualizar
+# Visualize
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 10), sharex=True)
 
-# Precio
-ax1.plot(data.index, data['Close'], label='Precio')
-ax1.set_title(f'{symbol} - Precio y RSI')
+# Price
+ax1.plot(data.index, data['Close'], label='Price')
+ax1.set_title(f'{symbol} - Price and RSI')
 ax1.legend()
 ax1.grid(True, alpha=0.3)
 
 # RSI
 ax2.plot(data.index, data['RSI'], color='purple', linewidth=2)
-ax2.axhline(y=70, color='red', linestyle='--', alpha=0.7, label='Sobrecompra (70)')
-ax2.axhline(y=30, color='green', linestyle='--', alpha=0.7, label='Sobreventa (30)')
+ax2.axhline(y=70, color='red', linestyle='--', alpha=0.7, label='Overbought (70)')
+ax2.axhline(y=30, color='green', linestyle='--', alpha=0.7, label='Oversold (30)')
 ax2.axhline(y=50, color='gray', linestyle='-', alpha=0.5)
 ax2.fill_between(data.index, 30, 70, alpha=0.1, color='gray')
 ax2.set_ylabel('RSI')
@@ -118,46 +120,46 @@ ax2.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
 
-# Interpretación
-rsi_actual = data['RSI'].iloc[-1]
-if rsi_actual > 70:
-    print(f"⚠️ RSI = {rsi_actual:.1f} - SOBRECOMPRA (posible corrección)")
-elif rsi_actual < 30:
-    print(f"🔔 RSI = {rsi_actual:.1f} - SOBREVENTA (posible rebote)")
+# Interpretation
+current_rsi = data['RSI'].iloc[-1]
+if current_rsi > 70:
+    print(f"RSI = {current_rsi:.1f} - OVERBOUGHT (possible correction)")
+elif current_rsi < 30:
+    print(f"RSI = {current_rsi:.1f} - OVERSOLD (possible bounce)")
 else:
-    print(f"➖ RSI = {rsi_actual:.1f} - ZONA NEUTRAL")
+    print(f"RSI = {current_rsi:.1f} - NEUTRAL ZONE")
 ```
 
-**📊 Interpretación:**
-- RSI > 70 = Sobrecompra (cuidado, puede bajar)
-- RSI < 30 = Sobreventa (oportunidad, puede subir)
-- RSI = 50 = Equilibrio
-- Divergencias = Cuando precio y RSI van en direcciones opuestas
+**Interpretation:**
+- RSI > 70 = Overbought (careful, may drop)
+- RSI < 30 = Oversold (opportunity, may rise)
+- RSI = 50 = Equilibrium
+- Divergences = When price and RSI go in opposite directions
 
-### 3️⃣ MACD (Moving Average Convergence Divergence)
+### 3. MACD (Moving Average Convergence Divergence)
 
-**¿Qué es?** Muestra la relación entre dos medias móviles y el momentum.
+**What is it?** Shows the relationship between two moving averages and momentum.
 
 ```python
-def calcular_macd(data, rapido=12, lento=26, signal=9):
-    """Calcula MACD, Signal y Histograma"""
-    ema_rapido = data['Close'].ewm(span=rapido, adjust=False).mean()
-    ema_lento = data['Close'].ewm(span=lento, adjust=False).mean()
+def calculate_macd(data, fast=12, slow=26, signal=9):
+    """Calculates MACD, Signal and Histogram"""
+    ema_fast = data['Close'].ewm(span=fast, adjust=False).mean()
+    ema_slow = data['Close'].ewm(span=slow, adjust=False).mean()
 
-    macd_line = ema_rapido - ema_lento
+    macd_line = ema_fast - ema_slow
     signal_line = macd_line.ewm(span=signal, adjust=False).mean()
-    histograma = macd_line - signal_line
+    histogram = macd_line - signal_line
 
-    return macd_line, signal_line, histograma
+    return macd_line, signal_line, histogram
 
-# Calcular MACD
-data['MACD'], data['Signal'], data['Histogram'] = calcular_macd(data)
+# Calculate MACD
+data['MACD'], data['Signal'], data['Histogram'] = calculate_macd(data)
 
-# Visualizar
+# Visualize
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 10), sharex=True)
 
-# Precio
-ax1.plot(data.index, data['Close'], label='Precio')
+# Price
+ax1.plot(data.index, data['Close'], label='Price')
 ax1.set_title(f'{symbol} - MACD Analysis')
 ax1.legend()
 ax1.grid(True, alpha=0.3)
@@ -173,119 +175,119 @@ ax2.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
 
-# Interpretación
+# Interpretation
 if data['MACD'].iloc[-1] > data['Signal'].iloc[-1]:
-    print("✅ MACD > Signal = MOMENTUM ALCISTA")
+    print("MACD > Signal = BULLISH MOMENTUM")
     if data['Histogram'].iloc[-1] > data['Histogram'].iloc[-2]:
-        print("   📈 Histograma creciendo = Momentum acelerando")
+        print("   Histogram growing = Momentum accelerating")
 else:
-    print("❌ MACD < Signal = MOMENTUM BAJISTA")
+    print("MACD < Signal = BEARISH MOMENTUM")
     if data['Histogram'].iloc[-1] < data['Histogram'].iloc[-2]:
-        print("   📉 Histograma decreciendo = Momentum debilitándose")
+        print("   Histogram shrinking = Momentum weakening")
 ```
 
-**📊 Interpretación:**
-- MACD cruza Signal hacia arriba = Señal de compra
-- MACD cruza Signal hacia abajo = Señal de venta
-- Histograma positivo y creciente = Momentum alcista fuerte
-- Histograma negativo y decreciente = Momentum bajista fuerte
+**Interpretation:**
+- MACD crosses Signal upward = Buy signal
+- MACD crosses Signal downward = Sell signal
+- Positive and growing histogram = Strong bullish momentum
+- Negative and shrinking histogram = Strong bearish momentum
 
-### 4️⃣ Bandas de Bollinger
+### 4. Bollinger Bands
 
-**¿Qué es?** Muestra un rango de precios "normal" basado en volatilidad.
+**What is it?** Shows a "normal" price range based on volatility.
 
 ```python
-def calcular_bollinger_bands(data, periodo=20, std_dev=2):
-    """Calcula Bandas de Bollinger"""
-    sma = data['Close'].rolling(window=periodo).mean()
-    std = data['Close'].rolling(window=periodo).std()
+def calculate_bollinger_bands(data, period=20, std_dev=2):
+    """Calculates Bollinger Bands"""
+    sma = data['Close'].rolling(window=period).mean()
+    std = data['Close'].rolling(window=period).std()
 
     upper_band = sma + (std * std_dev)
     lower_band = sma - (std * std_dev)
 
     return upper_band, sma, lower_band
 
-# Calcular Bandas
-data['BB_Upper'], data['BB_Middle'], data['BB_Lower'] = calcular_bollinger_bands(data)
+# Calculate Bands
+data['BB_Upper'], data['BB_Middle'], data['BB_Lower'] = calculate_bollinger_bands(data)
 
-# Calcular ancho de bandas (volatilidad)
+# Calculate band width (volatility)
 data['BB_Width'] = data['BB_Upper'] - data['BB_Lower']
 data['BB_Position'] = (data['Close'] - data['BB_Lower']) / (data['BB_Upper'] - data['BB_Lower'])
 
-# Visualizar
+# Visualize
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 10), sharex=True)
 
-# Precio y Bandas
-ax1.plot(data.index, data['Close'], label='Precio', linewidth=2, color='black')
-ax1.plot(data.index, data['BB_Upper'], label='Banda Superior', alpha=0.7)
+# Price and Bands
+ax1.plot(data.index, data['Close'], label='Price', linewidth=2, color='black')
+ax1.plot(data.index, data['BB_Upper'], label='Upper Band', alpha=0.7)
 ax1.plot(data.index, data['BB_Middle'], label='SMA 20', alpha=0.7)
-ax1.plot(data.index, data['BB_Lower'], label='Banda Inferior', alpha=0.7)
+ax1.plot(data.index, data['BB_Lower'], label='Lower Band', alpha=0.7)
 ax1.fill_between(data.index, data['BB_Upper'], data['BB_Lower'], alpha=0.1, color='gray')
-ax1.set_title(f'{symbol} - Bandas de Bollinger')
+ax1.set_title(f'{symbol} - Bollinger Bands')
 ax1.legend()
 ax1.grid(True, alpha=0.3)
 
-# Ancho de Bandas (Volatilidad)
+# Band Width (Volatility)
 ax2.plot(data.index, data['BB_Width'], color='orange', linewidth=2)
-ax2.set_ylabel('Ancho de Bandas')
-ax2.set_title('Volatilidad (Ancho de Bandas)')
+ax2.set_ylabel('Band Width')
+ax2.set_title('Volatility (Band Width)')
 ax2.grid(True, alpha=0.3)
 
 plt.tight_layout()
 plt.show()
 
-# Interpretación
-posicion = data['BB_Position'].iloc[-1]
-if posicion > 1:
-    print(f"⚠️ Precio SOBRE banda superior ({posicion:.2f}) - Posible resistencia")
-elif posicion < 0:
-    print(f"🔔 Precio BAJO banda inferior ({posicion:.2f}) - Posible soporte")
-elif posicion > 0.8:
-    print(f"📈 Precio cerca de banda superior ({posicion:.2f}) - Tendencia fuerte")
-elif posicion < 0.2:
-    print(f"📉 Precio cerca de banda inferior ({posicion:.2f}) - Presión bajista")
+# Interpretation
+position = data['BB_Position'].iloc[-1]
+if position > 1:
+    print(f"Price ABOVE upper band ({position:.2f}) - Possible resistance")
+elif position < 0:
+    print(f"Price BELOW lower band ({position:.2f}) - Possible support")
+elif position > 0.8:
+    print(f"Price near upper band ({position:.2f}) - Strong trend")
+elif position < 0.2:
+    print(f"Price near lower band ({position:.2f}) - Bearish pressure")
 else:
-    print(f"➖ Precio en zona media ({posicion:.2f}) - Rango normal")
+    print(f"Price in middle zone ({position:.2f}) - Normal range")
 ```
 
-**📊 Interpretación:**
-- Precio toca banda superior = Posible resistencia
-- Precio toca banda inferior = Posible soporte
-- Bandas estrechándose = Volatilidad baja (calma antes de tormenta)
-- Bandas expandiéndose = Volatilidad alta (movimiento fuerte)
+**Interpretation:**
+- Price touches upper band = Possible resistance
+- Price touches lower band = Possible support
+- Bands narrowing = Low volatility (calm before the storm)
+- Bands expanding = High volatility (strong move)
 
-### 5️⃣ Volumen (El Confirmador)
+### 5. Volume (The Confirmer)
 
-**¿Qué es?** Muestra cuánto interés hay en un movimiento de precio.
+**What is it?** Shows how much interest there is in a price movement.
 
 ```python
-# Análisis de Volumen
+# Volume Analysis
 data['Volume_SMA'] = data['Volume'].rolling(window=20).mean()
 data['Volume_Ratio'] = data['Volume'] / data['Volume_SMA']
 data['Price_Change'] = data['Close'].pct_change()
 
-# Visualizar
+# Visualize
 fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(14, 12), sharex=True)
 
-# Precio
-ax1.plot(data.index, data['Close'], label='Precio')
-ax1.set_title(f'{symbol} - Análisis de Volumen')
+# Price
+ax1.plot(data.index, data['Close'], label='Price')
+ax1.set_title(f'{symbol} - Volume Analysis')
 ax1.legend()
 ax1.grid(True, alpha=0.3)
 
-# Volumen
+# Volume
 colors = ['green' if c > 0 else 'red' for c in data['Price_Change']]
-ax2.bar(data.index, data['Volume'], color=colors, alpha=0.7, label='Volumen')
-ax2.plot(data.index, data['Volume_SMA'], color='blue', linewidth=2, label='Vol. Promedio 20d')
-ax2.set_ylabel('Volumen')
+ax2.bar(data.index, data['Volume'], color=colors, alpha=0.7, label='Volume')
+ax2.plot(data.index, data['Volume_SMA'], color='blue', linewidth=2, label='20d Avg Volume')
+ax2.set_ylabel('Volume')
 ax2.legend()
 ax2.grid(True, alpha=0.3)
 
-# Ratio de Volumen
+# Volume Ratio
 ax3.bar(data.index, data['Volume_Ratio'], color='purple', alpha=0.7)
 ax3.axhline(y=1, color='black', linestyle='--', alpha=0.5)
-ax3.axhline(y=2, color='red', linestyle='--', alpha=0.5, label='Volumen Alto (2x)')
-ax3.set_ylabel('Ratio Volumen')
+ax3.axhline(y=2, color='red', linestyle='--', alpha=0.5, label='High Volume (2x)')
+ax3.set_ylabel('Volume Ratio')
 ax3.set_ylim(0, 4)
 ax3.legend()
 ax3.grid(True, alpha=0.3)
@@ -293,147 +295,147 @@ ax3.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
 
-# Interpretación
+# Interpretation
 vol_ratio = data['Volume_Ratio'].iloc[-1]
 price_change = data['Price_Change'].iloc[-1] * 100
 
 if vol_ratio > 2 and price_change > 0:
-    print(f"🚀 Volumen ALTO ({vol_ratio:.1f}x) + Precio SUBIENDO = SEÑAL FUERTE DE COMPRA")
+    print(f"HIGH volume ({vol_ratio:.1f}x) + Price RISING = STRONG BUY SIGNAL")
 elif vol_ratio > 2 and price_change < 0:
-    print(f"⚠️ Volumen ALTO ({vol_ratio:.1f}x) + Precio BAJANDO = SEÑAL FUERTE DE VENTA")
+    print(f"HIGH volume ({vol_ratio:.1f}x) + Price FALLING = STRONG SELL SIGNAL")
 elif vol_ratio < 0.5:
-    print(f"😴 Volumen BAJO ({vol_ratio:.1f}x) = Movimiento débil, no confiable")
+    print(f"LOW volume ({vol_ratio:.1f}x) = Weak movement, unreliable")
 else:
-    print(f"➖ Volumen normal ({vol_ratio:.1f}x)")
+    print(f"Normal volume ({vol_ratio:.1f}x)")
 ```
 
-**📊 Interpretación:**
-- Precio sube + Volumen alto = Movimiento fuerte y confiable
-- Precio sube + Volumen bajo = Movimiento débil, cuidado
-- Precio baja + Volumen alto = Venta masiva, alejarse
-- Volumen spike = Algo importante está pasando
+**Interpretation:**
+- Price up + High volume = Strong, reliable movement
+- Price up + Low volume = Weak movement, be careful
+- Price down + High volume = Massive selling, stay away
+- Volume spike = Something important is happening
 
-## 🎯 Combinando Indicadores (El Poder Real)
+## Combining Indicators (The Real Power)
 
-### Sistema de Señales Multi-Indicador
+### Multi-Indicator Signal System
 
 ```python
-def generar_señales_combinadas(data):
-    """Combina múltiples indicadores para señales más confiables"""
+def generate_combined_signals(data):
+    """Combines multiple indicators for more reliable signals"""
 
-    señales = []
+    signals = []
 
-    # Calcular todos los indicadores
+    # Calculate all indicators
     data['SMA_20'] = data['Close'].rolling(20).mean()
     data['SMA_50'] = data['Close'].rolling(50).mean()
-    data['RSI'] = calcular_rsi(data)
-    data['MACD'], data['Signal'], _ = calcular_macd(data)
-    data['BB_Upper'], data['BB_Middle'], data['BB_Lower'] = calcular_bollinger_bands(data)
+    data['RSI'] = calculate_rsi(data)
+    data['MACD'], data['Signal'], _ = calculate_macd(data)
+    data['BB_Upper'], data['BB_Middle'], data['BB_Lower'] = calculate_bollinger_bands(data)
     data['Volume_Ratio'] = data['Volume'] / data['Volume'].rolling(20).mean()
 
-    # Sistema de puntuación
+    # Scoring system
     score = 0
 
-    # 1. Tendencia (SMA)
+    # 1. Trend (SMA)
     if data['Close'].iloc[-1] > data['SMA_20'].iloc[-1]:
         score += 1
-        señales.append("✅ Precio > SMA20")
+        signals.append("Price > SMA20")
     if data['SMA_20'].iloc[-1] > data['SMA_50'].iloc[-1]:
         score += 1
-        señales.append("✅ SMA20 > SMA50")
+        signals.append("SMA20 > SMA50")
 
     # 2. Momentum (RSI)
     if 30 < data['RSI'].iloc[-1] < 70:
         score += 1
-        señales.append(f"✅ RSI en zona neutral ({data['RSI'].iloc[-1]:.1f})")
+        signals.append(f"RSI in neutral zone ({data['RSI'].iloc[-1]:.1f})")
     elif data['RSI'].iloc[-1] < 30:
         score += 2
-        señales.append(f"🔔 RSI sobreventa ({data['RSI'].iloc[-1]:.1f})")
+        signals.append(f"RSI oversold ({data['RSI'].iloc[-1]:.1f})")
 
     # 3. MACD
     if data['MACD'].iloc[-1] > data['Signal'].iloc[-1]:
         score += 1
-        señales.append("✅ MACD > Signal")
+        signals.append("MACD > Signal")
 
     # 4. Bollinger Bands
     bb_pos = (data['Close'].iloc[-1] - data['BB_Lower'].iloc[-1]) / (data['BB_Upper'].iloc[-1] - data['BB_Lower'].iloc[-1])
     if 0.2 < bb_pos < 0.8:
         score += 1
-        señales.append(f"✅ Precio en rango normal BB ({bb_pos:.2f})")
+        signals.append(f"Price in normal BB range ({bb_pos:.2f})")
 
-    # 5. Volumen
+    # 5. Volume
     if data['Volume_Ratio'].iloc[-1] > 1.5:
         score += 1
-        señales.append(f"✅ Volumen alto ({data['Volume_Ratio'].iloc[-1]:.1f}x)")
+        signals.append(f"High volume ({data['Volume_Ratio'].iloc[-1]:.1f}x)")
 
-    return score, señales
+    return score, signals
 
-# Analizar
-score, señales = generar_señales_combinadas(data)
+# Analyze
+score, signals = generate_combined_signals(data)
 
 print(f"\n{'='*50}")
-print(f"ANÁLISIS MULTI-INDICADOR: {symbol}")
+print(f"MULTI-INDICATOR ANALYSIS: {symbol}")
 print(f"{'='*50}")
-print(f"Score Total: {score}/7")
-print("\nSeñales Detectadas:")
-for señal in señales:
-    print(f"  {señal}")
+print(f"Total Score: {score}/7")
+print("\nDetected Signals:")
+for signal in signals:
+    print(f"  {signal}")
 
-print(f"\n🎯 RECOMENDACIÓN:")
+print(f"\nRECOMMENDATION:")
 if score >= 6:
-    print("  🟢🟢🟢 COMPRA FUERTE - Múltiples confirmaciones")
+    print("  STRONG BUY - Multiple confirmations")
 elif score >= 4:
-    print("  🟢 COMPRA MODERADA - Señales positivas")
+    print("  MODERATE BUY - Positive signals")
 elif score >= 2:
-    print("  ⚪ NEUTRAL - Señales mixtas")
+    print("  NEUTRAL - Mixed signals")
 else:
-    print("  🔴 EVITAR - Pocas señales positivas")
+    print("  AVOID - Few positive signals")
 ```
 
-## ⚠️ Errores Comunes a Evitar
+## Common Mistakes to Avoid
 
-### ❌ Error #1: Usar un solo indicador
-**Problema**: Los indicadores fallan, especialmente solos.
-**Solución**: Siempre combina 2-3 indicadores de diferentes tipos.
+### Mistake #1: Using a single indicator
+**Problem**: Indicators fail, especially on their own.
+**Solution**: Always combine 2-3 indicators of different types.
 
-### ❌ Error #2: Ignorar el contexto del mercado
-**Problema**: RSI puede estar en sobrecompra por semanas en tendencia fuerte.
-**Solución**: Considera la tendencia general antes de actuar en señales.
+### Mistake #2: Ignoring market context
+**Problem**: RSI can be overbought for weeks in a strong trend.
+**Solution**: Consider the overall trend before acting on signals.
 
-### ❌ Error #3: No ajustar parámetros
-**Problema**: RSI(14) funciona diferente en crypto vs. blue chips.
-**Solución**: Prueba diferentes períodos y ajusta según el activo.
+### Mistake #3: Not adjusting parameters
+**Problem**: RSI(14) works differently in crypto vs. blue chips.
+**Solution**: Test different periods and adjust per asset.
 
-### ❌ Error #4: Reaccionar a cada señal
-**Problema**: Demasiadas señales = overtrading.
-**Solución**: Solo actúa cuando múltiples indicadores coinciden.
+### Mistake #4: Reacting to every signal
+**Problem**: Too many signals = overtrading.
+**Solution**: Only act when multiple indicators agree.
 
-### ❌ Error #5: Olvidar el volumen
-**Problema**: Movimientos sin volumen son falsos.
-**Solución**: SIEMPRE confirma con volumen.
+### Mistake #5: Forgetting volume
+**Problem**: Movements without volume are false.
+**Solution**: ALWAYS confirm with volume.
 
-## 🏆 Proyecto Final: Tu Dashboard de Indicadores
+## Final Project: Your Indicator Dashboard
 
 ```python
-def crear_dashboard_completo(symbol='AAPL'):
-    """Crea un dashboard completo con todos los indicadores"""
+def create_complete_dashboard(symbol='AAPL'):
+    """Creates a complete dashboard with all indicators"""
 
-    # Descargar datos
+    # Download data
     data = yf.download(symbol, period='6mo')
 
-    # Calcular todos los indicadores
+    # Calculate all indicators
     data['SMA_20'] = data['Close'].rolling(20).mean()
-    data['RSI'] = calcular_rsi(data)
-    data['MACD'], data['Signal'], data['Histogram'] = calcular_macd(data)
-    data['BB_Upper'], data['BB_Middle'], data['BB_Lower'] = calcular_bollinger_bands(data)
+    data['RSI'] = calculate_rsi(data)
+    data['MACD'], data['Signal'], data['Histogram'] = calculate_macd(data)
+    data['BB_Upper'], data['BB_Middle'], data['BB_Lower'] = calculate_bollinger_bands(data)
 
-    # Crear visualización
+    # Create visualization
     fig, axes = plt.subplots(5, 1, figsize=(15, 20), sharex=True)
 
-    # 1. Precio y SMA
-    axes[0].plot(data.index, data['Close'], label='Precio', linewidth=2)
+    # 1. Price and SMA
+    axes[0].plot(data.index, data['Close'], label='Price', linewidth=2)
     axes[0].plot(data.index, data['SMA_20'], label='SMA 20', alpha=0.7)
-    axes[0].set_title(f'{symbol} - Dashboard Completo de Indicadores')
+    axes[0].set_title(f'{symbol} - Complete Indicator Dashboard')
     axes[0].legend()
     axes[0].grid(True, alpha=0.3)
 
@@ -455,59 +457,59 @@ def crear_dashboard_completo(symbol='AAPL'):
     axes[2].grid(True, alpha=0.3)
 
     # 4. Bollinger Bands
-    axes[3].plot(data.index, data['Close'], label='Precio', color='black')
+    axes[3].plot(data.index, data['Close'], label='Price', color='black')
     axes[3].plot(data.index, data['BB_Upper'], 'r--', alpha=0.7)
     axes[3].plot(data.index, data['BB_Lower'], 'g--', alpha=0.7)
     axes[3].fill_between(data.index, data['BB_Upper'], data['BB_Lower'], alpha=0.1)
     axes[3].set_ylabel('Bollinger')
     axes[3].grid(True, alpha=0.3)
 
-    # 5. Volumen
+    # 5. Volume
     colors = ['green' if c > o else 'red' for c, o in zip(data['Close'], data['Open'])]
     axes[4].bar(data.index, data['Volume'], color=colors, alpha=0.7)
-    axes[4].set_ylabel('Volumen')
+    axes[4].set_ylabel('Volume')
     axes[4].grid(True, alpha=0.3)
 
     plt.tight_layout()
     plt.show()
 
-    # Análisis final
-    score, señales = generar_señales_combinadas(data)
-    return score, señales
+    # Final analysis
+    score, signals = generate_combined_signals(data)
+    return score, signals
 
-# Ejecutar dashboard
-score, señales = crear_dashboard_completo('AAPL')
+# Run dashboard
+score, signals = create_complete_dashboard('AAPL')
 ```
 
-## ✅ Checkpoint del Módulo
+## Module Checkpoint
 
-### Conocimientos ✅
-- [ ] Entiendo los 5 tipos principales de indicadores
-- [ ] Sé calcular SMA, RSI, MACD, Bollinger Bands
-- [ ] Puedo interpretar señales de cada indicador
-- [ ] Entiendo por qué combinar indicadores es crucial
+### Knowledge
+- [ ] I understand the 5 main types of indicators
+- [ ] I can calculate SMA, RSI, MACD, Bollinger Bands
+- [ ] I can interpret signals from each indicator
+- [ ] I understand why combining indicators is crucial
 
-### Habilidades ✅
-- [ ] Puedo codificar cualquier indicador desde cero
-- [ ] Sé crear visualizaciones claras de indicadores
-- [ ] Puedo combinar múltiples indicadores para señales
-- [ ] Evito los errores comunes de principiantes
+### Skills
+- [ ] I can code any indicator from scratch
+- [ ] I can create clear indicator visualizations
+- [ ] I can combine multiple indicators for signals
+- [ ] I avoid common beginner mistakes
 
-### Proyecto ✅
-- [ ] Mi dashboard multi-indicador funciona
-- [ ] Genera señales combinadas correctamente
-- [ ] Puedo aplicarlo a cualquier acción
+### Project
+- [ ] My multi-indicator dashboard works
+- [ ] It generates combined signals correctly
+- [ ] I can apply it to any stock
 
-## 🚀 Próximo Módulo
+## Next Module
 
-**F4: Tu Primera Estrategia Completa**
-- Diseño de estrategia sistemática
-- Reglas de entrada y salida
-- Gestión de riesgo
-- Backtesting básico
+**F4: Your First Complete Strategy**
+- Systematic strategy design
+- Entry and exit rules
+- Risk management
+- Basic backtesting
 
-**¡Ya dominas los indicadores! Hora de crear tu primera estrategia real 🎯**
+**You now master the indicators! Time to create your first real strategy**
 
 ---
 
-🎯 **¿Listo para tu primera estrategia?** → [F4: Primera Estrategia](../f4-primera-estrategia/)
+**Ready for your first strategy?** -> [F4: First Strategy](../f4-primera-estrategia/)

@@ -1,24 +1,26 @@
-# Short Selling Avanzado en Small Caps
+> 🇪🇸 [Leer en Español](short_selling_advanced.es.md) | 🇺🇸 **English**
 
-## ⚠️ ADVERTENCIA CRÍTICA
+# Advanced Short Selling in Small Caps
 
-Esta es una estrategia extremadamente avanzada y riesgosa. Solo para traders experimentados con:
-- 5+ años de experiencia en small caps
-- Capital que puedas perder completamente
-- Conocimiento profundo de short selling mechanics
-- Acceso a borrows y margin suficiente
+## ⚠️ CRITICAL WARNING
 
-**El 97% de los traders pierde dinero** con estas estrategias. Una mala operación puede resultar en pérdidas del 200-300%.
+This is an extremely advanced and risky strategy. Only for experienced traders with:
+- 5+ years of experience in small caps
+- Capital you can afford to lose entirely
+- Deep knowledge of short selling mechanics
+- Access to borrows and sufficient margin
 
-## Filosofía del Short Selling en Small Caps
+**97% of traders lose money** with these strategies. A single bad trade can result in 200-300% losses.
 
-### Por Qué Funciona
-- 99% de penny stocks son empresas sin fundamentos
-- Dilución constante destruye valor
-- Retail traders son predecibles en pánico
-- Pump & dump cycles son repetibles
+## Short Selling Philosophy in Small Caps
 
-### Anatomía de un Pump & Dump
+### Why It Works
+- 99% of penny stocks are companies with no fundamentals
+- Constant dilution destroys value
+- Retail traders are predictable in panic
+- Pump & dump cycles are repeatable
+
+### Anatomy of a Pump & Dump
 
 ```python
 class PumpDumpCycle:
@@ -28,7 +30,7 @@ class PumpDumpCycle:
                 'duration_days': (-5, -1),
                 'volume_multiplier': (2, 3),
                 'daily_moves': (5, 10),
-                'characteristics': 'Insiders acumulan, volumen sutil'
+                'characteristics': 'Insiders accumulate, subtle volume'
             },
             'pump': {
                 'duration_days': (1, 3),
@@ -40,33 +42,33 @@ class PumpDumpCycle:
                 'duration_days': (3, 5),
                 'volume_multiplier': (5, 20),
                 'daily_moves': (-5, 15),
-                'characteristics': 'Lower highs, volumen alto sin avance'
+                'characteristics': 'Lower highs, high volume without advance'
             },
             'dump': {
                 'duration_days': (5, 10),
                 'volume_multiplier': (3, 15),
                 'daily_moves': (-30, -70),
-                'characteristics': 'Colapso, panic selling, shorts cubren'
+                'characteristics': 'Collapse, panic selling, shorts cover'
             }
         }
     
     def identify_phase(self, price_data, volume_data):
-        """Identificar en qué fase está el cycle"""
-        # Implementar lógica de identificación
+        """Identify which phase the cycle is in"""
+        # Implement identification logic
         pass
 ```
 
-## Sistema de Screening Multi-Nivel
+## Multi-Level Screening System
 
-### Nivel 1: Filtros Básicos (8000 → 500 stocks)
+### Level 1: Basic Filters (8000 → 500 stocks)
 ```python
 def basic_filter(universe):
-    """Filtro básico para short candidates"""
+    """Basic filter for short candidates"""
     criteria = {
         'price_range': (0.50, 20.00),
         'avg_volume_20d': 1_000_000,
         'market_cap_max': 500_000_000,
-        'exchange': ['NASDAQ', 'NYSE'],  # Evitar OTC
+        'exchange': ['NASDAQ', 'NYSE'],  # Avoid OTC
         'float_max': 50_000_000
     }
     
@@ -83,24 +85,24 @@ def basic_filter(universe):
     return filtered
 ```
 
-### Nivel 2: Filtros de Actividad (500 → 50 stocks)
+### Level 2: Activity Filters (500 → 50 stocks)
 ```python
 def activity_filter(stocks):
-    """Filtrar por actividad anormal"""
+    """Filter by abnormal activity"""
     filtered = []
     
     for stock in stocks:
-        # Calcular métricas
+        # Calculate metrics
         volume_ratio = stock.volume_today / stock.avg_volume_20d
         price_change = (stock.price - stock.prev_close) / stock.prev_close
         daily_range = (stock.high - stock.low) / stock.low
         
-        # Criterios de actividad
+        # Activity criteria
         if (volume_ratio > 3 and
             abs(price_change) > 0.20 and
             daily_range > 0.10):
             
-            # Verificar días consecutivos verdes (para first red day)
+            # Check consecutive green days (for first red day)
             consecutive_green = count_consecutive_green_days(stock)
             
             stock.activity_score = calculate_activity_score(
@@ -113,30 +115,30 @@ def activity_filter(stocks):
     return filtered
 ```
 
-### Nivel 3: Filtros de Calidad (50 → 10 stocks)
+### Level 3: Quality Filters (50 → 10 stocks)
 ```python
 def quality_filter(stocks):
-    """Filtro final de calidad para shorts"""
+    """Final quality filter for shorts"""
     filtered = []
     
     for stock in stocks:
-        # Factores de calidad
+        # Quality factors
         has_real_news = check_real_catalyst(stock)
         short_interest = get_short_interest(stock)
         institutional_ownership = get_institutional_ownership(stock)
         pump_history = check_pump_history(stock)
         bid_ask_spread = (stock.ask - stock.bid) / stock.bid
         
-        # Score de calidad
+        # Quality score
         quality_score = 0
         
-        if not has_real_news:  # NO debe tener news reales
+        if not has_real_news:  # Must NOT have real news
             quality_score += 30
         if short_interest > 0.15:  # >15% short interest
             quality_score += 20
-        if institutional_ownership < 0.20:  # <20% institucional
+        if institutional_ownership < 0.20:  # <20% institutional
             quality_score += 20
-        if pump_history:  # Historial de pumps
+        if pump_history:  # History of pumps
             quality_score += 20
         if bid_ask_spread < 0.03:  # <3% spread
             quality_score += 10
@@ -148,7 +150,7 @@ def quality_filter(stocks):
     return sorted(filtered, key=lambda x: x.quality_score, reverse=True)
 ```
 
-## Las 4 Estrategias Principales
+## The 4 Main Strategies
 
 ### 1. First Red Day Pattern
 
@@ -161,20 +163,20 @@ class FirstRedDayStrategy:
         self.max_gap_down = -0.15  # -15%
         
     def identify_setup(self, stock_data):
-        """Identificar setup de First Red Day"""
-        # Verificar días verdes consecutivos
+        """Identify First Red Day setup"""
+        # Check consecutive green days
         green_days = self.count_consecutive_green_days(stock_data)
         
         if green_days < self.min_consecutive_green:
             return None
         
-        # Verificar gap down hoy
+        # Check today's gap down
         today_gap = (stock_data.open - stock_data.prev_close) / stock_data.prev_close
         
         if not (self.min_gap_down <= today_gap <= self.max_gap_down):
             return None
         
-        # Verificar otros criterios
+        # Check other criteria
         criteria = {
             'volume_spike': stock_data.volume > stock_data.avg_volume * 3,
             'below_vwap': stock_data.price < stock_data.vwap,
@@ -188,7 +190,7 @@ class FirstRedDayStrategy:
         return None
     
     def calculate_entry_levels(self, stock_data):
-        """Calcular niveles de entrada"""
+        """Calculate entry levels"""
         return {
             'aggressive_entry': stock_data.premarket_low * 0.995,  # Break PM low
             'conservative_entry': stock_data.vwap * 0.99,  # Break VWAP
@@ -199,7 +201,7 @@ class FirstRedDayStrategy:
         }
     
     def score_setup(self, stock_data):
-        """Score del setup (0-100)"""
+        """Setup score (0-100)"""
         score = 0
         
         # Momentum score (30%)
@@ -246,18 +248,18 @@ class ParabolicExhaustionStrategy:
         self.min_volume_spike = 10
         
     def detect_exhaustion_signals(self, intraday_data):
-        """Detectar señales de agotamiento"""
+        """Detect exhaustion signals"""
         signals = {}
         
-        # 1. Lower highs en últimas barras
-        recent_highs = intraday_data.tail(12)['high']  # Últimas 12 barras (1 hora)
+        # 1. Lower highs in recent bars
+        recent_highs = intraday_data.tail(12)['high']  # Last 12 bars (1 hour)
         signals['lower_highs'] = self.detect_lower_highs(recent_highs)
         
-        # 2. Volumen decreciente
+        # 2. Decreasing volume
         recent_volume = intraday_data.tail(6)['volume']
         signals['decreasing_volume'] = recent_volume.is_monotonic_decreasing
         
-        # 3. RSI divergencia
+        # 3. RSI divergence
         signals['rsi_divergence'] = self.detect_rsi_divergence(intraday_data)
         
         # 4. Failed breakouts
@@ -274,7 +276,7 @@ class ParabolicExhaustionStrategy:
         return signals
     
     def should_enter_short(self, signals):
-        """Determinar si entrar short"""
+        """Determine whether to enter short"""
         entry_criteria = [
             signals['lower_highs'],
             signals['decreasing_volume'],
@@ -284,11 +286,11 @@ class ParabolicExhaustionStrategy:
             signals['vwap_distance'] > 0.10  # 10% above VWAP
         ]
         
-        # Necesitamos al menos 4 de 6 señales
+        # We need at least 4 of 6 signals
         return sum(entry_criteria) >= 4
     
     def calculate_entry_strategy(self, current_price, signals):
-        """Calcular estrategia de entrada escalonada"""
+        """Calculate scaled entry strategy"""
         return {
             'entry_1': {
                 'price': current_price * 0.98,  # 2% down from current
@@ -320,22 +322,22 @@ class GapAndCrapStrategy:
         self.max_pm_volume = 500_000
         
     def identify_gap_fade_setup(self, stock_data):
-        """Identificar setup de gap fade"""
-        # Verificar gap sin catalizador
+        """Identify gap fade setup"""
+        # Check gap without catalyst
         gap_size = (stock_data.open - stock_data.prev_close) / stock_data.prev_close
         
         if gap_size < self.min_gap_size:
             return None
         
-        # Verificar que NO haya catalizador real
+        # Check that there is NO real catalyst
         if self.has_real_catalyst(stock_data):
             return None
         
-        # Verificar bajo volumen pre-market
+        # Check low pre-market volume
         if stock_data.premarket_volume > self.max_pm_volume:
             return None
         
-        # Verificar debilidad en pre-market
+        # Check pre-market weakness
         pm_pattern = self.analyze_premarket_pattern(stock_data)
         
         if pm_pattern['is_fading']:
@@ -344,7 +346,7 @@ class GapAndCrapStrategy:
         return None
     
     def calculate_fade_levels(self, stock_data, gap_size):
-        """Calcular niveles para fade del gap"""
+        """Calculate levels for gap fade"""
         prev_close = stock_data.prev_close
         gap_fill_50 = (stock_data.open + prev_close) / 2
         gap_fill_100 = prev_close
@@ -352,7 +354,7 @@ class GapAndCrapStrategy:
         return {
             'pm_entry': {
                 'price': stock_data.premarket_high * 0.97,
-                'size_pct': 0.50,  # Menor size por liquidez PM
+                'size_pct': 0.50,  # Smaller size due to PM liquidity
                 'time_window': '6:00-9:30'
             },
             'market_open_entry': {
@@ -366,13 +368,13 @@ class GapAndCrapStrategy:
                 'profit_expectation': f"{((stock_data.open - gap_fill_50) / stock_data.open):.1%}"
             },
             'stop_loss': stock_data.premarket_high * 1.05,
-            'time_limit': '10:30'  # Si no funciona en 1 hora, salir
+            'time_limit': '10:30'  # If not working in 1 hour, exit
         }
 ```
 
-## Risk Management Específico
+## Specific Risk Management
 
-### Position Sizing para Shorts
+### Position Sizing for Shorts
 ```python
 class ShortPositionSizer:
     def __init__(self, account_value, max_portfolio_short_exposure=0.30):
@@ -380,11 +382,11 @@ class ShortPositionSizer:
         self.max_portfolio_short_exposure = max_portfolio_short_exposure
         
     def calculate_short_size(self, stock_data, strategy_type, setup_score):
-        """Calcular tamaño específico para shorts"""
+        """Calculate specific size for shorts"""
         
-        # Base risk según experiencia
+        # Base risk by experience
         base_risk_by_experience = {
-            'beginner': 0.005,    # 0.5% - NO recomendado
+            'beginner': 0.005,    # 0.5% - NOT recommended
             'intermediate': 0.01,  # 1%
             'advanced': 0.015,     # 1.5%
             'expert': 0.02        # 2%
@@ -392,35 +394,35 @@ class ShortPositionSizer:
         
         base_risk = base_risk_by_experience['advanced']  # Default
         
-        # Ajuste por tipo de estrategia
+        # Adjustment by strategy type
         strategy_multipliers = {
             'first_red_day': 1.0,
-            'parabolic_exhaustion': 0.75,  # Más volátil
-            'gap_and_crap': 1.25,  # Más predecible
+            'parabolic_exhaustion': 0.75,  # More volatile
+            'gap_and_crap': 1.25,  # More predictable
             'afternoon_breakdown': 1.0
         }
         
         strategy_mult = strategy_multipliers.get(strategy_type, 1.0)
         
-        # Ajuste por score del setup
-        score_multiplier = 0.5 + (setup_score / 100) * 1.5  # 0.5x a 2.0x
+        # Adjustment by setup score
+        score_multiplier = 0.5 + (setup_score / 100) * 1.5  # 0.5x to 2.0x
         
-        # Ajuste por características del stock
+        # Adjustment by stock characteristics
         volatility_mult = self.calculate_volatility_adjustment(stock_data)
         float_mult = self.calculate_float_adjustment(stock_data.float_shares)
         
-        # Risk final
+        # Final risk
         final_risk = (base_risk * strategy_mult * score_multiplier * 
                      volatility_mult * float_mult)
         
-        # Cap en máximos
-        final_risk = min(final_risk, 0.03)  # Nunca más de 3%
+        # Cap at maximums
+        final_risk = min(final_risk, 0.03)  # Never more than 3%
         
-        # Calcular shares
+        # Calculate shares
         entry_price = stock_data.price
         stop_price = self.calculate_stop_price(stock_data, strategy_type)
         
-        risk_per_share = stop_price - entry_price  # Para shorts
+        risk_per_share = stop_price - entry_price  # For shorts
         risk_amount = self.account_value * final_risk
         
         shares = int(risk_amount / risk_per_share) if risk_per_share > 0 else 0
@@ -441,22 +443,22 @@ class ShortPositionSizer:
         }
     
     def calculate_volatility_adjustment(self, stock_data):
-        """Ajustar por volatilidad"""
+        """Adjust for volatility"""
         avg_true_range = getattr(stock_data, 'atr_14', 0.1)
         price = stock_data.price
         volatility_pct = avg_true_range / price
         
-        if volatility_pct > 0.15:  # >15% diario
-            return 0.5  # Reducir size 50%
+        if volatility_pct > 0.15:  # >15% daily
+            return 0.5  # Reduce size 50%
         elif volatility_pct > 0.10:
             return 0.75
         else:
             return 1.0
     
     def calculate_float_adjustment(self, float_shares):
-        """Ajustar por float size"""
+        """Adjust for float size"""
         if float_shares < 5_000_000:  # Micro float
-            return 0.5  # Muy riesgoso
+            return 0.5  # Very risky
         elif float_shares < 15_000_000:  # Low float
             return 0.75
         else:
@@ -470,7 +472,7 @@ class ShortStopManager:
         self.max_loss_pct = 0.15  # 15% max loss
         
     def calculate_stop_levels(self, stock_data, strategy_type):
-        """Calcular stops específicos por estrategia"""
+        """Calculate strategy-specific stops"""
         
         stops = {}
         
@@ -495,27 +497,27 @@ class ShortStopManager:
         return stops
     
     def should_cut_loss_early(self, current_price, entry_price, unrealized_loss_pct):
-        """¿Cortar pérdida antes del stop?"""
-        # Cortar si pérdida > 10% y no hay momentum
+        """Should we cut the loss before the stop?"""
+        # Cut if loss > 10% and no momentum
         if unrealized_loss_pct > 0.10:
             return True
         
-        # Cortar si squeeze detectado
+        # Cut if squeeze detected
         if self.detect_short_squeeze_signs(current_price, entry_price):
             return True
         
         return False
     
     def detect_short_squeeze_signs(self, current_price, entry_price):
-        """Detectar signos de short squeeze"""
-        # Simplified - en realidad necesitarías más data
+        """Detect short squeeze signs"""
+        # Simplified - in reality you would need more data
         price_increase = (current_price - entry_price) / entry_price
         
-        # Si subió >8% rápido, posible squeeze
+        # If up >8% quickly, possible squeeze
         return price_increase > 0.08
 ```
 
-## Monitoreo y Alertas
+## Monitoring and Alerts
 
 ```python
 class ShortMonitoringSystem:
@@ -529,11 +531,11 @@ class ShortMonitoringSystem:
         }
     
     def monitor_short_positions(self):
-        """Monitorear posiciones cortas activas"""
+        """Monitor active short positions"""
         for ticker, position in self.active_shorts.items():
             current_data = self.get_real_time_data(ticker)
             
-            # Calcular P&L
+            # Calculate P&L
             entry_price = position['entry_price']
             current_price = current_data['price']
             unrealized_pnl = (entry_price - current_price) / entry_price
@@ -547,7 +549,7 @@ class ShortMonitoringSystem:
             position['alerts'] = alerts
     
     def check_position_alerts(self, ticker, position, current_data, pnl):
-        """Check alertas para la posición"""
+        """Check alerts for the position"""
         alerts = []
         
         # Profit taking alerts
@@ -572,13 +574,13 @@ class ShortMonitoringSystem:
         return alerts
 ```
 
-## Consideraciones Legales y Éticas
+## Legal and Ethical Considerations
 
 ### Compliance
 ```python
-# Verificaciones de compliance para short selling
+# Compliance checks for short selling
 def compliance_check(ticker, intended_size):
-    """Verificar compliance antes de short"""
+    """Check compliance before shorting"""
     checks = {
         'uptick_rule': check_uptick_rule_compliance(ticker),
         'locate_available': check_share_locate_availability(ticker),
@@ -590,13 +592,13 @@ def compliance_check(ticker, intended_size):
     return all(checks.values()), checks
 ```
 
-### Advertencias Finales
-- **Nunca hacer short selling sin entender completamente los riesgos**
-- **Pérdidas ilimitadas** son posibles en shorts
-- **Short squeezes** pueden causar pérdidas masivas
-- **Costos de borrow** pueden ser extremos en penny stocks
-- **Regulaciones** cambian constantemente
+### Final Warnings
+- **Never short sell without fully understanding the risks**
+- **Unlimited losses** are possible with shorts
+- **Short squeezes** can cause massive losses
+- **Borrow costs** can be extreme on penny stocks
+- **Regulations** change constantly
 
-## Siguiente Paso
+## Next Step
 
-Este contenido es extremadamente avanzado. Para traders menos experimentados, recomiendo empezar con [Gap & Go](gap_and_go.md) en el lado long antes de considerar shorts.
+This content is extremely advanced. For less experienced traders, I recommend starting with [Gap & Go](gap_and_go.md) on the long side before considering shorts.

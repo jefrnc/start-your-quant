@@ -1,268 +1,270 @@
-# F1: ¿Qué es ser Quant? 🧮
+> 🇪🇸 [Leer en Español](README.es.md) | 🇺🇸 **English**
 
-**Módulo Fundamental 1 - Duración: 1-2 horas**
+# F1: What Is Being a Quant?
 
-## 🎯 Objetivos del Módulo
+**Fundamental Module 1 - Duration: 1-2 hours**
 
-Al completar este módulo podrás:
-- ✅ Explicar qué hace un quant trader vs. trader tradicional
-- ✅ Entender por qué los números funcionan mejor que la intuición
-- ✅ Identificar oportunidades donde aplicar métodos cuantitativos
-- ✅ Tener claridad sobre tu camino hacia convertirte en quant
+## Module Objectives
 
-## 📚 ¿Qué es un Quant Trader?
+After completing this module you will be able to:
+- Explain what a quant trader does vs. a traditional trader
+- Understand why numbers work better than intuition
+- Identify opportunities to apply quantitative methods
+- Have clarity about your path to becoming a quant
 
-### Definición Simple
-Un **quant trader** es alguien que usa **matemáticas, estadísticas y programación** para tomar decisiones de trading en lugar de intuición o "feeling".
+## What Is a Quant Trader?
 
-### Ejemplo Real: Dos Enfoques
+### Simple Definition
+A **quant trader** is someone who uses **mathematics, statistics, and programming** to make trading decisions instead of intuition or "gut feeling."
 
-**👤 Trader Tradicional**:
+### Real Example: Two Approaches
+
+**Traditional Trader**:
 ```
-"Apple está bajando mucho, creo que va a rebotar.
-Voy a comprar porque 'se siente' barato."
+"Apple is dropping a lot, I think it's going to bounce.
+I'm going to buy because it 'feels' cheap."
 ```
 
-**🧮 Quant Trader**:
+**Quant Trader**:
 ```python
-# Descarga 5 años de datos de AAPL
+# Download 5 years of AAPL data
 data = get_market_data('AAPL', '5y')
 
-# Calcula estadísticamente si "bajas fuertes" predicen rebotes
+# Statistically calculate whether "strong drops" predict bounces
 strong_drops = data[data['daily_change'] < -3%]
 next_day_returns = strong_drops['next_day_change']
 
-# Resultado: 67% de rebotes al día siguiente
-# Probabilidad histórica > 50% → Estrategia viable
+# Result: 67% of bounces the next day
+# Historical probability > 50% -> Viable strategy
 if probability > 0.6:
     place_order('BUY', 'AAPL', shares=100)
 ```
 
-### ¿Cuál es Mejor?
+### Which Is Better?
 
-**Trader Tradicional**:
-- ❌ Emociones afectan decisiones
-- ❌ No puede manejar muchas acciones
-- ❌ Difícil mejorar sistemáticamente
-- ❌ Resultados inconsistentes
+**Traditional Trader**:
+- Emotions affect decisions
+- Cannot manage many stocks
+- Hard to improve systematically
+- Inconsistent results
 
 **Quant Trader**:
-- ✅ Decisiones basadas en datos
-- ✅ Puede analizar 1000+ acciones
-- ✅ Mejora continua con más datos
-- ✅ Resultados medibles y repetibles
+- Data-driven decisions
+- Can analyze 1000+ stocks
+- Continuous improvement with more data
+- Measurable and repeatable results
 
-## 💰 ¿Por Qué Ser Quant?
+## Why Be a Quant?
 
-### 1. **Escalabilidad**
-- Un algoritmo puede monitorear **todo el mercado** 24/7
-- No hay límite humano de atención
-- Puedes tradear múltiples estrategias simultáneamente
+### 1. **Scalability**
+- An algorithm can monitor **the entire market** 24/7
+- No human attention limit
+- You can trade multiple strategies simultaneously
 
-### 2. **Consistencia**
-- Las mismas reglas **siempre**
-- No hay "días malos" donde decides diferente
-- Elimina FOMO, miedo, codicia
+### 2. **Consistency**
+- The same rules **always**
+- No "bad days" where you decide differently
+- Eliminates FOMO, fear, greed
 
-### 3. **Mejora Continua**
-- Cada día tienes **más datos** para mejorar
-- Puedes probar miles de variaciones
-- A/B testing de estrategias
+### 3. **Continuous Improvement**
+- Every day you have **more data** to improve
+- You can test thousands of variations
+- A/B testing of strategies
 
-### 4. **Ventaja Competitiva**
-- Mayoría de retail traders usan intuición
-- Acceso a **herramientas institucionales** (gratis)
-- Puedes automatizar mientras otros trabajan
+### 4. **Competitive Advantage**
+- Most retail traders use intuition
+- Access to **institutional tools** (free)
+- You can automate while others work
 
-## 🔍 Ejemplos de Estrategias Quant
+## Examples of Quant Strategies
 
-### 1. **Gap Trading** (Principiante)
+### 1. **Gap Trading** (Beginner)
 ```
-REGLA: Si una acción abre 5%+ arriba del cierre anterior
-Y el volumen es 2x el promedio
-ENTONCES: Comprar en la apertura, vender en 30 minutos
+RULE: If a stock opens 5%+ above the previous close
+AND volume is 2x the average
+THEN: Buy at the open, sell in 30 minutes
 
-RESULTADO HISTÓRICO: 62% win rate, 1.3 profit factor
-```
-
-### 2. **Mean Reversion** (Intermedio)
-```
-REGLA: Si el precio está 2 desviaciones estándar debajo de la media de 20 días
-Y el RSI < 30
-ENTONCES: Comprar y mantener hasta que regrese a la media
-
-RESULTADO: 71% win rate en small caps
+HISTORICAL RESULT: 62% win rate, 1.3 profit factor
 ```
 
-### 3. **Momentum + Volume** (Avanzado)
+### 2. **Mean Reversion** (Intermediate)
 ```
-REGLA: Si precio rompe máximo de 52 semanas
-Y volumen > 300% del promedio
-Y sector está en tendencia alcista
-ENTONCES: Comprar con stop loss dinámico
+RULE: If price is 2 standard deviations below the 20-day mean
+AND RSI < 30
+THEN: Buy and hold until it returns to the mean
 
-RESULTADO: 58% win rate, pero trades ganadores 3x más grandes
+RESULT: 71% win rate in small caps
 ```
 
-## 🛠️ Herramientas del Quant
+### 3. **Momentum + Volume** (Advanced)
+```
+RULE: If price breaks 52-week high
+AND volume > 300% of average
+AND sector is in an uptrend
+THEN: Buy with dynamic stop loss
 
-### **Software (Todo Gratis)**
-- **Python**: Lenguaje principal
-- **Pandas**: Manipulación de datos
-- **YFinance**: Datos de mercado gratuitos
-- **Matplotlib**: Gráficos
-- **Jupyter**: Análisis interactivo
+RESULT: 58% win rate, but winning trades are 3x larger
+```
 
-### **Datos (Muchos Gratuitos)**
-- **Yahoo Finance**: Precios históricos
-- **Alpha Vantage**: API gratuita
-- **Federal Reserve**: Datos económicos
-- **SEC Filings**: Información fundamental
+## Quant Tools
 
-### **Brokers con APIs**
-- **Interactive Brokers**: API profesional
-- **Alpaca**: Commission-free con API
+### **Software (All Free)**
+- **Python**: Primary language
+- **Pandas**: Data manipulation
+- **YFinance**: Free market data
+- **Matplotlib**: Charts
+- **Jupyter**: Interactive analysis
+
+### **Data (Many Free)**
+- **Yahoo Finance**: Historical prices
+- **Alpha Vantage**: Free API
+- **Federal Reserve**: Economic data
+- **SEC Filings**: Fundamental information
+
+### **Brokers with APIs**
+- **Interactive Brokers**: Professional API
+- **Alpaca**: Commission-free with API
 - **TD Ameritrade**: thinkorswim API
 
-## 📊 Tu Primer Análisis Cuantitativo
+## Your First Quantitative Analysis
 
-### Ejercicio 1.1: Análisis de Gap
-Vamos a probar si los "gaps" realmente funcionan:
+### Exercise 1.1: Gap Analysis
+Let's test whether "gaps" actually work:
 
 ```python
-# No te preocupes si no entiendes todo el código aún
-# Solo observa la METODOLOGÍA
+# Don't worry if you don't understand all the code yet
+# Just observe the METHODOLOGY
 
 import yfinance as yf
 import pandas as pd
 
-# 1. HIPÓTESIS: Las acciones que abren +5% tienden a seguir subiendo
+# 1. HYPOTHESIS: Stocks that open +5% tend to keep rising
 symbol = 'AAPL'
 data = yf.download(symbol, start='2020-01-01', end='2024-01-01')
 
-# 2. IDENTIFICAR gaps
+# 2. IDENTIFY gaps
 data['Gap'] = (data['Open'] - data['Close'].shift(1)) / data['Close'].shift(1) * 100
 
-# 3. FILTRAR gaps grandes (>5%)
+# 3. FILTER large gaps (>5%)
 big_gaps = data[data['Gap'] > 5]
 
-# 4. MEDIR qué pasó después
+# 4. MEASURE what happened next
 big_gaps['Next_Hour_Return'] = (data['High'] - data['Open']) / data['Open'] * 100
 
-# 5. ESTADÍSTICAS
+# 5. STATISTICS
 print(f"Total gaps >5%: {len(big_gaps)}")
-print(f"Promedio retorno primera hora: {big_gaps['Next_Hour_Return'].mean():.2f}%")
-print(f"% de gaps que siguieron subiendo: {(big_gaps['Next_Hour_Return'] > 0).mean()*100:.1f}%")
+print(f"Average first hour return: {big_gaps['Next_Hour_Return'].mean():.2f}%")
+print(f"% of gaps that kept rising: {(big_gaps['Next_Hour_Return'] > 0).mean()*100:.1f}%")
 ```
 
-**Tu Tarea**: Ejecuta este código y reflexiona:
-1. ¿Los números apoyan la estrategia de gaps?
-2. ¿Qué cambiarías para mejorar la estrategia?
-3. ¿Cómo es diferente esto a "intuir" que va a subir?
+**Your Task**: Run this code and reflect:
+1. Do the numbers support the gap strategy?
+2. What would you change to improve the strategy?
+3. How is this different from "guessing" it will go up?
 
-### Ejercicio 1.2: Define Tu "Por Qué"
-Escribe 2-3 párrafos respondiendo:
-1. **¿Por qué quieres ser quant trader?**
-2. **¿Qué te atrae más: la programación, las matemáticas, o el trading?**
-3. **¿Cuál es tu objetivo en 6 meses?**
+### Exercise 1.2: Define Your "Why"
+Write 2-3 paragraphs answering:
+1. **Why do you want to be a quant trader?**
+2. **What attracts you most: programming, mathematics, or trading?**
+3. **What is your goal in 6 months?**
 
-## 🎯 Tipos de Quant Traders
+## Types of Quant Traders
 
-### 1. **Retail Quant** (Objetivo inicial)
-- Administra capital propio ($1K - $100K)
-- Estrategias simples pero efectivas
-- Automatización básica
-- Trabajo de medio tiempo o hobby lucrativo
+### 1. **Retail Quant** (Initial Goal)
+- Manages own capital ($1K - $100K)
+- Simple but effective strategies
+- Basic automation
+- Part-time job or lucrative hobby
 
-### 2. **Hedge Fund Quant** (Objetivo a largo plazo)
-- Administra capital institucional ($1M+)
-- Estrategias complejas con ML/AI
-- Infraestructura avanzada
-- Trabajo de tiempo completo, salarios $200K+
+### 2. **Hedge Fund Quant** (Long-term Goal)
+- Manages institutional capital ($1M+)
+- Complex strategies with ML/AI
+- Advanced infrastructure
+- Full-time job, salaries $200K+
 
 ### 3. **Prop Trading Quant**
-- Trading con capital de la firma
-- Enfoque en high-frequency o arbitraje
-- Tecnología de punta
-- Compartir ganancias con la firma
+- Trading with the firm's capital
+- Focus on high-frequency or arbitrage
+- Cutting-edge technology
+- Profit sharing with the firm
 
-### ¿Cuál te atrae más?
+### Which attracts you most?
 
-## 🚧 Obstáculos Comunes (Y Cómo Superarlos)
+## Common Obstacles (And How to Overcome Them)
 
-### **"No sé programar"**
-**Solución**: Solo necesitas Python básico. Este curso te enseña todo lo necesario.
+### **"I don't know how to code"**
+**Solution**: You only need basic Python. This course teaches you everything you need.
 
-### **"No tengo capital"**
-**Solución**: Puedes empezar con $100 en paper trading y generar track record.
+### **"I don't have capital"**
+**Solution**: You can start with $100 in paper trading and build a track record.
 
-### **"Es muy complicado"**
-**Solución**: Estrategias simples funcionan. No necesitas ser Einstein.
+### **"It's too complicated"**
+**Solution**: Simple strategies work. You don't need to be Einstein.
 
-### **"Ya hay mucha competencia"**
-**Solución**: Retail quants compiten contra retail traders, no contra Goldman Sachs.
+### **"There's already too much competition"**
+**Solution**: Retail quants compete against retail traders, not against Goldman Sachs.
 
-### **"No tengo tiempo"**
-**Solución**: Una vez programado, el sistema trabaja mientras duermes.
+### **"I don't have time"**
+**Solution**: Once programmed, the system works while you sleep.
 
-## 🎓 Perfiles de Éxito
+## Success Profiles
 
 ### **Jim Simons** (Renaissance Technologies)
-- Matemático convertido en trader
-- Retornos anuales promedio: 35%+
-- Usa modelos estadísticos complejos
-- Patrimonio neto: $25B+
+- Mathematician turned trader
+- Average annual returns: 35%+
+- Uses complex statistical models
+- Net worth: $25B+
 
 ### **Ray Dalio** (Bridgewater)
-- Creó "All Weather" portfolio usando correlaciones
-- Gestiona $150B+ usando principios cuantitativos
-- Enfoque en datos macro-económicos
+- Created "All Weather" portfolio using correlations
+- Manages $150B+ using quantitative principles
+- Focus on macroeconomic data
 
 ### **Andreas Clenow** (Retail Quant)
-- Empezó como retail trader
-- Escribió libros sobre trading cuantitativo
-- Gestiona fondos usando estrategias "simples"
-- Demostró que no necesitas PhD para ser exitoso
+- Started as a retail trader
+- Wrote books on quantitative trading
+- Manages funds using "simple" strategies
+- Proved you don't need a PhD to be successful
 
-## ✅ Checkpoint del Módulo
+## Module Checkpoint
 
-Antes de continuar al siguiente módulo, debes poder:
+Before continuing to the next module, you should be able to:
 
-### Conocimiento ✅
-- [ ] Explicar la diferencia entre quant y trader tradicional
-- [ ] Dar 3 ventajas del trading cuantitativo
-- [ ] Entender qué significa "probar una hipótesis con datos"
-- [ ] Identificar qué tipo de quant quieres ser
+### Knowledge
+- [ ] Explain the difference between quant and traditional trader
+- [ ] Give 3 advantages of quantitative trading
+- [ ] Understand what "testing a hypothesis with data" means
+- [ ] Identify what type of quant you want to be
 
-### Mentalidad ✅
-- [ ] Estás convencido de que datos > intuición
-- [ ] Tienes claridad sobre tu "por qué"
-- [ ] Entiendes que es un proceso de aprendizaje gradual
-- [ ] Estás emocionado de empezar a programar
+### Mindset
+- [ ] You are convinced that data > intuition
+- [ ] You have clarity about your "why"
+- [ ] You understand this is a gradual learning process
+- [ ] You are excited to start coding
 
-### Ejercicios ✅
-- [ ] Ejecutaste el análisis de gaps (aunque no entiendas todo)
-- [ ] Escribiste tu "por qué" personal
-- [ ] Identificaste qué tipo de quant quieres ser
+### Exercises
+- [ ] You ran the gap analysis (even if you don't understand everything)
+- [ ] You wrote your personal "why"
+- [ ] You identified what type of quant you want to be
 
-## 🚀 Próximo Módulo
+## Next Module
 
-**F2: Python Trading Básico**
-- Instalación y setup completo
-- Descarga de datos reales
-- Tus primeros gráficos
-- Calculando indicadores simples
+**F2: Basic Python Trading**
+- Complete installation and setup
+- Downloading real data
+- Your first charts
+- Calculating simple indicators
 
-**Tiempo estimado**: 3-4 horas
+**Estimated time**: 3-4 hours
 
 ---
 
-## 💡 Reflexión Final
+## Final Reflection
 
-> **"El mejor momento para plantar un árbol fue hace 20 años. El segundo mejor momento es ahora."**
+> **"The best time to plant a tree was 20 years ago. The second best time is now."**
 
-Cada día que pasa sin empezar es un día menos de datos históricos para analizar y mejorar. Los mercados generan nuevos datos cada segundo.
+Every day that passes without starting is one less day of historical data to analyze and improve. Markets generate new data every second.
 
-**Tu ventana de oportunidad es AHORA.**
+**Your window of opportunity is NOW.**
 
-🎯 **¿Listo para el siguiente módulo?** → [F2: Python Trading Básico](../f2-python-trading-basico/README.md)
+**Ready for the next module?** -> [F2: Basic Python Trading](../f2-python-trading-basico/README.md)

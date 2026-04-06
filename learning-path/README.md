@@ -1,173 +1,175 @@
-# 🎓 Academia Quant: De Cero a Profesional
+> 🇪🇸 [Leer en Español](README.es.md) | 🇺🇸 **English**
 
-Aprende trading cuantitativo a tu propio ritmo con módulos prácticos y progresivos.
+# Quant Academy: From Zero to Professional
 
-## 🗺️ Ruta de Aprendizaje
+Learn quantitative trading at your own pace with practical, progressive modules.
+
+## Learning Path
 
 ```
-📍 INICIO
-    ↓
-🟢 FUNDAMENTOS
-    ↓
-🟡 ESTRATEGIAS
-    ↓
-🟠 ANÁLISIS
-    ↓
-🔴 TRADING EN VIVO
-    ↓
-🎯 QUANT PROFESIONAL
+START
+    |
+FUNDAMENTALS
+    |
+STRATEGIES
+    |
+ANALYSIS
+    |
+LIVE TRADING
+    |
+PROFESSIONAL QUANT
 ```
 
-## 📚 Módulos de Aprendizaje
+## Learning Modules
 
-### 🟢 FUNDAMENTOS (4 módulos)
-**Tiempo estimado**: 2-4 semanas (según tu ritmo)
+### FUNDAMENTALS (4 modules)
+**Estimated time**: 2-4 weeks (at your own pace)
 
-| Módulo | Tema | Duración | Proyecto |
-|--------|------|----------|----------|
-| **F1** | ¿Qué es ser Quant? | 1-2 horas | Tu primer análisis |
-| **F2** | Python Trading Básico | 3-4 horas | Descarga y visualiza datos |
-| **F3** | Indicadores Técnicos | 2-3 horas | Sistema de señales |
-| **F4** | Primera Estrategia | 2-3 horas | Estrategia completa |
+| Module | Topic | Duration | Project |
+|--------|-------|----------|---------|
+| **F1** | What Is Being a Quant? | 1-2 hours | Your first analysis |
+| **F2** | Basic Python Trading | 3-4 hours | Download and visualize data |
+| **F3** | Technical Indicators | 2-3 hours | Signal system |
+| **F4** | First Strategy | 2-3 hours | Complete strategy |
 
-### 🟡 ESTRATEGIAS (5 módulos)
-**Tiempo estimado**: 3-6 semanas
+### STRATEGIES (5 modules)
+**Estimated time**: 3-6 weeks
 
-| Módulo | Tema | Duración | Proyecto |
-|--------|------|----------|----------|
-| **E1** | Momentum Trading | 3-4 horas | Estrategia de gaps |
-| **E2** | Mean Reversion | 3-4 horas | Reversión a la media |
-| **E3** | Backtesting Robusto | 4-5 horas | Framework de testing |
-| **E4** | Optimización de Parámetros | 3-4 horas | Auto-optimización |
-| **E5** | Multi-Estrategia | 4-6 horas | Portfolio de estrategias |
+| Module | Topic | Duration | Project |
+|--------|-------|----------|---------|
+| **E1** | Momentum Trading | 3-4 hours | Gap strategy |
+| **E2** | Mean Reversion | 3-4 hours | Mean reversion |
+| **E3** | Robust Backtesting | 4-5 hours | Testing framework |
+| **E4** | Parameter Optimization | 3-4 hours | Auto-optimization |
+| **E5** | Multi-Strategy | 4-6 hours | Strategy portfolio |
 
-### 🟠 ANÁLISIS AVANZADO (4 módulos)
-**Tiempo estimado**: 4-8 semanas
+### ADVANCED ANALYSIS (4 modules)
+**Estimated time**: 4-8 weeks
 
-| Módulo | Tema | Duración | Proyecto |
-|--------|------|----------|----------|
-| **A1** | Gestión de Riesgo | 3-4 horas | Sistema de riesgo |
-| **A2** | Análisis de Performance | 2-3 horas | Dashboard de métricas |
-| **A3** | Datos Alternativos | 4-5 horas | Integración de sentiment |
-| **A4** | Machine Learning | 5-6 horas | Predicción con ML |
+| Module | Topic | Duration | Project |
+|--------|-------|----------|---------|
+| **A1** | Risk Management | 3-4 hours | Risk system |
+| **A2** | Performance Analysis | 2-3 hours | Metrics dashboard |
+| **A3** | Alternative Data | 4-5 hours | Sentiment integration |
+| **A4** | Machine Learning | 5-6 hours | ML prediction |
 
-### 🔴 TRADING PROFESIONAL (3 módulos)
-**Tiempo estimado**: 4-8 semanas
+### PROFESSIONAL TRADING (3 modules)
+**Estimated time**: 4-8 weeks
 
-| Módulo | Tema | Duración | Proyecto |
-|--------|------|----------|----------|
-| **P1** | Conexión con Broker | 3-4 horas | Paper trading |
-| **P2** | Ejecución Automatizada | 4-5 horas | Bot de trading |
-| **P3** | Monitoreo y Scaling | 3-4 horas | Sistema profesional |
+| Module | Topic | Duration | Project |
+|--------|-------|----------|---------|
+| **P1** | Broker Connection | 3-4 hours | Paper trading |
+| **P2** | Automated Execution | 4-5 hours | Trading bot |
+| **P3** | Monitoring and Scaling | 3-4 hours | Professional system |
 
-## 🚀 Cómo Empezar
+## How to Get Started
 
-### ✅ Evaluación Rápida (2 minutos)
+### Quick Assessment (2 minutes)
 
-**Programación**:
-- [ ] Sé usar Python básico
-- [ ] He usado pandas antes
-- [ ] Puedo instalar librerías
+**Programming**:
+- [ ] I can use basic Python
+- [ ] I have used pandas before
+- [ ] I can install libraries
 
 **Trading**:
-- [ ] Entiendo qué es bid/ask
-- [ ] He hecho trades manuales
-- [ ] Conozco indicadores técnicos
+- [ ] I understand what bid/ask is
+- [ ] I have made manual trades
+- [ ] I know technical indicators
 
-**Matemáticas**:
-- [ ] Entiendo estadística básica
-- [ ] Sé calcular promedios/desviaciones
-- [ ] Puedo interpretar gráficos
+**Mathematics**:
+- [ ] I understand basic statistics
+- [ ] I can calculate averages/deviations
+- [ ] I can interpret charts
 
-### 🎯 Tu Punto de Inicio
+### Your Starting Point
 
-| Checks | Comienza en | Tiempo Total |
-|--------|-------------|--------------|
-| 0-2 | **F1 - Fundamentos** | 3-6 meses |
-| 3-5 | **F3 - Indicadores** | 2-4 meses |
-| 6-8 | **E1 - Estrategias** | 2-3 meses |
-| 9+ | **A1 - Análisis** | 1-2 meses |
+| Checks | Start At | Total Time |
+|--------|----------|------------|
+| 0-2 | **F1 - Fundamentals** | 3-6 months |
+| 3-5 | **F3 - Indicators** | 2-4 months |
+| 6-8 | **E1 - Strategies** | 2-3 months |
+| 9+ | **A1 - Analysis** | 1-2 months |
 
-## 📖 Estructura de Cada Módulo
+## Module Structure
 
-### 🎯 Formato Consistente
-Cada módulo incluye:
+### Consistent Format
+Each module includes:
 
-1. **🎯 Objetivos** - Qué aprenderás exactamente
-2. **📚 Teoría** - Conceptos esenciales (20-30% del tiempo)
-3. **💻 Práctica** - Ejercicios hands-on (60-70% del tiempo)
-4. **🏆 Proyecto** - Aplicación real del conocimiento
-5. **✅ Checkpoint** - Verificación de aprendizaje
+1. **Objectives** - What you will learn exactly
+2. **Theory** - Essential concepts (20-30% of time)
+3. **Practice** - Hands-on exercises (60-70% of time)
+4. **Project** - Real-world application of knowledge
+5. **Checkpoint** - Learning verification
 
-### ⏱️ Tiempo Flexible
-- **Intensivo**: 2-3 horas por sesión
-- **Regular**: 1 hora por sesión
-- **Relajado**: 30 minutos por sesión
+### Flexible Timing
+- **Intensive**: 2-3 hours per session
+- **Regular**: 1 hour per session
+- **Relaxed**: 30 minutes per session
 
-### 📈 Progreso Medible
-- ✅ Ejercicios completados
-- 🏆 Proyectos funcionales
-- 📊 Código que funciona
-- 🎯 Métricas de trading
+### Measurable Progress
+- Completed exercises
+- Working projects
+- Functional code
+- Trading metrics
 
-## 🛠️ Setup Único (Una Sola Vez)
+## One-Time Setup
 
-### Instalación Completa
+### Complete Installation
 ```bash
-# 1. Verificar Python
-python --version  # Debe ser 3.8+
+# 1. Verify Python
+python --version  # Must be 3.8+
 
-# 2. Instalar todo de una vez
+# 2. Install everything at once
 pip install -r requirements.txt
 
-# 3. Verificar instalación
-python -c "import pandas, yfinance, matplotlib; print('✅ Todo listo!')"
+# 3. Verify installation
+python -c "import pandas, yfinance, matplotlib; print('All set!')"
 ```
 
-### Herramientas Opcionales
-- **Google Colab**: Para programar sin instalar nada
-- **Jupyter Notebook**: Para desarrollo interactivo
-- **VS Code**: Para proyectos más grandes
+### Optional Tools
+- **Google Colab**: For coding without installing anything
+- **Jupyter Notebook**: For interactive development
+- **VS Code**: For larger projects
 
-## 🎓 Certificación y Progreso
+## Certification and Progress
 
-### 🏅 Insignias por Módulo
-- **🟢 Fundamentos**: Básico en Python trading
-- **🟡 Estrategias**: Desarrollador de estrategias
-- **🟠 Análisis**: Analista cuantitativo
-- **🔴 Profesional**: Quant trader
+### Badges by Module
+- **Fundamentals**: Python trading basics
+- **Strategies**: Strategy developer
+- **Analysis**: Quantitative analyst
+- **Professional**: Quant trader
 
-### 📜 Certificado Final
-Al completar todos los módulos tendrás:
-- Portfolio de estrategias funcionales
-- Sistema de trading automatizado
-- Conocimiento equivalente a junior quant
-- Código reutilizable para cualquier activo
+### Final Certificate
+Upon completing all modules you will have:
+- Portfolio of working strategies
+- Automated trading system
+- Knowledge equivalent to a junior quant
+- Reusable code for any asset
 
-## 💡 Metodología de Aprendizaje
+## Learning Methodology
 
-### 🔄 Aprendizaje Progresivo
-Cada módulo construye sobre el anterior:
-- **No saltes módulos** (aunque tengas experiencia)
-- **Completa todos los ejercicios** (son acumulativos)
-- **Documenta tu progreso** (tendrás un portfolio al final)
+### Progressive Learning
+Each module builds on the previous one:
+- **Don't skip modules** (even if you have experience)
+- **Complete all exercises** (they are cumulative)
+- **Document your progress** (you'll have a portfolio at the end)
 
-### 🎯 Enfoque Práctico (80/20)
-- **80% práctica**: Código, ejercicios, proyectos
-- **20% teoría**: Solo lo esencial para entender
+### Practical Focus (80/20)
+- **80% practice**: Code, exercises, projects
+- **20% theory**: Only what's essential for understanding
 
-### 🤝 Aprendizaje Colaborativo
-- **Discord**: Chat en tiempo real con otros estudiantes
-- **GitHub**: Comparte tu código y ve el de otros
-- **Sessions**: Sesiones grupales de resolución de problemas
+### Collaborative Learning
+- **Discord**: Real-time chat with other students
+- **GitHub**: Share your code and see others'
+- **Sessions**: Group problem-solving sessions
 
-## 📊 ¿Qué Construirás?
+## What Will You Build?
 
-### Proyecto Final Integrado
-Al terminar tendrás un **sistema completo**:
+### Integrated Final Project
+When you finish, you'll have a **complete system**:
 
 ```python
-# Tu sistema profesional al final
+# Your professional system at the end
 class QuandTrader:
     def __init__(self):
         self.strategies = ['gap_and_go', 'mean_reversion', 'momentum']
@@ -175,71 +177,71 @@ class QuandTrader:
         self.portfolio = Portfolio()
 
     def run_daily_analysis(self):
-        # Descarga datos automáticamente
-        # Ejecuta todas tus estrategias
-        # Gestiona riesgo en tiempo real
-        # Envía alertas por Telegram
-        # Genera reportes automáticos
+        # Downloads data automatically
+        # Runs all your strategies
+        # Manages risk in real time
+        # Sends alerts via Telegram
+        # Generates automatic reports
         pass
 ```
 
-### Portfolio de Estrategias
-- 5+ estrategias probadas y optimizadas
-- Sistema de backtesting robusto
-- Gestión de riesgo automática
-- Monitoreo en tiempo real
-- Reportes profesionales
+### Strategy Portfolio
+- 5+ tested and optimized strategies
+- Robust backtesting system
+- Automatic risk management
+- Real-time monitoring
+- Professional reports
 
-## 🚀 Empezar AHORA
+## Start NOW
 
-### Opción 1: Total Principiante
+### Option 1: Complete Beginner
 ```bash
 cd learning-path/fundamentos/f1-que-es-ser-quant/
 open README.md
 ```
 
-### Opción 2: Tengo algo de Python
+### Option 2: Some Python Knowledge
 ```bash
 cd learning-path/fundamentos/f3-indicadores-tecnicos/
 open README.md
 ```
 
-### Opción 3: Ya tradeo manualmente
+### Option 3: Already Trading Manually
 ```bash
 cd learning-path/estrategias/e1-momentum-trading/
 open README.md
 ```
 
-## 🆘 Ayuda y Soporte
+## Help and Support
 
-### 📞 Recursos de Ayuda
-- **📖 FAQ**: Preguntas frecuentes resueltas
-- **💬 Discord**: Comunidad activa 24/7
-- **📧 Issues**: Para bugs o mejoras
-- **🎥 Videos**: Explicaciones visuales de conceptos complejos
+### Help Resources
+- **FAQ**: Frequently asked questions answered
+- **Discord**: Active community 24/7
+- **Issues**: For bugs or improvements
+- **Videos**: Visual explanations of complex concepts
 
-### 🔧 Solución Rápida de Problemas
-- **Instalación**: `pip install --upgrade pip`
-- **Importación**: `pip install nombre-libreria`
-- **Datos**: Verificar conexión a internet
-- **Gráficos**: `pip install matplotlib`
+### Quick Troubleshooting
+- **Installation**: `pip install --upgrade pip`
+- **Import**: `pip install library-name`
+- **Data**: Check internet connection
+- **Charts**: `pip install matplotlib`
 
-## 🏆 Comunidad
+## Community
 
-### 👥 Únete a Otros Quants
-- **Showcase**: Comparte tus proyectos
-- **Code Review**: Otros revisan tu código
-- **Colaboración**: Trabajen juntos en proyectos
-- **Networking**: Conecta con quants profesionales
+### Join Other Quants
+- **Showcase**: Share your projects
+- **Code Review**: Others review your code
+- **Collaboration**: Work together on projects
+- **Networking**: Connect with professional quants
 
-### 🎯 Compromiso
-Este es un maratón, no una carrera. Lo importante es la **consistencia**:
-- 🔄 **Poco pero frecuente** es mejor que mucho de vez en cuando
-- 📈 **Progreso diario** aunque sean 15 minutos
-- 🎯 **Enfoque en entender**, no en terminar rápido
+### Commitment
+This is a marathon, not a sprint. What matters is **consistency**:
+- **Little but frequent** is better than a lot all at once
+- **Daily progress** even if just 15 minutes
+- **Focus on understanding**, not on finishing fast
 
 ---
 
-**🚀 ¡Tu aventura quant comienza con un solo click!**
+**Your quant adventure begins with a single click!**
 
-Elige tu punto de inicio y comienza a construir tu futuro como quant trader.
+Choose your starting point and begin building your future as a quant trader.

@@ -1,70 +1,72 @@
-# Tipos de Datos: EOD, Intradía y Tick
+> 🇪🇸 [Leer en Español](data_types.es.md) | 🇺🇸 **English**
+
+# Data Types: EOD, Intraday, and Tick
 
 ## End-of-Day (EOD) Data
 
-### ¿Qué es?
-Datos con un solo punto por día: Open, High, Low, Close, Volume (OHLCV).
+### What Is It?
+Data with a single point per day: Open, High, Low, Close, Volume (OHLCV).
 
 ```python
-# Ejemplo EOD data
+# Example EOD data
 date         open    high    low     close   volume
 2024-01-15   175.00  178.50  174.25  177.80  45000000
 2024-01-16   177.80  179.00  176.00  178.25  42000000
 ```
 
-### Cuándo Usar
-- Swing trading (holding días/semanas)
-- Análisis de tendencias largas
-- Screening inicial de ideas
-- Backtesting de estrategias position
+### When to Use
+- Swing trading (holding days/weeks)
+- Long-term trend analysis
+- Initial idea screening
+- Position strategy backtesting
 
-### Pros y Contras
+### Pros and Cons
 ✅ **Pros:**
-- Gratis o barato
-- Fácil de manejar
-- Menos ruido
-- Backtests rápidos
+- Free or cheap
+- Easy to handle
+- Less noise
+- Fast backtests
 
-❌ **Contras:**
-- No sirve para day trading
-- Pierde información intradía
-- No puedes optimizar entries/exits
+❌ **Cons:**
+- Not useful for day trading
+- Loses intraday information
+- Can't optimize entries/exits
 
-### Código Ejemplo
+### Example Code
 ```python
 import yfinance as yf
 import pandas as pd
 
-# Obtener EOD data
+# Get EOD data
 ticker = 'AAPL'
 eod_data = yf.download(ticker, start='2023-01-01', end='2024-01-01')
 
-# Calcular métricas simples
+# Calculate simple metrics
 eod_data['SMA20'] = eod_data['Close'].rolling(20).mean()
 eod_data['Daily_Range'] = ((eod_data['High'] - eod_data['Low']) / eod_data['Low'] * 100)
 eod_data['Gap'] = (eod_data['Open'] / eod_data['Close'].shift(1) - 1) * 100
 ```
 
-## Intraday Data (Barras de Minutos)
+## Intraday Data (Minute Bars)
 
-### ¿Qué es?
-OHLCV para intervalos específicos: 1min, 5min, 15min, etc.
+### What Is It?
+OHLCV for specific intervals: 1min, 5min, 15min, etc.
 
 ```python
-# Ejemplo 5-min bars
+# Example 5-min bars
 datetime              open    high    low     close   volume
 2024-01-15 09:30:00  175.00  175.50  174.95  175.20  500000
 2024-01-15 09:35:00  175.20  175.80  175.10  175.75  450000
 2024-01-15 09:40:00  175.75  176.00  175.50  175.55  380000
 ```
 
-### Cuándo Usar
+### When to Use
 - Day trading
-- Entries/exits precisos
-- Patrones intradía (VWAP, breakouts)
-- Gestión de riesgo intradía
+- Precise entries/exits
+- Intraday patterns (VWAP, breakouts)
+- Intraday risk management
 
-### Resoluciones Comunes
+### Common Resolutions
 ```python
 RESOLUTIONS = {
     'scalping': '1min',
@@ -74,9 +76,9 @@ RESOLUTIONS = {
 }
 ```
 
-### Manejo de Datos
+### Data Handling
 ```python
-# Con Polygon.io
+# With Polygon.io
 from polygon import RESTClient
 client = RESTClient("YOUR_API_KEY")
 
@@ -89,12 +91,12 @@ bars = client.get_aggs(
     to="2024-01-15"
 )
 
-# Convertir a DataFrame
+# Convert to DataFrame
 df = pd.DataFrame(bars)
 df['datetime'] = pd.to_datetime(df['timestamp'], unit='ms')
 df.set_index('datetime', inplace=True)
 
-# Calcular VWAP
+# Calculate VWAP
 df['cum_vol'] = df['volume'].cumsum()
 df['cum_vol_price'] = (df['close'] * df['volume']).cumsum()
 df['vwap'] = df['cum_vol_price'] / df['cum_vol']
@@ -102,48 +104,48 @@ df['vwap'] = df['cum_vol_price'] / df['cum_vol']
 
 ## Tick Data
 
-### ¿Qué es?
-Cada transacción individual con timestamp exacto.
+### What Is It?
+Every individual transaction with exact timestamp.
 
 ```python
-# Ejemplo tick data
+# Example tick data
 timestamp              price   size  exchange  conditions
 2024-01-15 09:30:00.123  175.00  100   NYSE     ['regular']
 2024-01-15 09:30:00.125  175.01  500   NASDAQ   ['regular']
 2024-01-15 09:30:00.127  175.00  200   ARCA     ['odd_lot']
 ```
 
-### Cuándo Usar
+### When to Use
 - High frequency trading
-- Análisis de microestructura
-- Detección de blocks/dark pools
-- Slippage analysis exacto
+- Microstructure analysis
+- Block/dark pool detection
+- Exact slippage analysis
 
-### Consideraciones
-- **Tamaño**: 1GB+ por día para stocks líquidos
-- **Procesamiento**: Necesitas código optimizado
-- **Costo**: $100-500+/mes para data quality
+### Considerations
+- **Size**: 1GB+ per day for liquid stocks
+- **Processing**: You need optimized code
+- **Cost**: $100-500+/month for quality data
 
-### Trabajando con Tick Data
+### Working with Tick Data
 ```python
-# Ejemplo con Polygon tick data
+# Example with Polygon tick data
 trades = client.list_trades(
     ticker="AAPL",
     timestamp="2024-01-15",
     limit=50000
 )
 
-# Procesar para análisis
+# Process for analysis
 tick_df = pd.DataFrame(trades)
 tick_df['timestamp'] = pd.to_datetime(tick_df['sip_timestamp'], unit='ns')
 
-# Detectar prints grandes
+# Detect large prints
 large_prints = tick_df[tick_df['size'] >= 10000]
 
-# Analizar por exchange
+# Analyze by exchange
 exchange_volume = tick_df.groupby('exchange')['size'].sum()
 
-# Crear barras de tiempo desde ticks
+# Create time bars from ticks
 def create_time_bars(ticks, bar_size='5T'):
     ticks.set_index('timestamp', inplace=True)
     bars = ticks.resample(bar_size).agg({
@@ -154,39 +156,39 @@ def create_time_bars(ticks, bar_size='5T'):
     return bars
 ```
 
-## Comparación Práctica
+## Practical Comparison
 
-| Tipo | Tamaño/Día | Costo | Use Case | Latencia |
-|------|------------|-------|----------|----------|
-| EOD | 1 línea | $0 | Swing/Position | N/A |
-| 1-min | 390 líneas | $20-50 | Day trading | 1 min |
-| Tick | 100k-1M líneas | $100+ | HFT/Analysis | Real-time |
+| Type | Size/Day | Cost | Use Case | Latency |
+|------|----------|------|----------|---------|
+| EOD | 1 row | $0 | Swing/Position | N/A |
+| 1-min | 390 rows | $20-50 | Day trading | 1 min |
+| Tick | 100k-1M rows | $100+ | HFT/Analysis | Real-time |
 
-## Agregación de Datos
+## Data Aggregation
 
-### De Tick a Minuto
+### From Tick to Minute
 ```python
 def aggregate_ticks_to_bars(ticks, bar_type='time', bar_size=60):
     if bar_type == 'time':
-        # Barras de tiempo (cada 60 segundos)
+        # Time bars (every 60 seconds)
         bars = ticks.resample(f'{bar_size}S').agg({
             'price': ['first', 'max', 'min', 'last'],
             'size': 'sum'
         })
     
     elif bar_type == 'volume':
-        # Barras de volumen (cada N shares)
+        # Volume bars (every N shares)
         bars = aggregate_volume_bars(ticks, bar_size)
     
     elif bar_type == 'dollar':
-        # Barras de dólares (cada $N traded)
+        # Dollar bars (every $N traded)
         ticks['dollar_vol'] = ticks['price'] * ticks['size']
         bars = aggregate_dollar_bars(ticks, bar_size)
     
     return bars
 ```
 
-### Volume Bars (Avanzado)
+### Volume Bars (Advanced)
 ```python
 def create_volume_bars(ticks, volume_per_bar=100000):
     bars = []
@@ -204,14 +206,14 @@ def create_volume_bars(ticks, volume_per_bar=100000):
     return pd.DataFrame(bars)
 ```
 
-## Calidad de Datos
+## Data Quality
 
-### Checklist de Validación
+### Validation Checklist
 ```python
 def validate_intraday_data(df):
     issues = []
     
-    # 1. Gaps temporales
+    # 1. Temporal gaps
     expected_bars = pd.date_range(
         start=df.index[0].replace(hour=9, minute=30),
         end=df.index[0].replace(hour=16, minute=0),
@@ -221,7 +223,7 @@ def validate_intraday_data(df):
     if len(missing) > 0:
         issues.append(f"Missing {len(missing)} bars")
     
-    # 2. Precios negativos o cero
+    # 2. Negative or zero prices
     if (df[['open', 'high', 'low', 'close']] <= 0).any().any():
         issues.append("Zero or negative prices found")
     
@@ -230,22 +232,22 @@ def validate_intraday_data(df):
     if invalid_hl.any():
         issues.append(f"{invalid_hl.sum()} bars with high < low")
     
-    # 4. Volumen sospechoso
+    # 4. Suspicious volume
     if (df['volume'] == 0).sum() > len(df) * 0.1:
         issues.append("Too many zero volume bars")
     
     return issues
 ```
 
-## Mi Approach Personal
+## My Personal Approach
 
 ```python
-# Uso diferentes tipos según la estrategia
+# I use different types depending on the strategy
 DATA_CONFIG = {
     'gap_scanner': {
         'type': 'EOD',
         'source': 'yahoo',
-        'reason': 'Solo necesito gap % overnight'
+        'reason': 'Only need overnight gap %'
     },
     'vwap_trading': {
         'type': '1min',
@@ -255,32 +257,32 @@ DATA_CONFIG = {
     'tape_reading': {
         'type': 'tick',
         'source': 'polygon_websocket',
-        'reason': 'Ver order flow en tiempo real'
+        'reason': 'See order flow in real time'
     }
 }
 ```
 
-## Tips Prácticos
+## Practical Tips
 
-1. **Empieza con EOD**, es gratis y suficiente para aprender
-2. **Upgrade a 5-min** cuando hagas day trading
-3. **Tick data** solo si haces HFT o analysis profundo
-4. **Guarda localmente** data que uses frecuentemente
-5. **Timestamp timezone** siempre en Eastern (NYSE time)
+1. **Start with EOD**, it's free and sufficient for learning
+2. **Upgrade to 5-min** when you do day trading
+3. **Tick data** only if you do HFT or deep analysis
+4. **Store locally** data you use frequently
+5. **Timestamp timezone** always in Eastern (NYSE time)
 
-## Storage Eficiente
+## Efficient Storage
 
 ```python
-# Guardar eficientemente
-df.to_parquet('data/AAPL_2024_1min.parquet')  # Mejor que CSV
-df.to_hdf('data/ticks.h5', key='AAPL')  # Para datasets grandes
+# Save efficiently
+df.to_parquet('data/AAPL_2024_1min.parquet')  # Better than CSV
+df.to_hdf('data/ticks.h5', key='AAPL')  # For large datasets
 
-# Leer eficientemente
+# Read efficiently
 df = pd.read_parquet('data/AAPL_2024_1min.parquet')
 df = pd.read_hdf('data/ticks.h5', key='AAPL', 
                  where='timestamp >= "2024-01-15" & timestamp < "2024-01-16"')
 ```
 
-## Siguiente Paso
+## Next Step
 
-Ahora que entiendes los tipos de datos, vamos a [Limpieza de Datos](data_cleaning.md) para asegurar que tu data sea confiable.
+Now that you understand data types, let's move on to [Data Cleaning](data_cleaning.md) to ensure your data is reliable.

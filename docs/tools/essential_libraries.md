@@ -1,24 +1,26 @@
-# Librerías y Herramientas Esenciales
+> 🇪🇸 [Leer en Español](essential_libraries.es.md) | 🇺🇸 **English**
+
+# Essential Libraries and Tools
 
 ## Core Data Science Stack
 
-### Pandas - Manipulación de Datos
+### Pandas - Data Manipulation
 ```python
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 
-# Configuraciones esenciales para trading
+# Essential configurations for trading
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', 50)
 
 class PandasTradingUtils:
-    """Utilidades específicas de trading con Pandas"""
+    """Trading-specific utilities with Pandas"""
     
     @staticmethod
     def resample_ohlc(df, timeframe='5T'):
-        """Resample a diferentes timeframes"""
+        """Resample to different timeframes"""
         ohlc_dict = {
             'open': 'first',
             'high': 'max', 
@@ -32,7 +34,7 @@ class PandasTradingUtils:
     
     @staticmethod
     def calculate_returns(df, price_col='close'):
-        """Calcular diferentes tipos de returns"""
+        """Calculate different types of returns"""
         returns_df = df.copy()
         
         # Simple returns
@@ -48,10 +50,10 @@ class PandasTradingUtils:
     
     @staticmethod
     def add_trading_session_flags(df):
-        """Agregar flags de sesiones de trading"""
+        """Add trading session flags"""
         df = df.copy()
         
-        # Convertir a ET si no está ya
+        # Convert to ET if not already
         if df.index.tz is None:
             df.index = df.index.tz_localize('UTC').tz_convert('US/Eastern')
         
@@ -71,7 +73,7 @@ class PandasTradingUtils:
     
     @staticmethod
     def filter_trading_hours(df, session='regular'):
-        """Filtrar por sesión de trading"""
+        """Filter by trading session"""
         df_with_flags = PandasTradingUtils.add_trading_session_flags(df)
         
         if session == 'regular':
@@ -87,11 +89,11 @@ class PandasTradingUtils:
         
         return df_with_flags
 
-# Ejemplo de uso
+# Usage example
 def demo_pandas_utils():
-    """Demo de utilidades de Pandas"""
+    """Pandas utilities demo"""
     
-    # Crear datos de ejemplo
+    # Create sample data
     dates = pd.date_range('2024-01-01 09:30:00', '2024-01-01 16:00:00', freq='1T')
     sample_data = pd.DataFrame({
         'open': np.random.randn(len(dates)).cumsum() + 100,
@@ -101,30 +103,30 @@ def demo_pandas_utils():
         'volume': np.random.randint(1000, 10000, len(dates))
     }, index=dates)
     
-    # Resample a 5 minutos
+    # Resample to 5 minutes
     ohlc_5min = PandasTradingUtils.resample_ohlc(sample_data, '5T')
     print(f"📊 Original: {len(sample_data)} bars, 5min: {len(ohlc_5min)} bars")
     
-    # Calcular returns
+    # Calculate returns
     returns_data = PandasTradingUtils.calculate_returns(sample_data)
     print(f"💰 Average return: {returns_data['simple_return'].mean():.4f}")
     
     return sample_data
 ```
 
-### NumPy - Computación Numérica
+### NumPy - Numerical Computing
 ```python
 import numpy as np
 from numba import jit
 import scipy.stats as stats
 
 class NumPyTradingUtils:
-    """Utilidades de NumPy optimizadas para trading"""
+    """NumPy utilities optimized for trading"""
     
     @staticmethod
     @jit(nopython=True)
     def fast_rolling_max(arr, window):
-        """Rolling max optimizado con Numba"""
+        """Rolling max optimized with Numba"""
         result = np.empty(len(arr))
         result[:window-1] = np.nan
         
@@ -136,7 +138,7 @@ class NumPyTradingUtils:
     @staticmethod
     @jit(nopython=True)
     def fast_rolling_min(arr, window):
-        """Rolling min optimizado con Numba"""
+        """Rolling min optimized with Numba"""
         result = np.empty(len(arr))
         result[:window-1] = np.nan
         
@@ -148,7 +150,7 @@ class NumPyTradingUtils:
     @staticmethod
     @jit(nopython=True)
     def calculate_rsi_fast(prices, period=14):
-        """RSI optimizado con Numba"""
+        """RSI optimized with Numba"""
         deltas = np.diff(prices)
         gains = np.where(deltas > 0, deltas, 0)
         losses = np.where(deltas < 0, -deltas, 0)
@@ -172,68 +174,68 @@ class NumPyTradingUtils:
     
     @staticmethod
     def calculate_sharpe_ratio(returns, risk_free_rate=0.02):
-        """Calcular Sharpe ratio"""
+        """Calculate Sharpe ratio"""
         excess_returns = returns - risk_free_rate/252  # Daily risk-free rate
         return np.sqrt(252) * np.mean(excess_returns) / np.std(excess_returns)
     
     @staticmethod
     def calculate_max_drawdown(cumulative_returns):
-        """Calcular maximum drawdown"""
+        """Calculate maximum drawdown"""
         peak = np.maximum.accumulate(cumulative_returns)
         drawdown = (cumulative_returns - peak) / peak
         return np.min(drawdown)
     
     @staticmethod
     def calculate_var(returns, confidence_level=0.05):
-        """Calcular Value at Risk"""
+        """Calculate Value at Risk"""
         return np.percentile(returns, confidence_level * 100)
     
     @staticmethod
     def calculate_cvar(returns, confidence_level=0.05):
-        """Calcular Conditional Value at Risk (Expected Shortfall)"""
+        """Calculate Conditional Value at Risk (Expected Shortfall)"""
         var = NumPyTradingUtils.calculate_var(returns, confidence_level)
         return np.mean(returns[returns <= var])
 
-# Ejemplo de uso
+# Usage example
 def demo_numpy_utils():
-    """Demo de utilidades NumPy"""
+    """NumPy utilities demo"""
     
-    # Generar returns sintéticos
+    # Generate synthetic returns
     np.random.seed(42)
-    returns = np.random.normal(0.001, 0.02, 252)  # 1 año de returns diarios
+    returns = np.random.normal(0.001, 0.02, 252)  # 1 year of daily returns
     prices = 100 * np.exp(np.cumsum(returns))
     
-    # Calcular métricas
+    # Calculate metrics
     sharpe = NumPyTradingUtils.calculate_sharpe_ratio(returns)
     max_dd = NumPyTradingUtils.calculate_max_drawdown(np.cumsum(returns))
     var_5 = NumPyTradingUtils.calculate_var(returns, 0.05)
     cvar_5 = NumPyTradingUtils.calculate_cvar(returns, 0.05)
     
-    print(f"📊 Métricas de Performance:")
+    print(f"📊 Performance Metrics:")
     print(f"Sharpe Ratio: {sharpe:.2f}")
     print(f"Max Drawdown: {max_dd:.2%}")
     print(f"VaR (5%): {var_5:.2%}")
     print(f"CVaR (5%): {cvar_5:.2%}")
     
-    # RSI rápido
+    # Fast RSI
     rsi = NumPyTradingUtils.calculate_rsi_fast(prices)
     print(f"RSI actual: {rsi[-1]:.1f}")
 ```
 
 ## Technical Analysis Libraries
 
-### TA-Lib - Indicadores Técnicos
+### TA-Lib - Technical Indicators
 ```python
 import talib
 
 class TALibIntegration:
-    """Integración completa con TA-Lib"""
+    """Complete integration with TA-Lib"""
     
     @staticmethod
     def comprehensive_analysis(df):
-        """Análisis técnico comprehensivo"""
+        """Comprehensive technical analysis"""
         
-        # Preparar datos
+        # Prepare data
         high = df['high'].values
         low = df['low'].values
         close = df['close'].values
@@ -276,7 +278,7 @@ class TALibIntegration:
     
     @staticmethod
     def get_all_patterns(df):
-        """Obtener todos los patrones de candlestick"""
+        """Get all candlestick patterns"""
         
         open_prices = df['open'].values
         high = df['high'].values
@@ -285,7 +287,7 @@ class TALibIntegration:
         
         patterns = {}
         
-        # Lista de todos los patrones disponibles en TA-Lib
+        # List of all available patterns in TA-Lib
         pattern_functions = [
             'CDL2CROWS', 'CDL3BLACKCROWS', 'CDL3INSIDE', 'CDL3LINESTRIKE',
             'CDL3OUTSIDE', 'CDL3STARSINSOUTH', 'CDL3WHITESOLDIERS', 'CDLABANDONEDBABY',
@@ -316,7 +318,7 @@ class TALibIntegration:
     
     @staticmethod
     def detect_active_patterns(df, min_strength=80):
-        """Detectar patrones activos con fuerza mínima"""
+        """Detect active patterns with minimum strength"""
         
         patterns = TALibIntegration.get_all_patterns(df)
         active_patterns = {}
@@ -333,11 +335,11 @@ class TALibIntegration:
         
         return active_patterns
 
-# Ejemplo de uso
+# Usage example
 def demo_talib_integration():
-    """Demo de integración TA-Lib"""
+    """TA-Lib integration demo"""
     
-    # Crear datos de ejemplo
+    # Create sample data
     dates = pd.date_range('2024-01-01', periods=100, freq='D')
     sample_data = pd.DataFrame({
         'open': np.random.randn(100).cumsum() + 100,
@@ -347,18 +349,18 @@ def demo_talib_integration():
         'volume': np.random.randint(100000, 1000000, 100)
     }, index=dates)
     
-    # Análisis comprehensivo
+    # Comprehensive analysis
     analysis = TALibIntegration.comprehensive_analysis(sample_data)
     
-    print("📊 Análisis Técnico:")
+    print("📊 Technical Analysis:")
     print(f"RSI actual: {analysis['rsi'][-1]:.1f}")
     print(f"MACD: {analysis['macd'][-1]:.3f}")
     print(f"ATR: {analysis['atr'][-1]:.2f}")
     
-    # Detectar patrones activos
+    # Detect active patterns
     active_patterns = TALibIntegration.detect_active_patterns(sample_data)
     if active_patterns:
-        print(f"\n🕯️ Patrones Activos:")
+        print(f"\n🕯️ Active Patterns:")
         for pattern, info in active_patterns.items():
             direction = "📈 Bullish" if info['bullish'] else "📉 Bearish"
             print(f"{pattern}: {direction} (Strength: {info['strength']})")
@@ -367,7 +369,7 @@ def demo_talib_integration():
 ### Custom Indicators
 ```python
 class CustomIndicators:
-    """Indicadores personalizados para small cap trading"""
+    """Custom indicators for small cap trading"""
     
     @staticmethod
     def vwap(df):
@@ -380,7 +382,7 @@ class CustomIndicators:
     
     @staticmethod
     def anchored_vwap(df, anchor_date):
-        """VWAP anclado desde fecha específica"""
+        """Anchored VWAP from specific date"""
         anchor_index = df.index.get_loc(anchor_date, method='nearest')
         anchor_df = df.iloc[anchor_index:]
         
@@ -388,25 +390,25 @@ class CustomIndicators:
     
     @staticmethod
     def relative_volume(df, lookback_periods=20):
-        """Volumen relativo vs promedio"""
+        """Relative volume vs average"""
         avg_volume = df['volume'].rolling(window=lookback_periods).mean()
         return df['volume'] / avg_volume
     
     @staticmethod
     def gap_percentage(df):
-        """Porcentaje de gap vs cierre anterior"""
+        """Gap percentage vs previous close"""
         prev_close = df['close'].shift(1)
         gap_pct = (df['open'] - prev_close) / prev_close
         return gap_pct
     
     @staticmethod
     def daily_range_percentage(df):
-        """Rango diario como porcentaje"""
+        """Daily range as percentage"""
         return (df['high'] - df['low']) / df['low']
     
     @staticmethod
     def money_flow_index(df, period=14):
-        """Money Flow Index - RSI basado en volumen"""
+        """Money Flow Index - volume-based RSI"""
         typical_price = (df['high'] + df['low'] + df['close']) / 3
         money_flow = typical_price * df['volume']
         
@@ -468,7 +470,7 @@ class CustomIndicators:
     
     @staticmethod
     def consecutive_bars(df, direction='up'):
-        """Contar barras consecutivas en una dirección"""
+        """Count consecutive bars in one direction"""
         if direction == 'up':
             condition = df['close'] > df['open']
         else:
@@ -485,7 +487,7 @@ class CustomIndicators:
     
     @staticmethod
     def pivot_points(df, method='traditional'):
-        """Calcular pivot points"""
+        """Calculate pivot points"""
         
         if method == 'traditional':
             pivot = (df['high'] + df['low'] + df['close']) / 3
@@ -523,11 +525,11 @@ class CustomIndicators:
                 's1': support_1, 's2': support_2, 's3': support_3
             }
 
-# Demo de indicadores personalizados
+# Custom indicators demo
 def demo_custom_indicators():
-    """Demo de indicadores personalizados"""
+    """Custom indicators demo"""
     
-    # Datos de ejemplo
+    # Sample data
     dates = pd.date_range('2024-01-01', periods=50, freq='D')
     sample_data = pd.DataFrame({
         'open': np.random.randn(50).cumsum() + 100,
@@ -537,19 +539,19 @@ def demo_custom_indicators():
         'volume': np.random.randint(100000, 1000000, 50)
     }, index=dates)
     
-    # Calcular indicadores
+    # Calculate indicators
     vwap = CustomIndicators.vwap(sample_data)
     rvol = CustomIndicators.relative_volume(sample_data)
     gap_pct = CustomIndicators.gap_percentage(sample_data)
     mfi = CustomIndicators.money_flow_index(sample_data)
     squeeze = CustomIndicators.squeeze_indicator(sample_data)
     
-    print("🔧 Indicadores Personalizados:")
+    print("🔧 Custom Indicators:")
     print(f"VWAP actual: ${vwap.iloc[-1]:.2f}")
     print(f"Relative Volume: {rvol.iloc[-1]:.2f}x")
     print(f"Gap %: {gap_pct.iloc[-1]:.2%}")
     print(f"MFI: {mfi.iloc[-1]:.1f}")
-    print(f"En squeeze: {'Sí' if squeeze.iloc[-1] else 'No'}")
+    print(f"In squeeze: {'Yes' if squeeze.iloc[-1] else 'No'}")
 ```
 
 ## Visualization Libraries
@@ -561,16 +563,16 @@ import seaborn as sns
 import matplotlib.dates as mdates
 from matplotlib.patches import Rectangle
 
-# Configuración de estilo
+# Style configuration
 plt.style.use('dark_background')
 sns.set_palette("husl")
 
 class TradingVisualization:
-    """Visualizaciones específicas para trading"""
+    """Trading-specific visualizations"""
     
     @staticmethod
     def setup_plot_style():
-        """Configurar estilo de plots"""
+        """Configure plot style"""
         plt.rcParams['figure.figsize'] = (15, 8)
         plt.rcParams['font.size'] = 10
         plt.rcParams['axes.grid'] = True
@@ -578,7 +580,7 @@ class TradingVisualization:
         
     @staticmethod
     def candlestick_chart(df, indicators=None, title=""):
-        """Gráfico de candlestick con indicadores"""
+        """Candlestick chart with indicators"""
         
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(15, 10), 
                                       gridspec_kw={'height_ratios': [3, 1]})
@@ -645,7 +647,7 @@ class TradingVisualization:
     
     @staticmethod
     def performance_dashboard(returns, title="Performance Dashboard"):
-        """Dashboard de performance comprehensivo"""
+        """Comprehensive performance dashboard"""
         
         fig = plt.figure(figsize=(20, 12))
         
@@ -721,14 +723,14 @@ class TradingVisualization:
         plt.tight_layout()
         return fig
 
-# Demo de visualizaciones
+# Visualization demo
 def demo_trading_visualization():
-    """Demo de visualizaciones de trading"""
+    """Trading visualization demo"""
     
-    # Configurar estilo
+    # Configure style
     TradingVisualization.setup_plot_style()
     
-    # Datos de ejemplo
+    # Sample data
     dates = pd.date_range('2024-01-01', periods=60, freq='D')
     sample_data = pd.DataFrame({
         'open': np.random.randn(60).cumsum() + 100,
@@ -738,19 +740,19 @@ def demo_trading_visualization():
         'volume': np.random.randint(100000, 1000000, 60)
     }, index=dates)
     
-    # Indicadores
+    # Indicators
     indicators = {
         'sma_20': sample_data['close'].rolling(20).mean(),
         'vwap': CustomIndicators.vwap(sample_data)
     }
     
-    # Gráfico de candlestick
+    # Candlestick chart
     fig1 = TradingVisualization.candlestick_chart(
         sample_data, indicators, "Sample Stock - Candlestick Chart"
     )
     plt.show()
     
-    # Dashboard de performance
+    # Performance dashboard
     returns = sample_data['close'].pct_change().dropna()
     fig2 = TradingVisualization.performance_dashboard(
         returns, "Sample Strategy Performance"
@@ -758,4 +760,4 @@ def demo_trading_visualization():
     plt.show()
 ```
 
-Estas librerías forman el core stack para análisis cuantitativo y visualización de datos de trading, optimizadas específicamente para small cap trading strategies.
+These libraries form the core stack for quantitative analysis and trading data visualization, specifically optimized for small cap trading strategies.

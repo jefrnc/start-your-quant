@@ -1,10 +1,12 @@
-# Framework de Testing para Estrategias de Trading
+> 🇪🇸 [Leer en Español](strategy_testing_framework.es.md) | 🇺🇸 **English**
 
-## Introducción: Testing Riguroso Como Ventaja Competitiva
+# Testing Framework for Trading Strategies
 
-Un framework robusto de testing es la diferencia entre una estrategia que funciona en backtest y una que genera alpha real en producción. Este framework integra validación estadística, testing de robustez, y evaluación de riesgo para asegurar que las estrategias sean deployment-ready.
+## Introduction: Rigorous Testing as a Competitive Advantage
 
-## Architecture del Testing Framework
+A robust testing framework is the difference between a strategy that works in backtest and one that generates real alpha in production. This framework integrates statistical validation, robustness testing, and risk evaluation to ensure strategies are deployment-ready.
+
+## Testing Framework Architecture
 
 ### Core Testing Engine
 
@@ -18,7 +20,7 @@ import warnings
 
 @dataclass
 class TestResult:
-    """Resultado estandarizado de testing"""
+    """Standardized test result"""
     test_name: str
     passed: bool
     score: float
@@ -27,7 +29,7 @@ class TestResult:
     critical: bool = False
 
 class StrategyTester(ABC):
-    """Base class para todos los testers de estrategia"""
+    """Base class for all strategy testers"""
     
     @abstractmethod
     def run_test(self, strategy_results: Dict[str, Any]) -> TestResult:
@@ -39,11 +41,11 @@ class StrategyTestingFramework:
         self.testers = []
         self.test_results = []
         
-        # Registrar testers por defecto
+        # Register default testers
         self._register_default_testers()
     
     def _register_default_testers(self):
-        """Registra testers estándar del framework"""
+        """Registers standard framework testers"""
         self.register_tester(StatisticalSignificanceTester())
         self.register_tester(RobustnessTester())
         self.register_tester(RiskProfileTester())
@@ -54,20 +56,20 @@ class StrategyTestingFramework:
         self.register_tester(ConsistencyTester())
     
     def register_tester(self, tester: StrategyTester):
-        """Registra un nuevo tester"""
+        """Registers a new tester"""
         self.testers.append(tester)
     
     def run_full_testing_suite(self, strategy_results: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Ejecuta suite completo de testing
+        Runs the full testing suite
         """
-        print("🧪 Iniciando Testing Framework Completo...")
+        print("Testing Framework Starting...")
         
         test_results = []
         critical_failures = []
         
         for tester in self.testers:
-            print(f"  Ejecutando: {tester.__class__.__name__}")
+            print(f"  Running: {tester.__class__.__name__}")
             
             try:
                 result = tester.run_test(strategy_results)
@@ -88,13 +90,13 @@ class StrategyTestingFramework:
                 test_results.append(error_result)
                 critical_failures.append(error_result)
         
-        # Calcular score general
+        # Calculate overall score
         overall_score = self._calculate_overall_score(test_results)
         
-        # Generar reporte
+        # Generate report
         testing_report = self._generate_testing_report(test_results, overall_score)
         
-        # Decisión de deployment
+        # Deployment decision
         deployment_ready = self._assess_deployment_readiness(
             test_results, critical_failures, overall_score
         )
@@ -109,11 +111,11 @@ class StrategyTestingFramework:
         }
     
     def _calculate_overall_score(self, test_results: List[TestResult]) -> float:
-        """Calcula score general ponderado"""
+        """Calculates weighted overall score"""
         if not test_results:
             return 0.0
         
-        # Pesos por criticidad
+        # Weights by criticality
         weights = []
         scores = []
         
@@ -128,9 +130,9 @@ class StrategyTestingFramework:
     def _assess_deployment_readiness(self, test_results: List[TestResult], 
                                    critical_failures: List[TestResult],
                                    overall_score: float) -> Dict[str, Any]:
-        """Evalúa si la estrategia está lista para deployment"""
+        """Assesses whether the strategy is ready for deployment"""
         
-        # Criterios de deployment
+        # Deployment criteria
         criteria = {
             'no_critical_failures': len(critical_failures) == 0,
             'minimum_score': overall_score >= 0.7,  # 70% mínimo
@@ -159,7 +161,7 @@ class StatisticalSignificanceTester(StrategyTester):
     
     def run_test(self, strategy_results: Dict[str, Any]) -> TestResult:
         """
-        Valida significancia estadística de los resultados
+        Validates statistical significance of results
         """
         trades = strategy_results.get('trades', [])
         returns = strategy_results.get('returns', [])
@@ -174,23 +176,23 @@ class StatisticalSignificanceTester(StrategyTester):
                 critical=True
             )
         
-        # Test t-student para retornos
+        # Student t-test for returns
         from scipy import stats
         
         returns_array = np.array(returns)
         
-        # Test de normalidad
+        # Normality test
         normality_test = stats.jarque_bera(returns_array)
         is_normal = normality_test.pvalue > self.confidence_level
         
-        # Test t para media != 0
+        # T-test for mean != 0
         if is_normal:
             t_stat, p_value = stats.ttest_1samp(returns_array, 0)
         else:
-            # Usar test no paramétrico si no es normal
+            # Use non-parametric test if not normal
             t_stat, p_value = stats.wilcoxon(returns_array)
         
-        # Test de autocorrelación (independencia)
+        # Autocorrelation test (independence)
         from statsmodels.stats.diagnostic import acorr_ljungbox
         lb_test = acorr_ljungbox(returns_array, lags=[10], return_df=True)
         independence = lb_test['lb_pvalue'].iloc[0] > self.confidence_level
@@ -201,7 +203,7 @@ class StatisticalSignificanceTester(StrategyTester):
         sharpe_t_stat = sharpe_ratio / sharpe_se
         sharpe_p_value = 2 * (1 - stats.norm.cdf(abs(sharpe_t_stat)))
         
-        # Score compuesto
+        # Composite score
         tests_passed = sum([
             p_value < self.confidence_level,  # Retornos significativos
             independence,  # Independencia
@@ -209,7 +211,7 @@ class StatisticalSignificanceTester(StrategyTester):
         ])
         
         score = tests_passed / 3.0
-        passed = score >= 0.67  # Al menos 2 de 3 tests
+        passed = score >= 0.67  # At least 2 of 3 tests
         
         details = {
             'n_trades': len(trades),
@@ -251,15 +253,15 @@ class RobustnessTester(StrategyTester):
     
     def run_test(self, strategy_results: Dict[str, Any]) -> TestResult:
         """
-        Evalúa robustez de la estrategia ante cambios de parámetros
+        Evaluates strategy robustness against parameter changes
         """
-        # Obtener resultados de sensitivity analysis si está disponible
+        # Get sensitivity analysis results if available
         sensitivity_data = strategy_results.get('sensitivity_analysis', {})
         
         if not sensitivity_data:
             return self._run_basic_robustness_test(strategy_results)
         
-        # Analizar sensibilidad de parámetros
+        # Analyze parameter sensitivity
         param_robustness_scores = []
         sensitive_params = []
         
@@ -267,23 +269,23 @@ class RobustnessTester(StrategyTester):
             if isinstance(param_results, dict) and 'sensitivity_score' in param_results:
                 sensitivity = param_results['sensitivity_score']
                 
-                # Score: menos sensibilidad = más robusto
+                # Score: less sensitivity = more robust
                 robustness_score = max(0, 1 - sensitivity)
                 param_robustness_scores.append(robustness_score)
                 
                 if sensitivity > self.sensitivity_threshold:
                     sensitive_params.append(param_name)
         
-        # Score general de robustez
+        # Overall robustness score
         if param_robustness_scores:
             overall_robustness = np.mean(param_robustness_scores)
         else:
-            overall_robustness = 0.5  # Score neutral si no hay datos
+            overall_robustness = 0.5  # Neutral score if no data
         
-        # Test de estabilidad temporal
+        # Temporal stability test
         temporal_stability = self._test_temporal_stability(strategy_results)
         
-        # Combinar scores
+        # Combine scores
         final_score = (overall_robustness * 0.6 + temporal_stability * 0.4)
         passed = final_score >= 0.6 and len(sensitive_params) <= 2
         
@@ -315,13 +317,13 @@ class RobustnessTester(StrategyTester):
         )
     
     def _test_temporal_stability(self, strategy_results: Dict[str, Any]) -> float:
-        """Test de estabilidad temporal usando ventanas móviles"""
+        """Temporal stability test using rolling windows"""
         trades = strategy_results.get('trades', [])
         
         if len(trades) < 50:
-            return 0.5  # Score neutral para pocos trades
+            return 0.5  # Neutral score for few trades
         
-        # Dividir trades en períodos
+        # Split trades into periods
         n_periods = 5
         period_size = len(trades) // n_periods
         
@@ -340,7 +342,7 @@ class RobustnessTester(StrategyTester):
         if len(period_returns) < 3:
             return 0.5
         
-        # Calcular estabilidad como inverso del coeficiente de variación
+        # Calculate stability as inverse of coefficient of variation
         cv = np.std(period_returns) / abs(np.mean(period_returns)) if np.mean(period_returns) != 0 else float('inf')
         stability = max(0, 1 - cv) if cv != float('inf') else 0
         
@@ -361,27 +363,27 @@ class OverfittingTester(StrategyTester):
     
     def run_test(self, strategy_results: Dict[str, Any]) -> TestResult:
         """
-        Detecta señales de overfitting en la estrategia
+        Detects overfitting signals in the strategy
         """
-        # 1. Comparación In-Sample vs Out-of-Sample
+        # 1. In-Sample vs Out-of-Sample comparison
         is_performance = strategy_results.get('in_sample_metrics', {})
         oos_performance = strategy_results.get('out_of_sample_metrics', {})
         
         degradation_score = self._calculate_degradation_score(is_performance, oos_performance)
         
-        # 2. Análisis de complejidad de parámetros
+        # 2. Parameter complexity analysis
         parameters = strategy_results.get('parameters', {})
         parameter_complexity_score = self._assess_parameter_complexity(parameters)
         
-        # 3. Complejidad del modelo
+        # 3. Model complexity
         model_complexity = strategy_results.get('model_complexity', {})
         complexity_score = self._assess_model_complexity(model_complexity)
         
-        # 4. Estabilidad de parámetros
+        # 4. Parameter stability
         param_evolution = strategy_results.get('parameter_evolution', [])
         stability_score = self._assess_parameter_stability(param_evolution)
         
-        # Score compuesto (invertido: menos overfitting = mejor score)
+        # Composite score (invertido: menos overfitting = mejor score)
         overfitting_risk = (
             degradation_score * self.overfitting_indicators['is_oos_degradation'] +
             parameter_complexity_score * self.overfitting_indicators['parameter_count'] +
@@ -390,7 +392,7 @@ class OverfittingTester(StrategyTester):
         )
         
         final_score = max(0, 1 - overfitting_risk)
-        passed = final_score >= 0.6  # Bajo riesgo de overfitting
+        passed = final_score >= 0.6  # Low overfitting risk
         
         details = {
             'overfitting_risk': float(overfitting_risk),
@@ -427,9 +429,9 @@ class OverfittingTester(StrategyTester):
         )
     
     def _calculate_degradation_score(self, is_metrics: Dict, oos_metrics: Dict) -> float:
-        """Calcula score de degradación IS vs OOS"""
+        """Calculates IS vs OOS degradation score"""
         if not is_metrics or not oos_metrics:
-            return 0.5  # Score neutral si no hay datos
+            return 0.5  # Neutral score if no data
         
         key_metrics = ['sharpe_ratio', 'total_return', 'win_rate']
         degradations = []
@@ -446,7 +448,7 @@ class OverfittingTester(StrategyTester):
             return 0.5
         
         avg_degradation = np.mean(degradations)
-        return min(1.0, avg_degradation / 0.5)  # Normalizar: 50% degradation = score 1.0
+        return min(1.0, avg_degradation / 0.5)  # Normalize: 50% degradation = score 1.0
 ```
 
 ### Market Regime Tester
@@ -458,14 +460,14 @@ class MarketRegimeTester(StrategyTester):
     
     def run_test(self, strategy_results: Dict[str, Any]) -> TestResult:
         """
-        Evalúa performance a través de diferentes regímenes de mercado
+        Evaluates performance across different market regimes
         """
         regime_results = strategy_results.get('regime_analysis', {})
         
         if not regime_results:
             return self._perform_basic_regime_analysis(strategy_results)
         
-        # Evaluar performance en cada régimen
+        # Evaluate performance in each regime
         regime_scores = {}
         regimes_tested = list(regime_results.keys())
         
@@ -474,21 +476,21 @@ class MarketRegimeTester(StrategyTester):
             regime_return = results.get('total_return', 0)
             regime_trades = results.get('trade_count', 0)
             
-            # Score por régimen (combinación de métricas)
+            # Score per regime (metric combination)
             regime_score = self._calculate_regime_score(regime_sharpe, regime_return, regime_trades)
             regime_scores[regime] = regime_score
         
-        # Evaluar cobertura de regímenes
+        # Evaluate regime coverage
         regime_coverage = len(regimes_tested) / len(self.required_regimes)
         
-        # Consistencia entre regímenes
+        # Consistency across regimes
         if regime_scores:
             regime_consistency = 1 - (np.std(list(regime_scores.values())) / np.mean(list(regime_scores.values())))
             regime_consistency = max(0, regime_consistency)
         else:
             regime_consistency = 0
         
-        # Score final
+        # Final score
         avg_regime_performance = np.mean(list(regime_scores.values())) if regime_scores else 0
         final_score = (
             avg_regime_performance * 0.5 +
@@ -539,24 +541,24 @@ class ExecutionFeasibilityTester(StrategyTester):
     
     def run_test(self, strategy_results: Dict[str, Any]) -> TestResult:
         """
-        Evalúa factibilidad de ejecución en mercados reales
+        Evaluates execution feasibility in real markets
         """
         trades = strategy_results.get('trades', [])
         execution_analysis = strategy_results.get('execution_analysis', {})
         
-        # 1. Análisis de tamaño de posición vs liquidez
+        # 1. Position size vs liquidity analysis
         position_feasibility = self._assess_position_sizes(trades, execution_analysis)
         
-        # 2. Análisis de slippage esperado
+        # 2. Expected slippage analysis
         slippage_analysis = self._assess_slippage_impact(trades, execution_analysis)
         
-        # 3. Análisis de turnover
+        # 3. Turnover analysis
         turnover_analysis = self._assess_turnover_requirements(trades)
         
         # 4. Timing constraints
         timing_feasibility = self._assess_timing_constraints(trades)
         
-        # Score compuesto
+        # Composite score
         feasibility_scores = [
             position_feasibility,
             slippage_analysis,
@@ -565,7 +567,7 @@ class ExecutionFeasibilityTester(StrategyTester):
         ]
         
         final_score = np.mean(feasibility_scores)
-        passed = final_score >= 0.7  # Alto estándar para feasibility
+        passed = final_score >= 0.7  # High standard for feasibility
         
         details = {
             'position_feasibility': float(position_feasibility),
@@ -596,34 +598,34 @@ class ExecutionFeasibilityTester(StrategyTester):
         )
     
     def _assess_position_sizes(self, trades: List[Dict], execution_data: Dict) -> float:
-        """Evalúa si los tamaños de posición son ejecutables"""
+        """Evaluates whether position sizes are executable"""
         if not trades:
             return 1.0
         
-        # Extraer tamaños de posición y volúmenes
+        # Extract position sizes and volumes
         position_sizes = []
         liquidity_ratios = []
         
         for trade in trades:
             position_value = trade.get('position_value', 0)
-            daily_volume = trade.get('avg_daily_volume', 1)  # Evitar división por cero
+            daily_volume = trade.get('avg_daily_volume', 1)  # Avoid division by zero
             
             if daily_volume > 0:
                 liquidity_ratio = position_value / daily_volume
                 liquidity_ratios.append(liquidity_ratio)
         
         if not liquidity_ratios:
-            return 0.5  # Score neutral
+            return 0.5  # Neutral score
         
-        # Porcentaje de trades que exceden threshold
+        # Percentage of trades exceeding threshold
         excessive_positions = sum(1 for ratio in liquidity_ratios if ratio > self.feasibility_criteria['max_position_size'])
         excessive_ratio = excessive_positions / len(liquidity_ratios)
         
-        # Score: menos posiciones excesivas = mejor
-        return max(0, 1 - excessive_ratio * 2)  # Penalizar heavily
+        # Score: fewer excessive positions = better
+        return max(0, 1 - excessive_ratio * 2)  # Penalize heavily
     
     def _assess_slippage_impact(self, trades: List[Dict], execution_data: Dict) -> float:
-        """Evalúa impacto del slippage en la estrategia"""
+        """Evaluates slippage impact on the strategy"""
         if not trades:
             return 1.0
         
@@ -635,7 +637,7 @@ class ExecutionFeasibilityTester(StrategyTester):
         
         slippage_impact = estimated_slippage_cost / total_gross_pnl
         
-        # Score basado en impacto del slippage
+        # Score based on slippage impact
         if slippage_impact <= 0.1:  # ≤10% impact
             return 1.0
         elif slippage_impact <= 0.3:  # ≤30% impact
@@ -680,7 +682,7 @@ Deployment Ready: {deployment_ready}
 """
     
     def generate_comprehensive_report(self, testing_results: Dict[str, Any]) -> str:
-        """Genera reporte comprehensivo de testing"""
+        """Generates comprehensive testing report"""
         
         # Extract data
         test_results = testing_results['test_results']
@@ -717,7 +719,7 @@ Deployment Ready: {deployment_ready}
         return report
     
     def _generate_test_summary_table(self, test_results: List[TestResult]) -> str:
-        """Genera tabla resumen de tests"""
+        """Generates test summary table"""
         table_rows = []
         
         for result in test_results:
@@ -730,10 +732,10 @@ Deployment Ready: {deployment_ready}
         return "\n".join(table_rows)
     
     def export_results_to_json(self, testing_results: Dict[str, Any], filepath: str):
-        """Exporta resultados a JSON para análisis posterior"""
+        """Exports results to JSON for further analysis"""
         import json
         
-        # Convertir TestResult objects a dicts
+        # Convert TestResult objects to dicts
         serializable_results = {
             'overall_score': testing_results['overall_score'],
             'deployment_ready': testing_results['deployment_ready'],
@@ -758,14 +760,14 @@ Deployment Ready: {deployment_ready}
 ### Usage Example
 
 ```python
-# Ejemplo de uso completo del framework
+# Complete framework usage example
 def test_gap_and_go_strategy():
-    """Ejemplo completo de testing para estrategia Gap and Go"""
+    """Complete testing example for Gap and Go strategy"""
     
-    # 1. Ejecutar backtesting completo (simulado)
+    # 1. Run full backtesting (simulated)
     strategy_results = {
-        'trades': generate_sample_trades(),  # Lista de trades
-        'returns': generate_sample_returns(),  # Lista de retornos
+        'trades': generate_sample_trades(),  # List of trades
+        'returns': generate_sample_returns(),  # List of returns
         'in_sample_metrics': {'sharpe_ratio': 1.2, 'total_return': 0.15},
         'out_of_sample_metrics': {'sharpe_ratio': 0.9, 'total_return': 0.12},
         'parameters': {'min_gap': 0.02, 'volume_multiplier': 2.0},
@@ -774,20 +776,20 @@ def test_gap_and_go_strategy():
         'execution_analysis': generate_execution_data()
     }
     
-    # 2. Inicializar framework de testing
+    # 2. Initialize testing framework
     testing_framework = StrategyTestingFramework(strict_mode=True)
     
-    # 3. Ejecutar tests
+    # 3. Run tests
     testing_results = testing_framework.run_full_testing_suite(strategy_results)
     
-    # 4. Generar reporte
+    # 4. Generate report
     report_generator = TestingReportGenerator()
     report = report_generator.generate_comprehensive_report(testing_results)
     
-    # 5. Exportar resultados
+    # 5. Export results
     report_generator.export_results_to_json(testing_results, 'gap_and_go_test_results.json')
     
-    # 6. Tomar decisión
+    # 6. Make decision
     if testing_results['deployment_ready']['ready']:
         print("✅ Strategy is ready for deployment!")
     else:
@@ -802,4 +804,4 @@ if __name__ == "__main__":
 
 ---
 
-*Un framework robusto de testing es esencial para separar estrategias que funcionan en backtest de aquellas que generarán alpha real. Este framework proporciona validación comprehensiva que incluye significancia estadística, robustez, detección de overfitting, y factibilidad de ejecución.*
+*A robust testing framework is essential for separating strategies that work in backtest from those that will generate real alpha. This framework provides comprehensive validation including statistical significance, robustness, overfitting detection, and execution feasibility.*

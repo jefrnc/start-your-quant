@@ -1,10 +1,12 @@
-# Production Deployment para Trading Algorítmico
+> 🇪🇸 [Leer en Español](production_deployment.es.md) | 🇺🇸 **English**
 
-## Introducción: De Backtesting a Producción
+# Production Deployment for Algorithmic Trading
 
-El deployment exitoso de estrategias algorítmicas requiere una infraestructura robusta que maneje alta disponibilidad, baja latencia, monitoreo continuo y recuperación automática. Este documento cubre la arquitectura completa para deployment profesional.
+## Introduction: From Backtesting to Production
 
-## Architecture de Production
+Successful deployment of algorithmic strategies requires robust infrastructure that handles high availability, low latency, continuous monitoring, and automatic recovery. This document covers the complete architecture for professional deployment.
+
+## Production Architecture
 
 ### Core Infrastructure
 
@@ -31,7 +33,7 @@ import boto3
 
 @dataclass
 class DeploymentConfig:
-    """Configuración de deployment"""
+    """Deployment configuration"""
     environment: str  # dev, staging, prod
     strategy_name: str
     version: str
@@ -57,7 +59,7 @@ class DeploymentConfig:
         return asdict(self)
 
 class ProductionInfrastructure:
-    """Infraestructura de producción"""
+    """Production infrastructure"""
     
     def __init__(self, config: DeploymentConfig):
         self.config = config
@@ -74,7 +76,7 @@ class ProductionInfrastructure:
         self.circuit_breakers = {}
         
     def _setup_logging(self) -> logging.Logger:
-        """Configura logging estructurado"""
+        """Configure structured logging"""
         logger = logging.getLogger(f"trading-{self.config.strategy_name}")
         logger.setLevel(getattr(logging, self.config.log_level.upper()))
         
@@ -102,7 +104,7 @@ class ProductionInfrastructure:
         return logger
     
     def _setup_metrics(self) -> Dict[str, Any]:
-        """Configura métricas de Prometheus"""
+        """Configure Prometheus metrics"""
         metrics = {
             'trades_total': Counter(
                 'trading_trades_total',
@@ -142,7 +144,7 @@ class ProductionInfrastructure:
         return metrics
     
     def _setup_database(self):
-        """Configura conexión a base de datos"""
+        """Configure database connection"""
         try:
             engine = create_engine(
                 self.config.database_url,
@@ -163,7 +165,7 @@ class ProductionInfrastructure:
             raise
     
     def _setup_cache(self):
-        """Configura Redis para caching"""
+        """Configure Redis for caching"""
         try:
             cache = redis.from_url(
                 self.config.redis_url,
@@ -184,7 +186,7 @@ class ProductionInfrastructure:
             raise
     
     async def deploy(self) -> bool:
-        """Deploya la estrategia en producción"""
+        """Deploy the strategy to production"""
         try:
             self.logger.info(f"Starting deployment of {self.config.strategy_name} v{self.config.version}")
             
@@ -220,7 +222,7 @@ class ProductionInfrastructure:
             return False
     
     async def _pre_deployment_checks(self) -> bool:
-        """Verificaciones pre-deployment"""
+        """Pre-deployment checks"""
         checks = {
             'database_connectivity': self._check_database_connectivity(),
             'cache_connectivity': self._check_cache_connectivity(),
@@ -243,7 +245,7 @@ class ProductionInfrastructure:
         return True
     
     async def _deploy_containers(self) -> bool:
-        """Deploya containers usando Kubernetes"""
+        """Deploy containers using Kubernetes"""
         try:
             # Load Kubernetes config
             kubernetes.config.load_incluster_config()
@@ -270,7 +272,7 @@ class ProductionInfrastructure:
             return False
     
     def _create_deployment_manifest(self) -> Dict[str, Any]:
-        """Crea manifest de Kubernetes"""
+        """Create Kubernetes manifest"""
         return {
             "apiVersion": "apps/v1",
             "kind": "Deployment",
@@ -343,7 +345,7 @@ class ProductionInfrastructure:
         }
 
 class TradingStrategyService:
-    """Servicio de estrategia de trading en producción"""
+    """Production trading strategy service"""
     
     def __init__(self, infrastructure: ProductionInfrastructure):
         self.infrastructure = infrastructure
@@ -362,7 +364,7 @@ class TradingStrategyService:
         self.error_count = 0
         
     async def start(self):
-        """Inicia el servicio de trading"""
+        """Start the trading service"""
         try:
             self.logger.info("Starting trading strategy service")
             
@@ -390,7 +392,7 @@ class TradingStrategyService:
             raise
     
     async def _initialize_components(self):
-        """Inicializa componentes del servicio"""
+        """Initialize service components"""
         
         # Data manager
         self.data_manager = ProductionDataManager(
@@ -421,7 +423,7 @@ class TradingStrategyService:
         self.logger.info("All components initialized")
     
     async def _service_loop(self):
-        """Loop principal del servicio"""
+        """Main service loop"""
         while self.is_running:
             try:
                 # Update heartbeat
@@ -457,7 +459,7 @@ class TradingStrategyService:
                 await asyncio.sleep(5)  # Wait before retry
     
     async def _check_system_health(self) -> Dict[str, Any]:
-        """Verifica salud del sistema"""
+        """Check system health"""
         health_checks = {
             'data_feed_healthy': await self.data_manager.health_check(),
             'risk_manager_healthy': self.risk_manager.health_check(),
@@ -477,7 +479,7 @@ class TradingStrategyService:
         }
     
     async def _handle_emergency(self, emergency_status: Dict[str, Any]):
-        """Maneja condiciones de emergencia"""
+        """Handle emergency conditions"""
         emergency_type = emergency_status['type']
         
         self.logger.critical(f"Emergency condition detected: {emergency_type}")
@@ -506,7 +508,7 @@ class TradingStrategyService:
         ).set(0)
 
 class ProductionMonitoringSystem:
-    """Sistema de monitoreo para producción"""
+    """Production monitoring system"""
     
     def __init__(self, infrastructure: ProductionInfrastructure):
         self.infrastructure = infrastructure
@@ -526,7 +528,7 @@ class ProductionMonitoringSystem:
         self.alert_channels = []
         
     async def start_monitoring(self):
-        """Inicia sistema de monitoreo"""
+        """Start monitoring system"""
         monitoring_tasks = [
             self._monitor_performance_metrics(),
             self._monitor_business_metrics(),
@@ -538,7 +540,7 @@ class ProductionMonitoringSystem:
         await asyncio.gather(*monitoring_tasks)
     
     async def _monitor_performance_metrics(self):
-        """Monitorea métricas de performance"""
+        """Monitor performance metrics"""
         while True:
             try:
                 # Latency monitoring
@@ -562,7 +564,7 @@ class ProductionMonitoringSystem:
                 await asyncio.sleep(60)
     
     async def _send_alert(self, alert: Dict[str, Any]):
-        """Envía alerta a canales configurados"""
+        """Send alert to configured channels"""
         alert_message = {
             'timestamp': datetime.now().isoformat(),
             'strategy': self.infrastructure.config.strategy_name,
@@ -581,14 +583,14 @@ class ProductionMonitoringSystem:
                 self.logger.error(f"Failed to send alert to {channel}: {e}")
 
 class BlueGreenDeployment:
-    """Implementación de Blue-Green deployment"""
+    """Blue-Green deployment implementation"""
     
     def __init__(self, infrastructure: ProductionInfrastructure):
         self.infrastructure = infrastructure
         self.logger = infrastructure.logger
         
     async def deploy_new_version(self, new_version: str) -> bool:
-        """Deploya nueva versión usando Blue-Green strategy"""
+        """Deploy new version using Blue-Green strategy"""
         try:
             self.logger.info(f"Starting Blue-Green deployment to version {new_version}")
             
@@ -630,7 +632,7 @@ class BlueGreenDeployment:
             return False
     
     def _create_green_config(self, new_version: str) -> DeploymentConfig:
-        """Crea configuración para ambiente Green"""
+        """Create configuration for Green environment"""
         green_config = DeploymentConfig(
             environment=f"{self.infrastructure.config.environment}-green",
             strategy_name=self.infrastructure.config.strategy_name,
@@ -666,7 +668,7 @@ class AutoScalingManager:
         self.scale_down_threshold = 0.50
         
     async def start_autoscaling(self):
-        """Inicia auto-scaling"""
+        """Start auto-scaling"""
         while True:
             try:
                 # Get current metrics
@@ -685,7 +687,7 @@ class AutoScalingManager:
                 await asyncio.sleep(60)
     
     def _make_scaling_decision(self, metrics: Dict[str, float]) -> Dict[str, Any]:
-        """Toma decisión de scaling basada en métricas"""
+        """Make scaling decision based on metrics"""
         current_replicas = metrics['current_replicas']
         cpu_utilization = metrics['cpu_utilization']
         memory_utilization = metrics['memory_utilization']
@@ -721,7 +723,7 @@ class AutoScalingManager:
 
 # Usage Example
 async def main():
-    """Ejemplo completo de deployment en producción"""
+    """Complete production deployment example"""
     
     # 1. Create deployment configuration
     config = DeploymentConfig(
@@ -1219,4 +1221,4 @@ jobs:
 
 ---
 
-*El deployment exitoso en producción requiere una combinación de infraestructura robusta, monitoreo comprehensivo, y procesos automatizados. Esta arquitectura asegura alta disponibilidad, escalabilidad automática, y recovery rápido ante fallas.*
+*Successful production deployment requires a combination of robust infrastructure, comprehensive monitoring, and automated processes. This architecture ensures high availability, automatic scalability, and fast recovery from failures.*

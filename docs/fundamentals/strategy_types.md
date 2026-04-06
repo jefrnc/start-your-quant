@@ -1,115 +1,117 @@
-# Tipos de Estrategias Cuantitativas
+> 🇪🇸 [Leer en Español](strategy_types.es.md) | 🇺🇸 **English**
 
-## Las 4 Categorías Principales
+# Types of Quantitative Strategies
+
+## The 4 Main Categories
 
 ### 1. Momentum / Trend Following
-**Filosofía**: "La tendencia es tu amiga"
+**Philosophy**: "The trend is your friend"
 
 ```python
-# Ejemplo simple: Breakout de 20 días
+# Simple example: 20-day Breakout
 def momentum_strategy(data):
     data['20_day_high'] = data['High'].rolling(20).max()
     data['signal'] = data['Close'] > data['20_day_high'].shift(1)
     return data
 ```
 
-**Características**:
-- Win rate bajo (35-45%) pero alto reward/risk
-- Funcionan mejor en mercados trending
-- Fáciles de programar y backtest
-- Sufren en mercados laterales
+**Characteristics**:
+- Low win rate (35-45%) but high reward/risk
+- Work best in trending markets
+- Easy to code and backtest
+- Suffer in sideways markets
 
-**Variantes comunes**:
-- Breakout de rangos
-- Cruces de medias móviles  
-- Relative strength (RS) vs índice
-- Gap and Go (para small caps)
+**Common variants**:
+- Range breakouts
+- Moving average crossovers  
+- Relative strength (RS) vs index
+- Gap and Go (for small caps)
 
 ### 2. Mean Reversion
-**Filosofía**: "Lo que sube, baja"
+**Philosophy**: "What goes up, comes down"
 
 ```python
-# Ejemplo: Bollinger Bands reversal
+# Example: Bollinger Bands reversal
 def mean_reversion_strategy(data):
     data['SMA'] = data['Close'].rolling(20).mean()
     data['STD'] = data['Close'].rolling(20).std()
     data['Lower_Band'] = data['SMA'] - (2 * data['STD'])
     data['Upper_Band'] = data['SMA'] + (2 * data['STD'])
     
-    # Comprar en sobreventa
+    # Buy on oversold
     data['signal'] = data['Close'] < data['Lower_Band']
     return data
 ```
 
-**Características**:
-- Win rate alto (60-70%) pero menor reward
-- Mejor en mercados laterales
-- Requieren buenos stops
-- Peligrosas en trends fuertes
+**Characteristics**:
+- High win rate (60-70%) but lower reward
+- Better in sideways markets
+- Require good stops
+- Dangerous in strong trends
 
-**Variantes comunes**:
+**Common variants**:
 - RSI oversold/overbought
 - Bollinger Bands squeeze
 - Pairs trading
 - VWAP reversion
 
-### 3. Arbitraje Estadístico
-**Filosofía**: "Explotar ineficiencias temporales"
+### 3. Statistical Arbitrage
+**Philosophy**: "Exploit temporary inefficiencies"
 
 ```python
-# Ejemplo: Pairs trading
+# Example: Pairs trading
 def pairs_trading(stock_a, stock_b, window=20):
-    # Calcular spread
+    # Calculate spread
     ratio = stock_a / stock_b
     mean_ratio = ratio.rolling(window).mean()
     std_ratio = ratio.rolling(window).std()
     
-    # Z-score del spread
+    # Z-score of the spread
     z_score = (ratio - mean_ratio) / std_ratio
     
-    # Señales
+    # Signals
     signals = pd.DataFrame()
     signals['long_a_short_b'] = z_score < -2
     signals['short_a_long_b'] = z_score > 2
     return signals
 ```
 
-**Características**:
-- Market neutral (no depende de dirección)
-- Requiere mucho capital
-- Competencia con HFT
-- Margins pequeños, alto volumen
+**Characteristics**:
+- Market neutral (direction-independent)
+- Requires significant capital
+- Competition with HFT
+- Small margins, high volume
 
-**Variantes comunes**:
+**Common variants**:
 - ETF arbitrage
 - Index arbitrage
 - Cross-exchange crypto arb
 - Options arbitrage
 
-### 4. Market Making / Liquidez
-**Filosofía**: "Proveer liquidez y capturar el spread"
+### 4. Market Making / Liquidity
+**Philosophy**: "Provide liquidity and capture the spread"
 
 ```python
-# Ejemplo conceptual (simplificado)
+# Conceptual example (simplified)
 def simple_market_making(ticker, spread_target=0.02):
     mid_price = (bid + ask) / 2
     
-    # Colocar órdenes a ambos lados
+    # Place orders on both sides
     place_buy_order(price=mid_price - spread_target/2)
     place_sell_order(price=mid_price + spread_target/2)
     
-    # Ajustar inventario si se desbalancea
+    # Adjust inventory if imbalanced
     if inventory > max_inventory:
         adjust_prices_to_reduce_inventory()
 ```
 
-**Características**:
-- Miles de pequeñas ganancias
-- Requiere baja latencia
-- Gestión de inventario crítica
-- Riesgo en movimientos direccionales
+**Characteristics**:
+- Thousands of small gains
+- Requires low latency
+- Critical inventory management
+- Risk in directional moves
 
-## Estrategias Específicas para Small Caps
+## Small Cap-Specific Strategies
 
 ### Gap and Go
 ```python
@@ -135,15 +137,15 @@ def gap_and_go_scanner(universe):
 ### VWAP Reclaim
 ```python
 def vwap_reclaim_setup(data):
-    # Calcular VWAP
+    # Calculate VWAP
     data['VWAP'] = (data['Close'] * data['Volume']).cumsum() / data['Volume'].cumsum()
     
-    # Detectar reclaim
+    # Detect reclaim
     data['below_vwap'] = data['Low'] < data['VWAP']
     data['reclaim'] = (data['below_vwap'].shift(1) & 
                       (data['Close'] > data['VWAP']))
     
-    # Confirmar con volumen
+    # Confirm with volume
     data['volume_spike'] = data['Volume'] > data['Volume'].rolling(20).mean() * 2
     data['signal'] = data['reclaim'] & data['volume_spike']
     
@@ -153,40 +155,40 @@ def vwap_reclaim_setup(data):
 ### Parabolic Short
 ```python
 def parabolic_exhaustion(data, lookback=10):
-    # Detectar movimiento parabólico
+    # Detect parabolic move
     returns = data['Close'].pct_change()
     cumulative = (1 + returns).cumprod()
     
-    # Condiciones de exhaustion
+    # Exhaustion conditions
     data['parabolic'] = (
-        (cumulative > cumulative.shift(lookback) * 1.5) &  # +50% en 10 días
-        (data['RSI'] > 80) &  # RSI extremo
+        (cumulative > cumulative.shift(lookback) * 1.5) &  # +50% in 10 days
+        (data['RSI'] > 80) &  # Extreme RSI
         (data['Volume'] > data['Volume'].rolling(20).mean() * 3)  # Climax volume
     )
     
     return data['parabolic']
 ```
 
-## Cómo Elegir Tu Estrategia
+## How to Choose Your Strategy
 
-### Según tu personalidad:
-- **Paciente + Analítico** → Mean Reversion
-- **Agresivo + Rápido** → Momentum
-- **Matemático + Detallista** → Arbitraje
-- **Multitasking + Tech** → Market Making
+### Based on your personality:
+- **Patient + Analytical** -> Mean Reversion
+- **Aggressive + Fast** -> Momentum
+- **Mathematical + Detail-oriented** -> Arbitrage
+- **Multitasking + Tech** -> Market Making
 
-### Según tu capital:
+### Based on your capital:
 - **< $25k**: Momentum small caps (PDT rule)
 - **$25k - $100k**: Mix momentum + mean reversion
-- **$100k - $500k**: Agregar pairs trading
-- **> $500k**: Todas las estrategias
+- **$100k - $500k**: Add pairs trading
+- **> $500k**: All strategies
 
-### Según tu tiempo:
+### Based on your time:
 - **Part-time**: Swing momentum
 - **Full-time**: Day trading + scalping
-- **Automatizado**: Market making + arbitraje
+- **Automated**: Market making + arbitrage
 
-## Framework para Evaluar Estrategias
+## Framework for Evaluating Strategies
 
 ```python
 def evaluate_strategy(backtest_results):
@@ -200,7 +202,7 @@ def evaluate_strategy(backtest_results):
         'expectancy': calculate_expectancy(backtest_results)
     }
     
-    # Score final
+    # Final score
     if (metrics['profit_factor'] > 1.5 and 
         metrics['sharpe_ratio'] > 1.0 and 
         metrics['max_drawdown'] < 0.20):
@@ -209,10 +211,10 @@ def evaluate_strategy(backtest_results):
         return "NEEDS WORK"
 ```
 
-## Mi Mix Personal
+## My Personal Mix
 
 ```python
-# Portfolio de estrategias
+# Strategy portfolio
 STRATEGIES = {
     'morning_momentum': {
         'allocation': 0.40,
@@ -237,21 +239,21 @@ STRATEGIES = {
 }
 ```
 
-## Errores Comunes
+## Common Mistakes
 
-1. **Over-optimizar una estrategia** en vez de diversificar
-2. **Ignorar costos** de transacción en backtests
-3. **No considerar liquidez** en small caps
-4. **Asumir fills perfectos** en estrategias de alta frecuencia
-5. **No tener circuit breakers** para condiciones adversas
+1. **Over-optimizing a single strategy** instead of diversifying
+2. **Ignoring transaction costs** in backtests
+3. **Not considering liquidity** in small caps
+4. **Assuming perfect fills** in high-frequency strategies
+5. **Not having circuit breakers** for adverse conditions
 
-## Recursos para Profundizar
+## Resources for Further Learning
 
 - **Momentum**: "Following the Trend" - Andreas Clenow
 - **Mean Reversion**: "Mean Reversion Trading" - Ernest Chan  
-- **Arbitraje**: "Statistical Arbitrage" - Andrew Pole
-- **Market Making**: Papers de Avellaneda & Stoikov
+- **Arbitrage**: "Statistical Arbitrage" - Andrew Pole
+- **Market Making**: Avellaneda & Stoikov papers
 
-## Siguiente Paso
+## Next Step
 
-Ya conoces los tipos de estrategias. Ahora vamos a [Fuentes de Datos](../data/data_sources.md) para ver dónde conseguir la materia prima para tus backtests.
+Now you know the types of strategies. Let's move on to [Data Sources](../data/data_sources.md) to see where to get the raw material for your backtests.

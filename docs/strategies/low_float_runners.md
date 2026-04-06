@@ -1,12 +1,14 @@
+> 🇪🇸 [Leer en Español](low_float_runners.es.md) | 🇺🇸 **English**
+
 # Low Float Runners Strategy
 
-## Concepto Base
+## Core Concept
 
-La estrategia Low Float Runners se enfoca en stocks con float extremadamente bajo (típicamente <15M shares) que experimentan momentum buying significativo. Estos stocks pueden tener movimientos explosivos debido a la limitada supply de shares disponibles para trading.
+The Low Float Runners strategy focuses on stocks with extremely low float (typically <15M shares) that experience significant momentum buying. These stocks can have explosive moves due to the limited supply of shares available for trading.
 
-## Fundamentos de Low Float
+## Low Float Fundamentals
 
-### ¿Por Qué Low Float Causa Explosive Moves?
+### Why Does Low Float Cause Explosive Moves?
 
 ```python
 class LowFloatMechanics:
@@ -18,7 +20,7 @@ class LowFloatMechanics:
         }
         
     def calculate_supply_demand_dynamics(self, float_shares, daily_volume):
-        """Calcular dynamics de supply/demand"""
+        """Calculate supply/demand dynamics"""
         
         # Institutional lockup estimate (typically 60-80% of float)
         locked_shares = float_shares * 0.70
@@ -39,7 +41,7 @@ class LowFloatMechanics:
         }
         
     def estimate_price_impact(self, order_size, tradeable_float, current_price):
-        """Estimar impacto en precio de orden grande"""
+        """Estimate price impact of a large order"""
         
         # Simplified market impact model
         float_ratio = order_size / tradeable_float
@@ -57,7 +59,7 @@ class LowFloatMechanics:
         }
     
     def categorize_impact(self, impact_pct):
-        """Categorizar impacto en mercado"""
+        """Categorize market impact"""
         if impact_pct > 0.20:
             return 'explosive'
         elif impact_pct > 0.10:
@@ -82,7 +84,7 @@ class LowFloatScreener:
         }
     
     def tier_1_screening(self, stock_universe):
-        """Filtro inicial - características básicas"""
+        """Initial filter - basic characteristics"""
         
         filtered = []
         
@@ -116,7 +118,7 @@ class LowFloatScreener:
         return filtered
     
     def tier_2_screening(self, stocks):
-        """Filtro de actividad - anomalías de volumen/precio"""
+        """Activity filter - volume/price anomalies"""
         
         filtered = []
         
@@ -147,7 +149,7 @@ class LowFloatScreener:
         return sorted(filtered, key=lambda x: x.activity_score, reverse=True)
     
     def tier_3_screening(self, stocks):
-        """Filtro de momentum - calidad del setup"""
+        """Momentum filter - setup quality"""
         
         filtered = []
         
@@ -178,7 +180,7 @@ class LowFloatScreener:
         return filtered
     
     def calculate_activity_metrics(self, stock):
-        """Calcular métricas de actividad"""
+        """Calculate activity metrics"""
         
         volume_ratio = stock.volume_today / stock.avg_volume_20d
         price_change = (stock.price - stock.prev_close) / stock.prev_close
@@ -210,7 +212,7 @@ class MomentumQualityAnalyzer:
         ]
     
     def analyze_momentum_quality(self, stock_data):
-        """Análisis completo de calidad del momentum"""
+        """Complete momentum quality analysis"""
         
         # 1. Volume Profile Analysis
         volume_analysis = self.analyze_volume_profile(stock_data)
@@ -251,7 +253,7 @@ class MomentumQualityAnalyzer:
         }
     
     def analyze_volume_profile(self, stock_data):
-        """Analizar perfil de volumen"""
+        """Analyze volume profile"""
         
         score = 0
         
@@ -290,7 +292,7 @@ class MomentumQualityAnalyzer:
         }
     
     def analyze_price_structure(self, stock_data):
-        """Analizar estructura de precio"""
+        """Analyze price structure"""
         
         score = 0
         
@@ -337,7 +339,7 @@ class LowFloatEntryManager:
         }
     
     def determine_entry_approach(self, stock_data, momentum_analysis):
-        """Determinar mejor approach de entrada"""
+        """Determine best entry approach"""
         
         # Factor analysis
         volume_ratio = stock_data.volume_today / stock_data.avg_volume_20d
@@ -357,7 +359,7 @@ class LowFloatEntryManager:
             return 'scalp'
     
     def breakout_entry(self, stock_data, momentum_analysis):
-        """Entrada en breakout de resistencia"""
+        """Entry on resistance breakout"""
         
         resistance_level = stock_data.resistance_level
         current_price = stock_data.price
@@ -392,7 +394,7 @@ class LowFloatEntryManager:
         }
     
     def pullback_entry(self, stock_data, momentum_analysis):
-        """Entrada en pullback a soporte"""
+        """Entry on pullback to support"""
         
         support_level = stock_data.support_level
         vwap = stock_data.vwap
@@ -425,7 +427,7 @@ class LowFloatEntryManager:
         }
     
     def momentum_entry(self, stock_data, momentum_analysis):
-        """Entrada en momentum continuation"""
+        """Entry on momentum continuation"""
         
         current_price = stock_data.price
         
@@ -461,9 +463,9 @@ class LowFloatEntryManager:
         }
 ```
 
-## Risk Management Extremo
+## Extreme Risk Management
 
-### Position Sizing para High Volatility
+### Position Sizing for High Volatility
 ```python
 class LowFloatRiskManager:
     def __init__(self, account_size, max_portfolio_exposure=0.15):
@@ -472,7 +474,7 @@ class LowFloatRiskManager:
         self.low_float_max_exposure = 0.08  # Never more than 8% in one low float
         
     def calculate_low_float_position_size(self, stock_data, entry_plan, momentum_score):
-        """Cálculo especializado para low float"""
+        """Specialized calculation for low float"""
         
         # Base calculations
         entry_price = entry_plan['entry_price']
@@ -517,7 +519,7 @@ class LowFloatRiskManager:
         }
     
     def calculate_volatility_factor(self, stock_data):
-        """Factor de ajuste por volatilidad"""
+        """Volatility adjustment factor"""
         
         atr_pct = stock_data.atr_14 / stock_data.price
         
@@ -531,7 +533,7 @@ class LowFloatRiskManager:
             return 1.0
     
     def calculate_float_factor(self, float_shares):
-        """Factor de ajuste por float size"""
+        """Float size adjustment factor"""
         
         if float_shares < 3_000_000:      # Micro float
             return 0.5                    # Very risky
@@ -554,13 +556,13 @@ class LowFloatStopManager:
         }
     
     def manage_stops_dynamically(self, position, current_data, strategy_type):
-        """Gestión dinámica de stops para low float"""
+        """Dynamic stop management for low float"""
         
         stop_strategy = self.stop_strategies.get(strategy_type, self.default_stops)
         return stop_strategy(position, current_data)
     
     def breakout_stops(self, position, current_data):
-        """Stops específicos para breakout trades"""
+        """Breakout trade specific stops"""
         
         entry_price = position['entry_price']
         current_price = current_data['price']
@@ -600,7 +602,7 @@ class LowFloatStopManager:
             }
     
     def momentum_stops(self, position, current_data):
-        """Stops para momentum trades - más agresivos"""
+        """Momentum trade stops - more aggressive"""
         
         entry_price = position['entry_price']
         current_price = current_data['price']
@@ -635,7 +637,7 @@ class LowFloatStopManager:
             }
     
     def check_emergency_exit_conditions(self, position, current_data):
-        """Condiciones de exit de emergencia"""
+        """Emergency exit conditions"""
         
         emergency_conditions = []
         
@@ -689,13 +691,13 @@ class LowFloatProfitManager:
         }
         
         self.position_reduction = {
-            'quick_scalp': [0.50, 0.30, 0.20],      # Reduce position %
+            'quick_scalp': [0.50, 0.30, 0.20],      # Position reduction %
             'momentum_ride': [0.30, 0.40, 0.30],
             'breakout_play': [0.25, 0.35, 0.40]
         }
     
     def create_profit_plan(self, entry_price, position_size, strategy_type):
-        """Crear plan de toma de ganancias"""
+        """Create profit-taking plan"""
         
         profit_levels = self.profit_stages.get(strategy_type, self.profit_stages['momentum_ride'])
         reduction_schedule = self.position_reduction.get(strategy_type, self.position_reduction['momentum_ride'])
@@ -728,7 +730,7 @@ class LowFloatProfitManager:
         }
     
     def dynamic_profit_adjustment(self, current_position, market_conditions):
-        """Ajustar profit taking basado en condiciones dinámicas"""
+        """Adjust profit taking based on dynamic conditions"""
         
         adjustments = []
         
@@ -768,4 +770,4 @@ class LowFloatProfitManager:
         return adjustments
 ```
 
-La estrategia Low Float Runners requiere extrema disciplina en risk management debido a la naturaleza explosiva y volátil de estos stocks. La clave está en entries precisos, stops ajustados, y profit taking agresivo.
+The Low Float Runners strategy requires extreme discipline in risk management due to the explosive and volatile nature of these stocks. The key lies in precise entries, tight stops, and aggressive profit taking.

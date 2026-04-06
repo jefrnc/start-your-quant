@@ -1,93 +1,95 @@
+> 🇪🇸 [Leer en Español](README.es.md) | 🇺🇸 **English**
+
 # Start Your Quant - Source Code
 
-Esta carpeta contiene implementaciones de referencia en Python que complementan la documentación del proyecto Start Your Quant.
+This folder contains reference Python implementations that complement the Start Your Quant project documentation.
 
-## Estructura
+## Structure
 
 ```
 src/
-├── README.md                          # Este archivo
-├── indicators/                        # Indicadores técnicos
-│   ├── moving_averages.py            # Medias móviles (SMA, EMA, WMA)
-│   └── vwap.py                       # VWAP y bandas
-├── strategies/                        # Estrategias de trading
-│   └── gap_and_go.py                 # Estrategia Gap and Go
-├── backtesting/                       # Motor de backtesting
-│   ├── simple_engine.py              # Motor simple de backtesting
-│   └── trade_reporting.py            # Exportación CSV para TraderVue
-├── risk/                             # Gestión de riesgo
-│   └── position_sizing.py            # Modelos de dimensionamiento
-├── data/                             # Fuentes de datos
-│   └── data_sources.py               # APIs y gestión de datos
-└── examples/                         # Ejemplos completos
-    └── complete_strategy_example.py  # Ejemplo integral
+├── README.md                          # This file
+├── indicators/                        # Technical indicators
+│   ├── moving_averages.py            # Moving averages (SMA, EMA, WMA)
+│   └── vwap.py                       # VWAP and bands
+├── strategies/                        # Trading strategies
+│   └── gap_and_go.py                 # Gap and Go strategy
+├── backtesting/                       # Backtesting engine
+│   ├── simple_engine.py              # Simple backtesting engine
+│   └── trade_reporting.py            # CSV export for TraderVue
+├── risk/                             # Risk management
+│   └── position_sizing.py            # Sizing models
+├── data/                             # Data sources
+│   └── data_sources.py               # APIs and data management
+└── examples/                         # Complete examples
+    └── complete_strategy_example.py  # Integrated example
 ```
 
-## Componentes Principales
+## Main Components
 
-### 📊 Indicadores Técnicos (`indicators/`)
+### Technical Indicators (`indicators/`)
 
-- **Moving Averages**: SMA, EMA, WMA y señales de cruce
-- **VWAP**: Volume Weighted Average Price con bandas
+- **Moving Averages**: SMA, EMA, WMA and crossover signals
+- **VWAP**: Volume Weighted Average Price with bands
 
-### 🎯 Estrategias (`strategies/`)
+### Strategies (`strategies/`)
 
-- **Gap and Go**: Estrategia para gaps de apertura con confirmación de volumen
+- **Gap and Go**: Opening gap strategy with volume confirmation
 
-### 🔄 Backtesting (`backtesting/`)
+### Backtesting (`backtesting/`)
 
-- **Simple Engine**: Motor básico de backtesting con gestión de portafolio
-- **Trade Reporting**: Exportación de trades a CSV para TraderVue, TradesViz y análisis personal
+- **Simple Engine**: Basic backtesting engine with portfolio management
+- **Trade Reporting**: Trade export to CSV for TraderVue, TradesViz, and personal analysis
 
-### ⚖️ Gestión de Riesgo (`risk/`)
+### Risk Management (`risk/`)
 
-- **Position Sizing**: Múltiples modelos (fijo, Kelly, ATR, paridad de riesgo)
+- **Position Sizing**: Multiple models (fixed, Kelly, ATR, risk parity)
 
-### 📈 Datos (`data/`)
+### Data (`data/`)
 
-- **Data Sources**: Interfaces para Yahoo Finance, Alpha Vantage y otros
+- **Data Sources**: Interfaces for Yahoo Finance, Alpha Vantage, and others
 
-### 🚀 Ejemplos (`examples/`)
+### Examples (`examples/`)
 
-- **Complete Strategy**: Ejemplo que integra todos los componentes
+- **Complete Strategy**: Example integrating all components
 
-## Instalación y Uso
+## Installation and Usage
 
-### Requisitos
+### Requirements
 
 ```bash
 pip install pandas numpy matplotlib requests
 ```
 
-### Uso Básico
+### Basic Usage
 
 ```python
-# Ejemplo de uso de indicadores
+# Example using indicators
 from indicators.moving_averages import MovingAverages
 import pandas as pd
 
-# Crear datos de ejemplo
+# Create sample data
 prices = pd.Series([100, 101, 99, 102, 104, 103, 105])
 
-# Calcular medias móviles
+# Calculate moving averages
 ma = MovingAverages()
 sma_5 = ma.sma(prices, 5)
 ema_5 = ma.ema(prices, 5)
 ```
 
-### Ejecutar Ejemplo Completo
+### Run Complete Example
 
 ```bash
 cd src/examples
 python complete_strategy_example.py
 ```
 
-## Relación con Documentación
+## Relationship with Documentation
 
-Cada módulo de código está diseñado para complementar específicamente la documentación en `docs/`:
+Each code module is designed to specifically complement the documentation in `docs/`:
 
-| Código | Documentación Relacionada |
-|--------|---------------------------|
+| Code | Related Documentation |
+|------|----------------------|
 | `indicators/moving_averages.py` | `docs/indicators/moving_averages.md` |
 | `indicators/vwap.py` | `docs/indicators/vwap.md` |
 | `strategies/gap_and_go.py` | `docs/strategies/gap_and_go.md` |
@@ -96,57 +98,57 @@ Cada módulo de código está diseñado para complementar específicamente la do
 | `risk/position_sizing.py` | `docs/risk/position_sizing.md` |
 | `data/data_sources.py` | `docs/data/data_sources.md` |
 
-## Características del Código
+## Code Features
 
-### ✅ Diseño Modular
-- Cada componente es independiente y reutilizable
-- Interfaces claras entre módulos
-- Fácil extensión y personalización
+### Modular Design
+- Each component is independent and reusable
+- Clear interfaces between modules
+- Easy extension and customization
 
-### ✅ Código Educativo
-- Comentarios detallados en español e inglés
-- Ejemplos de uso en cada módulo
-- Implementaciones explicativas paso a paso
+### Educational Code
+- Detailed comments in Spanish and English
+- Usage examples in each module
+- Step-by-step explanatory implementations
 
-### ✅ Estándares de Calidad
-- Type hints para mejor documentación
-- Manejo de errores apropiado
-- Validación de datos de entrada
+### Quality Standards
+- Type hints for better documentation
+- Appropriate error handling
+- Input data validation
 
-### ✅ Flexibilidad
-- Configuración personalizable
-- Múltiples algoritmos por categoría
-- Parámetros ajustables
+### Flexibility
+- Customizable configuration
+- Multiple algorithms per category
+- Adjustable parameters
 
-## Desarrollo del Código
+## Code Development
 
-Este código ha sido desarrollado siguiendo las mejores prácticas de trading cuantitativo e implementa conceptos avanzados:
+This code has been developed following quantitative trading best practices and implements advanced concepts:
 
-- **Evaluación de Modelos**: Métricas robustas de backtesting y validación
-- **IA en Trading**: Conceptos aplicados en análisis de patrones y señales
-- **Gestión de Riesgo**: Modelos cuantitativos para dimensionamiento y control
+- **Model Evaluation**: Robust backtesting and validation metrics
+- **AI in Trading**: Concepts applied in pattern analysis and signals
+- **Risk Management**: Quantitative models for sizing and control
 
-## Próximos Pasos
+## Next Steps
 
-1. **Expandir Indicadores**: Bollinger Bands, RSI, MACD
-2. **Más Estrategias**: Mean reversion, momentum, arbitraje
-3. **ML Integration**: Implementar transformers para finanzas
-4. **Live Trading**: Conexión con brokers reales
+1. **Expand Indicators**: Bollinger Bands, RSI, MACD
+2. **More Strategies**: Mean reversion, momentum, arbitrage
+3. **ML Integration**: Implement transformers for finance
+4. **Live Trading**: Connect with real brokers
 5. **Advanced Risk**: VaR, stress testing, correlation analysis
 
-## Contribuir
+## Contributing
 
-Para contribuir al código:
+To contribute to the code:
 
-1. Mantén el estilo educativo y comentarios claros
-2. Incluye ejemplos de uso en cada módulo
-3. Asegúrate de que complementa la documentación existente
-4. Añade tests unitarios cuando sea apropiado
+1. Maintain the educational style and clear comments
+2. Include usage examples in each module
+3. Ensure it complements existing documentation
+4. Add unit tests when appropriate
 
-## Notas Importantes
+## Important Notes
 
-⚠️ **Disclaimer**: Este código es para fines educativos. No constituye asesoramiento financiero. Siempre realiza tu propia investigación antes de invertir dinero real.
+**Disclaimer**: This code is for educational purposes. It does not constitute financial advice. Always do your own research before investing real money.
 
-📚 **Aprendizaje**: Use este código junto con la documentación en `docs/` para un aprendizaje completo de trading cuantitativo.
+**Learning**: Use this code alongside the documentation in `docs/` for a complete quantitative trading learning experience.
 
-🔧 **Personalización**: Modifica los parámetros y algoritmos según tus necesidades específicas de trading.
+**Customization**: Modify the parameters and algorithms according to your specific trading needs.

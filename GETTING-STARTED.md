@@ -1,117 +1,119 @@
-# 🚀 Guía de Inicio - Start Your Quant
+> 🇪🇸 [Leer en Español](GETTING-STARTED.es.md) | 🇺🇸 **English**
 
-**Tu aventura hacia convertirte en quant trader empieza aquí.**
+# Getting Started - Start Your Quant
 
-## 🎯 ¿Qué vas a aprender?
+**Your adventure toward becoming a quant trader starts here.**
 
-- **🧮 Trading Cuantitativo**: Usar matemáticas y programación en lugar de intuición
-- **🐍 Python para Finanzas**: El lenguaje #1 de Wall Street
-- **📊 Análisis de Datos**: Encontrar patrones rentables en el mercado
-- **🤖 Automatización**: Sistemas que tradean mientras duermes
-- **📈 Estrategias Reales**: Métodos probados en mercados reales
+## What Will You Learn?
 
-## ⚡ Empezar Sin Instalaciones
+- **Quantitative Trading**: Use math and programming instead of intuition
+- **Python for Finance**: Wall Street's #1 language
+- **Data Analysis**: Find profitable patterns in the market
+- **Automation**: Systems that trade while you sleep
+- **Real Strategies**: Methods proven in real markets
 
-### 🌐 Opción 1: Google Colab (Recomendado)
-**Perfecto para principiantes - No instalas nada**
+## Start Without Installing Anything
 
-1. Ve a [Google Colab](https://colab.research.google.com)
-2. Crea un nuevo notebook
-3. Pega este código y ejecuta:
+### Option 1: Google Colab (Recommended)
+**Perfect for beginners - No installation needed**
+
+1. Go to [Google Colab](https://colab.research.google.com)
+2. Create a new notebook
+3. Paste this code and run:
 
 ```python
-# Instalar librerías básicas
+# Install basic libraries
 !pip install yfinance pandas matplotlib seaborn
 
-# Tu primer análisis cuantitativo
+# Your first quantitative analysis
 import yfinance as yf
 import matplotlib.pyplot as plt
 
-# Descargar datos de Apple
+# Download Apple data
 data = yf.download('AAPL', period='1y')
 
-# Crear gráfico
+# Create chart
 plt.figure(figsize=(10, 6))
 plt.plot(data.index, data['Close'])
-plt.title('Apple - Tu Primer Análisis Quant')
+plt.title('Apple - Your First Quant Analysis')
 plt.show()
 
-print(f"Precio actual: ${data['Close'][-1]:.2f}")
-print("🎉 ¡Ya eres un quant trader!")
+print(f"Current price: ${data['Close'][-1]:.2f}")
+print("You're already a quant trader!")
 ```
 
-### 💻 Opción 2: Tu Computadora
-**Si prefieres trabajar localmente**
+### Option 2: Your Computer
+**If you prefer to work locally**
 
-1. **Instalar Python** (si no lo tienes):
-   - [python.org](https://python.org) → Descargar última versión
-   - Marcar "Add to PATH" en Windows
+1. **Install Python** (if you don't have it):
+   - [python.org](https://python.org) -> Download latest version
+   - Check "Add to PATH" on Windows
 
-2. **Instalar librerías**:
+2. **Install libraries**:
    ```bash
    pip install yfinance pandas matplotlib seaborn numpy
    ```
 
-3. **Verificar**:
+3. **Verify**:
    ```bash
-   python -c "import yfinance; print('✅ Todo listo!')"
+   python -c "import yfinance; print('All set!')"
    ```
 
-## 🎯 ¿Por Dónde Empezar?
+## Where Should You Start?
 
-### 📊 Test Rápido: ¿Cuál es tu nivel?
+### Quick Test: What's Your Level?
 
-**Pregunta 1: ¿Has programado antes?**
-- A) Nunca → Empieza en **F1**
-- B) Un poco → Empieza en **F2**
-- C) Sí, pero no Python → Empieza en **F2**
-- D) Sí, conozco Python → Empieza en **F3**
+**Question 1: Have you programmed before?**
+- A) Never -> Start at **F1**
+- B) A little -> Start at **F2**
+- C) Yes, but not Python -> Start at **F2**
+- D) Yes, I know Python -> Start at **F3**
 
-**Pregunta 2: ¿Has hecho trading antes?**
-- A) Nunca → Empieza en **F1**
-- B) Un poco manual → Empieza en **F2**
-- C) Sí, pero manualmente → Empieza en **F3**
-- D) Sí, conozco análisis técnico → Empieza en **E1**
+**Question 2: Have you traded before?**
+- A) Never -> Start at **F1**
+- B) A little manually -> Start at **F2**
+- C) Yes, but manually -> Start at **F3**
+- D) Yes, I know technical analysis -> Start at **E1**
 
-### 📊 Tu Plan Personalizado (elige UNO):
-| Si eres... | Semana 1 | Semana 2 | Semana 3 | Semana 4 | META |
-|------------|----------|-----------|-----------|-----------|------|
-| **Total Noob** | Python basics + Colab | Leer datos Yahoo | Tu primer indicador | Bot papel trading | Bot funcionando |
-| **Dev Sin Trading** | Indicadores técnicos | Backtesting basics | Optimización | Broker API | Bot real |
-| **Trader Manual** | Python crash course | Automatizar TU estrategia | Backtesting | Mejoras | Tu sistema auto |
-| **Quiero Todo YA** | Setup completo | 3 estrategias | Portfolio manager | Cloud deploy | Sistema pro |
+### Your Personalized Plan (choose ONE):
+| If you are... | Week 1 | Week 2 | Week 3 | Week 4 | GOAL |
+|---------------|--------|---------|---------|---------|------|
+| **Total Noob** | Python basics + Colab | Read Yahoo data | Your first indicator | Paper trading bot | Working bot |
+| **Dev Without Trading** | Technical indicators | Backtesting basics | Optimization | Broker API | Real bot |
+| **Manual Trader** | Python crash course | Automate YOUR strategy | Backtesting | Improvements | Your auto system |
+| **Want It All NOW** | Complete setup | 3 strategies | Portfolio manager | Cloud deploy | Pro system |
 
-## 🔥 MINUTO 10-20: Bots Listos para Copiar
+## MINUTES 10-20: Ready-to-Copy Bots
 
-### Bot #1: Detector de Gaps Matutinos (Gana con volatilidad)
+### Bot #1: Morning Gap Detector (Profit from volatility)
 ```python
-# Bot que detecta gaps (aperturas con gran diferencia)
+# Bot that detects gaps (openings with large differences)
 import yfinance as yf
 import pandas as pd
 
-# Lista de acciones volátiles
-volatiles = ['TSLA', 'NVDA', 'AMD', 'COIN', 'MARA']
+# List of volatile stocks
+volatile = ['TSLA', 'NVDA', 'AMD', 'COIN', 'MARA']
 
-print("🔍 ESCANEANDO GAPS DEL DÍA...\n")
+print("SCANNING TODAY'S GAPS...\n")
 
-for ticker in volatiles:
+for ticker in volatile:
     data = yf.download(ticker, period='5d', progress=False)
 
-    # Gap = Apertura hoy vs Cierre ayer
+    # Gap = Today's open vs yesterday's close
     gap = ((data['Open'][-1] - data['Close'][-2]) / data['Close'][-2]) * 100
 
-    if abs(gap) > 2:  # Gap mayor a 2%
-        tipo = "UP ↑️" if gap > 0 else "DOWN ↓️"
-        print(f"🚨 {ticker}: GAP {tipo} de {gap:.2f}%")
-        print(f"   Potencial: Regresión a ${data['Close'][-2]:.2f}")
-        print(f"   Entrada: ${data['Open'][-1]:.2f}")
+    if abs(gap) > 2:  # Gap greater than 2%
+        direction = "UP" if gap > 0 else "DOWN"
+        print(f"ALERT {ticker}: GAP {direction} of {gap:.2f}%")
+        print(f"   Potential: Regression to ${data['Close'][-2]:.2f}")
+        print(f"   Entry: ${data['Open'][-1]:.2f}")
         print(f"   Target: ${data['Close'][-2]:.2f}")
-        print(f"   Ganancia potencial: {abs(gap):.2f}%\n")
+        print(f"   Potential gain: {abs(gap):.2f}%\n")
 ```
 
-### Bot #2: Cazador de Oversold (Compra en pánico)
+### Bot #2: Oversold Hunter (Buy the panic)
 ```python
-# Bot que encuentra acciones sobrevendidas
+# Bot that finds oversold stocks
 import yfinance as yf
 import pandas as pd
 
@@ -124,7 +126,7 @@ def calculate_rsi(data, period=14):
 
 blue_chips = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM']
 
-print("🎯 BUSCANDO OPORTUNIDADES DE COMPRA (RSI < 30)\n")
+print("LOOKING FOR BUY OPPORTUNITIES (RSI < 30)\n")
 
 for ticker in blue_chips:
     data = yf.download(ticker, period='1mo', progress=False)
@@ -132,80 +134,80 @@ for ticker in blue_chips:
 
     current_rsi = data['RSI'][-1]
 
-    if current_rsi < 35:  # Sobrevendido
-        print(f"🟢 {ticker} SOBREVENDIDO!")
+    if current_rsi < 35:  # Oversold
+        print(f"{ticker} OVERSOLD!")
         print(f"   RSI: {current_rsi:.2f}")
-        print(f"   Precio actual: ${data['Close'][-1]:.2f}")
-        print(f"   Promedio 30d: ${data['Close'].mean():.2f}")
-        print(f"   Potencial rebote: {((data['Close'].mean() - data['Close'][-1]) / data['Close'][-1] * 100):.2f}%\n")
+        print(f"   Current price: ${data['Close'][-1]:.2f}")
+        print(f"   30d average: ${data['Close'].mean():.2f}")
+        print(f"   Bounce potential: {((data['Close'].mean() - data['Close'][-1]) / data['Close'][-1] * 100):.2f}%\n")
 ```
 
-### Bot #3: Sistema Completo con Stop Loss
+### Bot #3: Complete System with Stop Loss
 ```python
-# Sistema completo con gestión de riesgo
+# Complete system with risk management
 import yfinance as yf
 import numpy as np
 
-# Configuración
-TICKER = 'SPY'  # ETF del S&P 500
-CAPITAL_INICIAL = 10000
-RIESGO_POR_TRADE = 0.02  # 2% máximo
+# Configuration
+TICKER = 'SPY'  # S&P 500 ETF
+INITIAL_CAPITAL = 10000
+RISK_PER_TRADE = 0.02  # 2% maximum
 
 data = yf.download(TICKER, period='6mo', progress=False)
 
-# Indicadores
+# Indicators
 data['MA20'] = data['Close'].rolling(20).mean()
 data['MA50'] = data['Close'].rolling(50).mean()
-data['Volatilidad'] = data['Close'].rolling(20).std()
+data['Volatility'] = data['Close'].rolling(20).std()
 
-# Señales
+# Signals
 data['Signal'] = 0
-data.loc[data['MA20'] > data['MA50'], 'Signal'] = 1  # Compra
-data.loc[data['MA20'] < data['MA50'], 'Signal'] = -1  # Venta
+data.loc[data['MA20'] > data['MA50'], 'Signal'] = 1  # Buy
+data.loc[data['MA20'] < data['MA50'], 'Signal'] = -1  # Sell
 
-# Stop Loss dinámico (2x volatilidad)
-data['StopLoss'] = data['Close'] - (2 * data['Volatilidad'])
+# Dynamic stop loss (2x volatility)
+data['StopLoss'] = data['Close'] - (2 * data['Volatility'])
 
-# Simular trades
-capital = CAPITAL_INICIAL
+# Simulate trades
+capital = INITIAL_CAPITAL
 trades = []
 
 for i in range(1, len(data)):
     if data['Signal'].iloc[i] == 1 and data['Signal'].iloc[i-1] != 1:
-        # Entrada
-        entrada = data['Close'].iloc[i]
+        # Entry
+        entry = data['Close'].iloc[i]
         stop = data['StopLoss'].iloc[i]
-        size = (capital * RIESGO_POR_TRADE) / (entrada - stop)
+        size = (capital * RISK_PER_TRADE) / (entry - stop)
 
         trades.append({
-            'Fecha': data.index[i].date(),
-            'Tipo': 'COMPRA',
-            'Precio': entrada,
+            'Date': data.index[i].date(),
+            'Type': 'BUY',
+            'Price': entry,
             'Stop': stop,
             'Shares': int(size)
         })
 
-# Resultados
-print("📈 BACKTEST COMPLETO - ÚLTIMOS 6 MESES\n")
-print(f"Capital inicial: ${CAPITAL_INICIAL:,}")
+# Results
+print("COMPLETE BACKTEST - LAST 6 MONTHS\n")
+print(f"Initial capital: ${INITIAL_CAPITAL:,}")
 print(f"Total trades: {len(trades)}")
-print(f"\nÚLTIMAS 3 SEÑALES:")
+print(f"\nLAST 3 SIGNALS:")
 
 for trade in trades[-3:]:
-    print(f"\n{trade['Fecha']}: {trade['Tipo']} @ ${trade['Precio']:.2f}")
+    print(f"\n{trade['Date']}: {trade['Type']} @ ${trade['Price']:.2f}")
     print(f"  Stop Loss: ${trade['Stop']:.2f}")
-    print(f"  Posición: {trade['Shares']} shares")
-    print(f"  Riesgo: ${(trade['Shares'] * (trade['Precio'] - trade['Stop'])):.2f}")
+    print(f"  Position: {trade['Shares']} shares")
+    print(f"  Risk: ${(trade['Shares'] * (trade['Price'] - trade['Stop'])):.2f}")
 ```
 
-## 💵 MINUTO 20-30: Conecta con un Broker REAL
+## MINUTES 20-30: Connect with a REAL Broker
 
-### Opción A: Paper Trading (Sin Riesgo)
+### Option A: Paper Trading (No Risk)
 ```python
-# Alpaca Paper Trading - GRATIS, sin dinero real
-# 1. Registrate en: alpaca.markets (2 min)
-# 2. Obtén tus API keys
-# 3. Pega este código:
+# Alpaca Paper Trading - FREE, no real money
+# 1. Register at: alpaca.markets (2 min)
+# 2. Get your API keys
+# 3. Paste this code:
 
 !pip install alpaca-py
 
@@ -213,18 +215,18 @@ from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import MarketOrderRequest
 from alpaca.trading.enums import OrderSide, TimeInForce
 
-# Tus credenciales (paper trading)
-API_KEY = 'tu_api_key'
-SECRET_KEY = 'tu_secret_key'
+# Your credentials (paper trading)
+API_KEY = 'your_api_key'
+SECRET_KEY = 'your_secret_key'
 
 client = TradingClient(API_KEY, SECRET_KEY, paper=True)
 
-# Tu cuenta
+# Your account
 account = client.get_account()
 print(f"Balance: ${account.cash}")
-print(f"Poder de compra: ${account.buying_power}")
+print(f"Buying power: ${account.buying_power}")
 
-# Hacer un trade
+# Make a trade
 order_data = MarketOrderRequest(
     symbol="AAPL",
     qty=1,
@@ -233,133 +235,133 @@ order_data = MarketOrderRequest(
 )
 
 order = client.submit_order(order_data)
-print(f"Orden enviada: Compra 1 AAPL")
+print(f"Order submitted: Buy 1 AAPL")
 ```
 
-### Opción B: Notificaciones a tu Teléfono
+### Option B: Phone Notifications
 ```python
-# Bot de Telegram - Recibe alertas en tu celular
-# 1. Busca @BotFather en Telegram
-# 2. Crea un bot (/newbot)
-# 3. Guarda el token
+# Telegram Bot - Receive alerts on your phone
+# 1. Search @BotFather on Telegram
+# 2. Create a bot (/newbot)
+# 3. Save the token
 
 !pip install python-telegram-bot
 
 import requests
 
-def enviar_alerta(mensaje):
-    token = "TU_BOT_TOKEN"
-    chat_id = "TU_CHAT_ID"
+def send_alert(message):
+    token = "YOUR_BOT_TOKEN"
+    chat_id = "YOUR_CHAT_ID"
     url = f"https://api.telegram.org/bot{token}/sendMessage"
-    requests.post(url, data={'chat_id': chat_id, 'text': mensaje})
+    requests.post(url, data={'chat_id': chat_id, 'text': message})
 
-# Enviar alerta de tu bot
-if signal == "COMPRA":
-    enviar_alerta(f"🟢 COMPRAR {ticker} a ${precio:.2f}")
+# Send alert from your bot
+if signal == "BUY":
+    send_alert(f"BUY {ticker} at ${price:.2f}")
 ```
 
-## 🎯 RESULTADO: Tu Sistema de Trading en 30 Minutos
+## RESULT: Your Trading System in 30 Minutes
 
-✅ **Ya tienes:**
-- 3 bots funcionando
-- Scanner de oportunidades
-- Sistema con stop loss
-- Conexión a broker (paper)
-- Alertas al celular
+**You now have:**
+- 3 working bots
+- Opportunity scanner
+- System with stop loss
+- Broker connection (paper)
+- Phone alerts
 
-🚀 **Siguiente paso:**
-- Únete al Discord para compartir resultados
-- Mejora los bots con la comunidad
-- Empieza el curso completo
+**Next step:**
+- Join the Discord to share results
+- Improve bots with the community
+- Start the full course
 
-🔗 **Links Útiles:**
+**Useful Links:**
 - [Discord QuantLab](https://discord.gg/GgXZ3zAS)
-- [Academia Completa]({{ site.baseurl }}/learning-path/)
-- [Código en GitHub](https://github.com/jefrnc/start-your-quant)
+- [Complete Academy]({{ site.baseurl }}/learning-path/)
+- [Code on GitHub](https://github.com/jefrnc/start-your-quant)
 
-### Minutos 31-45: Primera Estrategia
-1. Copia el código de media móvil
-2. Pruébalo con diferentes acciones
-3. Modifica los parámetros
+### Minutes 31-45: First Strategy
+1. Copy the moving average code
+2. Test it with different stocks
+3. Modify the parameters
 
-### Minutos 46-60: Plan Personal
-1. Define tu objetivo (¿por qué quieres ser quant?)
-2. Elige tu ruta de entrada
-3. Marca en tu calendario 30 min diarios
+### Minutes 46-60: Personal Plan
+1. Define your goal (why do you want to be a quant?)
+2. Choose your entry path
+3. Block 30 min daily on your calendar
 
-## 🆘 Problemas Comunes
+## Common Problems
 
-### "No se instala yfinance"
+### "yfinance won't install"
 ```bash
 pip install --upgrade pip
 pip install yfinance
 ```
 
-### "No aparecen los gráficos"
+### "Charts don't appear"
 ```python
 import matplotlib.pyplot as plt
-plt.show()  # Agregar al final del código
+plt.show()  # Add at the end of the code
 ```
 
-### "Error al descargar datos"
-- Verificar conexión a internet
-- Probar otro símbolo: 'MSFT', 'GOOGL'
-- Usar período más corto: period='1mo'
+### "Error downloading data"
+- Check internet connection
+- Try another symbol: 'MSFT', 'GOOGL'
+- Use shorter period: period='1mo'
 
-### "Python no reconocido"
-- Windows: Marcar "Add to PATH" al instalar
+### "Python not recognized"
+- Windows: Check "Add to PATH" when installing
 - Mac: `brew install python`
 - Linux: `sudo apt install python3`
 
-## 💪 Mantener la Motivación
+## Staying Motivated
 
-### 🎯 Objetivos Semanales
-- **Semana 1**: Completar F1 y F2
-- **Semana 2**: Completar F3 y F4
-- **Semana 3**: Empezar estrategias (E1)
-- **Semana 4**: Primera estrategia completa
+### Weekly Goals
+- **Week 1**: Complete F1 and F2
+- **Week 2**: Complete F3 and F4
+- **Week 3**: Start strategies (E1)
+- **Week 4**: First complete strategy
 
-### 📈 Progreso Visible
-- Cada módulo incluye ejercicios verificables
-- Tu código va mejorando gradualmente
-- Builds un portfolio de estrategias
-- Métricas reales de performance
+### Visible Progress
+- Each module includes verifiable exercises
+- Your code gradually improves
+- Build a strategy portfolio
+- Real performance metrics
 
-### 🤝 Comunidad
-- GitHub Issues para preguntas técnicas
-- Discord para chat diario (próximamente)
-- Comparte tu progreso con #StartYourQuant
+### Community
+- GitHub Issues for technical questions
+- Discord for daily chat (coming soon)
+- Share your progress with #StartYourQuant
 
-## 🏆 Al Final Tendrás
+## By the End You'll Have
 
-### 💻 Portfolio Técnico
-- 5+ estrategias probadas
-- Sistema de backtesting robusto
-- Dashboard de monitoreo
-- Código reutilizable
+### Technical Portfolio
+- 5+ tested strategies
+- Robust backtesting system
+- Monitoring dashboard
+- Reusable code
 
-### 🧠 Conocimientos
-- Python para trading
-- Análisis técnico cuantitativo
-- Gestión de riesgo
-- Optimización de estrategias
+### Knowledge
+- Python for trading
+- Quantitative technical analysis
+- Risk management
+- Strategy optimization
 
-### 🚀 Habilidades
-- Analizar cualquier acción en minutos
-- Probar ideas rápidamente
-- Automatizar decisiones de trading
-- Evaluar performance objetivamente
+### Skills
+- Analyze any stock in minutes
+- Test ideas quickly
+- Automate trading decisions
+- Evaluate performance objectively
 
-## ⚡ ¡Empezar AHORA!
+## Start NOW!
 
-**La mejor estrategia es empezar, aunque sea imperfecto.**
+**The best strategy is to start, even if it's imperfect.**
 
 1. **Setup**: `python quick-start.py` (5 min)
-2. **Primera lección**: [F1 - ¿Qué es ser Quant?](learning-path/fundamentos/f1-que-es-ser-quant/) (30 min)
-3. **Compromiso**: 30 min diarios por 30 días
+2. **First lesson**: [F1 - What Is Being a Quant?](learning-path/fundamentos/f1-que-es-ser-quant/) (30 min)
+3. **Commitment**: 30 min daily for 30 days
 
-**En 30 días tendrás más conocimiento cuantitativo que 95% de traders retail.**
+**In 30 days you'll have more quantitative knowledge than 95% of retail traders.**
 
 ---
 
-🎯 **¿Listo para empezar?** → Ejecuta `python quick-start.py` y comienza tu aventura quant!
+**Ready to start?** -> Run `python quick-start.py` and begin your quant adventure!

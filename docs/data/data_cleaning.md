@@ -1,14 +1,16 @@
-# Limpieza y Estructuración de Datos
+> 🇪🇸 [Leer en Español](data_cleaning.es.md) | 🇺🇸 **English**
 
-## Por Qué Importa
+# Data Cleaning and Structuring
 
-Garbage in, garbage out. Puedes tener la mejor estrategia del mundo, pero si tus datos están mal, tus resultados serán ficción. He perdido días debuggeando "estrategias rotas" que en realidad tenían datos corruptos.
+## Why It Matters
 
-## Problemas Comunes en Trading Data
+Garbage in, garbage out. You can have the best strategy in the world, but if your data is bad, your results will be fiction. I've lost days debugging "broken strategies" that actually had corrupt data.
 
-### 1. Missing Data (Huecos)
+## Common Problems in Trading Data
+
+### 1. Missing Data (Gaps)
 ```python
-# Problema: Faltan barras durante horario de mercado
+# Problem: Missing bars during market hours
 datetime              close   volume
 2024-01-15 09:30:00  175.00  500000
 2024-01-15 09:31:00  175.20  450000
@@ -19,23 +21,23 @@ datetime              close   volume
 **Solución:**
 ```python
 def fill_missing_bars(df, market_hours_only=True):
-    # Crear índice completo
+    # Create complete index
     if market_hours_only:
         full_index = pd.date_range(
             start=df.index[0].replace(hour=9, minute=30),
             end=df.index[-1].replace(hour=16, minute=0),
             freq='1min'
         )
-        # Filtrar solo horario de mercado
+        # Filter only market hours
         full_index = full_index[(full_index.time >= pd.Timestamp('09:30').time()) & 
                                (full_index.time <= pd.Timestamp('16:00').time())]
     
-    # Reindexar y forward fill
+    # Reindex and forward fill
     df = df.reindex(full_index)
     df['close'] = df['close'].fillna(method='ffill')
-    df['volume'] = df['volume'].fillna(0)  # Volumen 0 si no hubo trades
+    df['volume'] = df['volume'].fillna(0)  # Volume 0 si no hubo trades
     
-    # OHLC: forward fill desde el close anterior
+    # OHLC: forward fill from previous close
     df['open'] = df['open'].fillna(df['close'])
     df['high'] = df['high'].fillna(df['close'])
     df['low'] = df['low'].fillna(df['close'])
@@ -43,12 +45,12 @@ def fill_missing_bars(df, market_hours_only=True):
     return df
 ```
 
-### 2. Outliers y Fat Fingers
+### 2. Outliers and Fat Fingers
 ```python
-# Problema: Trades erróneos que distorsionan el análisis
+# Problem: Erroneous trades that distort analysis
 def detect_outliers(df, method='iqr', threshold=3):
     if method == 'iqr':
-        # Método IQR (Interquartile Range)
+        # IQR Method (Interquartile Range)
         Q1 = df['close'].quantile(0.25)
         Q3 = df['close'].quantile(0.75)
         IQR = Q3 - Q1
@@ -56,28 +58,28 @@ def detect_outliers(df, method='iqr', threshold=3):
         upper_bound = Q3 + threshold * IQR
         
     elif method == 'zscore':
-        # Método Z-score
+        # Z-score Method
         mean = df['close'].mean()
         std = df['close'].std()
         lower_bound = mean - threshold * std
         upper_bound = mean + threshold * std
     
-    # Marcar outliers
+    # Mark outliers
     df['is_outlier'] = (df['close'] < lower_bound) | (df['close'] > upper_bound)
     
-    # Opción 1: Eliminar
+    # Option 1: Remove
     # df = df[~df['is_outlier']]
     
-    # Opción 2: Capear (mejor para trading)
+    # Option 2: Cap (better for trading)
     df.loc[df['close'] > upper_bound, 'close'] = upper_bound
     df.loc[df['close'] < lower_bound, 'close'] = lower_bound
     
     return df
 ```
 
-### 3. Ajustes por Splits y Dividendos
+### 3. Adjustments for Splits and Dividends
 ```python
-# Problema: AAPL hizo split 4:1, datos históricos incorrectos
+# Problem: AAPL did a 4:1 split, incorrect historical data
 def adjust_for_splits(df, splits_df):
     """
     splits_df debe tener columnas: date, ratio
@@ -88,58 +90,58 @@ def adjust_for_splits(df, splits_df):
         split_date = split['date']
         ratio = split['ratio']
         
-        # Ajustar precios anteriores al split
+        # Adjust prices before the split
         mask = df.index < split_date
         df.loc[mask, ['open', 'high', 'low', 'close']] /= ratio
         df.loc[mask, 'volume'] *= ratio
     
     return df
 
-# Usando yfinance (ya viene ajustado)
+# Using yfinance (already adjusted)
 ticker = yf.Ticker('AAPL')
-# auto_adjust=True ajusta automáticamente por splits y dividendos
+# auto_adjust=True automatically adjusts for splits and dividends
 df = ticker.history(period='2y', auto_adjust=True)
 ```
 
 ### 4. Timezone Hell
 ```python
-# Problema: Mezclar timezones = desastre
+# Problem: Mixing timezones = disaster
 def standardize_timezone(df, target_tz='America/New_York'):
     """
     Convierte todo a Eastern Time (NYSE)
     """
     if df.index.tz is None:
-        # Asumir UTC si no tiene timezone
+        # Assume UTC if no timezone
         df.index = df.index.tz_localize('UTC')
     
-    # Convertir a Eastern
+    # Convert to Eastern
     df.index = df.index.tz_convert(target_tz)
     
-    # Opcional: remover timezone para cálculos más rápidos
+    # Optional: remove timezone for faster calculations
     # df.index = df.index.tz_localize(None)
     
     return df
 ```
 
-### 5. Duplicados
+### 5. Duplicates
 ```python
-# Problema: El mismo trade reportado múltiples veces
+# Problem: Same trade reported multiple times
 def remove_duplicates(df):
-    # Método 1: Duplicados exactos
+    # Method 1: Exact duplicates
     df = df[~df.index.duplicated(keep='first')]
     
-    # Método 2: Duplicados en ventana temporal (más agresivo)
+    # Method 2: Duplicates in time window (more aggressive)
     df = df.sort_index()
     time_diff = df.index.to_series().diff()
     
-    # Eliminar si hay otro trade en < 1 segundo
+    # Remove if there's another trade within < 1 second
     mask = time_diff > pd.Timedelta('1s')
-    mask.iloc[0] = True  # Mantener el primer trade
+    mask.iloc[0] = True  # Keep the first trade
     
     return df[mask]
 ```
 
-## Pipeline de Limpieza Completo
+## Complete Cleaning Pipeline
 
 ```python
 class DataCleaner:
@@ -158,13 +160,13 @@ class DataCleaner:
         }
     
     def clean(self, df, ticker=None):
-        """Pipeline completo de limpieza"""
+        """Complete cleaning pipeline"""
         original_len = len(df)
         
-        # 1. Validación básica
+        # 1. Basic validation
         df = self.validate_basic(df)
         
-        # 2. Remover duplicados
+        # 2. Remove duplicates
         df = df[~df.index.duplicated(keep='first')]
         
         # 3. Timezone
@@ -183,11 +185,11 @@ class DataCleaner:
                 threshold=self.config['outlier_threshold']
             )
         
-        # 6. Validar OHLC relationships
+        # 6. Validate OHLC relationships
         if self.config['validate_prices']:
             df = self.validate_ohlc(df)
         
-        # 7. Ajustar por splits si tenemos la info
+        # 7. Adjust for splits if we have the info
         if self.config['adjust_splits'] and ticker:
             df = self.auto_adjust_splits(df, ticker)
         
@@ -195,32 +197,32 @@ class DataCleaner:
         return df
     
     def validate_basic(self, df):
-        """Validaciones básicas de sanidad"""
-        # Remover filas con todos NaN
+        """Basic sanity validations"""
+        # Remove rows with all NaN
         df = df.dropna(how='all')
         
-        # Remover volumen negativo
+        # Remove negative volume
         df = df[df['volume'] >= 0]
         
-        # Remover precios negativos o cero
+        # Remove negative or zero prices
         price_cols = ['open', 'high', 'low', 'close']
         df = df[(df[price_cols] > 0).all(axis=1)]
         
         return df
     
     def validate_ohlc(self, df):
-        """Asegurar que high >= low, etc."""
-        # High debe ser >= que open, close
+        """Ensure high >= low, etc."""
+        # High must be >= open, close
         df['high'] = df[['high', 'open', 'close']].max(axis=1)
         
-        # Low debe ser <= que open, close
+        # Low must be <= open, close
         df['low'] = df[['low', 'open', 'close']].min(axis=1)
         
         return df
     
     def auto_adjust_splits(self, df, ticker):
-        """Auto-detectar y ajustar splits grandes"""
-        # Detectar cambios de precio > 40% overnight
+        """Auto-detect and adjust large splits"""
+        # Detect price changes > 40% overnight
         df['prev_close'] = df['close'].shift(1)
         df['overnight_change'] = df['open'] / df['prev_close']
         
@@ -237,24 +239,24 @@ class DataCleaner:
         return df
 ```
 
-## Estructuración para Analysis
+## Structuring for Analysis
 
-### Agregar Features Comunes
+### Adding Common Features
 ```python
 def add_technical_features(df):
-    """Agregar indicadores comunes para análisis"""
+    """Add common indicators for analysis"""
     # Returns
     df['returns'] = df['close'].pct_change()
     df['log_returns'] = np.log(df['close'] / df['close'].shift(1))
     
-    # Volatilidad
+    # Volatility
     df['volatility'] = df['returns'].rolling(20).std()
     
-    # Rango
+    # Range
     df['range'] = (df['high'] - df['low']) / df['low'] * 100
     df['range_avg'] = df['range'].rolling(20).mean()
     
-    # Volumen
+    # Volume
     df['volume_sma'] = df['volume'].rolling(20).mean()
     df['volume_ratio'] = df['volume'] / df['volume_sma']
     
@@ -267,7 +269,7 @@ def add_technical_features(df):
     return df
 ```
 
-### Estructura para Backtesting
+### Structure for Backtesting
 ```python
 class BacktestData:
     def __init__(self, data, universe=None):
@@ -276,29 +278,29 @@ class BacktestData:
         self.current_index = 0
         
     def prepare_for_backtest(self):
-        """Preparar data para backtesting eficiente"""
+        """Prepare data for efficient backtesting"""
         for ticker in self.universe:
             df = self.data[ticker]
             
-            # Pre-calcular indicadores
+            # Pre-calculate indicators
             df = add_technical_features(df)
             
-            # Crear columnas para señales
+            # Create columns for signals
             df['signal'] = 0
             df['position'] = 0
             df['pnl'] = 0
             
-            # Indexar por fecha para lookups rápidos
+            # Index by date for fast lookups
             df = df.sort_index()
             
             self.data[ticker] = df
     
     def get_snapshot(self, date, lookback=20):
-        """Obtener vista de los datos hasta cierta fecha"""
+        """Get data view up to a certain date"""
         snapshot = {}
         for ticker in self.universe:
             df = self.data[ticker]
-            # Datos hasta la fecha, incluyendo lookback
+            # Data up to the date, including lookback
             mask = df.index <= date
             historical = df[mask].tail(lookback)
             snapshot[ticker] = historical
@@ -306,11 +308,11 @@ class BacktestData:
         return snapshot
 ```
 
-## Validación Final
+## Final Validation
 
 ```python
 def validate_dataset(data_dict, start_date, end_date):
-    """Validación completa del dataset antes de backtest"""
+    """Complete dataset validation before backtest"""
     report = {
         'tickers': len(data_dict),
         'issues': [],
@@ -318,7 +320,7 @@ def validate_dataset(data_dict, start_date, end_date):
     }
     
     for ticker, df in data_dict.items():
-        # Verificar cobertura temporal
+        # Check temporal coverage
         actual_start = df.index[0]
         actual_end = df.index[-1]
         
@@ -328,7 +330,7 @@ def validate_dataset(data_dict, start_date, end_date):
         if actual_end < pd.Timestamp(end_date):
             report['issues'].append(f"{ticker}: Data ends early ({actual_end})")
         
-        # Stats por ticker
+        # Stats per ticker
         report['stats'][ticker] = {
             'rows': len(df),
             'missing_closes': df['close'].isna().sum(),
@@ -346,7 +348,7 @@ if report['issues']:
         print(f"  - {issue}")
 ```
 
-## Mi Checklist Personal
+## My Personal Checklist
 
 ```python
 # clean_all.py
@@ -371,29 +373,29 @@ def my_cleaning_pipeline(raw_data):
 ## Storage Best Practices
 
 ```python
-# Guardar datos limpios
+# Save clean data
 def save_clean_data(df, ticker, format='parquet'):
     date_str = pd.Timestamp.now().strftime('%Y%m%d')
     
     if format == 'parquet':
-        # Más eficiente para lectura
+        # More efficient for reading
         df.to_parquet(f'data/clean/{ticker}_{date_str}.parquet')
     elif format == 'hdf':
-        # Mejor para datasets muy grandes
+        # Better for very large datasets
         df.to_hdf(f'data/clean/{ticker}_{date_str}.h5', key='data')
     elif format == 'csv':
-        # Compatible pero menos eficiente
+        # Compatible but less efficient
         df.to_csv(f'data/clean/{ticker}_{date_str}.csv')
 ```
 
-## Red Flags en tus Datos
+## Red Flags in Your Data
 
-1. **Demasiados gaps**: Proveedor poco confiable
-2. **Volumen errático**: Posibles ajustes incorrectos
-3. **Precios perfectamente redondos**: Data sintética
-4. **Patrones repetitivos**: Posible data duplicada
-5. **Volatilidad irreal**: Outliers no detectados
+1. **Too many gaps**: Unreliable provider
+2. **Erratic volume**: Possible incorrect adjustments
+3. **Perfectly round prices**: Synthetic data
+4. **Repetitive patterns**: Possibly duplicated data
+5. **Unrealistic volatility**: Undetected outliers
 
-## Siguiente Paso
+## Next Step
 
-Con datos limpios, ahora podemos crear [Datasets para Backtesting](backtesting_datasets.md) optimizados.
+With clean data, we can now create optimized [Backtesting Datasets](backtesting_datasets.md).

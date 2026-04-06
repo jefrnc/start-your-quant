@@ -1,8 +1,10 @@
-# Arquitectura del Sistema de Trading Automatizado
+> 🇪🇸 [Leer en Español](system_architecture.es.md) | 🇺🇸 **English**
 
-## Diseño de Arquitectura General
+# Automated Trading System Architecture
 
-### Componentes del Sistema
+## General Architecture Design
+
+### System Components
 ```python
 from enum import Enum
 from dataclasses import dataclass, field
@@ -16,7 +18,7 @@ import threading
 import queue
 
 class SystemComponent(Enum):
-    """Componentes del sistema"""
+    """System components"""
     DATA_MANAGER = "data_manager"
     STRATEGY_ENGINE = "strategy_engine"
     RISK_MANAGER = "risk_manager"
@@ -27,7 +29,7 @@ class SystemComponent(Enum):
     ORDER_MANAGER = "order_manager"
 
 class SystemState(Enum):
-    """Estados del sistema"""
+    """System states"""
     STARTING = "starting"
     RUNNING = "running"
     PAUSED = "paused"
@@ -37,7 +39,7 @@ class SystemState(Enum):
 
 @dataclass
 class SystemConfig:
-    """Configuración del sistema"""
+    """System configuration"""
     # Trading parameters
     account_size: float = 100000
     max_positions: int = 5
@@ -67,7 +69,7 @@ class SystemConfig:
     backup_data_provider: str = "yahoo"
 
 class TradingSystemCore:
-    """Core del sistema de trading automatizado"""
+    """Automated trading system core"""
     
     def __init__(self, config: SystemConfig):
         self.config = config
@@ -86,7 +88,7 @@ class TradingSystemCore:
         self._initialize_components()
     
     def _setup_logging(self):
-        """Configurar sistema de logging"""
+        """Configure logging system"""
         logging.basicConfig(
             level=getattr(logging, self.config.log_level),
             format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -98,7 +100,7 @@ class TradingSystemCore:
         return logging.getLogger('TradingSystem')
     
     def _initialize_message_queues(self):
-        """Inicializar colas de mensajes"""
+        """Initialize message queues"""
         queue_names = [
             'market_data',
             'trade_signals',
@@ -112,7 +114,7 @@ class TradingSystemCore:
             self.message_queues[queue_name] = queue.Queue(maxsize=1000)
     
     def _initialize_components(self):
-        """Inicializar componentes del sistema"""
+        """Initialize system components"""
         try:
             # Data Manager
             self.components[SystemComponent.DATA_MANAGER] = DataManager(
@@ -161,7 +163,7 @@ class TradingSystemCore:
             raise
     
     async def start_system(self):
-        """Iniciar sistema completo"""
+        """Start complete system"""
         try:
             self.logger.info("Starting trading system...")
             self.state = SystemState.STARTING
@@ -187,7 +189,7 @@ class TradingSystemCore:
             raise
     
     async def stop_system(self):
-        """Detener sistema"""
+        """Stop system"""
         try:
             self.logger.info("Stopping trading system...")
             self.state = SystemState.STOPPING
@@ -206,7 +208,7 @@ class TradingSystemCore:
             self.state = SystemState.ERROR
     
     async def _main_system_loop(self):
-        """Loop principal del sistema"""
+        """Main system loop"""
         while self.running:
             try:
                 # Check if market is open
@@ -225,7 +227,7 @@ class TradingSystemCore:
                 await asyncio.sleep(1)
     
     async def _health_monitor_loop(self):
-        """Loop de monitoreo de salud del sistema"""
+        """System health monitoring loop"""
         while self.running:
             try:
                 # Check system health
@@ -243,7 +245,7 @@ class TradingSystemCore:
                 await asyncio.sleep(30)
     
     def _is_market_open(self) -> bool:
-        """Verificar si el mercado está abierto"""
+        """Check if the market is open"""
         now = datetime.now()
         market_open = now.replace(
             hour=int(self.config.market_open_time.split(':')[0]),
@@ -260,7 +262,7 @@ class TradingSystemCore:
         return now.weekday() < 5 and market_open <= now <= market_close
     
     async def _process_system_events(self):
-        """Procesar eventos del sistema"""
+        """Process system events"""
         try:
             while not self.message_queues['system_events'].empty():
                 event = self.message_queues['system_events'].get_nowait()
@@ -269,7 +271,7 @@ class TradingSystemCore:
             pass
     
     async def _handle_system_event(self, event: Dict):
-        """Manejar evento del sistema"""
+        """Handle system event"""
         event_type = event.get('type')
         
         if event_type == 'pause_trading':
@@ -282,7 +284,7 @@ class TradingSystemCore:
             await self._rebalance_portfolio()
     
     async def _check_component_health(self):
-        """Verificar salud de componentes"""
+        """Check component health"""
         for component_type, component in self.components.items():
             try:
                 health = await component.get_health()
@@ -292,7 +294,7 @@ class TradingSystemCore:
                 self.logger.error(f"Error checking health of {component_type.value}: {e}")
     
     async def _get_system_health(self) -> Dict:
-        """Obtener estado de salud del sistema"""
+        """Get system health status"""
         health_status = {
             'timestamp': datetime.now(),
             'overall_status': 'healthy',
@@ -317,7 +319,7 @@ class TradingSystemCore:
         return health_status
 
 class BaseComponent(ABC):
-    """Clase base para componentes del sistema"""
+    """Base class for system components"""
     
     def __init__(self, config: SystemConfig, name: str):
         self.config = config
@@ -328,21 +330,21 @@ class BaseComponent(ABC):
     
     @abstractmethod
     async def start(self):
-        """Iniciar componente"""
+        """Start component"""
         pass
     
     @abstractmethod
     async def stop(self):
-        """Detener componente"""
+        """Stop component"""
         pass
     
     @abstractmethod
     async def process(self):
-        """Procesar lógica principal del componente"""
+        """Process component main logic"""
         pass
     
     async def get_health(self) -> Dict:
-        """Obtener estado de salud del componente"""
+        """Get component health status"""
         time_since_heartbeat = datetime.now() - self.last_heartbeat
         
         return {
@@ -353,11 +355,11 @@ class BaseComponent(ABC):
         }
     
     def update_heartbeat(self):
-        """Actualizar heartbeat"""
+        """Update heartbeat"""
         self.last_heartbeat = datetime.now()
 
 class DataManager(BaseComponent):
-    """Gestor de datos de mercado"""
+    """Market data manager"""
     
     def __init__(self, config: SystemConfig, market_data_queue: queue.Queue):
         super().__init__(config, "DataManager")
@@ -366,7 +368,7 @@ class DataManager(BaseComponent):
         self.subscribed_symbols = set()
         
     async def start(self):
-        """Iniciar data manager"""
+        """Start data manager"""
         self.logger.info("Starting Data Manager...")
         
         # Initialize data providers
@@ -379,7 +381,7 @@ class DataManager(BaseComponent):
         self.logger.info("Data Manager started")
     
     async def stop(self):
-        """Detener data manager"""
+        """Stop data manager"""
         self.logger.info("Stopping Data Manager...")
         self.running = False
         
@@ -390,12 +392,12 @@ class DataManager(BaseComponent):
         self.logger.info("Data Manager stopped")
     
     async def process(self):
-        """Procesar datos de mercado"""
+        """Process market data"""
         # This is handled by the data processing loop
         pass
     
     async def _initialize_data_providers(self):
-        """Inicializar proveedores de datos"""
+        """Initialize data providers"""
         # Initialize primary data provider
         primary_provider = self._create_data_provider(self.config.primary_data_provider)
         await primary_provider.connect()
@@ -408,7 +410,7 @@ class DataManager(BaseComponent):
             self.data_providers['backup'] = backup_provider
     
     def _create_data_provider(self, provider_name: str):
-        """Crear proveedor de datos"""
+        """Create data provider"""
         # Factory method to create data providers
         if provider_name == "polygon":
             from src.data_acquisition.polygon_provider import PolygonDataProvider
@@ -420,7 +422,7 @@ class DataManager(BaseComponent):
             raise ValueError(f"Unknown data provider: {provider_name}")
     
     async def _data_processing_loop(self):
-        """Loop de procesamiento de datos"""
+        """Data processing loop"""
         while self.running:
             try:
                 # Get data from primary provider
@@ -441,7 +443,7 @@ class DataManager(BaseComponent):
                 await asyncio.sleep(5)
     
     async def _get_market_data(self) -> Optional[Dict]:
-        """Obtener datos de mercado"""
+        """Get market data"""
         try:
             # Try primary provider first
             primary_provider = self.data_providers.get('primary')
@@ -462,17 +464,17 @@ class DataManager(BaseComponent):
         return None
     
     def subscribe_symbol(self, symbol: str):
-        """Suscribirse a datos de un símbolo"""
+        """Subscribe to data for a symbol"""
         self.subscribed_symbols.add(symbol)
         self.logger.info(f"Subscribed to {symbol}")
     
     def unsubscribe_symbol(self, symbol: str):
-        """Desuscribirse de datos de un símbolo"""
+        """Unsubscribe from data for a symbol"""
         self.subscribed_symbols.discard(symbol)
         self.logger.info(f"Unsubscribed from {symbol}")
 
 class StrategyEngine(BaseComponent):
-    """Motor de estrategias"""
+    """Strategy engine"""
     
     def __init__(self, config: SystemConfig, market_data_queue: queue.Queue, 
                  signals_queue: queue.Queue):
@@ -483,7 +485,7 @@ class StrategyEngine(BaseComponent):
         self.strategy_positions = {}
     
     async def start(self):
-        """Iniciar strategy engine"""
+        """Start strategy engine"""
         self.logger.info("Starting Strategy Engine...")
         
         # Load and initialize strategies
@@ -496,18 +498,18 @@ class StrategyEngine(BaseComponent):
         self.logger.info("Strategy Engine started")
     
     async def stop(self):
-        """Detener strategy engine"""
+        """Stop strategy engine"""
         self.logger.info("Stopping Strategy Engine...")
         self.running = False
         self.logger.info("Strategy Engine stopped")
     
     async def process(self):
-        """Procesar estrategias"""
+        """Process strategies"""
         # This is handled by the strategy processing loop
         pass
     
     async def _load_strategies(self):
-        """Cargar estrategias configuradas"""
+        """Load configured strategies"""
         for strategy_name in self.config.active_strategies:
             try:
                 strategy = self._create_strategy(strategy_name)
@@ -518,7 +520,7 @@ class StrategyEngine(BaseComponent):
                 self.logger.error(f"Error loading strategy {strategy_name}: {e}")
     
     def _create_strategy(self, strategy_name: str):
-        """Crear instancia de estrategia"""
+        """Create strategy instance"""
         # Factory method to create strategies
         if strategy_name == "gap_and_go":
             from src.strategies.gap_and_go import GapAndGoStrategy
@@ -530,7 +532,7 @@ class StrategyEngine(BaseComponent):
             raise ValueError(f"Unknown strategy: {strategy_name}")
     
     async def _strategy_processing_loop(self):
-        """Loop de procesamiento de estrategias"""
+        """Strategy processing loop"""
         while self.running:
             try:
                 # Get market data
@@ -563,7 +565,7 @@ class StrategyEngine(BaseComponent):
                 await asyncio.sleep(1)
 
 class RiskManager(BaseComponent):
-    """Gestor de riesgo"""
+    """Risk manager"""
     
     def __init__(self, config: SystemConfig, signals_queue: queue.Queue,
                  orders_queue: queue.Queue, alerts_queue: queue.Queue):
@@ -576,7 +578,7 @@ class RiskManager(BaseComponent):
         self.account_equity = config.account_size
     
     async def start(self):
-        """Iniciar risk manager"""
+        """Start risk manager"""
         self.logger.info("Starting Risk Manager...")
         
         # Start risk processing loop
@@ -586,18 +588,18 @@ class RiskManager(BaseComponent):
         self.logger.info("Risk Manager started")
     
     async def stop(self):
-        """Detener risk manager"""
+        """Stop risk manager"""
         self.logger.info("Stopping Risk Manager...")
         self.running = False
         self.logger.info("Risk Manager stopped")
     
     async def process(self):
-        """Procesar gestión de riesgo"""
+        """Process risk management"""
         # This is handled by the risk processing loop
         pass
     
     async def _risk_processing_loop(self):
-        """Loop de procesamiento de riesgo"""
+        """Risk processing loop"""
         while self.running:
             try:
                 # Get trade signals
@@ -628,7 +630,7 @@ class RiskManager(BaseComponent):
                 await asyncio.sleep(1)
     
     async def _validate_signal(self, signal: Dict) -> bool:
-        """Validar señal contra reglas de riesgo"""
+        """Validate signal against risk rules"""
         
         # Check daily loss limit
         daily_loss_pct = self.daily_pnl / self.account_equity
@@ -650,7 +652,7 @@ class RiskManager(BaseComponent):
         return True
     
     async def _create_order_from_signal(self, signal: Dict) -> Optional[Dict]:
-        """Crear orden desde señal"""
+        """Create order from signal"""
         
         return {
             'symbol': signal['symbol'],
@@ -664,7 +666,7 @@ class RiskManager(BaseComponent):
         }
     
     async def _send_risk_alert(self, message: str, data: Dict):
-        """Enviar alerta de riesgo"""
+        """Send risk alert"""
         alert = {
             'type': 'risk_alert',
             'message': message,
@@ -678,7 +680,7 @@ class RiskManager(BaseComponent):
             self.logger.error("Alerts queue is full")
 
 class ExecutionEngine(BaseComponent):
-    """Motor de ejecución de órdenes"""
+    """Order execution engine"""
     
     def __init__(self, config: SystemConfig, orders_queue: queue.Queue):
         super().__init__(config, "ExecutionEngine")
@@ -687,7 +689,7 @@ class ExecutionEngine(BaseComponent):
         self.order_history = []
     
     async def start(self):
-        """Iniciar execution engine"""
+        """Start execution engine"""
         self.logger.info("Starting Execution Engine...")
         
         # Initialize brokers
@@ -700,7 +702,7 @@ class ExecutionEngine(BaseComponent):
         self.logger.info("Execution Engine started")
     
     async def stop(self):
-        """Detener execution engine"""
+        """Stop execution engine"""
         self.logger.info("Stopping Execution Engine...")
         self.running = False
         
@@ -711,12 +713,12 @@ class ExecutionEngine(BaseComponent):
         self.logger.info("Execution Engine stopped")
     
     async def process(self):
-        """Procesar ejecución de órdenes"""
+        """Process order execution"""
         # This is handled by the order processing loop
         pass
     
     async def _initialize_brokers(self):
-        """Inicializar conexiones a brokers"""
+        """Initialize broker connections"""
         # Initialize primary broker
         primary_broker = self._create_broker(self.config.primary_broker)
         await primary_broker.connect()
@@ -729,7 +731,7 @@ class ExecutionEngine(BaseComponent):
             self.brokers['backup'] = backup_broker
     
     def _create_broker(self, broker_name: str):
-        """Crear conexión a broker"""
+        """Create broker connection"""
         if broker_name == "ibkr":
             from src.execution.ibkr_broker import IBKRBroker
             return IBKRBroker()
@@ -740,7 +742,7 @@ class ExecutionEngine(BaseComponent):
             raise ValueError(f"Unknown broker: {broker_name}")
     
     async def _order_processing_loop(self):
-        """Loop de procesamiento de órdenes"""
+        """Order processing loop"""
         while self.running:
             try:
                 # Get orders
@@ -768,7 +770,7 @@ class ExecutionEngine(BaseComponent):
                 await asyncio.sleep(1)
     
     async def _execute_order(self, order: Dict) -> Dict:
-        """Ejecutar orden"""
+        """Execute order"""
         try:
             # Try primary broker first
             primary_broker = self.brokers.get('primary')
@@ -789,11 +791,11 @@ class ExecutionEngine(BaseComponent):
             self.logger.error(f"Error executing order: {e}")
             return {'success': False, 'error': str(e)}
 
-# Demo de la arquitectura
+# Architecture demo
 async def demo_trading_system():
-    """Demo del sistema de trading"""
+    """Trading system demo"""
     
-    # Configuración
+    # Configuration
     config = SystemConfig(
         account_size=100000,
         max_positions=3,
@@ -803,29 +805,29 @@ async def demo_trading_system():
         primary_data_provider='polygon'
     )
     
-    # Crear sistema
+    # Create system
     trading_system = TradingSystemCore(config)
     
     try:
-        # Iniciar sistema
+        # Start system
         await trading_system.start_system()
         
-        # Ejecutar por 30 segundos para demo
+        # Run for 30 seconds for demo
         await asyncio.sleep(30)
         
-        # Obtener estado de salud
+        # Get health status
         health = await trading_system._get_system_health()
         print(f"System health: {health}")
         
     finally:
-        # Detener sistema
+        # Stop system
         await trading_system.stop_system()
 
 if __name__ == "__main__":
     asyncio.run(demo_trading_system())
 ```
 
-## Deployment y Infraestructura
+## Deployment and Infrastructure
 
 ### Docker Configuration
 ```dockerfile
@@ -1072,14 +1074,14 @@ spec:
       storage: 50Gi
 ```
 
-### Monitoring y Observabilidad
+### Monitoring and Observability
 ```python
 # monitoring/metrics.py
 from prometheus_client import Counter, Histogram, Gauge, start_http_server
 import time
 from functools import wraps
 
-# Métricas de Prometheus
+# Prometheus metrics
 TRADES_TOTAL = Counter('trading_trades_total', 'Total number of trades', ['strategy', 'side', 'status'])
 TRADE_DURATION = Histogram('trading_trade_duration_seconds', 'Trade duration in seconds')
 ACCOUNT_EQUITY = Gauge('trading_account_equity_dollars', 'Current account equity in dollars')
@@ -1088,42 +1090,42 @@ DAILY_PNL = Gauge('trading_daily_pnl_dollars', 'Daily P&L in dollars')
 SYSTEM_ERRORS = Counter('trading_system_errors_total', 'Total system errors', ['component', 'error_type'])
 
 class TradingMetrics:
-    """Sistema de métricas para trading"""
+    """Trading metrics system"""
     
     def __init__(self, port=8000):
         self.port = port
         
     def start_metrics_server(self):
-        """Iniciar servidor de métricas"""
+        """Start metrics server"""
         start_http_server(self.port)
         print(f"Metrics server started on port {self.port}")
     
     def record_trade(self, strategy: str, side: str, status: str):
-        """Registrar trade"""
+        """Record trade"""
         TRADES_TOTAL.labels(strategy=strategy, side=side, status=status).inc()
     
     def record_trade_duration(self, duration: float):
-        """Registrar duración de trade"""
+        """Record trade duration"""
         TRADE_DURATION.observe(duration)
     
     def update_account_equity(self, equity: float):
-        """Actualizar equity de cuenta"""
+        """Update account equity"""
         ACCOUNT_EQUITY.set(equity)
     
     def update_positions_count(self, count: int):
-        """Actualizar conteo de posiciones"""
+        """Update positions count"""
         POSITIONS_COUNT.set(count)
     
     def update_daily_pnl(self, pnl: float):
-        """Actualizar P&L diario"""
+        """Update daily P&L"""
         DAILY_PNL.set(pnl)
     
     def record_system_error(self, component: str, error_type: str):
-        """Registrar error de sistema"""
+        """Record system error"""
         SYSTEM_ERRORS.labels(component=component, error_type=error_type).inc()
 
 def measure_time(metric_name):
-    """Decorator para medir tiempo de ejecución"""
+    """Decorator to measure execution time"""
     def decorator(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
@@ -1137,7 +1139,7 @@ def measure_time(metric_name):
         return wrapper
     return decorator
 
-# Configuración de Grafana Dashboard
+# Grafana Dashboard configuration
 GRAFANA_DASHBOARD = {
     "dashboard": {
         "title": "Trading System Dashboard",
@@ -1197,4 +1199,4 @@ GRAFANA_DASHBOARD = {
 }
 ```
 
-Esta arquitectura proporciona un sistema de trading robusto, escalable y observable, con capacidades de deployment tanto en contenedores como en Kubernetes, junto con monitoreo completo de métricas y salud del sistema.
+This architecture provides a robust, scalable, and observable trading system, with deployment capabilities in both containers and Kubernetes, along with comprehensive metrics and system health monitoring.

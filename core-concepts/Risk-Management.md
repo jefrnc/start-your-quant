@@ -1,43 +1,45 @@
-# Gestión de Riesgo Sistemática
+> 🇪🇸 [Leer en Español](Risk-Management.es.md) | 🇺🇸 **English**
 
-## Filosofía: Risk-First Design
+# Systematic Risk Management
 
-En el trading cuantitativo, **la gestión de riesgo no es un add-on, es el fundamento**. Cada decisión de trading debe empezar con la pregunta: "¿Cuánto puedo permitirme perder en esta operación?"
+## Philosophy: Risk-First Design
 
-### Principios Fundamentales
+In quantitative trading, **risk management is not an add-on, it's the foundation**. Every trading decision must start with the question: "How much can I afford to lose on this trade?"
+
+### Fundamental Principles
 
 1. **Capital Preservation > Profit Maximization**
-2. **Riesgo Predefinido**: Nunca entrar sin saber el exit
-3. **Position Sizing Matemático**: Basado en probabilidades, no intuición
-4. **Diversificación Temporal**: No todo el capital al mismo tiempo
-5. **Circuit Breakers**: Límites automáticos para prevenir catástrofes
+2. **Predefined Risk**: Never enter without knowing the exit
+3. **Mathematical Position Sizing**: Based on probabilities, not intuition
+4. **Temporal Diversification**: Not all capital at the same time
+5. **Circuit Breakers**: Automatic limits to prevent catastrophes
 
-## Framework de Riesgo para Small Caps
+## Risk Framework for Small Caps
 
-### Parámetros Base del Sistema
+### System Base Parameters
 
 ```yaml
 risk_parameters:
-  # Riesgo por Trade
-  max_risk_per_trade: 10.0        # $10 máximo por operación
-  max_position_size: 70.0         # $70 máximo por posición
+  # Risk per Trade
+  max_risk_per_trade: 10.0        # $10 maximum per trade
+  max_position_size: 70.0         # $70 maximum per position
 
-  # Riesgo Diario/Semanal
-  max_daily_loss: 50.0            # $50 pérdida máxima diaria
-  max_weekly_loss: 150.0          # $150 pérdida máxima semanal
+  # Daily/Weekly Risk
+  max_daily_loss: 50.0            # $50 maximum daily loss
+  max_weekly_loss: 150.0          # $150 maximum weekly loss
 
   # Drawdown Limits
-  max_account_drawdown: 0.15      # 15% drawdown máximo
+  max_account_drawdown: 0.15      # 15% maximum drawdown
   emergency_stop_drawdown: 0.25   # 25% emergency stop
 
-  # Concentración
-  max_positions_concurrent: 3     # Máximo 3 posiciones simultáneas
-  max_exposure_per_symbol: 0.05   # 5% del capital por símbolo
+  # Concentration
+  max_positions_concurrent: 3     # Maximum 3 simultaneous positions
+  max_exposure_per_symbol: 0.05   # 5% of capital per symbol
 ```
 
-## Position Sizing Metodologías
+## Position Sizing Methodologies
 
-### 1. **Fixed Dollar Risk (Nuestro Método Principal)**
+### 1. **Fixed Dollar Risk (Our Primary Method)**
 
 ```python
 def calculate_position_size_fixed_risk(
@@ -46,9 +48,9 @@ def calculate_position_size_fixed_risk(
     max_risk_dollars: float = 10.0
 ) -> int:
     """
-    Calcula shares basado en riesgo fijo en dólares
+    Calculates shares based on fixed dollar risk
 
-    Ejemplo:
+    Example:
     - Entry: $5.00
     - Stop: $4.75
     - Risk: $10
@@ -57,11 +59,11 @@ def calculate_position_size_fixed_risk(
     risk_per_share = abs(entry_price - stop_loss_price)
 
     if risk_per_share <= 0:
-        raise ValueError("Stop loss debe ser diferente al precio de entrada")
+        raise ValueError("Stop loss must be different from entry price")
 
     shares = int(max_risk_dollars / risk_per_share)
 
-    # Verificar límite de posición máxima
+    # Check maximum position limit
     max_shares_by_position = int(70.0 / entry_price)
 
     return min(shares, max_shares_by_position)
@@ -74,11 +76,11 @@ def calculate_position_size_percentage(
     account_balance: float,
     entry_price: float,
     stop_loss_price: float,
-    risk_percentage: float = 0.01  # 1% del account
+    risk_percentage: float = 0.01  # 1% of account
 ) -> int:
     """
-    Position sizing basado en % del account
-    Útil para accounts más grandes
+    Position sizing based on % of account
+    Useful for larger accounts
     """
     max_risk_dollars = account_balance * risk_percentage
     return calculate_position_size_fixed_risk(
@@ -96,7 +98,7 @@ def calculate_position_size_atr(
     max_risk_dollars: float = 10.0
 ) -> int:
     """
-    Position sizing basado en volatilidad (ATR)
+    Position sizing based on volatility (ATR)
     Stop loss = entry_price - (ATR * multiplier)
     """
     stop_loss_price = entry_price - (atr * atr_multiplier)
@@ -110,41 +112,41 @@ def calculate_position_size_atr(
 
 ### 1. **Fixed Percentage Stop**
 ```python
-# Ejemplo: 5% stop loss
-stop_price = entry_price * 0.95  # Para long positions
+# Example: 5% stop loss
+stop_price = entry_price * 0.95  # For long positions
 ```
-**Pros**: Simple, predecible
-**Cons**: No considera volatilidad del instrumento
+**Pros**: Simple, predictable
+**Cons**: Doesn't consider instrument volatility
 
 ### 2. **ATR-Based Stop**
 ```python
-# Ejemplo: 2x ATR stop
+# Example: 2x ATR stop
 stop_price = entry_price - (atr * 2.0)
 ```
-**Pros**: Se adapta a volatilidad
-**Cons**: Puede ser demasiado amplio en small caps
+**Pros**: Adapts to volatility
+**Cons**: Can be too wide in small caps
 
 ### 3. **Technical Level Stop**
 ```python
-# Stop bajo soporte técnico
+# Stop below technical support
 support_level = identify_support_level(price_data)
 stop_price = support_level * 0.99  # 1% buffer
 ```
-**Pros**: Lógica de mercado
-**Cons**: Subjetivo, puede cambiar
+**Pros**: Market logic
+**Cons**: Subjective, can change
 
 ### 4. **Time-Based Stop**
 ```python
-# Exit después de X minutos sin movimiento favorable
+# Exit after X minutes without favorable movement
 if minutes_since_entry > 30 and pnl < 0:
     exit_position()
 ```
-**Pros**: Evita holds largos
-**Cons**: Puede salir prematuramente
+**Pros**: Avoids long holds
+**Cons**: May exit prematurely
 
-## Diversificación y Correlación
+## Diversification and Correlation
 
-### Análisis de Correlación entre Posiciones
+### Correlation Analysis Between Positions
 
 ```python
 import pandas as pd
@@ -152,7 +154,7 @@ import numpy as np
 
 def calculate_portfolio_correlation(positions: dict) -> pd.DataFrame:
     """
-    Calcula correlación entre posiciones actuales
+    Calculates correlation between current positions
 
     Args:
         positions: {symbol: quantity} dict
@@ -162,7 +164,7 @@ def calculate_portfolio_correlation(positions: dict) -> pd.DataFrame:
     """
     symbols = list(positions.keys())
 
-    # Obtener returns históricos
+    # Get historical returns
     returns_data = {}
     for symbol in symbols:
         returns_data[symbol] = get_historical_returns(symbol, days=30)
@@ -174,11 +176,11 @@ def calculate_portfolio_correlation(positions: dict) -> pd.DataFrame:
 
 def check_correlation_risk(positions: dict, max_correlation: float = 0.7):
     """
-    Verifica si las posiciones están muy correlacionadas
+    Checks if positions are too correlated
     """
     corr_matrix = calculate_portfolio_correlation(positions)
 
-    # Buscar correlaciones altas
+    # Find high correlations
     high_corr_pairs = []
     for i in range(len(corr_matrix.columns)):
         for j in range(i+1, len(corr_matrix.columns)):
@@ -193,23 +195,23 @@ def check_correlation_risk(positions: dict, max_correlation: float = 0.7):
     return high_corr_pairs
 ```
 
-### Reglas de Diversificación
+### Diversification Rules
 
-1. **Sector Limits**: Máximo 50% del capital en un sector
-2. **Market Cap Limits**: No más de 3 micro caps simultáneamente
-3. **Geographic Limits**: Para international trading
-4. **Time Diversification**: Escalonar entradas en el tiempo
+1. **Sector Limits**: Maximum 50% of capital in one sector
+2. **Market Cap Limits**: No more than 3 micro caps simultaneously
+3. **Geographic Limits**: For international trading
+4. **Time Diversification**: Stagger entries over time
 
 ## Drawdown Management
 
-### Tipos de Drawdown
+### Types of Drawdown
 
-1. **Account Drawdown**: Pérdida desde equity peak
-2. **Strategy Drawdown**: Pérdida de una estrategia específica
-3. **Daily Drawdown**: Pérdida intradiaria
-4. **Monthly Drawdown**: Pérdida mensual
+1. **Account Drawdown**: Loss from equity peak
+2. **Strategy Drawdown**: Loss from a specific strategy
+3. **Daily Drawdown**: Intraday loss
+4. **Monthly Drawdown**: Monthly loss
 
-### Sistema de Alertas por Drawdown
+### Drawdown Alert System
 
 ```python
 class DrawdownMonitor:
@@ -218,7 +220,7 @@ class DrawdownMonitor:
         self.peak_balance = initial_balance
         self.current_balance = initial_balance
 
-        # Límites de alerta
+        # Alert limits
         self.warning_drawdown = 0.10    # 10% warning
         self.danger_drawdown = 0.15     # 15% reduce size
         self.emergency_drawdown = 0.25  # 25% stop trading
@@ -226,14 +228,14 @@ class DrawdownMonitor:
     def update_balance(self, new_balance: float):
         self.current_balance = new_balance
 
-        # Actualizar peak si corresponde
+        # Update peak if applicable
         if new_balance > self.peak_balance:
             self.peak_balance = new_balance
 
-        # Calcular drawdown actual
+        # Calculate current drawdown
         current_drawdown = (self.peak_balance - new_balance) / self.peak_balance
 
-        # Generar alertas
+        # Generate alerts
         if current_drawdown >= self.emergency_drawdown:
             return "EMERGENCY_STOP"
         elif current_drawdown >= self.danger_drawdown:
@@ -256,45 +258,45 @@ class DrawdownMonitor:
 
 ## Position Recycling Risk Management
 
-### Gestión de Riesgo en Múltiples Entradas
+### Risk Management for Multiple Entries
 
-Nuestro enfoque de "position recycling" requiere gestión de riesgo especial:
+Our "position recycling" approach requires special risk management:
 
 ```python
 class PositionRecyclingRisk:
     def __init__(self, symbol: str, max_total_risk: float = 15.0):
         self.symbol = symbol
         self.max_total_risk = max_total_risk
-        self.positions = []  # Lista de {quantity, entry_price, timestamp}
+        self.positions = []  # List of {quantity, entry_price, timestamp}
         self.total_quantity = 0
         self.weighted_avg_price = 0.0
 
     def can_add_position(self, new_quantity: int, new_price: float) -> bool:
         """
-        Verifica si podemos añadir una nueva posición sin exceder riesgo
+        Checks if we can add a new position without exceeding risk
         """
-        # Calcular nueva posición total
+        # Calculate new total position
         new_total_quantity = self.total_quantity + new_quantity
         new_total_value = (self.weighted_avg_price * self.total_quantity +
                           new_price * new_quantity)
         new_avg_price = new_total_value / new_total_quantity
 
-        # Calcular riesgo con stop loss a 5%
+        # Calculate risk with 5% stop loss
         potential_loss = new_total_quantity * new_avg_price * 0.05
 
         return potential_loss <= self.max_total_risk
 
     def add_position(self, quantity: int, price: float):
-        """Añade nueva posición y actualiza métricas"""
+        """Adds new position and updates metrics"""
         if not self.can_add_position(quantity, price):
-            raise ValueError("Excede límite de riesgo total")
+            raise ValueError("Exceeds total risk limit")
 
-        # Actualizar weighted average
+        # Update weighted average
         total_value = self.weighted_avg_price * self.total_quantity + price * quantity
         self.total_quantity += quantity
         self.weighted_avg_price = total_value / self.total_quantity
 
-        # Registrar posición
+        # Record position
         self.positions.append({
             'quantity': quantity,
             'price': price,
@@ -302,9 +304,9 @@ class PositionRecyclingRisk:
         })
 ```
 
-## Risk Metrics y Monitoring
+## Risk Metrics and Monitoring
 
-### Métricas Clave a Trackear
+### Key Metrics to Track
 
 1. **Risk-Adjusted Returns**
    - Sharpe Ratio
@@ -321,14 +323,14 @@ class PositionRecyclingRisk:
    - Sector Concentration
    - Time Concentration
 
-### Dashboard de Risk Monitoring
+### Risk Monitoring Dashboard
 
 ```python
 def generate_risk_report(trades_df: pd.DataFrame) -> dict:
     """
-    Genera reporte completo de riesgo
+    Generates a complete risk report
     """
-    # Calcular equity curve
+    # Calculate equity curve
     trades_df['cumulative_pnl'] = trades_df['pnl'].cumsum()
 
     # Drawdown analysis
@@ -352,25 +354,25 @@ def generate_risk_report(trades_df: pd.DataFrame) -> dict:
     }
 ```
 
-## Escenarios de Crisis y Contingencias
+## Crisis Scenarios and Contingencies
 
-### Plan de Contingencia por Escenario
+### Contingency Plan by Scenario
 
 #### 1. **Market Flash Crash**
 ```python
-# Auto-liquidar todas las posiciones si:
-if market_drop_5min > 0.05:  # 5% drop en 5 minutos
+# Auto-liquidate all positions if:
+if market_drop_5min > 0.05:  # 5% drop in 5 minutes
     liquidate_all_positions()
     suspend_new_entries(hours=2)
 ```
 
 #### 2. **Individual Stock Halt**
 ```python
-# Si una posición es suspendida:
+# If a position is halted:
 if stock_halted:
-    # No panic - es normal en small caps
-    # Revisar razón del halt
-    # Preparar exit plan cuando reanude
+    # Don't panic - it's normal in small caps
+    # Review halt reason
+    # Prepare exit plan for when it resumes
     monitor_halt_reason()
 ```
 
@@ -395,68 +397,68 @@ if account_equity < stop_loss_level:
     emergency_stop_protocol()
 ```
 
-## Psicología del Risk Management
+## Psychology of Risk Management
 
 ### Common Risk Management Mistakes
 
 1. **"Just this once" mentality**
-   - Exceder position size "porque es muy buena oportunidad"
-   - Solution: Automatización, sin overrides manuales
+   - Exceeding position size "because it's a great opportunity"
+   - Solution: Automation, no manual overrides
 
 2. **Revenge trading**
-   - Aumentar size después de pérdidas para "recuperar"
-   - Solution: Circuit breakers automáticos
+   - Increasing size after losses to "recover"
+   - Solution: Automatic circuit breakers
 
 3. **Fear of missing out (FOMO)**
-   - Entrar sin stop loss definido
-   - Solution: No entry sin exit plan
+   - Entering without a defined stop loss
+   - Solution: No entry without an exit plan
 
 4. **Overconfidence after wins**
-   - Relajar risk management después de streak ganador
-   - Solution: Risk parameters constantes
+   - Relaxing risk management after a winning streak
+   - Solution: Constant risk parameters
 
-### Mental Framework para Risk Management
+### Mental Framework for Risk Management
 
 ```
-Antes de cada trade, preguntarse:
+Before every trade, ask yourself:
 
-1. ¿Cuál es mi máxima pérdida aceptable?
-2. ¿Dónde está mi stop loss?
-3. ¿Cómo afecta esta posición a mi risk total?
-4. ¿Qué hago si el trade va contra mí?
-5. ¿Estoy emocionalmente preparado para la pérdida?
+1. What is my maximum acceptable loss?
+2. Where is my stop loss?
+3. How does this position affect my total risk?
+4. What do I do if the trade goes against me?
+5. Am I emotionally prepared for the loss?
 
-Si no puedes responder todas estas preguntas claramente,
-NO HAGAS EL TRADE.
+If you can't answer all of these questions clearly,
+DON'T TAKE THE TRADE.
 ```
 
-## Implementación Práctica
+## Practical Implementation
 
-### Checklist Pre-Trade
-- [ ] Position size calculado según riesgo fijo
-- [ ] Stop loss definido y programado
-- [ ] Verificar correlación con posiciones existentes
-- [ ] Confirmar que no excede límites diarios/semanales
-- [ ] Drawdown actual dentro de parámetros
-- [ ] Plan de exit (tanto ganancia como pérdida)
+### Pre-Trade Checklist
+- [ ] Position size calculated based on fixed risk
+- [ ] Stop loss defined and programmed
+- [ ] Verify correlation with existing positions
+- [ ] Confirm it doesn't exceed daily/weekly limits
+- [ ] Current drawdown within parameters
+- [ ] Exit plan (both profit and loss)
 
-### Monitoreo Intradiario
-- [ ] P&L actual vs límites diarios
-- [ ] Posiciones cerca de stop loss
-- [ ] Nuevas noticias que afecten posiciones
-- [ ] Correlaciones inesperadas entre posiciones
+### Intraday Monitoring
+- [ ] Current P&L vs daily limits
+- [ ] Positions near stop loss
+- [ ] New news affecting positions
+- [ ] Unexpected correlations between positions
 
-### Review Diario
-- [ ] Análisis de todos los trades del día
-- [ ] Actualización de métricas de riesgo
-- [ ] Verificación de que no se violaron reglas
-- [ ] Planning para siguiente día
+### Daily Review
+- [ ] Analysis of all day's trades
+- [ ] Update risk metrics
+- [ ] Verify no rules were violated
+- [ ] Planning for the next day
 
 ---
 
-**Remember**: En trading, no es cuánto ganas lo que importa, sino cuánto no pierdes. Un trader que preserve capital consistentemente siempre tendrá otra oportunidad de ganar.
+**Remember**: In trading, it's not how much you earn that matters, but how much you don't lose. A trader who consistently preserves capital will always have another opportunity to profit.
 
 **Next Steps**:
-- Leer [Performance Metrics](./Performance-Metrics.md) para métricas de evaluación
-- Implementar [Position Sizing Calculator](../scripts/strategy-metrics/position-sizing/)
-- Estudiar [Backtesting](../technical-practices/Backtesting.md) para validar risk management
+- Read [Performance Metrics](./Performance-Metrics.md) for evaluation metrics
+- Implement [Position Sizing Calculator](../scripts/strategy-metrics/position-sizing/)
+- Study [Backtesting](../technical-practices/Backtesting.md) to validate risk management

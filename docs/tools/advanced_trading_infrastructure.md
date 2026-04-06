@@ -1,6 +1,8 @@
-# Infraestructura Avanzada de Trading
+> 🇪🇸 [Leer en Español](advanced_trading_infrastructure.es.md) | 🇺🇸 **English**
 
-## Stack Tecnológico Completo
+# Advanced Trading Infrastructure
+
+## Complete Technology Stack
 
 ### Hardware Requirements
 ```python
@@ -83,9 +85,9 @@ class TradingTechStack:
         return base_stack
 ```
 
-## Pipeline de Datos en Tiempo Real
+## Real-Time Data Pipeline
 
-### Arquitectura de Datos
+### Data Architecture
 ```python
 class RealTimeDataPipeline:
     def __init__(self):
@@ -95,7 +97,7 @@ class RealTimeDataPipeline:
         self.alert_systems = {}
     
     def setup_data_sources(self):
-        """Configurar fuentes de datos"""
+        """Configure data sources"""
         # Polygon.io WebSocket
         self.data_sources['polygon'] = {
             'type': 'websocket',
@@ -126,44 +128,44 @@ class RealTimeDataPipeline:
         }
     
     def setup_processing_pipeline(self):
-        """Pipeline de procesamiento"""
+        """Processing pipeline"""
         stages = [
             {
                 'stage': 'ingestion',
                 'function': self.ingest_raw_data,
-                'description': 'Recibir y normalizar data cruda'
+                'description': 'Receive and normalize raw data'
             },
             {
                 'stage': 'validation',
                 'function': self.validate_data_quality,
-                'description': 'Verificar calidad y consistencia'
+                'description': 'Verify quality and consistency'
             },
             {
                 'stage': 'enrichment',
                 'function': self.enrich_with_indicators,
-                'description': 'Agregar indicadores técnicos'
+                'description': 'Add technical indicators'
             },
             {
                 'stage': 'screening',
                 'function': self.apply_screening_filters,
-                'description': 'Aplicar filtros de estrategias'
+                'description': 'Apply strategy filters'
             },
             {
                 'stage': 'alerting',
                 'function': self.generate_alerts,
-                'description': 'Generar alertas y señales'
+                'description': 'Generate alerts and signals'
             },
             {
                 'stage': 'storage',
                 'function': self.store_processed_data,
-                'description': 'Almacenar para análisis histórico'
+                'description': 'Store for historical analysis'
             }
         ]
         
         self.processing_pipeline = stages
     
     def ingest_raw_data(self, data_stream):
-        """Ingesta de datos en tiempo real"""
+        """Real-time data ingestion"""
         normalized_data = {
             'timestamp': pd.Timestamp.now(),
             'symbol': data_stream['symbol'],
@@ -177,8 +179,8 @@ class RealTimeDataPipeline:
         return normalized_data
     
     def enrich_with_indicators(self, market_data):
-        """Enriquecer con indicadores en tiempo real"""
-        # Mantener rolling window de datos
+        """Enrich with real-time indicators"""
+        # Maintain rolling window of data
         symbol = market_data['symbol']
         
         if symbol not in self.rolling_data:
@@ -186,7 +188,7 @@ class RealTimeDataPipeline:
         
         self.rolling_data[symbol].append(market_data)
         
-        # Calcular indicadores
+        # Calculate indicators
         df = pd.DataFrame(list(self.rolling_data[symbol]))
         
         if len(df) >= 20:
@@ -217,7 +219,7 @@ class RealTimeDataPipeline:
         return market_data
 ```
 
-### Sistema de Screening en Tiempo Real
+### Real-Time Screening System
 ```python
 class RealTimeScreener:
     def __init__(self):
@@ -226,7 +228,7 @@ class RealTimeScreener:
         self.screening_universe = set()
         
     def register_strategy(self, strategy_name, screening_function):
-        """Registrar estrategia de screening"""
+        """Register screening strategy"""
         self.strategies[strategy_name] = {
             'function': screening_function,
             'last_scan': None,
@@ -235,15 +237,15 @@ class RealTimeScreener:
         }
     
     def screen_market_data(self, market_data):
-        """Aplicar screening a market data en tiempo real"""
+        """Apply screening to real-time market data"""
         symbol = market_data['symbol']
         alerts = []
         
-        # Solo screenear si el símbolo está en nuestro universo
+        # Only screen if the symbol is in our universe
         if symbol not in self.screening_universe:
             return alerts
         
-        # Aplicar cada estrategia
+        # Apply each strategy
         for strategy_name, strategy_info in self.strategies.items():
             try:
                 # Check rate limiting
@@ -275,27 +277,27 @@ class RealTimeScreener:
         
         return alerts
 
-# Ejemplo de función de screening para Gap & Go
+# Example screening function for Gap & Go
 def gap_and_go_screener(market_data):
-    """Screening para Gap & Go en tiempo real"""
-    # Verificar si hay gap significativo
+    """Real-time Gap & Go screening"""
+    # Check if there is a significant gap
     if 'prev_close' not in market_data:
         return None
     
     gap_pct = (market_data['price'] - market_data['prev_close']) / market_data['prev_close']
     
-    # Criterios básicos
-    if gap_pct < 0.10:  # Menos de 10% gap
+    # Basic criteria
+    if gap_pct < 0.10:  # Less than 10% gap
         return None
     
-    if market_data.get('volume_ratio', 1) < 3:  # Menos de 3x volumen
+    if market_data.get('volume_ratio', 1) < 3:  # Less than 3x volume
         return None
     
-    # Verificar si está manteniendo el gap
+    # Check if it is holding the gap
     if market_data['price'] < market_data.get('vwap', market_data['price']):
         return None
     
-    # Si pasa todos los filtros, generar señal
+    # If it passes all filters, generate signal
     return {
         'signal': True,
         'signal_type': 'gap_and_go_continuation',
@@ -307,7 +309,7 @@ def gap_and_go_screener(market_data):
     }
 ```
 
-## Sistema de Alertas Multi-Canal
+## Multi-Channel Alert System
 
 ### Discord Integration
 ```python
@@ -332,15 +334,15 @@ class TradingAlertsBot:
             if message.author == self.client.user:
                 return
             
-            # Responder a comandos básicos
+            # Respond to basic commands
             if message.content.startswith('!status'):
                 await self.send_system_status(message.channel)
     
     async def send_trading_alert(self, alert_data):
-        """Enviar alerta de trading a Discord"""
+        """Send trading alert to Discord"""
         channel = self.client.get_channel(self.channel_id)
         
-        # Crear embed rico
+        # Create rich embed
         embed = discord.Embed(
             title=f"🚨 {alert_data['strategy'].upper()} ALERT",
             description=alert_data['message'],
@@ -354,7 +356,7 @@ class TradingAlertsBot:
         embed.add_field(name="Target", value=f"${alert_data['target']:.2f}", inline=True)
         embed.add_field(name="Confidence", value=f"{alert_data['confidence']:.1%}", inline=True)
         
-        # Calcular R/R ratio
+        # Calculate R/R ratio
         risk = abs(alert_data['entry_price'] - alert_data['stop_loss'])
         reward = abs(alert_data['target'] - alert_data['entry_price'])
         rr_ratio = reward / risk if risk > 0 else 0
@@ -364,7 +366,7 @@ class TradingAlertsBot:
         await channel.send(embed=embed)
     
     def start(self):
-        """Iniciar bot de alertas"""
+        """Start alerts bot"""
         self.client.run(self.token)
 ```
 
@@ -383,13 +385,13 @@ class EmailAlertSystem:
         self.from_email = smtp_config['from_email']
     
     def send_critical_alert(self, to_emails, alert_data):
-        """Enviar alerta crítica por email"""
+        """Send critical alert via email"""
         msg = MIMEMultipart()
         msg['From'] = self.from_email
         msg['To'] = ', '.join(to_emails)
         msg['Subject'] = f"CRITICAL TRADING ALERT: {alert_data['symbol']}"
         
-        # Crear contenido HTML
+        # Create HTML content
         html_body = f"""
         <html>
         <body>
@@ -410,7 +412,7 @@ class EmailAlertSystem:
         
         msg.attach(MIMEText(html_body, 'html'))
         
-        # Enviar email
+        # Send email
         try:
             server = smtplib.SMTP(self.smtp_server, self.smtp_port)
             server.starttls()
@@ -423,7 +425,7 @@ class EmailAlertSystem:
             return False
 ```
 
-## Monitoreo de Sistema
+## System Monitoring
 
 ### Health Monitoring
 ```python
@@ -440,7 +442,7 @@ class SystemHealthMonitor:
         }
     
     def collect_system_metrics(self):
-        """Recopilar métricas del sistema"""
+        """Collect system metrics"""
         import psutil
         
         self.health_metrics = {
@@ -456,7 +458,7 @@ class SystemHealthMonitor:
         return self.health_metrics
     
     def check_system_health(self):
-        """Verificar salud del sistema"""
+        """Check system health"""
         metrics = self.collect_system_metrics()
         alerts = []
         
@@ -473,7 +475,7 @@ class SystemHealthMonitor:
         return alerts
     
     def test_data_connections(self):
-        """Test conectividad con fuentes de datos"""
+        """Test connectivity with data sources"""
         connection_tests = {}
         
         # Test Polygon.io
@@ -496,12 +498,12 @@ class SystemHealthMonitor:
         return connection_tests
 ```
 
-## Costos y ROI
+## Costs and ROI
 
-### Análisis de Costos
+### Cost Analysis
 ```python
 def calculate_infrastructure_costs():
-    """Calcular costos mensuales de infraestructura"""
+    """Calculate monthly infrastructure costs"""
     
     monthly_costs = {
         'data_feeds': {
@@ -557,11 +559,11 @@ def calculate_infrastructure_costs():
     }
 
 def calculate_breakeven_analysis(infrastructure_costs, trading_capital):
-    """Calcular análisis de break-even"""
+    """Calculate break-even analysis"""
     
     annual_cost = infrastructure_costs['annual_operational']
     
-    # Retornos necesarios para break-even
+    # Returns needed for break-even
     breakeven_scenarios = {
         'conservative': {
             'required_annual_return_pct': annual_cost / trading_capital,
@@ -579,7 +581,7 @@ def calculate_breakeven_analysis(infrastructure_costs, trading_capital):
     return breakeven_scenarios
 ```
 
-## Backup y Disaster Recovery
+## Backup and Disaster Recovery
 
 ```python
 class DisasterRecoveryPlan:
@@ -588,7 +590,7 @@ class DisasterRecoveryPlan:
         self.recovery_procedures = {}
         
     def setup_backup_systems(self):
-        """Configurar sistemas de backup"""
+        """Configure backup systems"""
         self.backup_systems = {
             'data_backup': {
                 'primary': 'AWS S3 with versioning',
@@ -611,7 +613,7 @@ class DisasterRecoveryPlan:
         }
     
     def create_recovery_procedures(self):
-        """Procedimientos de recuperación"""
+        """Recovery procedures"""
         self.recovery_procedures = {
             'internet_outage': {
                 'immediate_actions': [
@@ -643,4 +645,4 @@ class DisasterRecoveryPlan:
         }
 ```
 
-Este sistema de infraestructura avanzada permite trading profesional con alta disponibilidad y monitoreo completo. Los costos son significativos pero justificables para operaciones serias.
+This advanced infrastructure system enables professional trading with high availability and comprehensive monitoring. The costs are significant but justifiable for serious operations.

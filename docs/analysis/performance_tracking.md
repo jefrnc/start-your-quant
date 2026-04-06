@@ -1,6 +1,8 @@
-# Sistema de Tracking de Performance
+> 🇪🇸 [Leer en Español](performance_tracking.es.md) | 🇺🇸 **English**
 
-## Dashboard de Performance en Tiempo Real
+# Performance Tracking System
+
+## Real-Time Performance Dashboard
 
 ### Real-Time Metrics Engine
 ```python
@@ -16,7 +18,7 @@ import streamlit as st
 
 @dataclass
 class PositionMetrics:
-    """Métricas de una posición individual"""
+    """Individual position metrics"""
     symbol: str
     entry_time: datetime
     entry_price: float
@@ -33,7 +35,7 @@ class PositionMetrics:
 
 @dataclass
 class AccountMetrics:
-    """Métricas de cuenta agregadas"""
+    """Aggregated account metrics"""
     timestamp: datetime
     total_equity: float
     cash: float
@@ -50,7 +52,7 @@ class AccountMetrics:
             self.daily_return_pct = (self.total_equity - self.day_start_equity) / self.day_start_equity
 
 class RealTimePerformanceTracker:
-    """Sistema de tracking de performance en tiempo real"""
+    """Real-time performance tracking system"""
     
     def __init__(self, initial_capital: float):
         self.initial_capital = initial_capital
@@ -65,14 +67,14 @@ class RealTimePerformanceTracker:
             'max_positions': 5
         }
         
-        # Métricas de tracking
+        # Metrics de tracking
         self.start_of_day_equity = initial_capital
         self.peak_equity_today = initial_capital
         self.current_drawdown = 0.0
         
     def update_position(self, symbol: str, current_price: float, 
                        market_data: Dict = None):
-        """Actualizar métricas de posición"""
+        """Update position metrics"""
         
         if symbol not in self.positions:
             return
@@ -81,7 +83,7 @@ class RealTimePerformanceTracker:
         position.current_price = current_price
         position.time_in_position = datetime.now() - position.entry_time
         
-        # Calcular P&L
+        # Calculate P&L
         if position.side == 'long':
             position.unrealized_pnl = (current_price - position.entry_price) * position.quantity
         else:  # short
@@ -89,7 +91,7 @@ class RealTimePerformanceTracker:
         
         position.unrealized_pnl_pct = position.unrealized_pnl / (position.entry_price * position.quantity)
         
-        # Actualizar MFE/MAE
+        # Update MFE/MAE
         if position.unrealized_pnl > position.max_favorable_excursion:
             position.max_favorable_excursion = position.unrealized_pnl
         
@@ -100,7 +102,7 @@ class RealTimePerformanceTracker:
     
     def add_position(self, symbol: str, entry_price: float, quantity: int, 
                     side: str, strategy: str = "", risk_amount: float = 0.0):
-        """Agregar nueva posición"""
+        """Add new position"""
         
         position = PositionMetrics(
             symbol=symbol,
@@ -130,14 +132,14 @@ class RealTimePerformanceTracker:
     
     def close_position(self, symbol: str, exit_price: float, 
                       exit_reason: str = ""):
-        """Cerrar posición"""
+        """Close position"""
         
         if symbol not in self.positions:
             return None
         
         position = self.positions[symbol]
         
-        # Calcular P&L final
+        # Calculate P&L final
         if position.side == 'long':
             realized_pnl = (exit_price - position.entry_price) * position.quantity
         else:
@@ -162,14 +164,14 @@ class RealTimePerformanceTracker:
         
         self.trade_history.append(trade_record)
         
-        # Remover posición
+        # Remove position
         del self.positions[symbol]
         
         return trade_record
     
     def calculate_account_metrics(self, current_equity: float, 
                                  cash: float, buying_power: float) -> AccountMetrics:
-        """Calcular métricas de cuenta"""
+        """Calculate account metrics"""
         
         total_unrealized = sum(pos.unrealized_pnl for pos in self.positions.values())
         
@@ -206,7 +208,7 @@ class RealTimePerformanceTracker:
         return metrics
     
     def check_risk_limits(self, current_equity: float) -> List[str]:
-        """Verificar límites de riesgo"""
+        """Check risk limits"""
         
         violations = []
         
@@ -237,11 +239,11 @@ class RealTimePerformanceTracker:
         return violations
     
     def get_strategy_breakdown(self) -> Dict:
-        """Obtener breakdown por estrategia"""
+        """Get breakdown by strategy"""
         
         strategy_metrics = {}
         
-        # P&L por estrategia de posiciones abiertas
+        # P&L by strategy for open positions
         for position in self.positions.values():
             strategy = position.strategy or 'Unknown'
             if strategy not in strategy_metrics:
@@ -255,7 +257,7 @@ class RealTimePerformanceTracker:
             strategy_metrics[strategy]['unrealized_pnl'] += position.unrealized_pnl
             strategy_metrics[strategy]['total_risk'] += position.risk_amount
         
-        # P&L por estrategia de trades cerrados hoy
+        # P&L by strategy for closed trades today
         today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
         today_exits = [t for t in self.trade_history 
                       if t['timestamp'] >= today_start and t['type'] == 'exit']
@@ -281,18 +283,18 @@ class RealTimePerformanceTracker:
         return strategy_metrics
     
     def calculate_performance_metrics(self, lookback_days: int = 30) -> Dict:
-        """Calcular métricas de performance"""
+        """Calculate performance metrics"""
         
         cutoff_date = datetime.now() - timedelta(days=lookback_days)
         
-        # Filtrar trades del período
+        # Filter period trades
         period_trades = [t for t in self.trade_history 
                         if t['timestamp'] >= cutoff_date and t['type'] == 'exit']
         
         if not period_trades:
             return {'error': 'No trades in period'}
         
-        # Calcular métricas básicas
+        # Calculate basic metrics
         total_trades = len(period_trades)
         winning_trades = len([t for t in period_trades if t['realized_pnl'] > 0])
         
@@ -305,7 +307,7 @@ class RealTimePerformanceTracker:
         avg_loss = np.mean(losses) if losses else 0
         profit_factor = abs(avg_win / avg_loss) if avg_loss != 0 else float('inf')
         
-        # Calcular Sharpe ratio (aproximado)
+        # Calculate Sharpe ratio (approximate)
         daily_returns = []
         if self.account_history:
             for i in range(1, len(self.account_history)):
@@ -338,13 +340,13 @@ class RealTimePerformanceTracker:
         }
 
 class PerformanceDashboard:
-    """Dashboard interactivo de performance"""
+    """Interactive performance dashboard"""
     
     def __init__(self, tracker: RealTimePerformanceTracker):
         self.tracker = tracker
         
     def create_equity_curve_chart(self) -> go.Figure:
-        """Crear gráfico de equity curve"""
+        """Create equity curve chart"""
         
         if not self.tracker.account_history:
             return go.Figure()
@@ -389,7 +391,7 @@ class PerformanceDashboard:
         return fig
     
     def create_positions_table(self) -> pd.DataFrame:
-        """Crear tabla de posiciones"""
+        """Create positions table"""
         
         if not self.tracker.positions:
             return pd.DataFrame()
@@ -413,7 +415,7 @@ class PerformanceDashboard:
         return pd.DataFrame(positions_data)
     
     def create_pnl_distribution_chart(self) -> go.Figure:
-        """Crear gráfico de distribución de P&L"""
+        """Create P&L distribution chart"""
         
         today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
         today_trades = [t for t in self.tracker.trade_history 
@@ -453,7 +455,7 @@ class PerformanceDashboard:
         return fig
     
     def create_strategy_performance_chart(self) -> go.Figure:
-        """Crear gráfico de performance por estrategia"""
+        """Create performance by strategy chart"""
         
         strategy_breakdown = self.tracker.get_strategy_breakdown()
         
@@ -492,7 +494,7 @@ class PerformanceDashboard:
         return fig
     
     def create_risk_metrics_display(self) -> Dict:
-        """Crear display de métricas de riesgo"""
+        """Create risk metrics display"""
         
         current_equity = self.tracker.account_history[-1].total_equity if self.tracker.account_history else self.tracker.initial_capital
         
@@ -527,7 +529,7 @@ class PerformanceDashboard:
 
 # Streamlit Dashboard Implementation
 def create_streamlit_dashboard():
-    """Crear dashboard con Streamlit"""
+    """Create dashboard with Streamlit"""
     
     st.set_page_config(
         page_title="Trading Performance Dashboard",
@@ -671,7 +673,7 @@ def create_streamlit_dashboard():
 
 # Demo function
 def demo_performance_tracking():
-    """Demo del sistema de tracking"""
+    """Tracking system demo"""
     
     # Create tracker
     tracker = RealTimePerformanceTracker(100000)
@@ -712,9 +714,9 @@ if __name__ == "__main__":
     demo_performance_tracking()
 ```
 
-## Alertas y Notificaciones
+## Alerts y Notificaciones
 
-### Sistema de Alertas Multi-Canal
+### Multi-Channel Alert System
 ```python
 import smtplib
 import requests
@@ -725,14 +727,14 @@ from typing import List, Dict, Optional
 from enum import Enum
 
 class AlertSeverity(Enum):
-    """Niveles de severidad de alertas"""
+    """Alert severity levels"""
     INFO = "info"
     WARNING = "warning"
     CRITICAL = "critical"
     EMERGENCY = "emergency"
 
 class AlertChannel(Enum):
-    """Canales de alerta disponibles"""
+    """Available alert channels"""
     EMAIL = "email"
     TELEGRAM = "telegram"
     DISCORD = "discord"
@@ -741,7 +743,7 @@ class AlertChannel(Enum):
 
 @dataclass
 class Alert:
-    """Estructura de alerta"""
+    """Alert structure"""
     title: str
     message: str
     severity: AlertSeverity
@@ -750,7 +752,7 @@ class Alert:
     channels: List[AlertChannel] = field(default_factory=list)
 
 class AlertManager:
-    """Gestor de alertas multi-canal"""
+    """Multi-channel alert manager"""
     
     def __init__(self, config: Dict):
         self.config = config
@@ -774,7 +776,7 @@ class AlertManager:
         self.last_alert_time = {}
     
     def send_alert(self, alert: Alert):
-        """Enviar alerta por canales especificados"""
+        """Send alert through specified channels"""
         
         # Check rate limiting
         if not self._should_send_alert(alert):
@@ -802,7 +804,7 @@ class AlertManager:
         return success_count > 0
     
     def _should_send_alert(self, alert: Alert) -> bool:
-        """Verificar si debe enviar alerta (rate limiting)"""
+        """Check whether to send alert (rate limiting)"""
         
         alert_key = f"{alert.title}_{alert.severity.value}"
         last_time = self.last_alert_time.get(alert_key)
@@ -816,7 +818,7 @@ class AlertManager:
         return time_since_last >= rate_limit
     
     def _send_email(self, alert: Alert) -> bool:
-        """Enviar alerta por email"""
+        """Send alert via email"""
         
         email_config = self.config.get('email', {})
         if not email_config:
@@ -861,7 +863,7 @@ class AlertManager:
             return False
     
     def _send_telegram(self, alert: Alert) -> bool:
-        """Enviar alerta por Telegram"""
+        """Send alert via Telegram"""
         
         telegram_config = self.config.get('telegram', {})
         if not telegram_config:
@@ -896,7 +898,7 @@ class AlertManager:
             return False
     
     def _send_discord(self, alert: Alert) -> bool:
-        """Enviar alerta por Discord webhook"""
+        """Send alert via Discord webhook"""
         
         discord_config = self.config.get('discord', {})
         if not discord_config:
@@ -938,7 +940,7 @@ class AlertManager:
             return False
     
     def _send_sms(self, alert: Alert) -> bool:
-        """Enviar alerta por SMS (usando Twilio)"""
+        """Send alert via SMS (using Twilio)"""
         
         sms_config = self.config.get('sms', {})
         if not sms_config:
@@ -965,7 +967,7 @@ class AlertManager:
             return False
     
     def _send_desktop(self, alert: Alert) -> bool:
-        """Enviar notificación de escritorio"""
+        """Send desktop notification"""
         
         try:
             import plyer
@@ -987,7 +989,7 @@ class AlertManager:
             return False
     
     def _get_severity_emoji(self, severity: AlertSeverity) -> str:
-        """Obtener emoji por severidad"""
+        """Get emoji by severity"""
         emoji_map = {
             AlertSeverity.INFO: "ℹ️",
             AlertSeverity.WARNING: "⚠️",
@@ -997,7 +999,7 @@ class AlertManager:
         return emoji_map.get(severity, "📢")
     
     def _get_severity_color(self, severity: AlertSeverity) -> int:
-        """Obtener color por severidad (Discord)"""
+        """Get color by severity (Discord)"""
         color_map = {
             AlertSeverity.INFO: 0x3498db,      # Blue
             AlertSeverity.WARNING: 0xf39c12,   # Orange
@@ -1007,7 +1009,7 @@ class AlertManager:
         return color_map.get(severity, 0x95a5a6)  # Gray default
     
     def _format_alert_data_html(self, data: Dict) -> str:
-        """Formatear data para HTML"""
+        """Format data for HTML"""
         html = "<table border='1' style='border-collapse: collapse;'>"
         for key, value in data.items():
             html += f"<tr><td><b>{key}:</b></td><td>{value}</td></tr>"
@@ -1015,14 +1017,14 @@ class AlertManager:
         return html
     
     def _format_alert_data_text(self, data: Dict) -> str:
-        """Formatear data para texto"""
+        """Format data for text"""
         lines = []
         for key, value in data.items():
             lines.append(f"• *{key}:* {value}")
         return "\n".join(lines)
     
     def _format_alert_data_discord(self, data: Dict) -> List[Dict]:
-        """Formatear data para Discord fields"""
+        """Format data for Discord fields"""
         fields = []
         for key, value in data.items():
             fields.append({
@@ -1033,7 +1035,7 @@ class AlertManager:
         return fields
 
 class PerformanceAlertSystem:
-    """Sistema de alertas específico para performance"""
+    """Performance-specific alert system"""
     
     def __init__(self, alert_manager: AlertManager, tracker: RealTimePerformanceTracker):
         self.alert_manager = alert_manager
@@ -1052,7 +1054,7 @@ class PerformanceAlertSystem:
         }
     
     def check_alerts(self, current_equity: float):
-        """Verificar y enviar alertas necesarias"""
+        """Check and send necessary alerts"""
         
         alerts_to_send = []
         
@@ -1157,11 +1159,11 @@ class PerformanceAlertSystem:
         
         return len(alerts_to_send)
 
-# Demo del sistema de alertas
+# Alert system demo
 def demo_alert_system():
-    """Demo del sistema de alertas"""
+    """Alert system demo"""
     
-    # Configuración de alertas
+    # Alert configuration
     alert_config = {
         'email': {
             'smtp_server': 'smtp.gmail.com',
@@ -1180,14 +1182,14 @@ def demo_alert_system():
         }
     }
     
-    # Crear alert manager
+    # Create alert manager
     alert_manager = AlertManager(alert_config)
     
-    # Crear tracker y alert system
+    # Create tracker and alert system
     tracker = RealTimePerformanceTracker(100000)
     alert_system = PerformanceAlertSystem(alert_manager, tracker)
     
-    # Simular pérdida grande
+    # Simulate large loss
     tracker.start_of_day_equity = 100000
     current_equity = 95000  # 5% loss
     
@@ -1195,7 +1197,7 @@ def demo_alert_system():
     alerts_sent = alert_system.check_alerts(current_equity)
     print(f"📨 Sent {alerts_sent} alerts")
     
-    # Ejemplo de alerta manual
+    # Manual alert example
     manual_alert = Alert(
         title="Trade Execution",
         message="Successfully entered AAPL long position at $150.00",
@@ -1218,4 +1220,4 @@ if __name__ == "__main__":
     demo_alert_system()
 ```
 
-Este sistema de tracking y alertas proporciona monitoreo completo en tiempo real del performance de trading, con alertas inteligentes para ayudar a mantener disciplina y gestionar riesgo efectivamente.
+This tracking and alert system provides complete real-time monitoring of trading performance, with intelligent alerts to help maintain discipline and manage risk effectively.

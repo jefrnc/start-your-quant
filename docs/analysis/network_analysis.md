@@ -1,23 +1,25 @@
-# Análisis de Redes en Finanzas
+> 🇪🇸 [Leer en Español](network_analysis.es.md) | 🇺🇸 **English**
 
-## Introducción: De Pixeles a Empresas
+# Network Analysis in Finance
 
-Los enfoques de redes en finanzas toman prestadas técnicas del análisis de imágenes y las adaptan para entender relaciones entre activos financieros. Similar a como los filtros convolucionales detectan patrones en imágenes usando relaciones espaciales, podemos detectar patrones financieros usando relaciones económicas.
+## Introduction: From Pixels to Companies
 
-## Conceptos Fundamentales
+Network approaches in finance borrow techniques from image analysis and adapt them to understand relationships between financial assets. Similar to how convolutional filters detect patterns in images using spatial relationships, we can detect financial patterns using economic relationships.
 
-### Redes Financieras vs Redes Tradicionales
+## Core Concepts
 
-**Diferencias Clave:**
+### Financial Networks vs Traditional Networks
 
-| Aspecto | Redes de Imágenes | Redes Financieras |
+**Key Differences:**
+
+| Aspect | Image Networks | Financial Networks |
 |---------|-------------------|-------------------|
-| **Nodos** | Píxeles | Empresas/Activos |
-| **Conexiones** | Proximidad espacial | Relaciones económicas |
-| **Distancia** | Euclidiana | Correlación/Causalidad |
-| **Estabilidad** | Estática | Dinámica en el tiempo |
+| **Nodes** | Pixels | Companies/Assets |
+| **Connections** | Spatial proximity | Economic relationships |
+| **Distance** | Euclidean | Correlation/Causality |
+| **Stability** | Static | Dynamic over time |
 
-### Construcción de Redes Financieras
+### Building Financial Networks
 
 ```python
 import networkx as nx
@@ -32,19 +34,19 @@ class FinancialNetworkBuilder:
         
     def build_correlation_network(self, returns_df):
         """
-        Construye red basada en correlaciones de rendimientos
+        Build network based on return correlations
         """
-        # Calcular matriz de correlación
+        # Calculate correlation matrix
         corr_matrix = returns_df.corr()
         
-        # Crear grafo
+        # Create graph
         G = nx.Graph()
         
-        # Agregar nodos (empresas)
+        # Add nodes (companies)
         for company in returns_df.columns:
             G.add_node(company)
         
-        # Agregar aristas basadas en correlación
+        # Add edges based on correlation
         for i, company1 in enumerate(returns_df.columns):
             for j, company2 in enumerate(returns_df.columns[i+1:], i+1):
                 correlation = corr_matrix.iloc[i, j]
@@ -58,15 +60,15 @@ class FinancialNetworkBuilder:
     
     def build_news_network(self, news_mentions):
         """
-        Construye red basada en co-menciones en noticias
+        Build network based on news co-mentions
         """
         G = nx.Graph()
         
-        # Procesar artículos de noticias
+        # Process news articles
         for article in news_mentions:
             companies_mentioned = article['companies']
             
-            # Crear conexiones entre empresas mencionadas juntas
+            # Create connections between companies mentioned together
             for i, company1 in enumerate(companies_mentioned):
                 for company2 in companies_mentioned[i+1:]:
                     if G.has_edge(company1, company2):
@@ -78,9 +80,9 @@ class FinancialNetworkBuilder:
     
     def build_supply_chain_network(self, supply_relationships):
         """
-        Construye red basada en relaciones de cadena de suministro
+        Build network based on supply chain relationships
         """
-        G = nx.DiGraph()  # Dirigido para supplier -> customer
+        G = nx.DiGraph()  # Directed for supplier -> customer
         
         for relationship in supply_relationships:
             supplier = relationship['supplier']
@@ -94,9 +96,9 @@ class FinancialNetworkBuilder:
         return G
 ```
 
-## Graph Neural Networks para Finanzas
+## Graph Neural Networks for Finance
 
-### Arquitectura Base
+### Base Architecture
 
 ```python
 import torch
@@ -120,23 +122,23 @@ class FinancialGNN(nn.Module):
         self.dropout = nn.Dropout(0.2)
         
     def forward(self, x, edge_index, edge_attr=None):
-        # Primer layer de convolución
+        # First convolution layer
         x = self.conv1(x, edge_index)
         x = F.relu(x)
         x = self.dropout(x)
         
-        # Segundo layer
+        # Second layer
         x = self.conv2(x, edge_index)
         x = F.relu(x)
         x = self.dropout(x)
         
-        # Clasificación/Predicción
+        # Classification/Prediction
         out = self.classifier(x)
         
         return out
 ```
 
-### Aplicación: Predicción de Riesgo Sectorial
+### Application: Sector Risk Prediction
 
 ```python
 class SectorRiskPredictor:
@@ -145,9 +147,9 @@ class SectorRiskPredictor:
         
     def prepare_sector_network(self, company_data, sector_classifications):
         """
-        Prepara red para análisis de riesgo sectorial
+        Prepare network for sector risk analysis
         """
-        # Features por empresa
+        # Features per company
         features = []
         node_mapping = {}
         
@@ -165,7 +167,7 @@ class SectorRiskPredictor:
             ]
             features.append(company_features)
         
-        # Crear edges basados en sector y correlaciones
+        # Create edges based on sector and correlations
         edge_index = []
         edge_attr = []
         
@@ -195,22 +197,22 @@ class SectorRiskPredictor:
     
     def predict_contagion_risk(self, shock_companies, network_data):
         """
-        Predice propagación de riesgo a través de la red
+        Predict risk propagation through the network
         """
         features, edge_index, edge_attr = network_data
         
-        # Inicializar shock
+        # Initialize shock
         shock_vector = torch.zeros(len(features))
         for company in shock_companies:
             if company in self.node_mapping:
                 shock_vector[self.node_mapping[company]] = 1.0
         
-        # Simular propagación
+        # Simulate propagation
         propagation_steps = []
         current_shock = shock_vector.clone()
         
-        for step in range(10):  # 10 pasos de propagación
-            # Aplicar GNN para predecir próximo estado
+        for step in range(10):  # 10 propagation steps
+            # Apply GNN to predict next state
             model_input = torch.cat([features, current_shock.unsqueeze(1)], dim=1)
             next_shock = self.model(model_input, edge_index)
             
@@ -220,16 +222,16 @@ class SectorRiskPredictor:
         return propagation_steps
 ```
 
-## Casos de Estudio
+## Case Studies
 
-### Caso 1: Crisis Financiera 2008 - Análisis de Red
+### Case 1: 2008 Financial Crisis - Network Analysis
 
 ```python
 def analyze_2008_crisis_network():
     """
-    Analiza la evolución de la red durante la crisis de 2008
+    Analyze the network evolution during the 2008 crisis
     """
-    # Períodos de análisis
+    # Analysis periods
     periods = {
         'pre_crisis': ('2006-01-01', '2007-06-30'),
         'crisis_onset': ('2007-07-01', '2008-03-31'),
@@ -240,14 +242,14 @@ def analyze_2008_crisis_network():
     network_evolution = {}
     
     for period_name, (start_date, end_date) in periods.items():
-        # Datos del período
+        # Period data
         period_returns = get_returns_data(start_date, end_date)
         
-        # Construir red
+        # Build network
         network_builder = FinancialNetworkBuilder()
         G = network_builder.build_correlation_network(period_returns)
         
-        # Métricas de red
+        # Network metrics
         metrics = {
             'density': nx.density(G),
             'clustering': nx.average_clustering(G),
@@ -266,9 +268,9 @@ def analyze_2008_crisis_network():
 
 def analyze_crisis_propagation():
     """
-    Análisis específico de propagación durante la crisis
+    Specific analysis of propagation during the crisis
     """
-    # Red pre-crisis vs crisis
+    # Pre-crisis vs crisis network
     pre_crisis_network = build_network('2006-01-01', '2007-06-30')
     crisis_network = build_network('2008-01-01', '2008-12-31')
     
@@ -285,13 +287,13 @@ def analyze_crisis_propagation():
     return findings
 ```
 
-**Hallazgos Clave:**
-- La red se volvió **altamente conectada** durante la crisis
-- **Lehman Brothers** emergió como nodo central
-- La **modularidad sectorial** desapareció (todos los sectores se correlacionaron)
-- **Paths de contagio** fueron principalmente a través del sector financiero
+**Key Findings:**
+- The network became **highly connected** during the crisis
+- **Lehman Brothers** emerged as a central node
+- **Sector modularity** disappeared (all sectors became correlated)
+- **Contagion paths** were primarily through the financial sector
 
-### Caso 2: Análisis de Sentiment en Redes
+### Case 2: Sentiment Analysis in Networks
 
 ```python
 class SentimentNetworkAnalyzer:
@@ -300,11 +302,11 @@ class SentimentNetworkAnalyzer:
         
     def build_sentiment_network(self, news_data, companies):
         """
-        Construye red basada en sentiment de noticias
+        Build network based on news sentiment
         """
         G = nx.Graph()
         
-        # Procesar noticias por empresa
+        # Process news per company
         company_sentiments = {}
         
         for article in news_data:
@@ -313,13 +315,13 @@ class SentimentNetworkAnalyzer:
             
             sentiment_score = article_sentiment['score'] if article_sentiment['label'] == 'POSITIVE' else -article_sentiment['score']
             
-            # Agregar sentiment a empresas mencionadas
+            # Add sentiment to mentioned companies
             for company in mentioned_companies:
                 if company not in company_sentiments:
                     company_sentiments[company] = []
                 company_sentiments[company].append(sentiment_score)
         
-        # Crear conexiones basadas en co-ocurrencia de sentiment
+        # Create connections based on sentiment co-occurrence
         for article in news_data:
             mentioned_companies = self.extract_companies(article['text'], companies)
             if len(mentioned_companies) > 1:
@@ -328,7 +330,7 @@ class SentimentNetworkAnalyzer:
                 for i, company1 in enumerate(mentioned_companies):
                     for company2 in mentioned_companies[i+1:]:
                         if G.has_edge(company1, company2):
-                            # Actualizar peso basado en sentiment compartido
+                            # Update weight based on shared sentiment
                             G[company1][company2]['sentiment_correlation'] += article_sentiment
                             G[company1][company2]['co_mentions'] += 1
                         else:
@@ -340,17 +342,17 @@ class SentimentNetworkAnalyzer:
     
     def predict_sentiment_contagion(self, network, initial_sentiment_shock):
         """
-        Predice propagación de sentiment a través de la red
+        Predict sentiment propagation through the network
         """
-        # Modelo de difusión de sentiment
+        # Sentiment diffusion model
         sentiment_states = {node: 0 for node in network.nodes()}
         
-        # Aplicar shock inicial
+        # Apply initial shock
         for company, sentiment in initial_sentiment_shock.items():
             if company in sentiment_states:
                 sentiment_states[company] = sentiment
         
-        # Simular propagación
+        # Simulate propagation
         for iteration in range(10):
             new_states = sentiment_states.copy()
             
@@ -366,13 +368,13 @@ class SentimentNetworkAnalyzer:
                     total_weight += abs(weight)
                 
                 if total_weight > 0:
-                    # Combinar sentiment propio con influencia de vecinos
+                    # Combine own sentiment with neighbor influence
                     new_states[node] = 0.7 * sentiment_states[node] + 0.3 * (neighbor_influence / total_weight)
         
         return new_states
 ```
 
-## Modelado de Riesgo con Redes
+## Risk Modeling with Networks
 
 ### Dynamic Risk Networks
 
@@ -384,16 +386,16 @@ class DynamicRiskNetwork:
         
     def build_rolling_risk_networks(self, returns_data):
         """
-        Construye redes de riesgo con ventanas móviles
+        Build risk networks with rolling windows
         """
         for i in range(self.window_size, len(returns_data)):
             window_data = returns_data.iloc[i-self.window_size:i]
             date = returns_data.index[i]
             
-            # Construir red de correlaciones
+            # Build correlation network
             corr_network = self.build_correlation_network(window_data)
             
-            # Calcular métricas de riesgo sistémico
+            # Calculate systemic risk metrics
             systemic_risk_metrics = self.calculate_systemic_risk(corr_network, window_data)
             
             self.risk_networks[date] = {
@@ -405,12 +407,12 @@ class DynamicRiskNetwork:
     
     def calculate_systemic_risk(self, network, returns_data):
         """
-        Calcula métricas de riesgo sistémico
+        Calculate systemic risk metrics
         """
-        # 1. Network density como proxy de contagio
+        # 1. Network density as a contagion proxy
         density = nx.density(network)
         
-        # 2. Concentration de centralidad
+        # 2. Centrality concentration
         centrality = nx.eigenvector_centrality(network)
         centrality_concentration = np.std(list(centrality.values()))
         
@@ -430,7 +432,7 @@ class DynamicRiskNetwork:
     
     def calculate_covar_matrix(self, returns_data, quantile=0.05):
         """
-        Calcula Conditional Value at Risk entre pares de activos
+        Calculate Conditional Value at Risk between asset pairs
         """
         companies = returns_data.columns
         covar_matrix = np.zeros((len(companies), len(companies)))
@@ -438,10 +440,10 @@ class DynamicRiskNetwork:
         for i, company1 in enumerate(companies):
             for j, company2 in enumerate(companies):
                 if i != j:
-                    # VaR de company2
+                    # VaR of company2
                     var_company2 = np.quantile(returns_data[company2], quantile)
                     
-                    # Rendimientos de company1 cuando company2 está en stress
+                    # Returns of company1 when company2 is under stress
                     stress_condition = returns_data[company2] <= var_company2
                     conditional_returns = returns_data[company1][stress_condition]
                     
@@ -453,7 +455,7 @@ class DynamicRiskNetwork:
         return covar_matrix
 ```
 
-### Stress Testing con Redes
+### Stress Testing with Networks
 
 ```python
 class NetworkStressTester:
@@ -462,29 +464,29 @@ class NetworkStressTester:
         
     def node_removal_stress_test(self, removal_strategy='centrality'):
         """
-        Test de estrés removiendo nodos críticos
+        Stress test by removing critical nodes
         """
         original_network = self.network.copy()
         stress_results = {}
         
         if removal_strategy == 'centrality':
-            # Remover nodos por orden de centralidad
+            # Remove nodes by centrality order
             centrality = nx.betweenness_centrality(original_network)
             nodes_to_remove = sorted(centrality.keys(), key=lambda x: centrality[x], reverse=True)
         elif removal_strategy == 'random':
             nodes_to_remove = list(original_network.nodes())
             np.random.shuffle(nodes_to_remove)
         
-        for i, node in enumerate(nodes_to_remove[:10]):  # Top 10 nodos
+        for i, node in enumerate(nodes_to_remove[:10]):  # Top 10 nodes
             test_network = original_network.copy()
             test_network.remove_node(node)
             
-            # Métricas post-remoción
+            # Post-removal metrics
             if nx.is_connected(test_network):
                 avg_path_length = nx.average_shortest_path_length(test_network)
                 efficiency = nx.global_efficiency(test_network)
             else:
-                # Red fragmentada
+                # Fragmented network
                 largest_component = max(nx.connected_components(test_network), key=len)
                 subgraph = test_network.subgraph(largest_component)
                 avg_path_length = nx.average_shortest_path_length(subgraph)
@@ -502,7 +504,7 @@ class NetworkStressTester:
     
     def cascading_failure_simulation(self, initial_shock_nodes, failure_threshold=0.3):
         """
-        Simula fallos en cascada en la red
+        Simulate cascading failures in the network
         """
         network = self.network.copy()
         failed_nodes = set(initial_shock_nodes)
@@ -513,14 +515,14 @@ class NetworkStressTester:
             step += 1
             new_failures = set()
             
-            # Calcular estrés en nodos restantes
+            # Calculate stress on remaining nodes
             for node in network.nodes():
                 if node not in failed_nodes:
-                    # Contar vecinos fallados
+                    # Count failed neighbors
                     neighbors = list(network.neighbors(node))
                     failed_neighbors = len([n for n in neighbors if n in failed_nodes])
                     
-                    # Ratio de vecinos fallados
+                    # Failed neighbor ratio
                     if len(neighbors) > 0:
                         failure_ratio = failed_neighbors / len(neighbors)
                         
@@ -538,7 +540,7 @@ class NetworkStressTester:
                 'failure_percentage': len(failed_nodes) / len(self.network.nodes())
             })
             
-            # Remover nodos fallados para próxima iteración
+            # Remove failed nodes for next iteration
             network.remove_nodes_from(new_failures)
         
         return {
@@ -549,7 +551,7 @@ class NetworkStressTester:
         }
 ```
 
-## Aplicaciones Prácticas
+## Practical Applications
 
 ### 1. Portfolio Construction
 
@@ -561,7 +563,7 @@ class NetworkAwarePortfolio:
         
     def optimize_network_diversification(self, target_return=0.10):
         """
-        Optimización de portfolio considerando estructura de red
+        Portfolio optimization considering network structure
         """
         from scipy.optimize import minimize
         
@@ -569,22 +571,22 @@ class NetworkAwarePortfolio:
         expected_returns = self.returns_data.mean()
         cov_matrix = self.returns_data.cov()
         
-        # Función objetivo: minimizar riesgo + penalización por concentración de red
+        # Objective function: minimize risk + network concentration penalty
         def objective(weights):
             portfolio_var = np.dot(weights.T, np.dot(cov_matrix, weights))
             network_concentration_penalty = self.calculate_network_concentration(weights)
             
             return portfolio_var + 0.1 * network_concentration_penalty
         
-        # Restricciones
+        # Constraints
         constraints = [
-            {'type': 'eq', 'fun': lambda x: np.sum(x) - 1},  # Suma = 1
+            {'type': 'eq', 'fun': lambda x: np.sum(x) - 1},  # Sum = 1
             {'type': 'ineq', 'fun': lambda x: np.dot(expected_returns, x) - target_return}  # Return target
         ]
         
         bounds = [(0, 0.1) for _ in range(n_assets)]  # Max 10% per asset
         
-        # Optimización
+        # Optimization
         result = minimize(
             objective,
             x0=np.ones(n_assets) / n_assets,
@@ -597,7 +599,7 @@ class NetworkAwarePortfolio:
     
     def calculate_network_concentration(self, weights):
         """
-        Penaliza concentración en nodos centrales de la red
+        Penalize concentration in central network nodes
         """
         centrality = nx.eigenvector_centrality(self.network)
         companies = self.returns_data.columns
@@ -605,7 +607,7 @@ class NetworkAwarePortfolio:
         concentration_penalty = 0
         for i, company in enumerate(companies):
             if company in centrality:
-                # Penalizar más peso en nodos más centrales
+                # Penalize more weight in more central nodes
                 concentration_penalty += weights[i] * centrality[company]
         
         return concentration_penalty
@@ -621,17 +623,17 @@ class NetworkRiskManager:
         
     def calculate_network_var(self, confidence_level=0.95, holding_period=1):
         """
-        Calcula VaR considerando efectos de red
+        Calculate VaR considering network effects
         """
-        # VaR tradicional
+        # Traditional VaR
         portfolio_returns = self.calculate_portfolio_returns()
         traditional_var = np.quantile(portfolio_returns, 1 - confidence_level)
         
-        # Ajuste por concentración de red
+        # Network concentration adjustment
         network_concentration = self.calculate_portfolio_network_exposure()
-        concentration_multiplier = 1 + 0.5 * network_concentration  # Hasta 50% de aumento
+        concentration_multiplier = 1 + 0.5 * network_concentration  # Up to 50% increase
         
-        # VaR ajustado por red
+        # Network-adjusted VaR
         network_adjusted_var = traditional_var * concentration_multiplier
         
         return {
@@ -643,9 +645,9 @@ class NetworkRiskManager:
     
     def real_time_contagion_monitoring(self):
         """
-        Monitoreo en tiempo real de riesgo de contagio
+        Real-time contagion risk monitoring
         """
-        # Identificar posiciones en nodos críticos
+        # Identify positions in critical nodes
         centrality = nx.betweenness_centrality(self.network)
         
         critical_exposures = {}
@@ -657,7 +659,7 @@ class NetworkRiskManager:
                     'risk_score': self.weights[i] * centrality[company]
                 }
         
-        # Alert si hay concentración excesiva
+        # Alert if there is excessive concentration
         total_critical_exposure = sum([exp['weight'] for exp in critical_exposures.values()])
         
         return {
@@ -667,15 +669,15 @@ class NetworkRiskManager:
         }
 ```
 
-## Limitaciones y Consideraciones
+## Limitations and Considerations
 
-### Desafíos Técnicos
+### Technical Challenges
 
-**1. Calidad de Datos:**
+**1. Data Quality:**
 ```python
 def validate_network_data_quality(network_data):
     """
-    Validación de calidad para datos de red
+    Quality validation for network data
     """
     quality_checks = {
         'missing_nodes': check_missing_company_data(network_data),
@@ -688,39 +690,39 @@ def validate_network_data_quality(network_data):
 ```
 
 **2. Computational Complexity:**
-- Redes grandes (>1000 nodos) requieren optimizaciones
-- Actualización en tiempo real challenging
-- Trade-off entre precisión y velocidad
+- Large networks (>1000 nodes) require optimizations
+- Real-time updates are challenging
+- Trade-off between accuracy and speed
 
 **3. Model Overfitting:**
-- Riesgo de overfitting a patrones específicos de red
-- Necesidad de validación cruzada temporal
-- Robustez a cambios estructurales
+- Risk of overfitting to specific network patterns
+- Need for temporal cross-validation
+- Robustness to structural changes
 
-### Mejores Prácticas
+### Best Practices
 
 **1. Network Construction:**
 ```python
 def robust_network_construction():
     """
-    Mejores prácticas para construcción de redes robustas
+    Best practices for robust network construction
     """
     best_practices = {
-        'multiple_data_sources': 'Combinar correlaciones, noticias, fundamentales',
-        'dynamic_thresholds': 'Ajustar thresholds basado en régimen de mercado',
-        'temporal_validation': 'Validar estabilidad de conexiones en el tiempo',
-        'sector_awareness': 'Considerar estructura sectorial conocida',
-        'outlier_handling': 'Detectar y manejar períodos anómalos'
+        'multiple_data_sources': 'Combine correlations, news, fundamentals',
+        'dynamic_thresholds': 'Adjust thresholds based on market regime',
+        'temporal_validation': 'Validate connection stability over time',
+        'sector_awareness': 'Consider known sector structure',
+        'outlier_handling': 'Detect and handle anomalous periods'
     }
     return best_practices
 ```
 
 **2. Risk Management:**
-- **Límites de concentración** en nodos centrales
-- **Monitoreo continuo** de métricas de red
-- **Stress testing** regular con escenarios de contagio
-- **Diversificación explícita** por estructura de red
+- **Concentration limits** on central nodes
+- **Continuous monitoring** of network metrics
+- **Regular stress testing** with contagion scenarios
+- **Explicit diversification** by network structure
 
 ---
 
-*El análisis de redes ofrece una perspectiva única sobre la estructura y dinámicas de los mercados financieros. Al considerar no solo los activos individuales sino también sus interconexiones, podemos desarrollar estrategias más robustas y sistemas de gestión de riesgo más efectivos.*
+*Network analysis offers a unique perspective on the structure and dynamics of financial markets. By considering not only individual assets but also their interconnections, we can develop more robust strategies and more effective risk management systems.*

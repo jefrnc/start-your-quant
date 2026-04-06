@@ -1,49 +1,51 @@
-# Análisis Fundamental para Trading Cuantitativo
+> 🇪🇸 [Leer en Español](fundamental_analysis.es.md) | 🇺🇸 **English**
 
-## Introducción
+# Fundamental Analysis for Quantitative Trading
 
-El análisis fundamental evalúa el valor intrínseco de una empresa basándose en sus estados financieros, posición competitiva y perspectivas futuras. Para trading cuantitativo, automatizamos estos análisis para identificar oportunidades de value investing y integrarlas con estrategias técnicas.
+## Introduction
 
-## Conceptos Fundamentales
+Fundamental analysis evaluates a company's intrinsic value based on its financial statements, competitive position, and future prospects. For quantitative trading, we automate these analyses to identify value investing opportunities and integrate them with technical strategies.
 
-### ¿Por Qué Funciona el Análisis Fundamental?
+## Core Concepts
 
-**Teoría del Valor Intrínseco:**
-- Toda empresa tiene un valor real basado en sus fundamentos
-- Los precios de mercado fluctúan alrededor del valor intrínseco
-- Las discrepancias crean oportunidades de inversión
-- A largo plazo, el precio converge hacia el valor intrínseco
+### Why Does Fundamental Analysis Work?
 
-**Ventajas para Small Caps:**
-- Menos cobertura de analistas = más ineficiencias
-- Mayor volatilidad = mayores discrepancias precio/valor
-- Información menos procesada por el mercado
-- Oportunidades antes de que se descubran
+**Intrinsic Value Theory:**
+- Every company has a real value based on its fundamentals
+- Market prices fluctuate around intrinsic value
+- Discrepancies create investment opportunities
+- Over the long term, price converges toward intrinsic value
 
-### Métricas Clave
+**Advantages for Small Caps:**
+- Less analyst coverage = more inefficiencies
+- Higher volatility = larger price/value discrepancies
+- Information less processed by the market
+- Opportunities before they are discovered
 
-**Rentabilidad:**
+### Key Metrics
+
+**Profitability:**
 - ROE (Return on Equity)
 - ROA (Return on Assets) 
 - ROC (Return on Capital)
 - Profit Margins
 
-**Valoración:**
+**Valuation:**
 - P/E Ratio (Price to Earnings)
 - P/B Ratio (Price to Book)
 - P/S Ratio (Price to Sales)
 - EV/EBITDA
 
-**Eficiencia:**
+**Efficiency:**
 - Asset Turnover
 - Inventory Turnover
 - Working Capital Management
 
-## Valor Intrínseco - Modelo DCF
+## Intrinsic Value - DCF Model
 
-El Discounted Cash Flow (DCF) es el método más riguroso para calcular el valor intrínseco de una empresa.
+The Discounted Cash Flow (DCF) is the most rigorous method for calculating a company's intrinsic value.
 
-### Implementación Completa
+### Complete Implementation
 
 ```python
 import yfinance as yf
@@ -55,15 +57,15 @@ warnings.filterwarnings('ignore')
 
 class DCFValuator:
     """
-    Calculadora de Valor Intrínseco usando modelo DCF
+    Intrinsic Value Calculator using DCF model
     """
     
     def __init__(self, ticker):
         """
-        Parámetros
+        Parameters
         ----------
         ticker : str
-            Símbolo de la acción a evaluar
+            Stock symbol to evaluate
         """
         self.ticker = ticker
         self.stock = yf.Ticker(ticker)
@@ -72,16 +74,16 @@ class DCFValuator:
         
     def get_financial_data(self):
         """
-        Obtener datos financieros necesarios para DCF
+        Get financial data needed for DCF
         """
         try:
-            # Estados financieros
+            # Financial statements
             self.cashflow = self.stock.cashflow
             self.financials = self.stock.financials
             self.balance_sheet = self.stock.balance_sheet
             self.info = self.stock.info
             
-            # Datos clave
+            # Key data
             self.financial_data = {
                 'free_cash_flow': self.cashflow.loc["Free Cash Flow"].iloc[0],
                 'total_debt': self.balance_sheet.loc["Long Term Debt"].iloc[0] if "Long Term Debt" in self.balance_sheet.index else 0,
@@ -96,22 +98,22 @@ class DCFValuator:
             return True
             
         except Exception as e:
-            print(f"Error obteniendo datos financieros para {self.ticker}: {e}")
+            print(f"Error getting financial data for {self.ticker}: {e}")
             return False
     
     def calculate_growth_rates(self, years=5):
         """
-        Calcular tasas de crecimiento históricas
+        Calculate historical growth rates
         """
         try:
-            # Crecimiento de FCF histórico
+            # Historical FCF growth
             fcf_historical = self.cashflow.loc["Free Cash Flow"]
             if len(fcf_historical) >= 2:
                 fcf_growth = (fcf_historical.iloc[0] / fcf_historical.iloc[-1]) ** (1/len(fcf_historical)) - 1
             else:
                 fcf_growth = 0.05  # Default 5%
             
-            # Crecimiento de revenue histórico
+            # Historical revenue growth
             revenue_historical = self.financials.loc["Total Revenue"]
             if len(revenue_historical) >= 2:
                 revenue_growth = (revenue_historical.iloc[0] / revenue_historical.iloc[-1]) ** (1/len(revenue_historical)) - 1
@@ -119,29 +121,29 @@ class DCFValuator:
                 revenue_growth = 0.03  # Default 3%
             
             return {
-                'fcf_growth': max(min(fcf_growth, 0.15), -0.05),  # Cap entre -5% y 15%
-                'revenue_growth': max(min(revenue_growth, 0.12), -0.02)  # Cap entre -2% y 12%
+                'fcf_growth': max(min(fcf_growth, 0.15), -0.05),  # Cap between -5% and 15%
+                'revenue_growth': max(min(revenue_growth, 0.12), -0.02)  # Cap between -2% and 12%
             }
             
         except Exception as e:
-            print(f"Error calculando tasas de crecimiento: {e}")
+            print(f"Error calculating growth rates: {e}")
             return {'fcf_growth': 0.05, 'revenue_growth': 0.03}
     
     def set_dcf_assumptions(self, growth_rate=None, discount_rate=0.10, 
                            terminal_growth_rate=0.025, projection_years=5):
         """
-        Establecer supuestos para el modelo DCF
+        Set assumptions for the DCF model
         
-        Parámetros
+        Parameters
         ----------
         growth_rate : float
-            Tasa de crecimiento anual de FCF (si None, se calcula automáticamente)
+            Annual FCF growth rate (if None, calculated automatically)
         discount_rate : float
-            Tasa de descuento (WACC estimado)
+            Discount rate (estimated WACC)
         terminal_growth_rate : float
-            Tasa de crecimiento perpetuo
+            Perpetual growth rate
         projection_years : int
-            Años de proyección explícita
+            Explicit projection years
         """
         if growth_rate is None:
             growth_rates = self.calculate_growth_rates()
@@ -158,21 +160,21 @@ class DCFValuator:
     
     def calculate_dcf_valuation(self):
         """
-        Calcular valoración DCF completa
+        Calculate complete DCF valuation
         
         Returns
         -------
         dict
-            Resultados de valoración DCF
+            DCF valuation results
         """
         if not self.financial_data:
             if not self.get_financial_data():
-                return {'error': 'No se pudieron obtener datos financieros'}
+                return {'error': 'Could not get financial data'}
         
         if not self.dcf_assumptions:
             self.set_dcf_assumptions()
         
-        # Extraer datos
+        # Extract data
         fcf_base = self.financial_data['free_cash_flow']
         if fcf_base <= 0:
             return {'error': 'Free Cash Flow negativo o cero'}
@@ -182,41 +184,41 @@ class DCFValuator:
         terminal_growth = self.dcf_assumptions['terminal_growth_rate']
         years = self.dcf_assumptions['projection_years']
         
-        # Proyectar FCF futuro
+        # Project future FCF
         projected_fcf = []
         for year in range(1, years + 1):
             fcf_year = fcf_base * ((1 + growth_rate) ** year)
             projected_fcf.append(fcf_year)
         
-        # Calcular valor terminal
+        # Calculate terminal value
         terminal_fcf = projected_fcf[-1] * (1 + terminal_growth)
         terminal_value = terminal_fcf / (discount_rate - terminal_growth)
         
-        # Descontar flujos al presente
+        # Discount cash flows to present
         present_value_fcf = []
         for year, fcf in enumerate(projected_fcf, 1):
             pv = fcf / ((1 + discount_rate) ** year)
             present_value_fcf.append(pv)
         
-        # Descontar valor terminal
+        # Discount terminal value
         pv_terminal = terminal_value / ((1 + discount_rate) ** years)
         
-        # Valor total de la empresa
+        # Total enterprise value
         enterprise_value = sum(present_value_fcf) + pv_terminal
         
-        # Ajustar por deuda neta
+        # Adjust for net debt
         net_debt = self.financial_data['total_debt'] - self.financial_data['cash_and_equivalents']
         equity_value = enterprise_value - net_debt
         
-        # Valor por acción
+        # Value per share
         shares_outstanding = self.financial_data['shares_outstanding']
         if shares_outstanding <= 0:
-            return {'error': 'Acciones en circulación inválidas'}
+            return {'error': 'Invalid shares outstanding'}
         
         intrinsic_value_per_share = equity_value / shares_outstanding
         current_price = self.financial_data['current_price']
         
-        # Margen de seguridad
+        # Margin of safety
         margin_of_safety = (intrinsic_value_per_share - current_price) / intrinsic_value_per_share if intrinsic_value_per_share > 0 else -1
         
         return {
@@ -235,22 +237,22 @@ class DCFValuator:
     
     def get_recommendation(self, margin_of_safety):
         """
-        Generar recomendación basada en margen de seguridad
+        Generate recommendation based on margin of safety
         """
         if margin_of_safety > 0.3:
-            return "STRONG BUY - Margen de seguridad excelente"
+            return "STRONG BUY - Margin of safety excelente"
         elif margin_of_safety > 0.15:
-            return "BUY - Buen margen de seguridad"
+            return "BUY - Good margin of safety"
         elif margin_of_safety > 0:
-            return "HOLD - Margen de seguridad marginal"
+            return "HOLD - Margin of safety marginal"
         elif margin_of_safety > -0.15:
-            return "HOLD - Ligeramente sobrevaluada"
+            return "HOLD - Slightly overvalued"
         else:
-            return "SELL - Significativamente sobrevaluada"
+            return "SELL - Significantly overvalued"
     
     def sensitivity_analysis(self, growth_range=(-0.02, 0.02), discount_range=(-0.02, 0.02)):
         """
-        Análisis de sensibilidad para supuestos clave
+        Sensitivity analysis for key assumptions
         """
         base_valuation = self.calculate_dcf_valuation()
         if 'error' in base_valuation:
@@ -261,7 +263,7 @@ class DCFValuator:
         
         sensitivity_results = []
         
-        # Variaciones en growth rate
+        # Growth rate variations
         for delta_growth in np.linspace(growth_range[0], growth_range[1], 5):
             self.dcf_assumptions['growth_rate'] = base_growth + delta_growth
             valuation = self.calculate_dcf_valuation()
@@ -273,7 +275,7 @@ class DCFValuator:
                     'margin_of_safety': valuation['margin_of_safety']
                 })
         
-        # Variaciones en discount rate
+        # Discount rate variations
         for delta_discount in np.linspace(discount_range[0], discount_range[1], 5):
             self.dcf_assumptions['growth_rate'] = base_growth  # Reset
             self.dcf_assumptions['discount_rate'] = base_discount + delta_discount
@@ -286,7 +288,7 @@ class DCFValuator:
                     'margin_of_safety': valuation['margin_of_safety']
                 })
         
-        # Restaurar supuestos base
+        # Restore base assumptions
         self.dcf_assumptions['growth_rate'] = base_growth
         self.dcf_assumptions['discount_rate'] = base_discount
         
@@ -297,50 +299,50 @@ class DCFValuator:
 
 def dcf_screening(tickers, min_margin_of_safety=0.15):
     """
-    Screening de múltiples acciones usando DCF
+    Screening multiple stocks using DCF
     """
     results = []
     
     for ticker in tickers:
-        print(f"Analizando {ticker}...")
+        print(f"Analyzing {ticker}...")
         
         try:
             valuator = DCFValuator(ticker)
             valuation = valuator.calculate_dcf_valuation()
             
             if 'error' not in valuation:
-                # Solo incluir si cumple criterios mínimos
+                # Only include if minimum criteria are met
                 if (valuation['margin_of_safety'] > min_margin_of_safety and 
                     valuation['intrinsic_value_per_share'] > 0):
                     results.append(valuation)
                     
         except Exception as e:
-            print(f"Error analizando {ticker}: {e}")
+            print(f"Error analyzing {ticker}: {e}")
             continue
     
-    # Ordenar por margen de seguridad
+    # Sort by margin of safety
     results.sort(key=lambda x: x['margin_of_safety'], reverse=True)
     
     return results
 
-# Ejemplo de uso
+# Usage example
 def dcf_example_analysis():
     """
-    Ejemplo completo de análisis DCF
+    Complete DCF analysis example
     """
     ticker = "AAPL"
-    print(f"=== ANÁLISIS DCF: {ticker} ===\\n")
+    print(f"=== DCF ANALYSIS: {ticker} ===\\n")
     
-    # Crear valuador
+    # Create valuator
     valuator = DCFValuator(ticker)
     
-    # Obtener datos
+    # Get data
     if not valuator.get_financial_data():
-        print("❌ Error obteniendo datos financieros")
+        print("❌ Error getting financial data")
         return
     
-    # Mostrar datos clave
-    print("📊 DATOS FINANCIEROS CLAVE:")
+    # Show key data
+    print("📊 KEY FINANCIAL DATA:")
     for key, value in valuator.financial_data.items():
         if isinstance(value, (int, float)):
             if abs(value) > 1e9:
@@ -350,47 +352,47 @@ def dcf_example_analysis():
             else:
                 print(f"   {key}: ${value:,.2f}")
     
-    # Calcular tasas de crecimiento
+    # Calculate growth rates
     growth_rates = valuator.calculate_growth_rates()
-    print(f"\\n📈 TASAS DE CRECIMIENTO HISTÓRICAS:")
+    print(f"\\n📈 HISTORICAL GROWTH RATES:")
     print(f"   FCF Growth: {growth_rates['fcf_growth']:.1%}")
     print(f"   Revenue Growth: {growth_rates['revenue_growth']:.1%}")
     
-    # Establecer supuestos (usando crecimiento histórico)
+    # Set assumptions (using historical growth)
     assumptions = valuator.set_dcf_assumptions(
         growth_rate=growth_rates['fcf_growth']
     )
-    print(f"\\n⚙️ SUPUESTOS DCF:")
+    print(f"\\n⚙️ DCF ASSUMPTIONS:")
     for key, value in assumptions.items():
         if isinstance(value, float):
             print(f"   {key}: {value:.1%}")
         else:
             print(f"   {key}: {value}")
     
-    # Calcular valoración
+    # Calculate valuation
     valuation = valuator.calculate_dcf_valuation()
     
     if 'error' in valuation:
-        print(f"❌ Error en valoración: {valuation['error']}")
+        print(f"❌ Error in valuation: {valuation['error']}")
         return
     
-    print(f"\\n💰 RESULTADOS DCF:")
-    print(f"   Valor Intrínseco: ${valuation['intrinsic_value_per_share']:.2f}")
-    print(f"   Precio Actual: ${valuation['current_price']:.2f}")
-    print(f"   Margen de Seguridad: {valuation['margin_of_safety']:.1%}")
-    print(f"   Potencial Upside: {valuation['upside_potential']:.1%}")
-    print(f"   Recomendación: {valuation['recommendation']}")
+    print(f"\\n💰 DCF RESULTS:")
+    print(f"   Intrinsic Value: ${valuation['intrinsic_value_per_share']:.2f}")
+    print(f"   Current Price: ${valuation['current_price']:.2f}")
+    print(f"   Margin of Safety: {valuation['margin_of_safety']:.1%}")
+    print(f"   Upside Potential: {valuation['upside_potential']:.1%}")
+    print(f"   Recommendation: {valuation['recommendation']}")
     
-    # Análisis de sensibilidad
-    print(f"\\n🔍 ANÁLISIS DE SENSIBILIDAD:")
+    # Sensitivity analysis
+    print(f"\\n🔍 SENSITIVITY ANALYSIS:")
     sensitivity = valuator.sensitivity_analysis()
     
     if 'error' not in sensitivity:
-        print(f"   Rango de valores intrínsecos:")
+        print(f"   Range of intrinsic values:")
         values = [result['intrinsic_value'] for result in sensitivity['sensitivity_results']]
-        print(f"   Mínimo: ${min(values):.2f}")
-        print(f"   Máximo: ${max(values):.2f}")
-        print(f"   Rango: ±{(max(values) - min(values))/2:.2f}")
+        print(f"   Minimum: ${min(values):.2f}")
+        print(f"   Maximum: ${max(values):.2f}")
+        print(f"   Range: ±{(max(values) - min(values))/2:.2f}")
     
     return valuation
 
@@ -398,51 +400,51 @@ if __name__ == "__main__":
     dcf_example_analysis()
 ```
 
-## Fórmula Mágica de Joel Greenblatt
+## Joel Greenblatt's Magic Formula
 
-La Fórmula Mágica combina rentabilidad (ROC) y valoración (Earnings Yield) para identificar acciones infravaloradas de calidad.
+The Magic Formula combines profitability (ROC) and valuation (Earnings Yield) to identify high-quality undervalued stocks.
 
-### Implementación Completa
+### Complete Implementation
 
 ```python
 class MagicFormulaScreener:
     """
-    Implementación de la Fórmula Mágica de Joel Greenblatt
+    Joel Greenblatt's Magic Formula Implementation
     """
     
     def __init__(self, min_market_cap=50e6):
         """
-        Parámetros
+        Parameters
         ----------
         min_market_cap : float
-            Capitalización de mercado mínima en USD
+            Minimum market capitalization in USD
         """
         self.min_market_cap = min_market_cap
         self.results = []
     
     def calculate_metrics(self, ticker):
         """
-        Calcular métricas de la Fórmula Mágica para una acción
+        Calculate Magic Formula metrics for a stock
         
         Returns
         -------
         dict
-            Métricas calculadas o None si hay error
+            Calculated metrics or None on error
         """
         try:
             stock = yf.Ticker(ticker)
             
-            # Obtener datos necesarios
+            # Get data necesarios
             info = stock.info
             financials = stock.financials
             balance_sheet = stock.balance_sheet
             
-            # Verificar capitalización mínima
+            # Verify minimum market capitalization
             market_cap = info.get('marketCap', 0)
             if market_cap < self.min_market_cap:
                 return None
             
-            # Datos básicos
+            # Basic data
             current_price = info.get('currentPrice', 0)
             shares_outstanding = info.get('sharesOutstanding', 0)
             
@@ -453,7 +455,7 @@ class MagicFormulaScreener:
             if "EBIT" in financials.index:
                 ebit = financials.loc["EBIT"].iloc[0]
             else:
-                # Calcular EBIT aproximado
+                # Calculate approximate EBIT
                 operating_income = financials.loc["Operating Income"].iloc[0] if "Operating Income" in financials.index else 0
                 ebit = operating_income
             
@@ -481,7 +483,7 @@ class MagicFormulaScreener:
             # EY = EBIT / Market Cap
             earnings_yield = (ebit / market_cap) * 100
             
-            # P/E Ratio para referencia
+            # P/E Ratio for reference
             pe_ratio = market_cap / net_income if net_income > 0 else float('inf')
             
             return {
@@ -497,55 +499,55 @@ class MagicFormulaScreener:
             }
             
         except Exception as e:
-            print(f"Error calculando métricas para {ticker}: {e}")
+            print(f"Error calculating metrics for {ticker}: {e}")
             return None
     
     def screen_stocks(self, tickers):
         """
-        Aplicar screening de Fórmula Mágica a lista de tickers
+        Apply Magic Formula screening to ticker list
         
-        Parámetros
+        Parameters
         ----------
         tickers : list
-            Lista de símbolos de acciones
+            List of stock symbols
             
         Returns
         -------
         pd.DataFrame
-            Resultados ordenados por ranking
+            Results sorted by ranking
         """
         results = []
         
-        print(f"Screening {len(tickers)} acciones con Fórmula Mágica...")
+        print(f"Screening {len(tickers)} stocks with Magic Formula...")
         
         for ticker in tickers:
-            print(f"Analizando {ticker}...")
+            print(f"Analyzing {ticker}...")
             metrics = self.calculate_metrics(ticker)
             
             if metrics is not None:
                 results.append(metrics)
         
         if not results:
-            print("❌ No se encontraron acciones válidas")
+            print("❌ No valid stocks found")
             return pd.DataFrame()
         
-        # Convertir a DataFrame
+        # Convert to DataFrame
         df = pd.DataFrame(results)
         
-        # Calcular rankings
+        # Calculate rankings
         # Ranking ROC (1 = mejor ROC)
         df['roc_rank'] = df['roc'].rank(ascending=False, na_option='bottom')
         
         # Ranking Earnings Yield (1 = mejor EY)
         df['ey_rank'] = df['earnings_yield'].rank(ascending=False, na_option='bottom')
         
-        # Ranking combinado (menor es mejor)
+        # Combined ranking (lower is better)
         df['magic_formula_rank'] = df['roc_rank'] + df['ey_rank']
         
-        # Ordenar por ranking
+        # Sort by ranking
         df = df.sort_values('magic_formula_rank')
         
-        # Agregar percentiles
+        # Add percentiles
         df['roc_percentile'] = df['roc'].rank(pct=True) * 100
         df['ey_percentile'] = df['earnings_yield'].rank(pct=True) * 100
         
@@ -554,7 +556,7 @@ class MagicFormulaScreener:
     
     def get_top_stocks(self, n=10):
         """
-        Obtener las mejores n acciones según Fórmula Mágica
+        Get the top n stocks according to Magic Formula
         """
         if self.results.empty:
             return pd.DataFrame()
@@ -563,7 +565,7 @@ class MagicFormulaScreener:
     
     def analyze_results(self):
         """
-        Análisis estadístico de los resultados
+        Statistical analysis of results
         """
         if self.results.empty:
             return {}
@@ -582,33 +584,33 @@ class MagicFormulaScreener:
     
     def backtest_strategy(self, start_date="2023-01-01", end_date="2024-01-01", top_n=10):
         """
-        Backtest simple de la estrategia Fórmula Mágica
+        Simple backtest of Magic Formula strategy
         """
         if self.results.empty:
-            return {'error': 'No hay resultados para backtest'}
+            return {'error': 'No results for backtest'}
         
-        # Seleccionar top stocks
+        # Select top stocks
         top_stocks = self.get_top_stocks(top_n)
         tickers = top_stocks['ticker'].tolist()
         
         try:
-            # Obtener precios históricos
+            # Get historical prices
             price_data = yf.download(tickers, start=start_date, end=end_date)['Close']
             
             if price_data.empty:
-                return {'error': 'No se pudieron obtener datos de precios'}
+                return {'error': 'Could not get price data'}
             
-            # Calcular retornos
+            # Calculate returns
             returns = price_data.pct_change().dropna()
             
-            # Retorno igual ponderado del portfolio
+            # Equal-weighted portfolio return
             portfolio_returns = returns.mean(axis=1)
             
             # Benchmark (SPY)
             spy_data = yf.download('SPY', start=start_date, end=end_date)['Close']
             spy_returns = spy_data.pct_change().dropna()
             
-            # Métricas de performance
+            # Performance metrics
             portfolio_cumret = (1 + portfolio_returns).cumprod().iloc[-1] - 1
             spy_cumret = (1 + spy_returns).cumprod().iloc[-1] - 1
             
@@ -631,45 +633,45 @@ class MagicFormulaScreener:
             }
             
         except Exception as e:
-            return {'error': f'Error en backtest: {e}'}
+            return {'error': f'Error in backtest: {e}'}
 
 def magic_formula_example():
     """
-    Ejemplo completo de Fórmula Mágica
+    Complete Magic Formula example
     """
-    print("=== FÓRMULA MÁGICA DE JOEL GREENBLATT ===\\n")
+    print("=== JOEL GREENBLATT'S MAGIC FORMULA ===\\n")
     
-    # Lista de tickers para analizar (expandir según necesidad)
+    # List of tickers to analyze (expand as needed)
     tickers = [
         "AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "META", "NFLX", "NVDA",
         "JPM", "JNJ", "PG", "KO", "DIS", "INTC", "CSCO", "VZ",
         "PFE", "WMT", "HD", "MRK", "ABBV", "CRM", "ADBE", "TMO"
     ]
     
-    # Crear screener
+    # Create screener
     screener = MagicFormulaScreener(min_market_cap=1e9)  # Min $1B market cap
     
-    # Ejecutar screening
+    # Run screening
     results = screener.screen_stocks(tickers)
     
     if results.empty:
-        print("❌ No se encontraron resultados")
+        print("❌ No results found")
         return
     
-    print(f"✅ Analizadas {len(results)} acciones\\n")
+    print(f"✅ Analyzed {len(results)} stocks\\n")
     
-    # Mostrar top 10
+    # Show top 10
     top_10 = screener.get_top_stocks(10)
-    print("🏆 TOP 10 SEGÚN FÓRMULA MÁGICA:")
+    print("🏆 TOP 10 ACCORDING TO MAGIC FORMULA:")
     print(top_10[['ticker', 'roc', 'earnings_yield', 'pe_ratio', 'magic_formula_rank']].round(2))
     
-    # Estadísticas
+    # Statistics
     stats = screener.analyze_results()
-    print(f"\\n📊 ESTADÍSTICAS:")
-    print(f"   ROC Promedio: {stats['average_roc']:.1f}%")
-    print(f"   Earnings Yield Promedio: {stats['average_earnings_yield']:.1f}%")
-    print(f"   P/E Promedio: {stats['average_pe_ratio']:.1f}")
-    print(f"   Market Cap Mediana: ${stats['median_market_cap']/1e9:.1f}B")
+    print(f"\\n📊 STATISTICS:")
+    print(f"   Average ROC: {stats['average_roc']:.1f}%")
+    print(f"   Average Earnings Yield: {stats['average_earnings_yield']:.1f}%")
+    print(f"   Average P/E: {stats['average_pe_ratio']:.1f}")
+    print(f"   Median Market Cap: ${stats['median_market_cap']/1e9:.1f}B")
     
     # Backtest
     backtest = screener.backtest_strategy(
@@ -679,7 +681,7 @@ def magic_formula_example():
     )
     
     if 'error' not in backtest:
-        print(f"\\n📈 BACKTEST (Top 5 acciones):")
+        print(f"\\n📈 BACKTEST (Top 5 stocks):")
         print(f"   Portfolio Return: {backtest['portfolio_return']:.1%}")
         print(f"   SPY Return: {backtest['spy_return']:.1%}")
         print(f"   Outperformance: {backtest['outperformance']:.1%}")
@@ -692,13 +694,13 @@ if __name__ == "__main__":
     magic_formula_example()
 ```
 
-## Métricas Financieras Avanzadas
+## Advanced Financial Metrics
 
 ### 1. Quality Score
 ```python
 def calculate_quality_score(ticker):
     """
-    Calcular score de calidad de una empresa
+    Calculate quality score for a company
     """
     stock = yf.Ticker(ticker)
     
@@ -761,7 +763,7 @@ def calculate_quality_score(ticker):
 ```python
 class ValueInvestingScreener:
     """
-    Screener completo para value investing
+    Complete screener for value investing
     """
     
     def __init__(self):
@@ -777,7 +779,7 @@ class ValueInvestingScreener:
     
     def screen_stock(self, ticker):
         """
-        Evaluar una acción contra criterios value
+        Evaluate a stock against value criteria
         """
         try:
             stock = yf.Ticker(ticker)
@@ -794,7 +796,7 @@ class ValueInvestingScreener:
                 'current_ratio': info.get('currentRatio', 0)
             }
             
-            # Evaluar criterios
+            # Evaluate criteria
             passed_criteria = 0
             total_criteria = len(self.criteria)
             
@@ -824,7 +826,7 @@ class ValueInvestingScreener:
     
     def batch_screen(self, tickers, min_score=70):
         """
-        Screen múltiples acciones
+        Screen multiple stocks
         """
         results = []
         
@@ -833,43 +835,43 @@ class ValueInvestingScreener:
             if 'error' not in result and result['value_score'] >= min_score:
                 results.append(result)
         
-        # Ordenar por score
+        # Sort by score
         results.sort(key=lambda x: x['value_score'], reverse=True)
         
         return results
 ```
 
-## Integración con Trading Cuantitativo
+## Integration with Quantitative Trading
 
 ### 1. Fundamental + Technical Strategy
 ```python
 def fundamental_technical_strategy(ticker, dcf_margin_threshold=0.15):
     """
-    Combinar análisis fundamental con señales técnicas
+    Combine fundamental analysis with technical signals
     """
-    # Análisis fundamental
+    # Fundamental analysis
     valuator = DCFValuator(ticker)
     dcf_result = valuator.calculate_dcf_valuation()
     
     if 'error' in dcf_result:
-        return {'error': 'No se pudo completar análisis fundamental'}
+        return {'error': 'Could not complete fundamental analysis'}
     
-    # Solo considerar si hay margen de seguridad
+    # Only consider if there is margin of safety
     if dcf_result['margin_of_safety'] < dcf_margin_threshold:
         return {'signal': 'HOLD', 'reason': 'Insufficient margin of safety'}
     
-    # Obtener datos técnicos
+    # Get data técnicos
     end_date = datetime.now()
     start_date = end_date - timedelta(days=252)
     price_data = yf.download(ticker, start=start_date, end=end_date)
     
-    # Indicadores técnicos simples
+    # Simple technical indicators
     current_price = price_data['Close'].iloc[-1]
     sma_50 = price_data['Close'].rolling(50).mean().iloc[-1]
     sma_200 = price_data['Close'].rolling(200).mean().iloc[-1]
     rsi = calculate_rsi(price_data['Close']).iloc[-1]
     
-    # Lógica de señales combinada
+    # Combined signal logic
     fundamental_bullish = dcf_result['margin_of_safety'] > dcf_margin_threshold
     technical_bullish = (current_price > sma_50 and 
                         sma_50 > sma_200 and 
@@ -899,7 +901,7 @@ def fundamental_technical_strategy(ticker, dcf_margin_threshold=0.15):
     }
 
 def calculate_rsi(series, period=14):
-    """Helper function para RSI"""
+    """Helper function for RSI"""
     delta = series.diff()
     gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
     loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
@@ -911,11 +913,11 @@ def calculate_rsi(series, period=14):
 ```python
 def build_fundamental_portfolio(tickers, max_positions=10, min_margin_safety=0.2):
     """
-    Construir portfolio basado en análisis fundamental
+    Build portfolio based on fundamental analysis
     """
     candidates = []
     
-    # Screening fundamental
+    # Fundamental screening
     for ticker in tickers:
         try:
             # DCF Analysis
@@ -941,11 +943,11 @@ def build_fundamental_portfolio(tickers, max_positions=10, min_margin_safety=0.2
         except Exception as e:
             continue
     
-    # Seleccionar mejores
+    # Select best candidates
     candidates.sort(key=lambda x: x['composite_score'], reverse=True)
     selected = candidates[:max_positions]
     
-    # Calcular pesos (basado en composite score)
+    # Calculate weights (based on composite score)
     total_score = sum(stock['composite_score'] for stock in selected)
     for stock in selected:
         stock['weight'] = stock['composite_score'] / total_score
@@ -953,18 +955,18 @@ def build_fundamental_portfolio(tickers, max_positions=10, min_margin_safety=0.2
     return selected
 ```
 
-## Métricas de Evaluación
+## Evaluation Metrics
 
 ### Performance Tracking
 ```python
 def track_fundamental_performance(portfolio, start_date, end_date):
     """
-    Hacer seguimiento del performance de portfolio fundamental
+    Track fundamental portfolio performance
     """
     tickers = [stock['ticker'] for stock in portfolio]
     weights = [stock['weight'] for stock in portfolio]
     
-    # Obtener precios
+    # Get prices
     price_data = yf.download(tickers, start=start_date, end=end_date)['Close']
     returns = price_data.pct_change().dropna()
     
@@ -975,14 +977,14 @@ def track_fundamental_performance(portfolio, start_date, end_date):
     spy_data = yf.download('SPY', start=start_date, end=end_date)['Close']
     spy_returns = spy_data.pct_change().dropna()
     
-    # Métricas
+    # Metrics
     portfolio_cumret = (1 + portfolio_returns).cumprod().iloc[-1] - 1
     spy_cumret = (1 + spy_returns).cumprod().iloc[-1] - 1
     
     portfolio_sharpe = portfolio_returns.mean() / portfolio_returns.std() * np.sqrt(252)
     spy_sharpe = spy_returns.mean() / spy_returns.std() * np.sqrt(252)
     
-    # Calcular max drawdown
+    # Calculate max drawdown
     portfolio_cumulative = (1 + portfolio_returns).cumprod()
     portfolio_drawdown = (portfolio_cumulative / portfolio_cumulative.cummax() - 1).min()
     
@@ -997,37 +999,37 @@ def track_fundamental_performance(portfolio, start_date, end_date):
     }
 ```
 
-## Limitaciones y Mejores Prácticas
+## Limitations and Best Practices
 
-### Limitaciones del Análisis Fundamental
-1. **Datos históricos**: Los estados financieros reflejan el pasado
-2. **Accounting practices**: Diferentes métodos contables pueden distorsionar métricas
-3. **Market timing**: El valor puede tardar años en realizarse
-4. **Small caps data**: Datos menos confiables o disponibles
+### Limitations of Fundamental Analysis
+1. **Historical data**: Financial statements reflect the past
+2. **Accounting practices**: Different accounting methods can distort metrics
+3. **Market timing**: Value may take years to be realized
+4. **Small caps data**: Less reliable or available data
 
-### Mejores Prácticas
+### Best Practices
 ```python
 FUNDAMENTAL_BEST_PRACTICES = {
     'data_quality': {
-        'min_market_cap': 50e6,     # Mínimo $50M para datos confiables
-        'max_pe_outlier': 100,      # Evitar P/E extremos
-        'min_trading_volume': 100000 # Mínimo volumen diario
+        'min_market_cap': 50e6,     # Minimum $50M for reliable data
+        'max_pe_outlier': 100,      # Avoid extreme P/E
+        'min_trading_volume': 100000 # Minimum daily volume
     },
     'valuation': {
-        'dcf_sensitivity': True,     # Siempre hacer análisis de sensibilidad
-        'multiple_methods': True,    # Usar DCF + múltiples comparables
-        'margin_of_safety': 0.20,   # Mínimo 20% margen de seguridad
-        'growth_cap': 0.15          # Cap de crecimiento al 15% anual
+        'dcf_sensitivity': True,     # Always perform sensitivity analysis
+        'multiple_methods': True,    # Use DCF + comparable multiples
+        'margin_of_safety': 0.20,   # Minimum 20% margin of safety
+        'growth_cap': 0.15          # Growth cap at 15% annual
     },
     'portfolio': {
-        'max_position_size': 0.10,   # Máximo 10% por posición
-        'diversification': True,     # Diversificar por sectores
-        'rebalancing': 'quarterly',  # Rebalancear cada trimestre
-        'fundamental_weight': 0.70   # 70% peso fundamental, 30% técnico
+        'max_position_size': 0.10,   # Maximum 10% per position
+        'diversification': True,     # Diversify by sectors
+        'rebalancing': 'quarterly',  # Rebalance quarterly
+        'fundamental_weight': 0.70   # 70% fundamental weight, 30% technical
     }
 }
 ```
 
-## Siguiente Paso
+## Next Step
 
-Con Análisis Fundamental completado, ahora tienes un arsenal completo de herramientas cuantitativas profesionales. La documentación cubre desde indicadores técnicos hasta machine learning y análisis fundamental, proporcionando una base sólida para trading cuantitativo institucional.
+With Fundamental Analysis completed, you now have a full arsenal of professional quantitative tools. The documentation covers everything from technical indicators to machine learning and fundamental analysis, providing a solid foundation for institutional-grade quantitative trading.

@@ -1,194 +1,196 @@
-# Instrumentos Financieros para Quant Traders
+> 🇪🇸 [Leer en Español](Financial-Instruments.es.md) | 🇺🇸 **English**
 
-Antes de construir un sistema algorítmico, necesitás entender **qué estás tradeando**. Cada instrumento tiene reglas distintas que afectan directamente cómo diseñás, backtesteas y ejecutás tu estrategia.
+# Financial Instruments for Quant Traders
 
-## Acciones (Renta Variable)
+Before building an algorithmic system, you need to understand **what you're trading**. Each instrument has different rules that directly affect how you design, backtest, and execute your strategy.
 
-Una acción representa propiedad parcial de una empresa. Cuando comprás una acción, sos socio — con derechos a dividendos y voto en juntas.
+## Stocks (Equities)
 
-Se llama "renta variable" porque el rendimiento total (precio + dividendos) es incierto — a diferencia de un bono donde el cupón está fijado de antemano.
+A stock represents partial ownership of a company. When you buy a stock, you're a partner -- with rights to dividends and voting at shareholder meetings.
 
-### Lo que importa para tu sistema
+They're called "equities" (or "variable income" in some traditions) because the total return (price + dividends) is uncertain -- unlike a bond where the coupon is fixed in advance.
 
-- **Representación gráfica**: se grafica por el *last* (último precio al que se ejecutó una operación)
-- **Horarios**: mercado regular 9:30-16:00 ET, premarket desde 4:00 AM, afterhours hasta 20:00
-- **Liquidez**: varía enormemente — una large cap como AAPL vs una small cap de $2 son mundos distintos
-- **Short selling**: requiere localizar acciones prestadas (locate), no siempre disponible en small caps
-- **Sin vencimiento**: podés mantener una posición indefinidamente
+### What matters for your system
 
-### Por qué el mercado americano
+- **Chart representation**: plotted by the *last* (the most recent price at which a trade was executed)
+- **Hours**: regular market 9:30-16:00 ET, premarket from 4:00 AM, afterhours until 20:00
+- **Liquidity**: varies enormously -- a large cap like AAPL vs a $2 small cap are completely different worlds
+- **Short selling**: requires locating borrowed shares (locate), not always available in small caps
+- **No expiration**: you can hold a position indefinitely
 
-El mercado US concentra el mayor volumen, la mayor cantidad de instrumentos listados, y las APIs más maduras para trading algorítmico. Si tu cuenta es chica, las comisiones de brokers como IBKR ($0.005/acción) son manejables. Empezar con acciones españolas o europeas limita tus oportunidades y tus herramientas.
+### Why the US market
+
+The US market has the highest volume, the largest number of listed instruments, and the most mature APIs for algorithmic trading. If your account is small, commissions from brokers like IBKR ($0.005/share) are manageable. Starting with European stocks limits your opportunities and your tools.
 
 ```python
 import yfinance as yf
 
-# Datos de una acción — así de simple es acceder
+# Stock data -- it's this simple to access
 data = yf.download('AAPL', period='1mo', interval='1d')
-print(f"Último precio: ${data['Close'].iloc[-1]:.2f}")
-print(f"Volumen promedio: {data['Volume'].mean():,.0f} acciones/día")
+print(f"Last price: ${data['Close'].iloc[-1]:.2f}")
+print(f"Average volume: {data['Volume'].mean():,.0f} shares/day")
 ```
 
-## Bonos (Renta Fija)
+## Bonds (Fixed Income)
 
-Instrumentos de deuda: le prestás dinero a una empresa o gobierno y te devuelven el principal más un cupón (interés fijo). Se llama "renta fija" porque el cupón está predeterminado.
+Debt instruments: you lend money to a company or government and they return the principal plus a coupon (fixed interest). They're called "fixed income" because the coupon is predetermined.
 
-### Lo que importa para tu sistema
+### What matters for your system
 
-- **El cupón no cambia, pero el precio del bono sí**: existe un mercado secundario donde los bonos cotizan a descuento o prima
-- **Relación inversa con tasas de interés**: cuando las tasas suben, los precios de bonos bajan — esto es tradeable algorítmicamente
-- **Mayor cupón = mayor riesgo**: un bono de Argentina que paga 15% es más riesgoso que un Treasury US al 4%
-- **Vencimiento fijo**: si esperás al vencimiento, cobrás exactamente lo pactado (salvo default)
+- **The coupon doesn't change, but the bond price does**: there's a secondary market where bonds trade at a discount or premium
+- **Inverse relationship with interest rates**: when rates go up, bond prices go down -- this is algorithmically tradeable
+- **Higher coupon = higher risk**: an Argentine bond paying 15% is riskier than a US Treasury at 4%
+- **Fixed maturity**: if you wait until maturity, you collect exactly what was agreed (barring default)
 
-### Aplicación quant
+### Quant application
 
-Los bonos son fundamentales para estrategias de **curva de tasas**, **spread trading** (ej: largo bonos corporativos / corto treasuries), y como indicador macro para sistemas de acciones. Un sistema de momentum en acciones que ignora el mercado de bonos está operando con información incompleta.
+Bonds are fundamental for **yield curve** strategies, **spread trading** (e.g., long corporate bonds / short treasuries), and as a macro indicator for equity systems. A momentum system in stocks that ignores the bond market is operating with incomplete information.
 
-## Futuros
+## Futures
 
-Contratos estandarizados para comprar/vender un activo a un precio pactado en una fecha futura. Cotizan en mercados regulados (CME, EUREX, etc).
+Standardized contracts to buy/sell an asset at an agreed price on a future date. They trade on regulated markets (CME, EUREX, etc.).
 
-### Lo que importa para tu sistema
+### What matters for your system
 
-- **Tienen vencimiento**: si no cerrás antes, te pueden entregar el activo físico (materias primas) o liquidar por diferencia (financieros)
-- **Rollover**: para mantener exposición continua, hay que "rolear" del contrato próximo al siguiente — tu backtest DEBE considerar esto
-- **Representación gráfica**: se grafica por el *last*, igual que acciones
-- **Margen**: no pagás el 100% del valor — operás con margen, lo que amplifica ganancias y pérdidas
-- **Posición corta nativa**: podés vender futuros sin restricciones de locate
+- **They have expiration**: if you don't close before expiry, you may receive physical delivery (commodities) or cash settlement (financials)
+- **Rollover**: to maintain continuous exposure, you need to "roll" from the nearest contract to the next -- your backtest MUST account for this
+- **Chart representation**: plotted by the *last*, same as stocks
+- **Margin**: you don't pay 100% of the value -- you trade on margin, which amplifies gains and losses
+- **Native short position**: you can sell futures without locate restrictions
 
-### Trampas comunes en backtesting
+### Common backtesting pitfalls
 
-Para un tratamiento completo del ajuste de datos en futuros, ver [Calidad de Datos y Ajustes](../technical-practices/Data-Quality-Adjustments.md).
+For a complete treatment of data adjustment in futures, see [Data Quality and Adjustments](../technical-practices/Data-Quality-Adjustments.md).
 
 ```python
-# MAL: usar un gráfico continuo sin ajustar por rollover
-# Los gaps entre contratos generan señales falsas
+# WRONG: using a continuous chart without adjusting for rollover
+# Gaps between contracts generate false signals
 
-# BIEN: ajustar backward por diferencia al momento del rollover
-# Concepto simplificado — en la práctica se usan herramientas
-# especializadas o las funciones de la plataforma de trading.
+# RIGHT: backward-adjust by difference at rollover time
+# Simplified concept -- in practice, specialized tools
+# or trading platform functions are used.
 #
-# La idea: en la fecha de rolo, calcular la diferencia de precio
-# entre el contrato nuevo y el viejo, y restar esa diferencia
-# a todo el histórico anterior para eliminar el gap artificial.
+# The idea: on the roll date, calculate the price difference
+# between the new and old contract, and subtract that difference
+# from the entire prior history to eliminate the artificial gap.
 ```
 
-### Especificaciones que debés conocer antes de operar
+### Specifications you must know before trading
 
-Cada futuro tiene especificaciones únicas. Antes de incluir cualquier futuro en tu sistema, verificá:
+Each future has unique specifications. Before including any future in your system, verify:
 
-| Especificación | Por qué importa |
+| Specification | Why it matters |
 |---|---|
-| Tamaño del contrato | Define cuánto capital necesitás realmente |
-| Tick mínimo y valor | Afecta tu stop loss mínimo en dólares |
-| Último día de trading | Si tu sistema no cierra antes, el broker lo hará (con penalidad) |
-| Entregable vs. liquidación cash | Nunca quieras que te lleguen 1000 barriles de petróleo |
-| Horario de trading | Algunos futuros operan casi 24h, otros no |
+| Contract size | Defines how much capital you actually need |
+| Minimum tick and value | Affects your minimum stop loss in dollars |
+| Last trading day | If your system doesn't close before this, the broker will (with a penalty) |
+| Deliverable vs. cash settlement | You never want 1,000 barrels of oil delivered to you |
+| Trading hours | Some futures trade nearly 24h, others don't |
 
-## Opciones
+## Options
 
-Le dan al comprador un **derecho** (no obligación) a comprar o vender un activo a un precio determinado (strike). El vendedor tiene la **obligación** si el comprador ejerce.
+They give the buyer a **right** (not obligation) to buy or sell an asset at a specific price (strike). The seller has the **obligation** if the buyer exercises.
 
-- **Call**: derecho a comprar
-- **Put**: derecho a vender
-- El comprador paga una **prima** por ese derecho (como un seguro)
+- **Call**: right to buy
+- **Put**: right to sell
+- The buyer pays a **premium** for that right (like insurance)
 
-### Las 4 posiciones básicas
+### The 4 basic positions
 
-| Posición | Visión | Riesgo máximo | Ganancia máxima |
+| Position | Outlook | Maximum risk | Maximum gain |
 |---|---|---|---|
-| Comprar Call | Alcista | La prima pagada | Ilimitada |
-| Vender Call | Bajista/Neutral | Ilimitada | La prima cobrada |
-| Comprar Put | Bajista | La prima pagada | Strike - Prima |
-| Vender Put | Alcista/Neutral | Strike - Prima | La prima cobrada |
+| Buy Call | Bullish | Premium paid | Unlimited |
+| Sell Call | Bearish/Neutral | Unlimited | Premium collected |
+| Buy Put | Bearish | Premium paid | Strike - Premium |
+| Sell Put | Bullish/Neutral | Strike - Premium | Premium collected |
 
-### Por qué las opciones son difíciles de algoritmizar
+### Why options are hard to algorithmize
 
-Las opciones dependen de múltiples variables simultáneamente (las "griegas"):
+Options depend on multiple variables simultaneously (the "Greeks"):
 
-- **Delta**: sensibilidad al precio del subyacente
-- **Theta**: decaimiento temporal (la opción pierde valor cada día)
-- **Vega**: sensibilidad a la volatilidad implícita
-- **Gamma**: aceleración del delta
+- **Delta**: sensitivity to the underlying's price
+- **Theta**: time decay (the option loses value every day)
+- **Vega**: sensitivity to implied volatility
+- **Gamma**: acceleration of delta
 
-Además, cada subyacente tiene decenas de strikes y vencimientos activos simultáneamente. Esto multiplica la complejidad de datos, backtesting y ejecución. Si estás empezando en trading algorítmico, las opciones **no** son el mejor punto de entrada.
+Additionally, each underlying has dozens of strikes and active expirations simultaneously. This multiplies the complexity of data, backtesting, and execution. If you're starting in algorithmic trading, options are **not** the best entry point.
 
-### Opciones americanas vs europeas
+### American vs European options
 
-- **Americanas**: se pueden ejercer en cualquier momento → más flexibilidad pero más variables para modelar
-- **Europeas**: solo al vencimiento → más simples de modelar algorítmicamente
+- **American**: can be exercised at any time -- more flexibility but more variables to model
+- **European**: only at expiration -- simpler to model algorithmically
 
-## CFDs (Contratos por Diferencia)
+## CFDs (Contracts for Difference)
 
-Producto derivado puramente especulativo. Comprás/vendés la diferencia de precio sin poseer el activo. **No cotizan en mercados regulados** — son productos OTC negociados directamente con tu broker.
+A purely speculative derivative product. You buy/sell the price difference without owning the asset. **They don't trade on regulated markets** -- they're OTC products negotiated directly with your broker.
 
-### Lo que importa para tu sistema
+### What matters for your system
 
-- **Tu broker es tu contraparte**: él "crea" el mercado, lo que genera un conflicto de interés estructural
-- **No hay precio único**: cada broker puede tener spreads y precios distintos para el mismo CFD
-- **Swaps overnight**: mantener posiciones abiertas de un día al otro tiene costo — esto destruye estrategias de swing trading lentas
-- **Sin vencimiento**: a diferencia de futuros, no expiran
-- **Spread variable**: en momentos de volatilidad alta, el broker puede ampliar el spread significativamente o hasta cerrar posiciones
+- **Your broker is your counterparty**: they "create" the market, which generates a structural conflict of interest
+- **There's no single price**: each broker can have different spreads and prices for the same CFD
+- **Overnight swaps**: holding positions open from one day to the next has a cost -- this destroys slow swing trading strategies
+- **No expiration**: unlike futures, they don't expire
+- **Variable spread**: during high volatility moments, the broker can widen the spread significantly or even close positions
 
-### Representación gráfica
+### Chart representation
 
-Los CFDs (y forex) típicamente se negocian y grafican a partir del **bid o ask** (o un mid-price calculado), no del last como en exchanges centralizados. Esto significa que:
+CFDs (and forex) are typically negotiated and charted based on **bid or ask** (or a calculated mid-price), not the last as in centralized exchanges. This means:
 
 ```
-# Un backtest de CFD que usa datos de "close" sin distinguir bid/ask
-# está ignorando el spread real del broker.
+# A CFD backtest that uses "close" data without distinguishing bid/ask
+# is ignoring the broker's real spread.
 #
-# Si tu estrategia tiene un profit promedio de 5 pips y el spread
-# es de 2 pips, el spread se come el 40% de tu ganancia.
-# En backtest no lo ves. En real, sí.
+# If your strategy has an average profit of 5 pips and the spread
+# is 2 pips, the spread eats 40% of your profit.
+# You don't see it in backtest. You do in live trading.
 ```
 
-### Cuándo tiene sentido usar CFDs
+### When CFDs make sense
 
-Con cuentas muy chicas (< $5,000) donde no podés acceder a futuros por margen, los CFDs dan acceso a mercados con tamaños de posición pequeños. Pero si podés operar futuros, preferí futuros: están regulados, tienen cámara de compensación, y el precio es transparente.
+With very small accounts (< $5,000) where you can't access futures due to margin, CFDs provide access to markets with small position sizes. But if you can trade futures, prefer futures: they're regulated, have a clearinghouse, and the price is transparent.
 
-## Forex (Mercado de Divisas)
+## Forex (Foreign Exchange Market)
 
-Mercado descentralizado donde se negocian pares de divisas. Es el mercado más grande del mundo (~USD 6-7 trillones diarios de volumen) y opera 24 horas en días laborables.
+A decentralized market where currency pairs are traded. It's the largest market in the world (~USD 6-7 trillion daily volume) and operates 24 hours on business days.
 
-### Lo que importa para tu sistema
+### What matters for your system
 
-- **Pares**: siempre se tradea una divisa contra otra (EUR/USD, GBP/JPY). Si EUR/USD sube, el euro se fortalece vs. el dólar
-- **OTC como los CFDs**: no hay exchange central, cada proveedor de liquidez puede tener precio distinto
-- **Sesiones**: se mueve por zonas horarias — Tokio → Londres → Nueva York. La liquidez y volatilidad cambian según la sesión
-- **Representación por bid/ask**: igual que CFDs, tu backtest debe contemplar el spread real
-- **Sin vencimiento**: similar a CFDs, las posiciones se mantienen indefinidamente (con swaps)
+- **Pairs**: you always trade one currency against another (EUR/USD, GBP/JPY). If EUR/USD goes up, the euro strengthens vs. the dollar
+- **OTC like CFDs**: there's no central exchange, each liquidity provider can have a different price
+- **Sessions**: it moves by time zones -- Tokyo -> London -> New York. Liquidity and volatility change depending on the session
+- **Bid/ask representation**: like CFDs, your backtest must account for the real spread
+- **No expiration**: similar to CFDs, positions are held indefinitely (with swaps)
 
-### Ventaja para sistemas algorítmicos
+### Advantage for algorithmic systems
 
-Forex es uno de los mercados más amigables para algoritmos por su liquidez masiva, operación continua, y volatilidad predecible por sesión. Muchas firmas quant operan forex como su primer mercado.
+Forex is one of the most algorithm-friendly markets due to its massive liquidity, continuous operation, and predictable volatility by session. Many quant firms trade forex as their first market.
 
-## Tabla Comparativa para Decidir
+## Comparison Table for Decision Making
 
-| Criterio | Acciones | Futuros | Opciones | CFDs | Forex |
+| Criterion | Stocks | Futures | Options | CFDs | Forex |
 |---|---|---|---|---|---|
-| **Capital mínimo práctico** | $500+ | $5,000+ | $2,000+ | $200+ | $200+ |
-| **Regulación** | Alta | Alta | Alta | Baja | Baja |
-| **Complejidad algorítmica** | Media | Media | Alta | Baja | Media |
-| **Datos para backtest** | Fácil | Media | Difícil | Difícil | Media |
-| **Datos por** | Last | Last | Last | Bid/Ask | Bid/Ask |
-| **Vencimiento** | No | Sí | Sí | No | No |
-| **Short selling** | Limitado | Nativo | Vía puts | Nativo | Nativo |
-| **Mejor para empezar algo** | Sí | Con capital | No | Con cuenta chica | Sí |
+| **Practical minimum capital** | $500+ | $5,000+ | $2,000+ | $200+ | $200+ |
+| **Regulation** | High | High | High | Low | Low |
+| **Algorithmic complexity** | Medium | Medium | High | Low | Medium |
+| **Backtest data** | Easy | Medium | Difficult | Difficult | Medium |
+| **Data by** | Last | Last | Last | Bid/Ask | Bid/Ask |
+| **Expiration** | No | Yes | Yes | No | No |
+| **Short selling** | Limited | Native | Via puts | Native | Native |
+| **Best for starting algo** | Yes | With capital | No | With small account | Yes |
 
-## Implicaciones para tu Sistema
+## Implications for Your System
 
-### Si estás empezando
+### If you're just starting
 
-Arrancá con **acciones US** o **forex majors**. Datos abundantes, brokers accesibles, y la complejidad es manejable. Construí tu primer sistema funcional antes de agregar instrumentos más complejos.
+Start with **US stocks** or **forex majors**. Abundant data, accessible brokers, and the complexity is manageable. Build your first functional system before adding more complex instruments.
 
-### Si ya tenés un sistema rentable
+### If you already have a profitable system
 
-Diversificar por instrumento es tan importante como diversificar por estrategia. Un portfolio con sistemas en acciones + futuros + forex tiene correlaciones más bajas que uno solo en acciones. La descorrelación entre instrumentos es el verdadero "santo grial" de la gestión de portfolio.
+Diversifying by instrument is as important as diversifying by strategy. A portfolio with systems in stocks + futures + forex has lower correlations than one solely in stocks. Decorrelation between instruments is the true "holy grail" of portfolio management.
 
-### Errores comunes
+### Common mistakes
 
-1. **Backtestear CFDs con datos de exchange**: los precios no son los mismos — tu broker tiene su propio feed
-2. **Ignorar el costo de rollover en futuros**: un sistema que rola 12 veces al año tiene 12 eventos de slippage extra
-3. **Asumir que podés shortear cualquier acción**: en small caps, los locates son caros o inexistentes
-4. **Usar el mismo framework de backtesting para opciones que para acciones**: las opciones necesitan modelar decaimiento temporal, volatilidad implícita, y múltiples strikes simultáneos
+1. **Backtesting CFDs with exchange data**: the prices aren't the same -- your broker has its own feed
+2. **Ignoring rollover costs in futures**: a system that rolls 12 times a year has 12 extra slippage events
+3. **Assuming you can short any stock**: in small caps, locates are expensive or nonexistent
+4. **Using the same backtesting framework for options as for stocks**: options need to model time decay, implied volatility, and multiple simultaneous strikes

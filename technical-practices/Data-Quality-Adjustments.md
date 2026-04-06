@@ -1,32 +1,34 @@
-# Calidad de Datos y Ajustes para Backtesting
+> 🇪🇸 [Leer en Español](Data-Quality-Adjustments.es.md) | 🇺🇸 **English**
 
-Los datos son tu materia prima. Si tu base de datos no representa fielmente lo que pasó en el mercado, tu backtest no vale nada — por más sofisticado que sea tu algoritmo. Este es probablemente el tema más subestimado en trading algorítmico.
+# Data Quality and Adjustments for Backtesting
 
-## El Problema del Rolo en Futuros
+Data is your raw material. If your database doesn't faithfully represent what happened in the market, your backtest is worthless -- no matter how sophisticated your algorithm. This is probably the most underestimated topic in algorithmic trading.
 
-Los futuros vencen. El Mini S&P 500 vence trimestralmente (tercer viernes de marzo, junio, septiembre, diciembre). Para construir un gráfico histórico mayor a un trimestre, necesitás **unir vencimientos** en lo que se llama un gráfico continuo.
+## The Roll Problem in Futures
 
-El problema: entre vencimientos casi siempre hay un **gap de precio**. Este gap no es producto de oferta y demanda real — es un artefacto del enlace entre dos contratos diferentes. Si no lo tratás correctamente, ese gap contamina tus indicadores y distorsiona tu backtest.
+Futures expire. The Mini S&P 500 expires quarterly (third Friday of March, June, September, December). To build a historical chart longer than one quarter, you need to **splice expirations** into what's called a continuous chart.
 
-### De dónde sale el gap
+The problem: between expirations there's almost always a **price gap**. This gap isn't the product of real supply and demand -- it's an artifact of linking two different contracts. If you don't handle it correctly, that gap contaminates your indicators and distorts your backtest.
 
-Cuando un futuro empieza a cotizar (ej: septiembre), cotiza **por encima** del contrato que está por vencer (ej: junio). La diferencia se explica por:
+### Where the Gap Comes From
 
-- **Tipos de interés**: el valor temporal del dinero. Dinero hoy vale más que dinero en 3 meses
-- **Dividendos**: en futuros de índices, los dividendos que pagarán las acciones entre hoy y el vencimiento
-- **Costo de almacenamiento**: en materias primas (petróleo, granos), el costo de guardar el activo físico
+When a new futures contract starts trading (e.g., September), it trades **above** the expiring contract (e.g., June). The difference is explained by:
 
-En índices americanos con tipos de interés altos, esta diferencia puede ser de 40-45 puntos. En bonos (ej: Bund), los gaps son enormes.
+- **Interest rates**: the time value of money. Money today is worth more than money in 3 months
+- **Dividends**: in index futures, the dividends that stocks will pay between now and expiration
+- **Storage costs**: in commodities (oil, grains), the cost of storing the physical asset
 
-### Cuándo rolar
+In US indices with high interest rates, this difference can be 40-45 points. In bonds (e.g., Bund), the gaps are enormous.
 
-El momento óptimo para cambiar de contrato en tu gráfico continuo es **cuando el nuevo vencimiento tiene más volumen que el antiguo**:
+### When to Roll
+
+The optimal time to switch contracts in your continuous chart is **when the new expiration has more volume than the old one**:
 
 ```python
 def detect_roll_date(front_volume, next_volume):
     """
-    Detecta el día en que el próximo vencimiento supera al actual en volumen.
-    Ese es el día óptimo para el enlace en el gráfico continuo.
+    Detects the day when the next expiration surpasses the current one in volume.
+    That is the optimal day for the splice in the continuous chart.
     """
     for date in front_volume.index:
         if date in next_volume.index:
@@ -34,51 +36,51 @@ def detect_roll_date(front_volume, next_volume):
                 return date
     return None
 
-# IMPORTANTE: el timing varía por mercado
-# - Índices US (S&P, Nasdaq, Dow): 5-7 días antes del vencimiento
-# - DAX y futuros europeos: varía, puede ser pocos días antes o incluso cerca del vencimiento
-# - Bonos: varía según el mercado
-# Conocer las fechas de cada futuro que operás es tu responsabilidad
+# IMPORTANT: timing varies by market
+# - US Indices (S&P, Nasdaq, Dow): 5-7 days before expiration
+# - DAX and European futures: varies, can be a few days before or even close to expiration
+# - Bonds: varies by market
+# Knowing the dates for each future you trade is your responsibility
 ```
 
-**Nota clave**: el momento del rolo operativo (cerrar una posición y abrir otra en el nuevo contrato) NO tiene que coincidir exactamente con el momento del enlace en el gráfico continuo. Son dos cosas distintas.
+**Key note**: the operational roll timing (closing a position and opening another in the new contract) does NOT have to coincide exactly with the splice point in the continuous chart. They are two different things.
 
-## Tres Métodos de Ajuste
+## Three Adjustment Methods
 
-### 1. Sin ajustar
+### 1. Unadjusted
 
-Simplemente enlazás los contratos tal como cotizan. El gap queda ahí.
+Simply splice the contracts as they trade. The gap stays.
 
-**Ventaja**: los precios históricos son reales — lo que cotizó, cotizó.
+**Advantage**: historical prices are real -- what traded, traded.
 
-**Problema**: el gap artificial contamina cualquier indicador que use datos de más de un día. Y no es solo el día del rolo — una EMA de 50 períodos puede estar afectada durante semanas porque su fórmula recursiva arrastra el error.
+**Problem**: the artificial gap contaminates any indicator that uses more than one day of data. And it's not just the roll day -- a 50-period EMA can be affected for weeks because its recursive formula propagates the error.
 
 ```python
-# Indicadores especialmente sensibles a gaps sin ajustar:
-# - EMA (media exponencial): la fórmula recursiva propaga el error
-# - ATR: usa el true range que incluye el gap entre cierres
-# - ADX: derivado del ATR
-# - RSI: usa cambios de precio que incluyen el gap falso
-# - Estocástico: compara precio actual con rango, alterado por el gap
+# Indicators especially sensitive to unadjusted gaps:
+# - EMA (exponential moving average): the recursive formula propagates the error
+# - ATR: uses true range which includes the gap between closes
+# - ADX: derived from ATR
+# - RSI: uses price changes that include the false gap
+# - Stochastic: compares current price to range, altered by the gap
 #
-# Pueden estar alterados por MÁS barras que su período de cálculo
-# debido a las fórmulas recursivas que usan datos anteriores.
+# They can be distorted for MORE bars than their calculation period
+# due to recursive formulas that use prior data.
 ```
 
-### 2. Ajuste por valor absoluto (puntos)
+### 2. Absolute Value Adjustment (Points)
 
-Restás (o sumás) la diferencia del gap a todo el histórico previo.
+Subtract (or add) the gap difference from the entire prior history.
 
 ```python
 def adjust_absolute(data, roll_gaps):
     """
-    Ajuste backward por valor absoluto.
-    Mantiene el contrato actual al precio real y modifica el pasado.
+    Backward adjustment by absolute value.
+    Keeps the current contract at real price and modifies the past.
     """
     adjusted = data.copy()
     cumulative_adjustment = 0
 
-    # Procesamos de más reciente a más antiguo
+    # Process from most recent to oldest
     for roll_date, gap in sorted(roll_gaps.items(), reverse=True):
         cumulative_adjustment += gap
         mask = adjusted.index < roll_date
@@ -88,20 +90,20 @@ def adjust_absolute(data, roll_gaps):
     return adjusted
 ```
 
-**Ventaja**: mantiene el tick mínimo del activo. Si el Mini S&P se mueve de 0.25 en 0.25, los precios ajustados también lo hacen.
+**Advantage**: preserves the minimum tick of the asset. If the Mini S&P moves in 0.25 increments, the adjusted prices do too.
 
-**Desventaja**: en históricos largos, la relación proporcional de precios se distorsiona. 40 puntos de ajuste no significan lo mismo cuando el S&P estaba a 2,000 que cuando está a 5,000.
+**Disadvantage**: over long histories, the proportional price relationship gets distorted. A 40-point adjustment doesn't mean the same thing when the S&P was at 2,000 versus when it's at 5,000.
 
-### 3. Ajuste por ratio (porcentaje) — Recomendado
+### 3. Ratio Adjustment (Percentage) -- Recommended
 
-Ajustás proporcionalmente, preservando la relación porcentual de los precios.
+Adjust proportionally, preserving the percentage relationship of prices.
 
 ```python
 def adjust_ratio(data, roll_dates_and_prices):
     """
-    Ajuste backward por ratio.
-    Preserva relaciones porcentuales — el método más correcto
-    para históricos largos.
+    Backward adjustment by ratio.
+    Preserves percentage relationships -- the most correct method
+    for long histories.
     """
     adjusted = data.copy()
     cumulative_ratio = 1.0
@@ -118,77 +120,77 @@ def adjust_ratio(data, roll_dates_and_prices):
     return adjusted
 ```
 
-**Ventaja**: un movimiento del 1% en 2003 se representa igual que un 1% en 2024. Esto es correcto porque los mercados se mueven en porcentajes, no en puntos absolutos.
+**Advantage**: a 1% move in 2003 is represented the same as a 1% move in 2024. This is correct because markets move in percentages, not absolute points.
 
-**Desventaja**: los precios pierden el tick mínimo (aparecen decimales que no existen en el mercado real). Solución: redondear las órdenes al tick real antes de enviarlas.
+**Disadvantage**: prices lose the minimum tick (decimals appear that don't exist in the real market). Solution: round orders to the real tick before sending them.
 
-### Cuál usar
+### Which One to Use
 
-| Situación | Recomendación |
+| Situation | Recommendation |
 |---|---|
-| Backtest con indicadores en porcentaje (ATR%, ROC) | Ratio |
-| Backtest con indicadores en puntos absolutos | Valor absoluto funciona |
-| Histórico corto (< 2 años) | Cualquiera, la diferencia es mínima |
-| Histórico largo (> 5 años) | Ratio, sin duda |
-| Quiero ver precios históricos reales | Sin ajustar (solo para visualización, no para backtest) |
+| Backtest with percentage indicators (ATR%, ROC) | Ratio |
+| Backtest with absolute point indicators | Absolute value works |
+| Short history (< 2 years) | Either one, the difference is minimal |
+| Long history (> 5 years) | Ratio, without question |
+| I want to see real historical prices | Unadjusted (only for visualization, not for backtesting) |
 
-**La combinación ideal**: ajustar por ratio y trabajar con indicadores en porcentaje.
+**The ideal combination**: adjust by ratio and work with percentage-based indicators.
 
 ```python
-# EN VEZ DE:
-atr = calculate_atr(data, 14)  # ATR en puntos — inconsistente en el tiempo
+# INSTEAD OF:
+atr = calculate_atr(data, 14)  # ATR in points -- inconsistent over time
 
-# USAR:
-atr_pct = calculate_atr(data, 14) / data['close'] * 100  # ATR en % — consistente
+# USE:
+atr_pct = calculate_atr(data, 14) / data['close'] * 100  # ATR in % -- consistent
 ```
 
-## Dividendos en Acciones: El Mismo Problema
+## Dividends in Stocks: The Same Problem
 
-Cuando una acción paga dividendo, el precio se descuenta automáticamente por el monto del dividendo. Tu posición patrimonial no cambia (tenés la acción que vale menos + el efectivo del dividendo), pero tu gráfico muestra una caída que no fue producto de oferta y demanda.
+When a stock pays a dividend, the price is automatically discounted by the dividend amount. Your net worth position doesn't change (you have the stock worth less + the dividend cash), but your chart shows a drop that wasn't the product of supply and demand.
 
 ```
-Ejemplo: acción cotiza a $100, paga dividendo de $2
-- Antes: 1 acción × $100 = $100
-- Después: 1 acción × $98 + $2 efectivo = $100
-- El gráfico muestra una caída de 2% que NO es pérdida real
+Example: stock trades at $100, pays $2 dividend
+- Before: 1 share x $100 = $100
+- After: 1 share x $98 + $2 cash = $100
+- The chart shows a 2% drop that is NOT a real loss
 ```
 
-Para backtesting, es mejor **ajustar por dividendos** (backward, por ratio) para que tus indicadores y señales no se contaminen con caídas artificiales.
+For backtesting, it's better to **adjust for dividends** (backward, by ratio) so that your indicators and signals aren't contaminated by artificial drops.
 
-### Índices Total Return
+### Total Return Indices
 
-Los índices "Total Return" (en España les dicen "con dividendos") ya incorporan este ajuste. Reinvierten los dividendos en el índice, mostrando el rendimiento real de un inversor que reinvierte.
+"Total Return" indices already incorporate this adjustment. They reinvest dividends into the index, showing the real return of an investor who reinvests.
 
-La diferencia puede ser enorme: el IBEX 35 normal puede parecer lejos de sus máximos históricos nominales, mientras que el IBEX con dividendos puede haberlos superado ampliamente — la brecha se acumula año tras año. En acciones europeas que pagan dividendos altos, el efecto es muy pronunciado. En el Nasdaq, donde los dividendos son menores, el efecto existe pero es menos dramático.
+The difference can be enormous: the IBEX 35 standard index may appear far from its nominal all-time highs, while the IBEX with dividends may have surpassed them by a wide margin -- the gap accumulates year after year. In European stocks that pay high dividends, the effect is very pronounced. In the Nasdaq, where dividends are smaller, the effect exists but is less dramatic.
 
-**Para backtesting de estrategias sobre índices**: usá el Total Return o el ETF ajustado por dividendos (como SPY ajustado backward). Son la representación más fiel del rendimiento real.
+**For backtesting strategies on indices**: use the Total Return or the dividend-adjusted ETF (such as backward-adjusted SPY). They are the most faithful representation of real returns.
 
-## Errores Frecuentes con Datos
+## Common Data Errors
 
-### 1. Asumir que todos los datos son iguales
+### 1. Assuming All Data Is Equal
 
-Diferentes proveedores pueden tener datos distintos para el mismo activo. Comparar bases de datos antes de confiar ciegamente en una.
+Different providers can have different data for the same asset. Compare databases before blindly trusting one.
 
-Incluso proveedores de referencia tienen problemas con datos muy antiguos. Si tu proveedor tiene datos del oro desde 1975, verificá la calidad de esos primeros años — la tecnología de captura de datos era rudimentaria.
+Even reference providers have problems with very old data. If your provider has gold data since 1975, verify the quality of those early years -- data capture technology was rudimentary.
 
-### 2. No verificar el delay en datos de tiempo real
+### 2. Not Verifying Delay in Real-Time Data
 
-Diferentes fuentes de datos en tiempo real pueden no estar sincronizadas. Si tu señal usa datos de un feed y tu orden va a otro, un desfase de segundos puede importar.
+Different real-time data sources may not be synchronized. If your signal uses data from one feed and your order goes to another, a delay of seconds can matter.
 
-### 3. Usar datos de backtest y tiempo real de calidades diferentes
+### 3. Using Backtest and Real-Time Data of Different Quality
 
-Si tu backtest usa datos limpios de alta calidad pero tu ejecución en vivo usa un feed inferior, los resultados van a divergir. Las propiedades de ambos datasets deben ser análogas.
+If your backtest uses clean, high-quality data but your live execution uses an inferior feed, results will diverge. The properties of both datasets must be analogous.
 
-### 4. Ignorar el survivorship bias en acciones
+### 4. Ignoring Survivorship Bias in Stocks
 
-Si backtestás una estrategia rotacional del S&P 500 desde 2010, necesitás la composición del índice **en cada momento histórico**, incluyendo las empresas que fueron removidas. Las que sobrevivieron hasta hoy tienen un sesgo positivo inherente.
+If you backtest a rotational strategy on the S&P 500 from 2010, you need the index composition **at each historical moment**, including companies that were removed. Those that survived to today have an inherent positive bias.
 
-## Checklist Antes de Backtestear
+## Pre-Backtesting Checklist
 
-- [ ] ¿Mis datos de futuros están ajustados? ¿Por ratio o por valor absoluto?
-- [ ] ¿Conozco las fechas de vencimiento y el patrón de rolo de cada futuro?
-- [ ] ¿Mis datos de acciones están ajustados por dividendos y splits?
-- [ ] ¿La calidad de mis datos históricos es comparable a la de mis datos en tiempo real?
-- [ ] ¿He verificado la calidad del proveedor, especialmente en datos antiguos?
-- [ ] ¿Mis indicadores usan porcentajes en vez de valores absolutos cuando es posible?
-- [ ] ¿Estoy consciente del survivorship bias si uso universos de acciones?
+- [ ] Is my futures data adjusted? By ratio or by absolute value?
+- [ ] Do I know the expiration dates and roll pattern for each future?
+- [ ] Is my stock data adjusted for dividends and splits?
+- [ ] Is my historical data quality comparable to my real-time data?
+- [ ] Have I verified the provider's quality, especially for old data?
+- [ ] Are my indicators using percentages instead of absolute values when possible?
+- [ ] Am I aware of survivorship bias if using stock universes?

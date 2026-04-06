@@ -1,28 +1,30 @@
-# Bollinger Bands - El Oscilador de Volatilidad
+> 🇪🇸 [Leer en Español](bollinger_bands.es.md) | 🇺🇸 **English**
 
-## Definición
+# Bollinger Bands - The Volatility Oscillator
 
-Las Bandas de Bollinger son una herramienta de análisis técnico para generar señales de sobrecompra o sobreventa. Están compuestas por tres líneas: una media móvil simple (banda media) y una banda superior e inferior a +/- 2 desviaciones estándar.
+## Definition
 
-## Filosofía del Indicador
+Bollinger Bands are a technical analysis tool for generating overbought or oversold signals. They consist of three lines: a simple moving average (middle band) and an upper and lower band at +/- 2 standard deviations.
 
-### ¿Por Qué Funcionan?
-- **Reversión a la Media**: Los precios tienden a regresar al promedio tras desviaciones extremas
-- **Medición de Volatilidad**: Las bandas se expanden/contraen según la volatilidad del mercado
-- **Niveles Dinámicos**: A diferencia de soportes/resistencias fijos, se adaptan al precio
+## Indicator Philosophy
 
-### Componentes
+### Why Do They Work?
+- **Mean Reversion**: Prices tend to return to the average after extreme deviations
+- **Volatility Measurement**: Bands expand/contract based on market volatility
+- **Dynamic Levels**: Unlike fixed support/resistance, they adapt to price
+
+### Components
 ```
-Banda Superior = MA + (Desviación_Estándar × Factor)
-Banda Media    = Media Móvil Simple
-Banda Inferior = MA - (Desviación_Estándar × Factor)
+Upper_Band  = MA + (Standard_Deviation × Factor)
+Middle_Band = Simple Moving Average
+Lower_Band  = MA - (Standard_Deviation × Factor)
 ```
 
-**Parámetros estándar**:
-- **Período**: 20 (media móvil)
-- **Factor**: 2.0 (desviaciones estándar)
+**Standard parameters**:
+- **Period**: 20 (moving average)
+- **Factor**: 2.0 (standard deviations)
 
-## Implementación de Referencia
+## Reference Implementation
 
 ```python
 import pandas as pd
@@ -30,69 +32,69 @@ import numpy as np
 from copy import deepcopy
 import matplotlib.pyplot as plt
 
-def Bollinger_Bands(df: pd.DataFrame, longitud: int = 20, desviacion_std: float = 2.0, columna: str = "Close") -> pd.DataFrame:
+def Bollinger_Bands(df: pd.DataFrame, length: int = 20, std_deviation: float = 2.0, column: str = "Close") -> pd.DataFrame:
     """
-    Bandas de Bollinger - Implementación de referencia exacta
+    Bollinger Bands - Exact reference implementation
     
-    Las Bandas de Bollinger identifican niveles de sobrecompra/sobreventa mediante
-    la desviación del precio respecto a su media móvil.
+    Bollinger Bands identify overbought/oversold levels by measuring
+    the deviation of price from its moving average.
     
-    Parámetros
+    Parameters
     ----------
     df : pd.DataFrame
-        Datos históricos del activo (debe incluir columna Close)
-    longitud : int, default 20
-        Ventana para el cálculo de la media móvil y desviación estándar
-    desviacion_std : float, default 2.0
-        Número de desviaciones estándar para las bandas superior e inferior
-    columna : str, default "Close"
-        Columna a utilizar en el cálculo
+        Historical asset data (must include Close column)
+    length : int, default 20
+        Window for moving average and standard deviation calculation
+    std_deviation : float, default 2.0
+        Number of standard deviations for upper and lower bands
+    column : str, default "Close"
+        Column to use in the calculation
     
     Returns
     -------
     pd.DataFrame
-        DataFrame con columnas: BB_Up, MA, BB_Lw
+        DataFrame with columns: BB_Up, MA, BB_Lw
         
-    Ejemplo de Uso
+    Usage Example
     --------------
     >>> import yfinance as yf
     >>> df = yf.download("AAPL", start="2023-01-01", end="2024-01-01")
-    >>> bb = Bollinger_Bands(df, longitud=20, desviacion_std=2.0)
+    >>> bb = Bollinger_Bands(df, length=20, std_deviation=2.0)
     >>> print(bb.head())
     """
-    # Calcular usando copia para no modificar original
-    datos = deepcopy(df)
+    # Calculate using a copy to avoid modifying the original
+    data = deepcopy(df)
     
-    # Rolling window para media y desviación estándar
-    rolling = datos[columna].rolling(window=longitud)
+    # Rolling window for mean and standard deviation
+    rolling = data[column].rolling(window=length)
     
-    # Media móvil (banda media)
-    datos["MA"] = rolling.mean()
+    # Moving average (middle band)
+    data["MA"] = rolling.mean()
     
-    # Desviación estándar con ddof=0 (población completa)
-    std_bandas = desviacion_std * rolling.std(ddof=0)
+    # Standard deviation with ddof=0 (full population)
+    std_bands = std_deviation * rolling.std(ddof=0)
     
-    # Bandas superior e inferior
-    datos["BB_Up"] = datos["MA"] + std_bandas
-    datos["BB_Lw"] = datos["MA"] - std_bandas
+    # Upper and lower bands
+    data["BB_Up"] = data["MA"] + std_bands
+    data["BB_Lw"] = data["MA"] - std_bands
     
-    return datos[["BB_Up", "MA", "BB_Lw"]]
+    return data[["BB_Up", "MA", "BB_Lw"]]
 
 def calculate_bollinger_signals(df: pd.DataFrame, bb_data: pd.DataFrame) -> pd.DataFrame:
     """
-    Generar señales de trading usando Bollinger Bands
+    Generate trading signals using Bollinger Bands
     
-    Parámetros
+    Parameters
     ----------
     df : pd.DataFrame
-        Datos históricos con precio
+        Historical data with price
     bb_data : pd.DataFrame
-        Datos de Bollinger Bands (output de Bollinger_Bands)
+        Bollinger Bands data (output of Bollinger_Bands)
     
     Returns
     -------
     pd.DataFrame
-        DataFrame con señales y estadísticas
+        DataFrame with signals and statistics
     """
     signals = pd.DataFrame(index=df.index)
     signals['price'] = df['Close']
@@ -100,19 +102,19 @@ def calculate_bollinger_signals(df: pd.DataFrame, bb_data: pd.DataFrame) -> pd.D
     signals['bb_middle'] = bb_data['MA']
     signals['bb_lower'] = bb_data['BB_Lw']
     
-    # Calcular posición relativa dentro de las bandas
+    # Calculate relative position within the bands
     bb_width = bb_data['BB_Up'] - bb_data['BB_Lw']
     signals['bb_position'] = (df['Close'] - bb_data['BB_Lw']) / bb_width
     
-    # Señales básicas
-    signals['oversold'] = df['Close'] < bb_data['BB_Lw']  # Precio bajo banda inferior
-    signals['overbought'] = df['Close'] > bb_data['BB_Up']  # Precio sobre banda superior
+    # Basic signals
+    signals['oversold'] = df['Close'] < bb_data['BB_Lw']  # Price below lower band
+    signals['overbought'] = df['Close'] > bb_data['BB_Up']  # Price above upper band
     signals['middle_cross'] = np.where(
         (df['Close'] > bb_data['MA']) & (df['Close'].shift(1) <= bb_data['MA'].shift(1)), 1,
         np.where((df['Close'] < bb_data['MA']) & (df['Close'].shift(1) >= bb_data['MA'].shift(1)), -1, 0)
     )
     
-    # Squeeze detection (bandas contraídas = baja volatilidad)
+    # Squeeze detection (contracted bands = low volatility)
     signals['bb_width'] = bb_width
     signals['bb_squeeze'] = bb_width < bb_width.rolling(20).mean() * 0.8
     
@@ -123,33 +125,33 @@ def calculate_bollinger_signals(df: pd.DataFrame, bb_data: pd.DataFrame) -> pd.D
     return signals
 ```
 
-## Estrategias de Trading con Bollinger Bands
+## Trading Strategies with Bollinger Bands
 
 ### 1. Mean Reversion Strategy
 ```python
 def bollinger_mean_reversion(df: pd.DataFrame, bb_period: int = 20, std_factor: float = 2.0):
     """
-    Estrategia de reversión a la media usando Bollinger Bands
+    Mean reversion strategy using Bollinger Bands
     """
-    # Calcular bandas
-    bb = Bollinger_Bands(df, longitud=bb_period, desviacion_std=std_factor)
+    # Calculate bands
+    bb = Bollinger_Bands(df, length=bb_period, std_deviation=std_factor)
     signals = calculate_bollinger_signals(df, bb)
     
-    # Señales de entrada
+    # Entry signals
     entry_signals = pd.Series(0, index=df.index)
     
-    # Long cuando precio toca banda inferior (oversold)
+    # Long when price touches lower band (oversold)
     long_entry = (
         signals['oversold'] & 
-        (df['Volume'] > df['Volume'].rolling(20).mean()) &  # Confirmar con volumen
-        (df['Close'] > df['Close'].shift(1))  # Precio empezando a recuperar
+        (df['Volume'] > df['Volume'].rolling(20).mean()) &  # Confirm with volume
+        (df['Close'] > df['Close'].shift(1))  # Price starting to recover
     )
     
-    # Short cuando precio toca banda superior (overbought)
+    # Short when price touches upper band (overbought)
     short_entry = (
         signals['overbought'] &
         (df['Volume'] > df['Volume'].rolling(20).mean()) &
-        (df['Close'] < df['Close'].shift(1))  # Precio empezando a caer
+        (df['Close'] < df['Close'].shift(1))  # Price starting to fall
     )
     
     entry_signals[long_entry] = 1
@@ -164,21 +166,21 @@ def bollinger_mean_reversion(df: pd.DataFrame, bb_period: int = 20, std_factor: 
 
 def bollinger_breakout_strategy(df: pd.DataFrame, bb_period: int = 20, std_factor: float = 2.0):
     """
-    Estrategia de breakout usando Bollinger Bands
+    Breakout strategy using Bollinger Bands
     """
-    bb = Bollinger_Bands(df, longitud=bb_period, desviacion_std=std_factor)
+    bb = Bollinger_Bands(df, length=bb_period, std_deviation=std_factor)
     signals = calculate_bollinger_signals(df, bb)
     
     entry_signals = pd.Series(0, index=df.index)
     
-    # Long en breakout alcista tras squeeze
+    # Long on bullish breakout after squeeze
     long_breakout = (
         signals['upper_breakout'] &
-        signals['bb_squeeze'].shift(1) &  # Había squeeze previo
-        (df['Volume'] > df['Volume'].rolling(10).mean() * 1.5)  # Volumen fuerte
+        signals['bb_squeeze'].shift(1) &  # Previous squeeze present
+        (df['Volume'] > df['Volume'].rolling(10).mean() * 1.5)  # Strong volume
     )
     
-    # Short en breakout bajista tras squeeze
+    # Short on bearish breakout after squeeze
     short_breakout = (
         signals['lower_breakout'] &
         signals['bb_squeeze'].shift(1) &
@@ -200,13 +202,13 @@ def bollinger_breakout_strategy(df: pd.DataFrame, bb_period: int = 20, std_facto
 ```python
 def small_cap_bollinger_strategy(df: pd.DataFrame, volume_data: pd.DataFrame = None):
     """
-    Estrategia específica para small caps usando Bollinger Bands
+    Small caps specific strategy using Bollinger Bands
     """
-    # Parámetros ajustados para small caps (mayor volatilidad)
-    bb = Bollinger_Bands(df, longitud=15, desviacion_std=2.5)  # Bandas más amplias
+    # Parameters adjusted for small caps (higher volatility)
+    bb = Bollinger_Bands(df, length=15, std_deviation=2.5)  # Wider bands
     signals = calculate_bollinger_signals(df, bb)
     
-    # Agregar filtros específicos para small caps
+    # Add small cap specific filters
     if volume_data is not None:
         # RVOL filter
         avg_volume = df['Volume'].rolling(20).mean()
@@ -247,47 +249,47 @@ def small_cap_bollinger_strategy(df: pd.DataFrame, volume_data: pd.DataFrame = N
     }
 ```
 
-## Interpretación y Uso
+## Interpretation and Usage
 
-### Señales Principales
+### Main Signals
 
-1. **Oversold (Sobreventa)**
-   - Precio toca o cruza banda inferior
-   - Potencial reversión alcista
-   - ⚠️ Confirmar con volumen y momentum
+1. **Oversold**
+   - Price touches or crosses lower band
+   - Potential bullish reversal
+   - ⚠️ Confirm with volume and momentum
 
-2. **Overbought (Sobrecompra)**
-   - Precio toca o cruza banda superior  
-   - Potencial reversión bajista
-   - ⚠️ En tendencia fuerte puede extenderse
+2. **Overbought**
+   - Price touches or crosses upper band  
+   - Potential bearish reversal
+   - ⚠️ In a strong trend it can extend
 
-3. **Squeeze (Compresión)**
-   - Bandas muy juntas = baja volatilidad
-   - Precede movimientos explosivos
-   - 🎯 Setup ideal para breakouts
+3. **Squeeze (Compression)**
+   - Bands very close = low volatility
+   - Precedes explosive moves
+   - 🎯 Ideal setup for breakouts
 
-### Combinaciones Poderosas
+### Powerful Combinations
 
 ```python
 def bollinger_multi_timeframe(symbol: str, primary_tf: str = '1d', confirmation_tf: str = '1h'):
     """
-    Análisis multi-timeframe con Bollinger Bands
+    Multi-timeframe analysis with Bollinger Bands
     """
     import yfinance as yf
     
-    # Datos en múltiples timeframes
+    # Data in multiple timeframes
     df_daily = yf.download(symbol, period="6mo", interval=primary_tf)
     df_hourly = yf.download(symbol, period="1mo", interval=confirmation_tf)
     
-    # Bollinger en cada timeframe
-    bb_daily = Bollinger_Bands(df_daily, longitud=20, desviacion_std=2.0)
-    bb_hourly = Bollinger_Bands(df_hourly, longitud=20, desviacion_std=2.0)
+    # Bollinger on each timeframe
+    bb_daily = Bollinger_Bands(df_daily, length=20, std_deviation=2.0)
+    bb_hourly = Bollinger_Bands(df_hourly, length=20, std_deviation=2.0)
     
-    # Señales combinadas
+    # Combined signals
     daily_signals = calculate_bollinger_signals(df_daily, bb_daily)
     hourly_signals = calculate_bollinger_signals(df_hourly, bb_hourly)
     
-    # Setup multi-timeframe
+    # Multi-timeframe setup
     current_daily = daily_signals.iloc[-1]
     current_hourly = hourly_signals.iloc[-1]
     
@@ -299,7 +301,7 @@ def bollinger_multi_timeframe(symbol: str, primary_tf: str = '1d', confirmation_
         'confluence': None
     }
     
-    # Detectar confluencia
+    # Detect confluence
     if current_daily['oversold'] and current_hourly['oversold']:
         analysis['confluence'] = 'STRONG_OVERSOLD'
     elif current_daily['overbought'] and current_hourly['overbought']:
@@ -310,12 +312,12 @@ def bollinger_multi_timeframe(symbol: str, primary_tf: str = '1d', confirmation_
     return analysis
 ```
 
-## Visualización Avanzada
+## Advanced Visualization
 
 ```python
 def plot_bollinger_analysis(df: pd.DataFrame, bb_data: pd.DataFrame, signals: pd.DataFrame, title: str = "Bollinger Bands Analysis"):
     """
-    Crear gráfico completo de análisis Bollinger
+    Create complete Bollinger analysis chart
     """
     import matplotlib.pyplot as plt
     import matplotlib.dates as mdates
@@ -323,14 +325,14 @@ def plot_bollinger_analysis(df: pd.DataFrame, bb_data: pd.DataFrame, signals: pd
     fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(15, 12), 
                                         gridspec_kw={'height_ratios': [3, 1, 1]})
     
-    # Chart 1: Precio + Bollinger Bands
+    # Chart 1: Price + Bollinger Bands
     ax1.plot(df.index, df['Close'], 'k-', linewidth=2, label='Price')
     ax1.plot(bb_data.index, bb_data['BB_Up'], 'r--', label='Upper Band')
     ax1.plot(bb_data.index, bb_data['MA'], 'b-', label='Middle Band (MA)')
     ax1.plot(bb_data.index, bb_data['BB_Lw'], 'g--', label='Lower Band')
     ax1.fill_between(bb_data.index, bb_data['BB_Up'], bb_data['BB_Lw'], alpha=0.1, color='gray')
     
-    # Marcar señales
+    # Mark signals
     oversold_points = df.index[signals['oversold']]
     overbought_points = df.index[signals['overbought']]
     
@@ -343,7 +345,7 @@ def plot_bollinger_analysis(df: pd.DataFrame, bb_data: pd.DataFrame, signals: pd
     ax1.legend()
     ax1.grid(True, alpha=0.3)
     
-    # Chart 2: BB Position (posición dentro de las bandas)
+    # Chart 2: BB Position (position within the bands)
     ax2.plot(signals.index, signals['bb_position'], 'purple', linewidth=2)
     ax2.axhline(y=0, color='green', linestyle='--', alpha=0.7, label='Lower Band')
     ax2.axhline(y=1, color='red', linestyle='--', alpha=0.7, label='Upper Band')
@@ -355,7 +357,7 @@ def plot_bollinger_analysis(df: pd.DataFrame, bb_data: pd.DataFrame, signals: pd
     ax2.legend()
     ax2.grid(True, alpha=0.3)
     
-    # Chart 3: BB Width (volatilidad)
+    # Chart 3: BB Width (volatility)
     bb_width_norm = signals['bb_width'] / signals['bb_width'].rolling(50).mean()
     ax3.plot(signals.index, bb_width_norm, 'orange', linewidth=2)
     ax3.axhline(y=1, color='black', linestyle='-', alpha=0.5, label='Average')
@@ -367,7 +369,7 @@ def plot_bollinger_analysis(df: pd.DataFrame, bb_data: pd.DataFrame, signals: pd
     ax3.legend()
     ax3.grid(True, alpha=0.3)
     
-    # Formato de fechas
+    # Date formatting
     for ax in [ax1, ax2, ax3]:
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
         ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
@@ -376,89 +378,89 @@ def plot_bollinger_analysis(df: pd.DataFrame, bb_data: pd.DataFrame, signals: pd
     plt.tight_layout()
     plt.show()
 
-# Ejemplo de uso completo
+# Complete usage example
 def bollinger_complete_example():
     """
-    Ejemplo completo de análisis con Bollinger Bands
+    Complete analysis example with Bollinger Bands
     """
     import yfinance as yf
     
-    # Obtener datos
+    # Get data
     ticker = "AAPL"
     df = yf.download(ticker, start="2023-01-01", end="2024-01-01", interval="1d")
     
-    print(f"=== ANÁLISIS BOLLINGER BANDS: {ticker} ===\n")
+    print(f"=== BOLLINGER BANDS ANALYSIS: {ticker} ===\n")
     
-    # Calcular Bollinger Bands
-    bb = Bollinger_Bands(df, longitud=20, desviacion_std=2.0)
+    # Calculate Bollinger Bands
+    bb = Bollinger_Bands(df, length=20, std_deviation=2.0)
     signals = calculate_bollinger_signals(df, bb)
     
-    # Estadísticas
+    # Statistics
     oversold_count = signals['oversold'].sum()
     overbought_count = signals['overbought'].sum()
     squeeze_count = signals['bb_squeeze'].sum()
     
-    print(f"📊 ESTADÍSTICAS DEL PERÍODO:")
-    print(f"   Señales Oversold: {oversold_count}")
-    print(f"   Señales Overbought: {overbought_count}")
-    print(f"   Días en Squeeze: {squeeze_count}")
-    print(f"   % Tiempo en Squeeze: {squeeze_count/len(signals)*100:.1f}%")
+    print(f"PERIOD STATISTICS:")
+    print(f"   Oversold Signals: {oversold_count}")
+    print(f"   Overbought Signals: {overbought_count}")
+    print(f"   Days in Squeeze: {squeeze_count}")
+    print(f"   % Time in Squeeze: {squeeze_count/len(signals)*100:.1f}%")
     
-    # Análisis actual
+    # Current analysis
     current = signals.iloc[-1]
-    print(f"\n🎯 ANÁLISIS ACTUAL:")
-    print(f"   Precio: ${current['price']:.2f}")
-    print(f"   Banda Superior: ${current['bb_upper']:.2f}")
-    print(f"   Banda Media: ${current['bb_middle']:.2f}")
-    print(f"   Banda Inferior: ${current['bb_lower']:.2f}")
-    print(f"   Posición BB: {current['bb_position']:.2f} (0=Inferior, 1=Superior)")
+    print(f"\nCURRENT ANALYSIS:")
+    print(f"   Price: ${current['price']:.2f}")
+    print(f"   Upper Band: ${current['bb_upper']:.2f}")
+    print(f"   Middle Band: ${current['bb_middle']:.2f}")
+    print(f"   Lower Band: ${current['bb_lower']:.2f}")
+    print(f"   BB Position: {current['bb_position']:.2f} (0=Lower, 1=Upper)")
     
     if current['bb_position'] < 0.2:
-        print("   🟢 Estado: OVERSOLD - Posible rebote")
+        print("   Status: OVERSOLD - Possible bounce")
     elif current['bb_position'] > 0.8:
-        print("   🔴 Estado: OVERBOUGHT - Posible corrección")
+        print("   Status: OVERBOUGHT - Possible correction")
     elif current['bb_squeeze']:
-        print("   🟡 Estado: SQUEEZE - Preparándose para movimiento")
+        print("   Status: SQUEEZE - Preparing for move")
     else:
-        print("   ⚪ Estado: NEUTRAL")
+        print("   Status: NEUTRAL")
     
-    # Crear gráfico
+    # Create chart
     plot_bollinger_analysis(df, bb, signals, f"Bollinger Analysis - {ticker}")
     
     return bb, signals
 
-# Ejecutar ejemplo si se ejecuta directamente
+# Run example if executed directly
 if __name__ == "__main__":
     bollinger_complete_example()
 ```
 
-## Mejores Prácticas
+## Best Practices
 
-### ✅ **Do's (Hacer)**
+### ✅ **Do's**
 
-1. **Confirma con volumen**: Señales más confiables con volumen elevado
-2. **Usa múltiples timeframes**: Confluencia aumenta probabilidad
-3. **Aprovecha squeeze**: Baja volatilidad precede alta volatilidad
-4. **Combina con trend**: En tendencia fuerte, oversold/overbought menos confiables
+1. **Confirm with volume**: More reliable signals with elevated volume
+2. **Use multiple timeframes**: Confluence increases probability
+3. **Leverage squeeze**: Low volatility precedes high volatility
+4. **Combine with trend**: In a strong trend, oversold/overbought are less reliable
 
-### ❌ **Don'ts (No Hacer)**
+### ❌ **Don'ts**
 
-1. **No trades solo en touch**: Espera confirmación de reversión
-2. **No ignores el contexto**: Una banda no es soporte/resistencia absoluta
-3. **No uses parámetros fijos**: Ajusta según volatilidad del activo
-4. **No trades contra tendencia fuerte**: BB funciona mejor en rangos
+1. **Don't trade on touch alone**: Wait for reversal confirmation
+2. **Don't ignore context**: A band is not absolute support/resistance
+3. **Don't use fixed parameters**: Adjust based on asset volatility
+4. **Don't trade against strong trends**: BB works best in ranges
 
-### 🎯 **Parámetros para Small Caps**
+### 🎯 **Parameters for Small Caps**
 
 ```python
 SMALL_CAP_BB_PARAMS = {
-    'gap_and_go': {'period': 15, 'std': 2.5},      # Más ancho para gaps
-    'momentum': {'period': 20, 'std': 2.0},        # Estándar
-    'reversal': {'period': 25, 'std': 1.8},        # Más sensible
-    'breakout': {'period': 10, 'std': 3.0}         # Muy ancho para evitar whipsaws
+    'gap_and_go': {'period': 15, 'std': 2.5},      # Wider for gaps
+    'momentum': {'period': 20, 'std': 2.0},        # Standard
+    'reversal': {'period': 25, 'std': 1.8},        # More sensitive
+    'breakout': {'period': 10, 'std': 3.0}         # Very wide to avoid whipsaws
 }
 ```
 
-## Siguiente Paso
+## Next Step
 
-Con Bollinger Bands dominado, continuemos con [Parabolic SAR](parabolic_sar.md) para identificar cambios de tendencia.
+With Bollinger Bands mastered, let's continue with [Parabolic SAR](parabolic_sar.md) to identify trend changes.

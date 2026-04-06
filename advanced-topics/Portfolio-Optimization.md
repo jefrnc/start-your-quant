@@ -1,30 +1,32 @@
+> 🇪🇸 [Leer en Español](Portfolio-Optimization.es.md) | 🇺🇸 **English**
+
 # Multi-Strategy Portfolio Management
 
-## ¿Por qué Multi-Strategy Portfolio Management?
+## Why Multi-Strategy Portfolio Management?
 
-Ejecutar múltiples estrategias simultaneously no es simplemente "hacer más trades" - requiere **orchestration sophisticated** para maximizar portfolio-level returns mientras se controla el riesgo agregado. Para small caps, esto es especialmente crítico porque:
+Running multiple strategies simultaneously is not simply "making more trades" - it requires **sophisticated orchestration** to maximize portfolio-level returns while controlling aggregate risk. For small caps, this is especially critical because:
 
-- **Strategy correlation varía** con market regimes
-- **Capacity constraints** limitan scaling individual strategies
-- **Risk concentration** puede surgir inesperadamente
-- **Capital allocation** suboptimal destruye alpha
-- **Interaction effects** entre strategies pueden ser positivos o negativos
+- **Strategy correlation varies** with market regimes
+- **Capacity constraints** limit individual strategy scaling
+- **Risk concentration** can emerge unexpectedly
+- **Suboptimal capital allocation** destroys alpha
+- **Interaction effects** between strategies can be positive or negative
 
-### Problemas con Enfoques Naive
+### Problems with Naive Approaches
 
 ```python
-# Enfoque NAIVE - PROBLEMÁTICO
+# NAIVE approach - PROBLEMATIC
 strategies = ['gap_go', 'vwap_reclaim', 'mean_reversion']
 
-# Problemas comunes:
-# 1. Equal allocation sin considerar performance
+# Common problems:
+# 1. Equal allocation without considering performance
 # 2. No correlation monitoring
-# 3. Risk budgeting ignorado
+# 3. Risk budgeting ignored
 # 4. No regime adaptation
-# 5. Capacity limits ignorados
+# 5. Capacity limits ignored
 ```
 
-## Framework de Portfolio Management
+## Portfolio Management Framework
 
 ### 1. Multi-Strategy Architecture
 
@@ -41,7 +43,7 @@ warnings.filterwarnings('ignore')
 
 
 class StrategyStatus(Enum):
-    """Estados de estrategias en el portfolio"""
+    """Strategy states in the portfolio"""
     ACTIVE = "active"
     PAUSED = "paused"
     DEGRADED = "degraded"
@@ -50,7 +52,7 @@ class StrategyStatus(Enum):
 
 @dataclass
 class StrategyMetrics:
-    """Métricas de performance de estrategia individual"""
+    """Individual strategy performance metrics"""
     name: str
     sharpe_ratio: float = 0.0
     max_drawdown: float = 0.0
@@ -66,7 +68,7 @@ class StrategyMetrics:
 
 @dataclass
 class PortfolioConfig:
-    """Configuración del portfolio multi-strategy"""
+    """Multi-strategy portfolio configuration"""
 
     # Capital allocation
     total_capital: float = 100000.0
@@ -92,11 +94,11 @@ class PortfolioConfig:
 
 class MultiStrategyPortfolioManager:
     """
-    Portfolio manager que optimiza allocation entre múltiples strategies
+    Portfolio manager that optimizes allocation across multiple strategies
 
     Key responsibilities:
     1. Strategy allocation optimization
-    2. Risk budgeting y monitoring
+    2. Risk budgeting and monitoring
     3. Correlation management
     4. Performance attribution
     5. Dynamic rebalancing
@@ -111,7 +113,7 @@ class MultiStrategyPortfolioManager:
         self.last_rebalance = None
 
     def register_strategy(self, strategy_name: str, strategy_instance):
-        """Register nueva estrategia en el portfolio"""
+        """Register a new strategy in the portfolio"""
 
         self.strategies[strategy_name] = {
             'instance': strategy_instance,
@@ -125,7 +127,7 @@ class MultiStrategyPortfolioManager:
 
     def calculate_optimal_allocation(self) -> Dict[str, float]:
         """
-        Calcula optimal allocation usando modern portfolio theory con constraints
+        Calculates optimal allocation using modern portfolio theory with constraints
         """
 
         # Get strategy performance data
@@ -156,14 +158,14 @@ class MultiStrategyPortfolioManager:
             return self._risk_parity_allocation(strategy_data)
 
     def _prepare_strategy_data(self) -> Dict:
-        """Prepare strategy data para optimization"""
+        """Prepare strategy data for optimization"""
 
         strategy_data = {}
 
         for name, strategy_info in self.strategies.items():
             metrics = strategy_info['metrics']
 
-            # Only include strategies que meet minimum criteria
+            # Only include strategies that meet minimum criteria
             if (metrics.status == StrategyStatus.ACTIVE and
                 len(strategy_info['trade_history']) >= self.config.min_trades_for_inclusion and
                 metrics.confidence >= self.config.confidence_threshold):
@@ -188,7 +190,7 @@ class MultiStrategyPortfolioManager:
                                     cov_matrix: np.array,
                                     strategy_names: List[str]) -> np.array:
         """
-        Solve portfolio optimization usando mean-variance optimization con constraints
+        Solve portfolio optimization using mean-variance optimization with constraints
         """
 
         n = len(expected_returns)
@@ -249,7 +251,7 @@ class MultiStrategyPortfolioManager:
         return {name: weight_per_strategy for name in active_strategies}
 
     def _risk_parity_allocation(self, strategy_data: Dict) -> Dict[str, float]:
-        """Risk parity allocation basado en volatility"""
+        """Risk parity allocation based on volatility"""
 
         if not strategy_data:
             return self._equal_weight_allocation()
@@ -274,7 +276,7 @@ class MultiStrategyPortfolioManager:
 
     def rebalance_portfolio(self, market_data: Dict = None) -> Dict:
         """
-        Rebalance portfolio basado en optimal allocation
+        Rebalance portfolio based on optimal allocation
         """
 
         # Check if rebalancing is needed
@@ -404,7 +406,7 @@ class MultiStrategyPortfolioManager:
         return execution_results
 
     def add_strategy_trade(self, strategy_name: str, trade_result: Dict):
-        """Add trade result para strategy tracking"""
+        """Add trade result for strategy tracking"""
 
         if strategy_name not in self.strategies:
             print(f"Warning: Strategy '{strategy_name}' not registered")
@@ -424,7 +426,7 @@ class MultiStrategyPortfolioManager:
         self._update_strategy_metrics(strategy_name)
 
     def _update_strategy_metrics(self, strategy_name: str):
-        """Update metrics para estrategia específica"""
+        """Update metrics for a specific strategy"""
 
         strategy_info = self.strategies[strategy_name]
         trades = strategy_info['trade_history']
@@ -470,7 +472,7 @@ class MultiStrategyPortfolioManager:
         )
 
     def _update_all_strategy_metrics(self):
-        """Update metrics para todas las strategies"""
+        """Update metrics for all strategies"""
         for strategy_name in self.strategies:
             self._update_strategy_metrics(strategy_name)
 
@@ -657,7 +659,7 @@ STRATEGY PERFORMANCE
 # Portfolio Correlation Monitor
 class PortfolioCorrelationMonitor:
     """
-    Monitor correlations entre strategies en tiempo real
+    Monitor correlations between strategies in real time
     """
 
     def __init__(self, lookback_window: int = 60):
@@ -716,7 +718,7 @@ class PortfolioCorrelationMonitor:
 # Example usage and testing
 def example_multi_strategy_portfolio():
     """
-    Ejemplo completo de multi-strategy portfolio management
+    Complete multi-strategy portfolio management example
     """
 
     # Configure portfolio
@@ -776,8 +778,8 @@ if __name__ == "__main__":
 ```python
 class BlackLittermanPortfolio:
     """
-    Black-Litterman model adaptation para strategy allocation
-    Incorpora views específicas sobre strategy performance
+    Black-Litterman model adaptation for strategy allocation
+    Incorporates specific views on strategy performance
     """
 
     def __init__(self, returns_data: pd.DataFrame, tau: float = 0.05):
@@ -786,7 +788,7 @@ class BlackLittermanPortfolio:
 
     def calculate_bl_allocation(self, views: Dict, view_confidence: np.array) -> np.array:
         """
-        Calculate allocation usando Black-Litterman con strategy views
+        Calculate allocation using Black-Litterman with strategy views
 
         Args:
             views: Dict with strategy views (expected outperformance)
@@ -823,7 +825,7 @@ class BlackLittermanPortfolio:
 ```python
 class RegimeAdaptiveRiskParity:
     """
-    Risk parity allocation que adapta con market regimes
+    Risk parity allocation that adapts with market regimes
     """
 
     def __init__(self):
@@ -863,7 +865,7 @@ class RegimeAdaptiveRiskParity:
 ```python
 class DynamicRebalancer:
     """
-    Dynamic rebalancing que considera transaction costs y market impact
+    Dynamic rebalancing that considers transaction costs and market impact
     """
 
     def __init__(self, transaction_cost_pct: float = 0.001):
@@ -874,7 +876,7 @@ class DynamicRebalancer:
                                     target_weights: np.array,
                                     portfolio_value: float) -> Dict:
         """
-        Calculate optimal rebalancing considerando costs
+        Calculate optimal rebalancing considering costs
         """
 
         weight_diffs = target_weights - current_weights
@@ -910,14 +912,14 @@ class DynamicRebalancer:
         return deviation * portfolio_value * 0.01  # 1% benefit per 1% deviation
 ```
 
-## Integration con Trading System
+## Integration with Trading System
 
 ### **Real-Time Portfolio Monitor**
 
 ```python
 class RealTimePortfolioMonitor:
     """
-    Monitor portfolio en tiempo real con alertas automáticas
+    Real-time portfolio monitor with automatic alerts
     """
 
     def __init__(self, portfolio_manager: MultiStrategyPortfolioManager):
@@ -995,4 +997,4 @@ class RealTimePortfolioMonitor:
 - **[Risk Management](../core-concepts/Risk-Management.md)**: Portfolio risk controls
 - **[Performance Metrics](../core-concepts/Performance-Metrics.md)**: Portfolio attribution
 
-Este framework permite **orchestration sophisticated** de múltiples strategies, optimizando allocation, controlling risk concentration, y maximizing diversification benefits - critical para scaling systematic trading operations.
+This framework enables **sophisticated orchestration** of multiple strategies, optimizing allocation, controlling risk concentration, and maximizing diversification benefits - critical for scaling systematic trading operations.

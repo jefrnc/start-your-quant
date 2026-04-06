@@ -1,18 +1,20 @@
-# Fuentes de Datos Históricos
+> 🇪🇸 [Leer en Español](data_sources.es.md) | 🇺🇸 **English**
+
+# Historical Data Sources
 
 ## Overview
 
-La calidad de tus datos determina la calidad de tu backtesting. Aquí están las fuentes que uso actualmente, cada una con sus pros y contras.
+The quality of your data determines the quality of your backtesting. Here are the sources I currently use, each with their pros and cons.
 
 ## Yahoo Finance
 
-### Características
-- **Gratis** para datos EOD
-- Cobertura global de stocks
-- Datos desde 1960s para muchos tickers
-- API Python sencilla con `yfinance`
+### Features
+- **Free** for EOD data
+- Global stock coverage
+- Data from the 1960s for many tickers
+- Simple Python API with `yfinance`
 
-### Instalación y Uso
+### Installation and Usage
 ```python
 pip install yfinance
 ```
@@ -21,36 +23,36 @@ pip install yfinance
 import yfinance as yf
 import pandas as pd
 
-# Datos diarios
+# Daily data
 ticker = yf.Ticker("AAPL")
 data = ticker.history(start="2023-01-01", end="2023-12-31")
 
-# Múltiples tickers
+# Multiple tickers
 tickers = ["AAPL", "MSFT", "GOOGL"]
 data = yf.download(tickers, start="2023-01-01", end="2023-12-31")
 
-# Datos intraday (últimos 60 días max)
+# Intraday data (last 60 days max)
 intraday = ticker.history(period="1d", interval="1m")
 ```
 
-### Limitaciones
-- Solo datos EOD confiables
-- Intraday limitado a 60 días
-- No incluye dark pool o odd lots
-- Splits y dividendos a veces incorrectos
+### Limitations
+- Only reliable EOD data
+- Intraday limited to 60 days
+- Does not include dark pool or odd lots
+- Splits and dividends sometimes incorrect
 
-### Cuándo Usar
-- Backtesting inicial de estrategias swing
-- Screening rápido de ideas
-- Datos históricos largos
+### When to Use
+- Initial backtesting of swing strategies
+- Quick idea screening
+- Long historical data
 
 ## Polygon.io
 
-### Características
-- **API profesional** con datos tick-by-tick
-- WebSocket para datos real-time
-- Histórico completo desde 2003
-- Incluye dark pools, odd lots, condiciones
+### Features
+- **Professional API** with tick-by-tick data
+- WebSocket for real-time data
+- Complete history since 2003
+- Includes dark pools, odd lots, conditions
 
 ### Setup
 ```python
@@ -63,7 +65,7 @@ import os
 
 client = RESTClient(api_key=os.getenv("POLYGON_API_KEY"))
 
-# Aggregates (barras)
+# Aggregates (bars)
 aggs = client.get_aggs(
     ticker="AAPL",
     multiplier=5,
@@ -85,28 +87,28 @@ quotes = client.list_quotes(
 )
 ```
 
-### Planes y Precios (2024)
-- **Basic**: $0/mes - 2 años histórico, EOD, 5 calls/min
-- **Starter**: $29/mes - 5 años histórico, 15-min delayed, WebSockets
-- **Developer**: $79/mes - 10 años histórico, 15-min delayed, trades data
-- **Advanced**: $199/mes - 20+ años histórico, real-time data, quotes
+### Plans and Pricing (2024)
+- **Basic**: $0/month - 2 years historical, EOD, 5 calls/min
+- **Starter**: $29/month - 5 years historical, 15-min delayed, WebSockets
+- **Developer**: $79/month - 10 years historical, 15-min delayed, trades data
+- **Advanced**: $199/month - 20+ years historical, real-time data, quotes
 
-> **Nota**: Precios para usuarios individuales. Planes profesionales tienen costos diferentes.
+> **Note**: Prices for individual users. Professional plans have different costs.
 
-### Cuándo Usar
-- Estrategias intraday que necesitan precisión
-- Análisis de microestructura
-- Backtesting con fills realistas
+### When to Use
+- Intraday strategies that need precision
+- Microstructure analysis
+- Backtesting with realistic fills
 
-## TWS de Interactive Brokers
+## Interactive Brokers TWS
 
-### Características
-- Datos real-time incluidos con cuenta
-- API robusta para automatización
-- Histórico limitado pero gratis
-- Conexión directa para live trading
+### Features
+- Real-time data included with account
+- Robust API for automation
+- Limited but free history
+- Direct connection for live trading
 
-### Configuración con ib_insync
+### Configuration with ib_insync
 ```python
 pip install ib_insync
 ```
@@ -120,7 +122,7 @@ ib.connect('127.0.0.1', 7497, clientId=1)  # Paper: 7497, Live: 7496
 # Contract
 contract = Stock('AAPL', 'SMART', 'USD')
 
-# Datos históricos
+# Historical data
 bars = ib.reqHistoricalData(
     contract,
     endDateTime='',
@@ -130,7 +132,7 @@ bars = ib.reqHistoricalData(
     useRTH=True
 )
 
-# Convertir a DataFrame
+# Convert to DataFrame
 df = util.df(bars)
 
 # Real-time bars
@@ -141,62 +143,62 @@ bars = ib.reqRealTimeBars(contract, 5, 'TRADES', True)
 bars.updateEvent += onBarUpdate
 ```
 
-### Limitaciones
-- Máximo 1 año de datos minute
-- Rate limits estrictos
-- Requiere TWS abierto
+### Limitations
+- Maximum 1 year of minute data
+- Strict rate limits
+- Requires TWS open
 
-### Cuándo Usar
-- Trading automatizado en producción
-- Paper trading con datos reales
-- Verificación de otros data sources
+### When to Use
+- Automated trading in production
+- Paper trading with real data
+- Verification of other data sources
 
 ## DAS Trader
 
-### Características
-- Plataforma profesional de day trading
-- Level 2 completo
-- Hotkeys y automatización
-- Integración con múltiples brokers
+### Features
+- Professional day trading platform
+- Complete Level 2
+- Hotkeys and automation
+- Integration with multiple brokers
 
-### Exportar Datos
+### Exporting Data
 ```python
-# DAS guarda logs en formato CSV
+# DAS saves logs in CSV format
 import pandas as pd
 import glob
 
-# Leer trades ejecutados
+# Read executed trades
 trades_files = glob.glob('C:/DAS/Trades/*.csv')
 trades = pd.concat([pd.read_csv(f) for f in trades_files])
 
-# Procesar para análisis
+# Process for analysis
 trades['Time'] = pd.to_datetime(trades['Time'])
 trades['PnL'] = trades['ExitPrice'] - trades['EntryPrice']
 ```
 
-### Integración con Python
+### Python Integration
 ```python
-# Usar DAS API (requiere DAS Trader Pro)
+# Use DAS API (requires DAS Trader Pro)
 import win32com.client
 
 das = win32com.client.Dispatch("DAS.Application")
 das.SendOrder("BUY", "AAPL", 100, "MARKET")
 ```
 
-### Cuándo Usar
-- Ejecución manual con análisis post-trade
-- Combinar ejecución manual con análisis quant
-- Testing de estrategias antes de automatizar
+### When to Use
+- Manual execution with post-trade analysis
+- Combine manual execution with quant analysis
+- Strategy testing before automating
 
 ## QuantConnect
 
-### Características
-- **Plataforma cloud completa**
-- Datos incluidos (equities, options, futures, forex, crypto)
-- Motor de backtesting profesional
-- Deploy directo a live trading
+### Features
+- **Complete cloud platform**
+- Data included (equities, options, futures, forex, crypto)
+- Professional backtesting engine
+- Direct deploy to live trading
 
-### Ejemplo de Algoritmo
+### Algorithm Example
 ```python
 class MyAlgorithm(QCAlgorithm):
     def Initialize(self):
@@ -204,10 +206,10 @@ class MyAlgorithm(QCAlgorithm):
         self.SetEndDate(2023, 12, 31)
         self.SetCash(100000)
         
-        # Agregar securities
+        # Add securities
         self.spy = self.AddEquity("SPY", Resolution.Minute)
         
-        # Indicadores
+        # Indicators
         self.sma = self.SMA("SPY", 20, Resolution.Daily)
         
     def OnData(self, data):
@@ -220,27 +222,27 @@ class MyAlgorithm(QCAlgorithm):
             self.Liquidate("SPY")
 ```
 
-### Ventajas
-- No necesitas gestionar infraestructura
-- Datos limpios y ajustados
-- Community y ejemplos extensos
+### Advantages
+- No need to manage infrastructure
+- Clean, adjusted data
+- Extensive community and examples
 
-### Cuándo Usar
-- Estrategias multi-asset complejas
-- Cuando no quieres gestionar datos
-- Transición rápida de backtest a live
+### When to Use
+- Complex multi-asset strategies
+- When you don't want to manage data
+- Quick transition from backtest to live
 
 ## Flash Research
 
-### Características
-- Enfocado en **market microstructure**
-- Análisis de tape reading
-- Identificación de footprints institucionales
-- Datos de options flow
+### Features
+- Focused on **market microstructure**
+- Tape reading analysis
+- Institutional footprint identification
+- Options flow data
 
-### Casos de Uso
+### Use Cases
 ```python
-# Ejemplo conceptual - Flash Research provee insights, no raw data
+# Conceptual example - Flash Research provides insights, not raw data
 insights = {
     'institutional_accumulation': ['AAPL', 'MSFT'],
     'unusual_options_activity': [
@@ -251,25 +253,25 @@ insights = {
     ]
 }
 
-# Usar estos insights para filtrar universo
+# Use these insights to filter universe
 universe = screen_stocks(insights['institutional_accumulation'])
 ```
 
-### Cuándo Usar
-- Confirmación de señales técnicas
-- Identificar acumulación institucional
-- Options flow para direccionalidad
+### When to Use
+- Technical signal confirmation
+- Identify institutional accumulation
+- Options flow for directionality
 
-## Mi Stack Actual
+## My Current Stack
 
 ```python
 # config.py
 DATA_SOURCES = {
-    'historical': 'polygon',      # Para backtesting preciso
-    'realtime': 'ibkr_tws',      # Para ejecución
-    'screening': 'yahoo',         # Para ideas rápidas
-    'research': 'quantconnect',   # Para estrategias complejas
-    'insights': 'flash_research'  # Para confirmación
+    'historical': 'polygon',      # For precise backtesting
+    'realtime': 'ibkr_tws',      # For execution
+    'screening': 'yahoo',         # For quick ideas
+    'research': 'quantconnect',   # For complex strategies
+    'insights': 'flash_research'  # For confirmation
 }
 
 # data_manager.py
@@ -281,32 +283,32 @@ class DataManager:
         
     def get_data(self, ticker, source='auto'):
         if source == 'auto':
-            # Lógica para elegir mejor fuente
+            # Logic to choose best source
             if self.need_intraday:
                 return self.polygon.get_data(ticker)
             else:
                 return self.yahoo.get_data(ticker)
 ```
 
-## Costos Mensuales
+## Monthly Costs
 
-| Fuente | Costo | Lo que obtienes |
+| Source | Cost | What You Get |
 |--------|-------|-----------------|
-| Yahoo Finance | $0 | EOD data, screening básico |
-| Polygon.io | $79 | 10 años intraday, websocket |
-| IBKR | $10 + comms | Real-time, ejecución |
-| DAS Trader | $150 | Plataforma pro + data |
+| Yahoo Finance | $0 | EOD data, basic screening |
+| Polygon.io | $79 | 10 years intraday, websocket |
+| IBKR | $10 + comms | Real-time, execution |
+| DAS Trader | $150 | Pro platform + data |
 | QuantConnect | $0-$200 | Backtest + live deployment |
 | Flash Research | Variable | Market intelligence |
 
-**Total**: ~$300-400/mes para setup profesional
+**Total**: ~$300-400/month for professional setup
 
-## Tips para Empezar
+## Tips for Getting Started
 
-1. **Empieza gratis**: Yahoo Finance + paper trading IBKR
-2. **Primer upgrade**: Polygon.io Developer ($79)
-3. **Cuando seas consistente**: Agrega DAS o similar
-4. **Para escalar**: QuantConnect para múltiples estrategias
+1. **Start free**: Yahoo Finance + IBKR paper trading
+2. **First upgrade**: Polygon.io Developer ($79)
+3. **When you're consistent**: Add DAS or similar
+4. **To scale**: QuantConnect for multiple strategies
 
 ## Data Quality Checklist
 
@@ -327,6 +329,6 @@ def validate_data(df):
     return pd.Series(checks)
 ```
 
-## Siguiente Paso
+## Next Step
 
-Continúa con [Tipos de Datos](data_types.md) para entender las diferencias entre EOD, intraday y tick data.
+Continue with [Data Types](data_types.md) to understand the differences between EOD, intraday, and tick data.

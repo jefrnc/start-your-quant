@@ -1,22 +1,24 @@
-# Tamaño de Posición con Riesgo Fijo
+> 🇪🇸 [Leer en Español](position_sizing.es.md) | 🇺🇸 **English**
 
-## El Arte de No Quebrar
+# Fixed-Risk Position Sizing
 
-Position sizing es la diferencia entre ser rentable y quebrar. Puedes tener la mejor estrategia del mundo, pero si arriesgas demasiado en cada trade, un streak de perdidas te elimina.
+## The Art of Not Going Broke
 
-> **⚠️ Small Caps Warning**: La volatilidad extrema requiere position sizing más conservador que blue chips. Nuestra regla: máximo 1-2% de riesgo por trade en small caps.
+Position sizing is the difference between being profitable and going broke. You can have the best strategy in the world, but if you risk too much on each trade, a losing streak will wipe you out.
 
-## Filosofía: Risk-First Approach
+> **⚠️ Small Caps Warning**: Extreme volatility requires more conservative position sizing than blue chips. Our rule: maximum 1-2% risk per trade in small caps.
+
+## Philosophy: Risk-First Approach
 
 ```python
-# ❌ MALO: Pensar en ganancias primero
+# ❌ BAD: Thinking about gains first
 def bad_position_sizing(account_value, stock_price):
-    """Quiero comprar $10,000 de este stock"""
+    """I want to buy $10,000 of this stock"""
     return 10000 / stock_price
 
-# ✅ BUENO: Pensar en riesgo primero
+# ✅ GOOD: Thinking about risk first
 def good_position_sizing(account_value, entry_price, stop_price, risk_per_trade=0.02):
-    """¿Cuánto puedo perder en este trade?"""
+    """How much can I lose on this trade?"""
     risk_amount = account_value * risk_per_trade
     risk_per_share = entry_price - stop_price
     return risk_amount / risk_per_share if risk_per_share > 0 else 0
@@ -24,7 +26,7 @@ def good_position_sizing(account_value, entry_price, stop_price, risk_per_trade=
 
 ## Fixed Risk Position Sizing
 
-### El Método Base: 1-2% Risk
+### The Base Method: 1-2% Risk
 ```python
 class FixedRiskSizer:
     def __init__(self, account_value, max_risk_per_trade=0.02):
@@ -32,31 +34,31 @@ class FixedRiskSizer:
         self.max_risk_per_trade = max_risk_per_trade
         
     def calculate_shares(self, entry_price, stop_loss_price):
-        """Calcular shares basado en riesgo fijo"""
-        # Validaciones
+        """Calculate shares based on fixed risk"""
+        # Validations
         if entry_price <= 0 or stop_loss_price <= 0:
             return 0
         
-        # Para long positions
+        # For long positions
         risk_per_share = abs(entry_price - stop_loss_price)
         
         if risk_per_share == 0:
             return 0
         
-        # Cantidad de dinero que estoy dispuesto a perder
+        # Amount of money I'm willing to lose
         total_risk_amount = self.account_value * self.max_risk_per_trade
         
-        # Shares que puedo comprar
+        # Shares I can buy
         shares = int(total_risk_amount / risk_per_share)
         
-        # Verificar que no exceda % máximo del portfolio
+        # Verify it doesn't exceed max portfolio %
         max_position_value = self.account_value * 0.20  # 20% max
         max_shares_by_value = int(max_position_value / entry_price)
         
         return min(shares, max_shares_by_value)
     
     def calculate_position_details(self, entry_price, stop_loss_price):
-        """Detalles completos de la posición"""
+        """Complete position details"""
         shares = self.calculate_shares(entry_price, stop_loss_price)
         
         if shares == 0:
@@ -75,19 +77,19 @@ class FixedRiskSizer:
             'position_percentage': position_value / self.account_value
         }
 
-# Ejemplo de uso
+# Usage example
 sizer = FixedRiskSizer(account_value=50000, max_risk_per_trade=0.02)
 
-# Stock a $25, stop loss a $23
+# Stock at $25, stop loss at $23
 position = sizer.calculate_position_details(entry_price=25, stop_loss_price=23)
 print(f"Shares to buy: {position['shares']}")
 print(f"Risk amount: ${position['risk_amount']:.2f}")
 print(f"Risk percentage: {position['risk_percentage']:.2%}")
 ```
 
-## Position Sizing para Small Caps
+## Position Sizing for Small Caps
 
-### Adjustments para Volatilidad
+### Volatility Adjustments
 ```python
 class SmallCapPositionSizer(FixedRiskSizer):
     def __init__(self, account_value, base_risk=0.02):
@@ -95,20 +97,20 @@ class SmallCapPositionSizer(FixedRiskSizer):
         self.base_risk = base_risk
         
     def adjust_risk_for_volatility(self, ticker, current_price, lookback_days=20):
-        """Ajustar riesgo basado en volatilidad del stock"""
-        # Obtener datos históricos
+        """Adjust risk based on stock volatility"""
+        # Get historical data
         historical_data = get_historical_data(ticker, lookback_days)
         
         if historical_data.empty:
             return self.base_risk
         
-        # Calcular volatilidad
+        # Calculate volatility
         returns = historical_data['close'].pct_change().dropna()
         volatility = returns.std() * np.sqrt(252)  # Annualized
         
-        # Ajustar riesgo inversamente a la volatilidad
+        # Adjust risk inversely to volatility
         if volatility > 0.8:  # High vol (>80% annual)
-            risk_multiplier = 0.5  # Reducir risk al 50%
+            risk_multiplier = 0.5  # Reduce risk to 50%
         elif volatility > 0.5:  # Medium vol
             risk_multiplier = 0.75
         elif volatility > 0.3:  # Low vol
@@ -118,13 +120,13 @@ class SmallCapPositionSizer(FixedRiskSizer):
         
         adjusted_risk = self.base_risk * risk_multiplier
         
-        # Cap en máximo 3%
+        # Cap at maximum 3%
         return min(adjusted_risk, 0.03)
     
     def adjust_risk_for_float(self, float_shares):
-        """Ajustar riesgo basado en float size"""
+        """Adjust risk based on float size"""
         if float_shares < 5_000_000:  # Micro float
-            return self.base_risk * 0.5  # 50% del riesgo normal
+            return self.base_risk * 0.5  # 50% of normal risk
         elif float_shares < 20_000_000:  # Low float
             return self.base_risk * 0.75
         else:
@@ -132,7 +134,7 @@ class SmallCapPositionSizer(FixedRiskSizer):
     
     def calculate_smart_position(self, ticker, entry_price, stop_loss_price, 
                                float_shares=None, gap_percent=None):
-        """Position sizing inteligente para small caps"""
+        """Smart position sizing for small caps"""
         
         # Base risk
         risk = self.base_risk
@@ -147,7 +149,7 @@ class SmallCapPositionSizer(FixedRiskSizer):
         
         # Adjust for gap size
         if gap_percent and abs(gap_percent) > 20:
-            risk *= 0.5  # Reducir riesgo 50% en gaps grandes
+            risk *= 0.5  # Reduce risk 50% on large gaps
         
         # Update risk and calculate
         original_risk = self.max_risk_per_trade
@@ -175,7 +177,7 @@ class SmallCapPositionSizer(FixedRiskSizer):
 ### 1. Kelly Criterion
 ```python
 def kelly_criterion_sizing(win_rate, avg_win, avg_loss):
-    """Kelly Criterion para optimal position sizing"""
+    """Kelly Criterion for optimal position sizing"""
     if avg_loss == 0:
         return 0
     
@@ -187,18 +189,18 @@ def kelly_criterion_sizing(win_rate, avg_win, avg_loss):
     
     kelly_fraction = (b * p - q) / b
     
-    # Kelly es agresivo, usar fracción
+    # Kelly is aggressive, use a fraction
     conservative_kelly = kelly_fraction * 0.25  # 25% of full Kelly
     
-    # Cap en máximo 5%
+    # Cap at maximum 5%
     return min(max(conservative_kelly, 0), 0.05)
 
 def apply_kelly_sizing(historical_trades, current_trade):
-    """Aplicar Kelly a trade actual"""
-    if len(historical_trades) < 20:  # Necesitas historia
+    """Apply Kelly to current trade"""
+    if len(historical_trades) < 20:  # Need history
         return 0.02  # Default 2%
     
-    # Calcular estadísticas históricas
+    # Calculate historical statistics
     wins = [t for t in historical_trades if t > 0]
     losses = [t for t in historical_trades if t < 0]
     
@@ -214,27 +216,27 @@ def apply_kelly_sizing(historical_trades, current_trade):
 ### 2. Volatility Adjusted Sizing
 ```python
 def volatility_adjusted_sizing(base_risk, current_volatility, target_volatility=0.15):
-    """Ajustar position size por volatilidad"""
+    """Adjust position size by volatility"""
     if current_volatility <= 0:
         return base_risk
     
-    # Escalar inversamente a la volatilidad
+    # Scale inversely to volatility
     vol_adjustment = target_volatility / current_volatility
     adjusted_risk = base_risk * vol_adjustment
     
-    # Límites razonables
-    return max(min(adjusted_risk, 0.05), 0.005)  # Entre 0.5% y 5%
+    # Reasonable limits
+    return max(min(adjusted_risk, 0.05), 0.005)  # Between 0.5% and 5%
 
 def calculate_portfolio_volatility_target(positions, target_vol=0.15):
-    """Calcular sizing para mantener volatilidad de portfolio objetivo"""
-    # Simplified version - en realidad necesitas correlaciones
+    """Calculate sizing to maintain target portfolio volatility"""
+    # Simplified version - you actually need correlations
     individual_vols = [pos['volatility'] for pos in positions]
     individual_weights = [pos['weight'] for pos in positions]
     
-    # Portfolio vol (asumiendo correlación promedio)
+    # Portfolio vol (assuming average correlation)
     portfolio_vol = np.sqrt(np.sum([(w * v) ** 2 for w, v in zip(individual_weights, individual_vols)]))
     
-    # Scale factor para alcanzar target
+    # Scale factor to reach target
     if portfolio_vol > 0:
         scale_factor = target_vol / portfolio_vol
         return min(scale_factor, 2.0)  # Max 2x scaling
@@ -256,40 +258,40 @@ class DynamicRiskManager:
         """Update equity curve"""
         self.equity_curve.append(new_equity_value)
         
-        # Mantener solo el lookback period
+        # Keep only the lookback period
         if len(self.equity_curve) > self.lookback_period * 2:
             self.equity_curve = self.equity_curve[-self.lookback_period * 2:]
     
     def calculate_current_risk(self):
-        """Calcular riesgo actual basado en performance reciente"""
+        """Calculate current risk based on recent performance"""
         if len(self.equity_curve) < self.lookback_period:
             return self.base_risk
         
         recent_equity = self.equity_curve[-self.lookback_period:]
         
-        # Calcular drawdown actual
+        # Calculate current drawdown
         peak = max(recent_equity)
         current = recent_equity[-1]
         current_drawdown = (peak - current) / peak
         
-        # Calcular retornos recientes
+        # Calculate recent returns
         returns = [(recent_equity[i] - recent_equity[i-1]) / recent_equity[i-1] 
                   for i in range(1, len(recent_equity))]
         
-        # Win rate reciente
+        # Recent win rate
         winning_periods = len([r for r in returns if r > 0])
         recent_win_rate = winning_periods / len(returns)
         
         # Adjust risk based on recent performance
         risk_multiplier = 1.0
         
-        # Reducir riesgo si en drawdown
+        # Reduce risk if in drawdown
         if current_drawdown > 0.1:  # 10% drawdown
             risk_multiplier *= 0.5
         elif current_drawdown > 0.05:  # 5% drawdown
             risk_multiplier *= 0.75
         
-        # Ajustar por win rate reciente
+        # Adjust for recent win rate
         if recent_win_rate < 0.4:  # <40% win rate
             risk_multiplier *= 0.75
         elif recent_win_rate > 0.6:  # >60% win rate
@@ -304,7 +306,7 @@ class DynamicRiskManager:
 ### 2. Market Regime Adjustment
 ```python
 def adjust_risk_for_market_regime(base_risk, vix_level=None, market_trend=None):
-    """Ajustar riesgo según régimen de mercado"""
+    """Adjust risk based on market regime"""
     risk_multiplier = 1.0
     
     # VIX adjustment
@@ -314,7 +316,7 @@ def adjust_risk_for_market_regime(base_risk, vix_level=None, market_trend=None):
         elif vix_level > 20:  # Moderate fear
             risk_multiplier *= 0.75
         elif vix_level < 12:  # Complacency
-            risk_multiplier *= 0.8  # También reducir en complacencia
+            risk_multiplier *= 0.8  # Also reduce in complacency
     
     # Market trend adjustment
     if market_trend:
@@ -337,11 +339,11 @@ def adjust_risk_for_market_regime(base_risk, vix_level=None, market_trend=None):
 ### 1. Correlation Adjustments
 ```python
 def calculate_correlation_adjusted_sizing(positions, new_position, max_correlated_risk=0.1):
-    """Ajustar sizing considerando correlaciones"""
+    """Adjust sizing considering correlations"""
     if not positions:
         return new_position['base_size']
     
-    # Calcular correlación promedio con posiciones existentes
+    # Calculate average correlation with existing positions
     correlations = []
     for pos in positions:
         corr = calculate_correlation(pos['ticker'], new_position['ticker'])
@@ -349,7 +351,7 @@ def calculate_correlation_adjusted_sizing(positions, new_position, max_correlate
     
     avg_correlation = np.mean(correlations)
     
-    # Si alta correlación, reducir position size
+    # If high correlation, reduce position size
     if avg_correlation > 0.7:
         correlation_multiplier = 0.5
     elif avg_correlation > 0.5:
@@ -357,13 +359,13 @@ def calculate_correlation_adjusted_sizing(positions, new_position, max_correlate
     else:
         correlation_multiplier = 1.0
     
-    # Calcular riesgo total de posiciones correlacionadas
+    # Calculate total risk of correlated positions
     correlated_risk = sum([pos['risk_amount'] for pos in positions 
                           if calculate_correlation(pos['ticker'], new_position['ticker']) > 0.5])
     
     account_value = sum([pos['account_value'] for pos in positions])
     
-    # Si ya hay mucho riesgo correlacionado, reducir más
+    # If there's already too much correlated risk, reduce further
     if correlated_risk / account_value > max_correlated_risk:
         correlation_multiplier *= 0.5
     
@@ -378,7 +380,7 @@ class SectorRiskManager:
         self.sector_exposures = {}
         
     def add_position(self, ticker, sector, risk_amount, account_value):
-        """Agregar posición y track sector exposure"""
+        """Add position and track sector exposure"""
         if sector not in self.sector_exposures:
             self.sector_exposures[sector] = 0
         
@@ -450,7 +452,7 @@ class PositionMonitor:
         return total_risk
 ```
 
-## Mi Setup Personal
+## My Personal Setup
 
 ```python
 # position_sizing_config.py
@@ -473,7 +475,7 @@ RISK_CONFIG = {
 }
 
 def calculate_final_position_size(ticker, entry_price, stop_loss, account_value):
-    """Mi función principal de position sizing"""
+    """My main position sizing function"""
     
     # 1. Base sizing
     sizer = SmallCapPositionSizer(account_value, RISK_CONFIG['base_risk_per_trade'])
@@ -509,6 +511,6 @@ def calculate_final_position_size(ticker, entry_price, stop_loss, account_value)
     return position
 ```
 
-## Siguiente Paso
+## Next Step
 
-Con position sizing dominado, vamos a [Límites de Riesgo Diario](risk_limits.md) para proteger el capital a nivel portfolio.
+With position sizing mastered, let's move on to [Daily Risk Limits](risk_limits.md) to protect capital at the portfolio level.

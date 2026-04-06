@@ -1,123 +1,125 @@
-# KISS: Principios de Diseño de Sistemas
+> 🇪🇸 [Leer en Español](KISS-Design-Principles.es.md) | 🇺🇸 **English**
 
-Keep It Simple, Stupid. En trading algorítmico, la simplicidad no es una limitación — es tu principal defensa contra el overfitting.
+# KISS: System Design Principles
 
-## Por Qué Simple Gana
+Keep It Simple, Stupid. In algorithmic trading, simplicity is not a limitation -- it's your main defense against overfitting.
 
-La simplicidad fomenta la robustez. Y la robustez es lo más importante de todo en un sistema, porque no se puede garantizar — solo se puede fomentar durante el diseño.
+## Why Simple Wins
 
-Un sistema robusto mantiene su edge en datos que nunca vio. Un sistema complejo se ajusta perfectamente al pasado pero falla en el futuro. La diferencia entre ambos, casi siempre, es la cantidad de reglas.
+Simplicity fosters robustness. And robustness is the single most important thing in a system, because it can't be guaranteed -- it can only be fostered during design.
 
-**Regla práctica**: 1-2 reglas de entrada, 1 filtro como máximo, múltiples salidas. Si necesitás más de eso para que funcione, probablemente estés capturando ruido, no señal.
+A robust system maintains its edge on data it never saw. A complex system fits the past perfectly but fails in the future. The difference between the two, almost always, is the number of rules.
 
-### Cuántas Reglas Son Demasiadas
+**Practical rule**: 1-2 entry rules, 1 filter at most, multiple exits. If you need more than that for it to work, you're probably capturing noise, not signal.
 
-Cada regla, cada filtro, cada parámetro optimizable que agregás le da al sistema más flexibilidad para ajustarse a los datos históricos. Más complejidad = más riesgo de overfitting.
+### How Many Rules Are Too Many
 
-```
-1-2 reglas + 1 filtro:  robusto, difícil de ajustar al ruido
-3-4 reglas + 2 filtros: zona gris, hay que validar muy bien
-5+ reglas + 3 filtros:  casi seguro overfitting, por más que el backtest sea perfecto
-```
-
-Si no podés explicar tu sistema en 2 minutos a alguien que no sabe de trading, probablemente sea demasiado complejo.
-
-## Del Papel al Código: Pseudocódigo
-
-Antes de programar, escribí el sistema en pseudocódigo. No es opcional — es el paso que previene errores lógicos y te fuerza a entender exactamente qué hace cada parte.
-
-**Pseudocódigo**: mezcla entre lenguaje humano y lenguaje de programación. No es ejecutable, pero es suficientemente preciso para traducirlo a cualquier lenguaje.
+Every rule, every filter, every optimizable parameter you add gives the system more flexibility to fit to historical data. More complexity = more overfitting risk.
 
 ```
-PSEUDOCÓDIGO del sistema Aberration (Fitschen, 1986):
+1-2 rules + 1 filter:  robust, hard to fit to noise
+3-4 rules + 2 filters: gray zone, needs thorough validation
+5+ rules + 3 filters:  almost certainly overfitting, no matter how perfect the backtest
+```
+
+If you can't explain your system in 2 minutes to someone who doesn't know trading, it's probably too complex.
+
+## From Paper to Code: Pseudocode
+
+Before coding, write the system in pseudocode. This is not optional -- it's the step that prevents logical errors and forces you to understand exactly what each part does.
+
+**Pseudocode**: a mix between human language and programming language. It's not executable, but it's precise enough to translate into any language.
+
+```
+PSEUDOCODE for the Aberration system (Fitschen, 1986):
 
 Variables:
-  - media = media simple de N períodos
-  - banda_superior = media + 2 × desviación_estándar
-  - banda_inferior = media - 2 × desviación_estándar
+  - average = simple moving average of N periods
+  - upper_band = average + 2 x standard_deviation
+  - lower_band = average - 2 x standard_deviation
 
-Entrada largo:
-  SI cierre > banda_superior
-    COMPRAR en apertura siguiente barra
+Long entry:
+  IF close > upper_band
+    BUY at next bar open
 
-Salida largo:
-  SI estoy largo Y cierre < media
-    CERRAR largo en apertura siguiente barra
+Long exit:
+  IF long AND close < average
+    CLOSE long at next bar open
 
-Entrada corto:
-  SI cierre < banda_inferior
-    VENDER en apertura siguiente barra
+Short entry:
+  IF close < lower_band
+    SELL at next bar open
 
-Salida corto:
-  SI estoy corto Y cierre > media
-    CERRAR corto en apertura siguiente barra
+Short exit:
+  IF short AND close > average
+    CLOSE short at next bar open
 ```
 
-**Ventajas del pseudocódigo:**
-- Detectás errores lógicos antes de programar
-- Se traduce fácilmente a cualquier lenguaje (Python, EasyLanguage, MQL, NinjaScript)
-- Sirve como documentación del sistema
-- Si otra persona lo lee, puede verificar la lógica
+**Advantages of pseudocode:**
+- You catch logical errors before coding
+- It translates easily to any language (Python, EasyLanguage, MQL, NinjaScript)
+- It serves as system documentation
+- If someone else reads it, they can verify the logic
 
-## Largos y Cortos: Separar Cuando se Pueda
+## Longs and Shorts: Separate When Possible
 
-La renta variable históricamente muestra asimetría: tiende a subir de forma gradual y a caer de forma rápida y con mayor volatilidad. La volatilidad es mayor en caídas. Esto significa que los parámetros óptimos para el lado largo probablemente sean distintos a los del lado corto.
+Equities historically show asymmetry: they tend to rise gradually and fall quickly with higher volatility. Volatility is greater during declines. This means the optimal parameters for the long side are probably different from the short side.
 
-**Si optimizás largo y corto juntos**, el optimizador busca un compromiso que no es óptimo para ninguno de los dos. Normalmente se sesga hacia el lado largo (hay más datos largos en mercados alcistas).
+**If you optimize long and short together**, the optimizer seeks a compromise that's not optimal for either. It typically biases toward the long side (there's more long data in bull markets).
 
-**Si los separás**, cada lado tiene sus propios parámetros optimizados. La suma suele ser mejor que el conjunto.
+**If you separate them**, each side has its own optimized parameters. The sum is usually better than the whole.
 
-**Pero**: separar divide la muestra a la mitad. Con pocos trades, eso reduce la significancia estadística y aumenta el riesgo de overfitting.
+**But**: separating cuts the sample in half. With few trades, that reduces statistical significance and increases overfitting risk.
 
-| Situación | Recomendación |
+| Situation | Recommendation |
 |---|---|
-| Sistema intradía con muchos trades | Separar largos y cortos |
-| Sistema diario con buen histórico (10+ años) | Separar si hay suficientes trades por lado |
-| Sistema semanal/mensual | Operar conjunto — no hay suficiente muestra para separar |
-| No operar cortos en renta variable | Totalmente válido. Muchos fondos exitosos son solo largo |
+| Intraday system with many trades | Separate longs and shorts |
+| Daily system with good history (10+ years) | Separate if there are enough trades per side |
+| Weekly/monthly system | Trade together -- not enough sample to separate |
+| Not trading short on equities | Totally valid. Many successful funds are long-only |
 
-## ATR Normalizado: Comparar Manzanas con Manzanas
+## Normalized ATR: Comparing Apples to Apples
 
-El ATR estándar mide volatilidad en puntos. Pero 100 puntos con el Nasdaq a 5,000 representan un 2%, mientras que 100 puntos con el Nasdaq a 18,000 son apenas un 0.55%. El ATR por sí solo no permite comparar volatilidad relativa entre activos con precios distintos ni a lo largo del tiempo si el precio cambió mucho.
+Standard ATR measures volatility in points. But 100 points with the Nasdaq at 5,000 represents 2%, while 100 points with the Nasdaq at 18,000 is barely 0.55%. ATR alone doesn't allow you to compare relative volatility across assets with different prices or over time if the price has changed significantly.
 
-**Solución**: normalizar el ATR dividiéndolo por el precio.
+**Solution**: normalize the ATR by dividing it by price.
 
 ```python
 def atr_normalized(atr, high, low, close):
     """
-    ATR como porcentaje del precio.
-    Permite comparar volatilidad entre activos y a lo largo del tiempo.
+    ATR as a percentage of price.
+    Allows comparing volatility across assets and over time.
     """
     typical_price = (high + low + close) / 3
     return (atr / typical_price) * 100
 
-# Comparación (diario, ~20 años):
-# Nasdaq 100:  ATR% ~1.65%  — alta volatilidad
-# S&P 500:     ATR% ~1.24%  — moderada
-# Oro (GLD):   ATR% ~0.97%  — baja
-# Café:        ATR% ~2.24%  — muy alta
-# Petróleo:    ATR% ~3.08%  — extrema
+# Comparison (daily, ~20 years):
+# Nasdaq 100:  ATR% ~1.65%  -- high volatility
+# S&P 500:     ATR% ~1.24%  -- moderate
+# Gold (GLD):  ATR% ~0.97%  -- low
+# Coffee:      ATR% ~2.24%  -- very high
+# Crude Oil:   ATR% ~3.08%  -- extreme
 ```
 
-**Usos del ATR normalizado:**
-- Comparar volatilidad entre activos para elegir dónde operar
-- Ajustar la exposición: reducir contratos cuando la volatilidad sube, aumentar cuando baja (con límites)
-- Dimensionar stops y TPs que se adapten al régimen de volatilidad actual
+**Uses of normalized ATR:**
+- Compare volatility across assets to choose where to trade
+- Adjust exposure: reduce contracts when volatility rises, increase when it falls (with limits)
+- Size stops and TPs that adapt to the current volatility regime
 
-## Elegir Lenguaje de Programación
+## Choosing a Programming Language
 
-| Lenguaje | Plataforma | Nivel | Ideal para |
+| Language | Platform | Level | Best for |
 |---|---|---|---|
-| **EasyLanguage** | TradeStation, MultiCharts | Muy alto (casi pseudocódigo) | Principiantes, prototipado rápido |
-| **Python** | Independiente | Alto | Flexibilidad, ML, análisis de datos |
-| **NinjaScript** | NinjaTrader | Alto | Usuarios de NinjaTrader |
-| **MQL4/5** | MetaTrader | Medio-alto | Forex, códigos más largos |
+| **EasyLanguage** | TradeStation, MultiCharts | Very high (almost pseudocode) | Beginners, rapid prototyping |
+| **Python** | Independent | High | Flexibility, ML, data analysis |
+| **NinjaScript** | NinjaTrader | High | NinjaTrader users |
+| **MQL4/5** | MetaTrader | Medium-high | Forex, longer codebases |
 
-**El dilema**: elegir un lenguaje condiciona plataforma, broker y datos.
+**The dilemma**: choosing a language determines your platform, broker, and data.
 
-- **EasyLanguage/TradeStation**: todo-en-uno (plataforma + datos + broker + lenguaje). Ideal para empezar sin complicaciones de conexión
-- **Python**: máxima flexibilidad pero hay que resolver conexiones a datos, broker y ejecución por separado
+- **EasyLanguage/TradeStation**: all-in-one (platform + data + broker + language). Ideal for getting started without connection complications
+- **Python**: maximum flexibility but you have to solve data, broker, and execution connections separately
 
-No existe el lenguaje "mejor". Existe el que mejor se adapta a tu perfil y experiencia. Si ya sabés Python, usá Python. Si empezás de cero, EasyLanguage tiene la curva de aprendizaje más corta.
+There's no "best" language. There's the one that best fits your profile and experience. If you already know Python, use Python. If you're starting from scratch, EasyLanguage has the shortest learning curve.
 
-Lo que importa es que entiendas el código que operás — sea tuyo o de terceros. Si no podés explicar cada línea, no lo operes con dinero real.
+What matters is that you understand the code you're trading -- whether it's yours or someone else's. If you can't explain every line, don't trade it with real money.

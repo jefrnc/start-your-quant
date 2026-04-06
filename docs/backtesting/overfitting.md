@@ -1,33 +1,35 @@
-# Cómo Evitar Overfitting
+> 🇪🇸 [Leer en Español](overfitting.es.md) | 🇺🇸 **English**
 
-## La Trampa Más Peligrosa del Backtesting
+# How to Avoid Overfitting
 
-Overfitting es cuando tu estrategia funciona perfectamente en datos históricos pero falla miserablemente en vivo. Es como memorizar las respuestas de un examen específico sin entender el tema.
+## The Most Dangerous Trap in Backtesting
 
-## ¿Qué es Overfitting?
+Overfitting is when your strategy works perfectly on historical data but fails miserably in live trading. It's like memorizing the answers to a specific exam without understanding the subject.
 
-### Definición Simple
-Tu estrategia se ajusta tanto a los datos históricos que captura ruido en lugar de señales reales. Funciona en el pasado pero no se generaliza al futuro.
+## What Is Overfitting?
 
-### Ejemplo Visual
+### Simple Definition
+Your strategy fits so closely to historical data that it captures noise instead of real signals. It works in the past but doesn't generalize to the future.
+
+### Visual Example
 ```python
-# ❌ OVERFITTED: 15 parámetros para explicar 100 trades
+# ❌ OVERFITTED: 15 parameters to explain 100 trades
 def overfitted_strategy(data):
     return (
         (data['sma5'] > data['sma10']) &
         (data['sma10'] > data['sma15']) &
-        (data['rsi'] > 52.3) &  # Muy específico
-        (data['rsi'] < 67.8) &  # Muy específico
-        (data['volume'] > data['volume_sma'] * 1.847) &  # Decimal específico
-        (data['hour'] == 10) &  # Solo 10 AM
-        (data['minute'] >= 15) &  # Entre 10:15-10:30
+        (data['rsi'] > 52.3) &  # Too specific
+        (data['rsi'] < 67.8) &  # Too specific
+        (data['volume'] > data['volume_sma'] * 1.847) &  # Specific decimal
+        (data['hour'] == 10) &  # Only 10 AM
+        (data['minute'] >= 15) &  # Between 10:15-10:30
         (data['minute'] <= 30) &
-        (data['vwap_distance'] > 0.0023) &  # Muy específico
-        (data['day_of_week'] != 2) &  # No Tuesday
-        # ... 5 condiciones más específicas
+        (data['vwap_distance'] > 0.0023) &  # Too specific
+        (data['day_of_week'] != 2) &  # Not Tuesday
+        # ... 5 more specific conditions
     )
 
-# ✅ GENERALIZABLE: 3 parámetros simples
+# ✅ GENERALIZABLE: 3 simple parameters
 def robust_strategy(data):
     return (
         (data['close'] > data['vwap']) &
@@ -36,37 +38,37 @@ def robust_strategy(data):
     )
 ```
 
-## Señales de Overfitting
+## Signs of Overfitting
 
-### 1. Métricas Demasiado Buenas
+### 1. Metrics That Are Too Good
 ```python
 def detect_overfitting_signals(backtest_results):
-    """Detectar señales de overfitting"""
+    """Detect overfitting signals"""
     red_flags = []
     
-    # Sharpe ratio irreal
+    # Unrealistic Sharpe ratio
     if backtest_results['sharpe_ratio'] > 3:
-        red_flags.append("Sharpe ratio demasiado alto (>3)")
+        red_flags.append("Sharpe ratio too high (>3)")
     
-    # Win rate irreal
+    # Unrealistic win rate
     if backtest_results['win_rate'] > 0.8:
-        red_flags.append("Win rate demasiado alto (>80%)")
+        red_flags.append("Win rate too high (>80%)")
     
-    # Drawdown demasiado bajo
+    # Drawdown too low
     if backtest_results['max_drawdown'] < 0.03:
-        red_flags.append("Max drawdown demasiado bajo (<3%)")
+        red_flags.append("Max drawdown too low (<3%)")
     
-    # Profit factor irreal
+    # Unrealistic profit factor
     if backtest_results['profit_factor'] > 4:
-        red_flags.append("Profit factor demasiado alto (>4)")
+        red_flags.append("Profit factor too high (>4)")
     
-    # Pocos trades
+    # Too few trades
     if backtest_results['total_trades'] < 50:
-        red_flags.append("Muy pocos trades para ser estadísticamente significativo")
+        red_flags.append("Too few trades to be statistically significant")
     
     return red_flags
 
-# Ejemplo de uso
+# Usage example
 suspicious_results = {
     'sharpe_ratio': 4.2,
     'win_rate': 0.87,
@@ -76,15 +78,15 @@ suspicious_results = {
 }
 
 flags = detect_overfitting_signals(suspicious_results)
-print("🚨 Red flags detectadas:")
+print("Red flags detected:")
 for flag in flags:
     print(f"  - {flag}")
 ```
 
-### 2. Performance Inconsistente
+### 2. Inconsistent Performance
 ```python
 def test_temporal_stability(strategy, data, periods=4):
-    """Test de estabilidad temporal"""
+    """Temporal stability test"""
     results = []
     period_length = len(data) // periods
     
@@ -96,7 +98,7 @@ def test_temporal_stability(strategy, data, periods=4):
         period_result = backtest_strategy(strategy, period_data)
         results.append(period_result['total_return'])
     
-    # Calcular consistencia
+    # Calculate consistency
     consistency = {
         'results_by_period': results,
         'mean_return': np.mean(results),
@@ -106,19 +108,19 @@ def test_temporal_stability(strategy, data, periods=4):
         'coefficient_of_variation': np.std(results) / np.mean(results) if np.mean(results) != 0 else float('inf')
     }
     
-    # Red flag si la variación es muy alta
+    # Red flag if variation is very high
     if consistency['coefficient_of_variation'] > 1:
-        consistency['warning'] = "Alta variabilidad entre períodos - posible overfitting"
+        consistency['warning'] = "High variability between periods - possible overfitting"
     
     return consistency
 ```
 
-## Técnicas Anti-Overfitting
+## Anti-Overfitting Techniques
 
-### 1. Cross-Validation Temporal
+### 1. Temporal Cross-Validation
 ```python
 def walk_forward_validation(strategy, data, train_periods=252, test_periods=63):
-    """Walk-forward analysis para validar robustez"""
+    """Walk-forward analysis to validate robustness"""
     results = []
     
     for start in range(0, len(data) - train_periods - test_periods, test_periods):
@@ -146,7 +148,7 @@ def walk_forward_validation(strategy, data, train_periods=252, test_periods=63):
             'params': optimized_params
         })
     
-    # Analizar degradación
+    # Analyze degradation
     train_returns = [r['train_return'] for r in results]
     test_returns = [r['test_return'] for r in results]
     
@@ -164,11 +166,11 @@ def walk_forward_validation(strategy, data, train_periods=252, test_periods=63):
 ### 2. Parameter Stability Test
 ```python
 def parameter_stability_test(strategy, data, param_ranges, num_tests=100):
-    """Test de estabilidad de parámetros"""
+    """Parameter stability test"""
     results = []
     
     for _ in range(num_tests):
-        # Generar parámetros aleatorios dentro de rangos
+        # Generate random parameters within ranges
         random_params = {}
         for param, (min_val, max_val) in param_ranges.items():
             if isinstance(min_val, int):
@@ -176,7 +178,7 @@ def parameter_stability_test(strategy, data, param_ranges, num_tests=100):
             else:
                 random_params[param] = np.random.uniform(min_val, max_val)
         
-        # Test strategy con estos parámetros
+        # Test strategy with these parameters
         result = backtest_strategy(strategy, data, random_params)
         results.append({
             'params': random_params,
@@ -185,7 +187,7 @@ def parameter_stability_test(strategy, data, param_ranges, num_tests=100):
             'max_dd': result['max_drawdown']
         })
     
-    # Analizar distribución de resultados
+    # Analyze distribution of results
     returns = [r['return'] for r in results]
     
     stability_analysis = {
@@ -202,14 +204,14 @@ def parameter_stability_test(strategy, data, param_ranges, num_tests=100):
 ### 3. Bootstrap Analysis
 ```python
 def bootstrap_analysis(strategy, returns, num_bootstrap=1000):
-    """Bootstrap para estimar distribución de métricas"""
+    """Bootstrap to estimate metric distributions"""
     bootstrap_results = []
     
     for _ in range(num_bootstrap):
-        # Sample returns con replacement
+        # Sample returns with replacement
         bootstrap_sample = np.random.choice(returns, len(returns), replace=True)
         
-        # Calcular métricas para esta muestra
+        # Calculate metrics for this sample
         sharpe = calculate_sharpe_ratio(bootstrap_sample)
         max_dd = calculate_max_drawdown(np.cumprod(1 + bootstrap_sample))
         
@@ -246,34 +248,34 @@ class ValidationFramework:
         self.out_sample = data.iloc[self.split_point:]
         
     def develop_strategy(self, base_strategy):
-        """Desarrollar estrategia en in-sample data"""
+        """Develop strategy on in-sample data"""
         # Optimize parameters
         best_params = self.optimize_parameters(base_strategy, self.in_sample)
         
-        # Test en in-sample
+        # Test on in-sample
         in_sample_results = backtest_strategy(base_strategy, self.in_sample, best_params)
         
         return best_params, in_sample_results
     
     def validate_strategy(self, strategy, params):
-        """Una sola validación en out-of-sample"""
+        """Single validation on out-of-sample"""
         out_sample_results = backtest_strategy(strategy, self.out_sample, params)
         return out_sample_results
     
     def full_validation(self, strategy):
-        """Proceso completo de desarrollo y validación"""
-        # Desarrollo
+        """Complete development and validation process"""
+        # Development
         best_params, in_sample_results = self.develop_strategy(strategy)
         
-        # Validación (solo una vez!)
+        # Validation (only once!)
         out_sample_results = self.validate_strategy(strategy, best_params)
         
-        # Comparar performance
+        # Compare performance
         degradation = in_sample_results['total_return'] - out_sample_results['total_return']
         degradation_pct = degradation / in_sample_results['total_return']
         
-        # Veredicto
-        if degradation_pct < 0.3:  # Menos del 30% de degradación
+        # Verdict
+        if degradation_pct < 0.3:  # Less than 30% degradation
             verdict = "PASSED - Strategy is robust"
         elif degradation_pct < 0.5:
             verdict = "WARNING - Moderate degradation"
@@ -293,17 +295,17 @@ class ValidationFramework:
 ### 2. Monte Carlo Validation
 ```python
 def monte_carlo_validation(strategy, returns, num_simulations=1000):
-    """Monte Carlo para test de robustez"""
+    """Monte Carlo robustness test"""
     simulation_results = []
     
     for _ in range(num_simulations):
-        # Shuffle returns (mantener distribución pero cambiar orden)
+        # Shuffle returns (maintain distribution but change order)
         shuffled_returns = np.random.permutation(returns)
         
-        # Crear equity curve simulada
+        # Create simulated equity curve
         equity_curve = np.cumprod(1 + shuffled_returns)
         
-        # Calcular métricas
+        # Calculate metrics
         total_return = equity_curve[-1] - 1
         max_dd = calculate_max_drawdown(equity_curve)
         sharpe = calculate_sharpe_ratio(shuffled_returns)
@@ -314,11 +316,11 @@ def monte_carlo_validation(strategy, returns, num_simulations=1000):
             'sharpe_ratio': sharpe
         })
     
-    # Comparar con resultado original
+    # Compare with original result
     original_sharpe = calculate_sharpe_ratio(returns)
     simulated_sharpes = [r['sharpe_ratio'] for r in simulation_results]
     
-    # Percentile del resultado original
+    # Percentile of original result
     percentile = (np.sum(np.array(simulated_sharpes) < original_sharpe) / len(simulated_sharpes)) * 100
     
     analysis = {
@@ -333,12 +335,12 @@ def monte_carlo_validation(strategy, returns, num_simulations=1000):
     return analysis
 ```
 
-## Best Practices Anti-Overfitting
+## Best Practices Against Overfitting
 
-### 1. Principio de Parsimonia (Occam's Razor)
+### 1. Principle of Parsimony (Occam's Razor)
 ```python
 def strategy_complexity_score(strategy_conditions):
-    """Scoring de complejidad de estrategia"""
+    """Strategy complexity scoring"""
     complexity_factors = {
         'num_conditions': len(strategy_conditions),
         'num_parameters': count_unique_parameters(strategy_conditions),
@@ -346,7 +348,7 @@ def strategy_complexity_score(strategy_conditions):
         'time_specificity': check_time_specificity(strategy_conditions)
     }
     
-    # Score: menor es mejor
+    # Score: lower is better
     complexity_score = (
         complexity_factors['num_conditions'] * 2 +
         complexity_factors['num_parameters'] * 3 +
@@ -355,11 +357,11 @@ def strategy_complexity_score(strategy_conditions):
     )
     
     if complexity_score < 10:
-        assessment = "Simple y robusto"
+        assessment = "Simple and robust"
     elif complexity_score < 20:
-        assessment = "Moderadamente complejo"
+        assessment = "Moderately complex"
     else:
-        assessment = "Demasiado complejo - riesgo de overfitting"
+        assessment = "Too complex - overfitting risk"
     
     return {
         'score': complexity_score,
@@ -371,45 +373,45 @@ def strategy_complexity_score(strategy_conditions):
 ### 2. Economic Intuition Check
 ```python
 def economic_intuition_check(strategy_logic):
-    """Verificar si la estrategia tiene sentido económico"""
+    """Verify if the strategy makes economic sense"""
     intuition_questions = [
-        "¿Por qué debería funcionar esta estrategia?",
-        "¿Qué ineficiencia del mercado explota?",
-        "¿Por qué otros traders no la están usando?",
-        "¿Funcionaría en diferentes condiciones de mercado?",
-        "¿Es escalable con más capital?"
+        "Why should this strategy work?",
+        "What market inefficiency does it exploit?",
+        "Why aren't other traders already using it?",
+        "Would it work under different market conditions?",
+        "Is it scalable with more capital?"
     ]
     
-    # Esta función requiere input humano, pero el framework ayuda
+    # This function requires human input, but the framework helps
     return {
         'questions': intuition_questions,
-        'reminder': "Si no puedes explicar por qué funciona, probablemente sea overfitting"
+        'reminder': "If you can't explain why it works, it's probably overfitting"
     }
 ```
 
 ### 3. Regime Testing
 ```python
 def test_across_market_regimes(strategy, data):
-    """Test en diferentes regímenes de mercado"""
+    """Test across different market regimes"""
     
-    # Identificar regímenes (simplificado)
+    # Identify regimes (simplified)
     market_returns = data['SPY'].pct_change() if 'SPY' in data else data.iloc[:, 0].pct_change()
     volatility = market_returns.rolling(20).std()
     
-    # Clasificar períodos
+    # Classify periods
     regimes = {}
     
     # Bull/Bear markets
     rolling_returns = market_returns.rolling(60).sum()
-    regimes['bull'] = data[rolling_returns > 0.1]  # >10% en 60 días
-    regimes['bear'] = data[rolling_returns < -0.1]  # <-10% en 60 días
+    regimes['bull'] = data[rolling_returns > 0.1]  # >10% in 60 days
+    regimes['bear'] = data[rolling_returns < -0.1]  # <-10% in 60 days
     
     # High/Low volatility
     vol_median = volatility.median()
     regimes['low_vol'] = data[volatility < vol_median]
     regimes['high_vol'] = data[volatility >= vol_median]
     
-    # Test strategy en cada régimen
+    # Test strategy in each regime
     regime_results = {}
     
     for regime_name, regime_data in regimes.items():
@@ -417,7 +419,7 @@ def test_across_market_regimes(strategy, data):
             result = backtest_strategy(strategy, regime_data)
             regime_results[regime_name] = result
     
-    # Análizar consistencia
+    # Analyze consistency
     returns_by_regime = [r['total_return'] for r in regime_results.values()]
     sharpe_by_regime = [r['sharpe_ratio'] for r in regime_results.values()]
     
@@ -431,11 +433,11 @@ def test_across_market_regimes(strategy, data):
     return consistency_analysis
 ```
 
-## Mi Checklist Anti-Overfitting
+## My Anti-Overfitting Checklist
 
 ```python
 def overfitting_checklist(strategy, backtest_results, validation_results):
-    """Checklist completo anti-overfitting"""
+    """Complete anti-overfitting checklist"""
     
     checklist = {
         'metrics_realistic': True,
@@ -449,39 +451,39 @@ def overfitting_checklist(strategy, backtest_results, validation_results):
     
     issues = []
     
-    # 1. Métricas realistas
+    # 1. Realistic metrics
     if (backtest_results['sharpe_ratio'] > 3 or 
         backtest_results['win_rate'] > 0.8 or 
         backtest_results['max_drawdown'] < 0.03):
         checklist['metrics_realistic'] = False
-        issues.append("Métricas irrealísticamente buenas")
+        issues.append("Unrealistically good metrics")
     
-    # 2. Trades suficientes
+    # 2. Sufficient trades
     if backtest_results['total_trades'] < 100:
         checklist['sufficient_trades'] = False
-        issues.append("Insuficientes trades para significancia estadística")
+        issues.append("Insufficient trades for statistical significance")
     
-    # 3. Validación out-of-sample
+    # 3. Out-of-sample validation
     if validation_results['degradation_pct'] > 0.5:
         checklist['out_sample_validation'] = False
-        issues.append("Degradación significativa en out-of-sample")
+        issues.append("Significant degradation in out-of-sample")
     
-    # 4. Complejidad
+    # 4. Complexity
     complexity = strategy_complexity_score(strategy.conditions)
     if complexity['score'] > 20:
         checklist['complexity_reasonable'] = False
-        issues.append("Estrategia demasiado compleja")
+        issues.append("Strategy is too complex")
     
-    # Score final
+    # Final score
     passed_checks = sum(checklist.values())
     total_checks = len(checklist)
     
     if passed_checks == total_checks:
-        verdict = "✅ STRATEGY APPROVED - Low overfitting risk"
+        verdict = "STRATEGY APPROVED - Low overfitting risk"
     elif passed_checks >= total_checks * 0.8:
-        verdict = "⚠️ PROCEED WITH CAUTION - Some concerns"
+        verdict = "PROCEED WITH CAUTION - Some concerns"
     else:
-        verdict = "❌ HIGH OVERFITTING RISK - Needs rework"
+        verdict = "HIGH OVERFITTING RISK - Needs rework"
     
     return {
         'checklist': checklist,
@@ -491,39 +493,39 @@ def overfitting_checklist(strategy, backtest_results, validation_results):
     }
 ```
 
-## Próximos Pasos Después del Backtest
+## Next Steps After the Backtest
 
 ```python
 def post_backtest_roadmap(validation_results):
-    """Roadmap después de validar estrategia"""
+    """Roadmap after validating strategy"""
     
     if validation_results['verdict'] == "PASSED":
         return {
             'next_step': 'Paper Trading',
-            'duration': '2-3 meses',
-            'success_criteria': 'Correlación >70% con backtest',
-            'position_size': 'Empezar con 25% del tamaño planeado'
+            'duration': '2-3 months',
+            'success_criteria': 'Correlation >70% with backtest',
+            'position_size': 'Start with 25% of planned size'
         }
     elif "WARNING" in validation_results['verdict']:
         return {
             'next_step': 'Refinement',
             'actions': [
-                'Simplificar estrategia',
-                'Ampliar período de test',
-                'Test en más regímenes de mercado'
+                'Simplify strategy',
+                'Extend test period',
+                'Test in more market regimes'
             ]
         }
     else:
         return {
             'next_step': 'Back to Drawing Board',
             'actions': [
-                'Revisar lógica fundamental',
-                'Buscar nueva edge',
-                'Empezar desde cero'
+                'Review fundamental logic',
+                'Look for a new edge',
+                'Start from scratch'
             ]
         }
 ```
 
-## Siguiente Paso
+## Next Step
 
-Con el backtesting dominado, vamos a [Gestión de Riesgo](../risk/position_sizing.md) para proteger tu capital.
+With backtesting mastered, let's move on to [Risk Management](../risk/position_sizing.md) to protect your capital.

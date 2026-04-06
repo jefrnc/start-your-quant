@@ -1,50 +1,52 @@
-# ¿Qué es un Backtest?
+> 🇪🇸 [Leer en Español](what_is_backtest.es.md) | 🇺🇸 **English**
 
-## La Máquina del Tiempo del Trading
+# What Is a Backtest?
 
-Un backtest es básicamente una máquina del tiempo. Tomas tu estrategia y la ejecutas en datos históricos para ver cómo habría funcionado. Es la diferencia entre apostar y invertir.
+## The Trading Time Machine
 
-## Por Qué Importa
+A backtest is basically a time machine. You take your strategy and run it on historical data to see how it would have performed. It's the difference between gambling and investing.
 
-### La Cruda Realidad
-- 90% de los traders pierden dinero
-- La mayoría operan sin testing previo
-- "Se ve bien en el gráfico" ≠ Estrategia rentable
-- Un backtest te salva de perder dinero real
+## Why It Matters
 
-### Lo Que Realmente Mides
+### The Harsh Reality
+- 90% of traders lose money
+- Most trade without prior testing
+- "It looks good on the chart" ≠ Profitable strategy
+- A backtest saves you from losing real money
+
+### What You're Really Measuring
 ```python
-# No es solo: "¿Gané dinero?"
-# Es: "¿Puedo repetir esto consistentemente?"
+# It's not just: "Did I make money?"
+# It's: "Can I repeat this consistently?"
 
 backtest_questions = {
-    'profitability': '¿Es rentable?',
-    'consistency': '¿Funciona en diferentes períodos?',
-    'risk': '¿Cuánto puedo perder?',
-    'frequency': '¿Cuántas oportunidades hay?',
-    'drawdown': '¿Puedo psicológicamente manejar las pérdidas?',
-    'market_conditions': '¿Funciona en bull y bear markets?'
+    'profitability': 'Is it profitable?',
+    'consistency': 'Does it work across different periods?',
+    'risk': 'How much can I lose?',
+    'frequency': 'How many opportunities are there?',
+    'drawdown': 'Can I psychologically handle the losses?',
+    'market_conditions': 'Does it work in bull and bear markets?'
 }
 ```
 
-## Anatomía de un Backtest
+## Anatomy of a Backtest
 
-### 1. Datos Históricos
+### 1. Historical Data
 ```python
-# Calidad de datos = Calidad de resultados
+# Data quality = Results quality
 data_requirements = {
-    'timeframe': '2+ años mínimo',
-    'resolution': 'Acorde a tu estrategia (1min para day trading)',
+    'timeframe': '2+ years minimum',
+    'resolution': 'Match your strategy (1min for day trading)',
     'quality': 'Adjusted for splits, dividends',
-    'survivorship_bias': 'Incluir stocks delistados',
-    'universe': 'Representativo de donde tradearás'
+    'survivorship_bias': 'Include delisted stocks',
+    'universe': 'Representative of where you will trade'
 }
 ```
 
-### 2. Reglas de Trading
+### 2. Trading Rules
 ```python
 def example_strategy_rules():
-    """Ejemplo de reglas claras y testeable"""
+    """Example of clear, testable rules"""
     entry_rules = {
         'signal': 'close > vwap AND rvol > 2',
         'timing': 'Market hours only',
@@ -62,21 +64,21 @@ def example_strategy_rules():
     return {'entry': entry_rules, 'exit': exit_rules}
 ```
 
-### 3. Costos y Fricciones
+### 3. Costs and Frictions
 ```python
 def realistic_costs():
-    """Incluir todos los costos reales"""
+    """Include all real costs"""
     return {
         'commission': 0.005,  # $5 per 1000 shares
         'spread': 0.0002,     # 2 basis points
-        'slippage': 0.0001,   # 1 basis point promedio
-        'borrowing_costs': 0.0003,  # Para shorts
-        'platform_fees': 50,  # Mensual
-        'data_fees': 100      # Mensual
+        'slippage': 0.0001,   # 1 basis point average
+        'borrowing_costs': 0.0003,  # For shorts
+        'platform_fees': 50,  # Monthly
+        'data_fees': 100      # Monthly
     }
 ```
 
-## Ejemplo: Mi Primer Backtest
+## Example: My First Backtest
 
 ```python
 import pandas as pd
@@ -84,19 +86,19 @@ import numpy as np
 import yfinance as yf
 
 def simple_vwap_backtest(ticker, start_date, end_date):
-    """Backtest simple de VWAP strategy"""
+    """Simple VWAP strategy backtest"""
     
-    # 1. Obtener datos
+    # 1. Get data
     data = yf.download(ticker, start=start_date, end=end_date, interval='5m')
     
-    # 2. Calcular indicadores
+    # 2. Calculate indicators
     data['vwap'] = (data['Close'] * data['Volume']).cumsum() / data['Volume'].cumsum()
     data['above_vwap'] = data['Close'] > data['vwap']
     
-    # 3. Generar señales
+    # 3. Generate signals
     data['signal'] = data['above_vwap'] & ~data['above_vwap'].shift(1)  # Cross above
     
-    # 4. Simular trades
+    # 4. Simulate trades
     initial_capital = 10000
     position = 0
     cash = initial_capital
@@ -126,7 +128,7 @@ def simple_vwap_backtest(ticker, start_date, end_date):
                 trades.append(current_price - entry_price)
                 position = 0
     
-    # 5. Calcular métricas
+    # 5. Calculate metrics
     if trades:
         win_rate = len([t for t in trades if t > 0]) / len(trades)
         avg_win = np.mean([t for t in trades if t > 0])
@@ -148,18 +150,18 @@ def simple_vwap_backtest(ticker, start_date, end_date):
     else:
         return {'error': 'No trades generated'}
 
-# Ejecutar
+# Run
 results = simple_vwap_backtest('AAPL', '2023-01-01', '2023-12-31')
 print(results)
 ```
 
-## Tipos de Backtesting
+## Types of Backtesting
 
 ### 1. Vectorized Backtesting
 ```python
-# Rápido pero menos realista
+# Fast but less realistic
 def vectorized_backtest(data, signals):
-    """Toda la serie de tiempo a la vez"""
+    """Entire time series at once"""
     data['returns'] = data['close'].pct_change()
     data['strategy_returns'] = signals.shift(1) * data['returns']
     
@@ -169,7 +171,7 @@ def vectorized_backtest(data, signals):
 
 ### 2. Event-Driven Backtesting
 ```python
-# Más lento pero más realista
+# Slower but more realistic
 class EventDrivenBacktest:
     def __init__(self, initial_capital=10000):
         self.capital = initial_capital
@@ -177,7 +179,7 @@ class EventDrivenBacktest:
         self.trades = []
         
     def process_bar(self, bar):
-        """Procesar cada barra individualmente"""
+        """Process each bar individually"""
         # Check signals
         # Manage positions
         # Execute trades
@@ -187,7 +189,7 @@ class EventDrivenBacktest:
 ### 3. Monte Carlo Simulation
 ```python
 def monte_carlo_backtest(strategy, num_simulations=1000):
-    """Múltiples simulaciones con datos alterados"""
+    """Multiple simulations with altered data"""
     results = []
     
     for i in range(num_simulations):
@@ -199,29 +201,29 @@ def monte_carlo_backtest(strategy, num_simulations=1000):
     return analyze_distribution(results)
 ```
 
-## Errores Comunes en Backtesting
+## Common Backtesting Mistakes
 
 ### 1. Look-Ahead Bias
 ```python
-# ❌ MALO: Usar información del futuro
+# ❌ BAD: Using future information
 data['signal'] = data['close'] > data['close'].shift(-1)  # Peek into future
 
-# ✅ BUENO: Solo información disponible en el momento
+# ✅ GOOD: Only information available at the time
 data['signal'] = data['close'] > data['close'].shift(1)
 ```
 
 ### 2. Survivorship Bias
 ```python
-# ❌ MALO: Solo stocks que sobrevivieron
-universe = ['AAPL', 'MSFT', 'GOOGL']  # Solo winners
+# ❌ BAD: Only stocks that survived
+universe = ['AAPL', 'MSFT', 'GOOGL']  # Only winners
 
-# ✅ BUENO: Incluir stocks delistados
+# ✅ GOOD: Include delisted stocks
 universe = get_historical_universe('Russell3000', start_date)
 ```
 
 ### 3. Data Mining Bias
 ```python
-# ❌ MALO: Optimizar hasta que funcione
+# ❌ BAD: Optimize until it works
 for sma in range(5, 100):
     for rsi_threshold in range(20, 80):
         if backtest_return > 0.3:  # Cherry picking
@@ -230,14 +232,14 @@ for sma in range(5, 100):
 
 ### 4. Overfitting
 ```python
-# ❌ MALO: Demasiados parámetros
+# ❌ BAD: Too many parameters
 def overfitted_strategy(data, p1, p2, p3, p4, p5, p6, p7, p8):
-    # 8 parámetros = muy específico para data histórica
+    # 8 parameters = too specific to historical data
     pass
 
-# ✅ BUENO: Mantener simple
+# ✅ GOOD: Keep it simple
 def simple_strategy(data, short_ma=9, long_ma=20):
-    # 2 parámetros = más generalizable
+    # 2 parameters = more generalizable
     pass
 ```
 
@@ -245,22 +247,22 @@ def simple_strategy(data, short_ma=9, long_ma=20):
 
 ```python
 def proper_backtesting_workflow(data):
-    """Workflow correcto para evitar overfitting"""
+    """Correct workflow to avoid overfitting"""
     
     # Split data
     total_length = len(data)
-    in_sample_end = int(total_length * 0.7)  # 70% para desarrollo
+    in_sample_end = int(total_length * 0.7)  # 70% for development
     
     in_sample = data.iloc[:in_sample_end]
     out_sample = data.iloc[in_sample_end:]
     
-    # 1. Desarrollar estrategia en in-sample
+    # 1. Develop strategy on in-sample
     strategy = develop_strategy(in_sample)
     
-    # 2. Una sola vez: test en out-of-sample
+    # 2. One time only: test on out-of-sample
     out_sample_results = test_strategy(strategy, out_sample)
     
-    # 3. Si falla out-of-sample, volver al paso 1
+    # 3. If it fails out-of-sample, go back to step 1
     if out_sample_results['sharpe'] < 1.0:
         return "Strategy needs work"
     else:
@@ -271,7 +273,7 @@ def proper_backtesting_workflow(data):
 
 ```python
 def walk_forward_backtest(data, window_size=252, rebalance_freq=21):
-    """Backtest con re-optimización periódica"""
+    """Backtest with periodic re-optimization"""
     results = []
     
     for start in range(0, len(data) - window_size, rebalance_freq):
@@ -294,41 +296,41 @@ def walk_forward_backtest(data, window_size=252, rebalance_freq=21):
     return combine_results(results)
 ```
 
-## Red Flags en Resultados
+## Red Flags in Results
 
 ```python
 def validate_backtest_results(results):
-    """Identificar resultados sospechosos"""
+    """Identify suspicious results"""
     red_flags = []
     
-    # Demasiado bueno para ser verdad
-    if results['annual_return'] > 0.5:  # +50% anual
+    # Too good to be true
+    if results['annual_return'] > 0.5:  # +50% annual
         red_flags.append("Returns too high - likely overfitted")
     
-    # Win rate irreal
+    # Unrealistic win rate
     if results['win_rate'] > 0.8:  # 80%+ win rate
         red_flags.append("Win rate too high - check for look-ahead bias")
     
-    # Drawdown demasiado bajo
-    if results['max_drawdown'] < 0.05:  # Menos de 5%
+    # Drawdown too low
+    if results['max_drawdown'] < 0.05:  # Less than 5%
         red_flags.append("Drawdown too low - not realistic")
     
-    # Pocos trades
+    # Too few trades
     if results['total_trades'] < 100:
         red_flags.append("Not enough trades for statistical significance")
     
-    # Profit factor irreal
+    # Unrealistic profit factor
     if results['profit_factor'] > 3:
         red_flags.append("Profit factor too high - likely curve-fitted")
     
     return red_flags
 ```
 
-## Paper Trading: El Paso Siguiente
+## Paper Trading: The Next Step
 
 ```python
 def transition_to_paper_trading(backtest_results):
-    """Cómo pasar de backtest a paper trading"""
+    """How to go from backtest to paper trading"""
     
     if backtest_results['sharpe_ratio'] > 1.5:
         return {
@@ -348,10 +350,10 @@ def transition_to_paper_trading(backtest_results):
         }
 ```
 
-## Herramientas para Backtesting
+## Backtesting Tools
 
 ```python
-# Frameworks populares
+# Popular frameworks
 backtesting_tools = {
     'basic': 'pandas + numpy (custom)',
     'intermediate': 'backtrader, zipline',
@@ -360,6 +362,6 @@ backtesting_tools = {
 }
 ```
 
-## Siguiente Paso
+## Next Step
 
-Ahora que entiendes qué es un backtest, vamos a [Motor de Backtest Simple](simple_engine.md) para construir uno desde cero.
+Now that you understand what a backtest is, let's move on to [Simple Backtest Engine](simple_engine.md) to build one from scratch.

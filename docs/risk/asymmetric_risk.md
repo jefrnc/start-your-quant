@@ -1,36 +1,38 @@
-# Riesgo Asimétrico
+> 🇪🇸 [Leer en Español](asymmetric_risk.es.md) | 🇺🇸 **English**
 
-## Apostar Más Cuando las Probabilidades Están a Tu Favor
+# Asymmetric Risk
 
-El riesgo asimétrico es el secreto de los traders exitosos: arriesgar menos en setups mediocres y más en setups de alta probabilidad. No todos los trades son iguales, y tu position sizing debería reflejarlo.
+## Betting More When the Odds Are in Your Favor
 
-## El Concepto de Riesgo Asimétrico
+Asymmetric risk is the secret of successful traders: risk less on mediocre setups and more on high-probability setups. Not all trades are equal, and your position sizing should reflect that.
 
-### ¿Qué es?
+## The Concept of Asymmetric Risk
+
+### What Is It?
 ```python
-# ❌ SIMÉTRICO: Mismo riesgo en todos los trades
+# ❌ SYMMETRIC: Same risk on all trades
 def symmetric_risk_sizing(account_value):
-    return account_value * 0.02  # Siempre 2%
+    return account_value * 0.02  # Always 2%
 
-# ✅ ASIMÉTRICO: Riesgo variable según calidad del setup
+# ✅ ASYMMETRIC: Variable risk based on setup quality
 def asymmetric_risk_sizing(account_value, setup_quality):
     base_risk = 0.02
     
     if setup_quality == 'A+':
-        return account_value * (base_risk * 2.0)    # 4% en mejores setups
+        return account_value * (base_risk * 2.0)    # 4% on best setups
     elif setup_quality == 'A':
-        return account_value * (base_risk * 1.5)    # 3% en buenos setups
+        return account_value * (base_risk * 1.5)    # 3% on good setups
     elif setup_quality == 'B':
-        return account_value * (base_risk * 1.0)    # 2% en setups normales
+        return account_value * (base_risk * 1.0)    # 2% on normal setups
     elif setup_quality == 'C':
-        return account_value * (base_risk * 0.5)    # 1% en setups débiles
+        return account_value * (base_risk * 0.5)    # 1% on weak setups
     else:
-        return 0  # No tradear setups malos
+        return 0  # Don't trade bad setups
 ```
 
-### Por Qué Funciona
+### Why It Works
 ```python
-# Ejemplo: 100 trades con diferentes calidades
+# Example: 100 trades with different qualities
 trade_scenarios = {
     'symmetric': {
         'risk_per_trade': 0.02,
@@ -48,7 +50,7 @@ trade_scenarios = {
 }
 
 def calculate_expected_return(scenario):
-    """Calcular retorno esperado de cada escenario"""
+    """Calculate expected return for each scenario"""
     total_return = 0
     
     for setup_type, stats in scenario.items():
@@ -60,7 +62,7 @@ def calculate_expected_return(scenario):
         else:
             risk = scenario.get('risk_per_trade', 0.02)
         
-        # Expected return por trade de este tipo
+        # Expected return per trade of this type
         win_amount = risk * stats['avg_rr']
         loss_amount = risk
         expected_per_trade = (stats['win_rate'] * win_amount) - ((1 - stats['win_rate']) * loss_amount)
@@ -104,7 +106,7 @@ class SetupQualityScorer:
         }
     
     def score_technical_factors(self, data):
-        """Score factores técnicos"""
+        """Score technical factors"""
         scores = {}
         
         # VWAP Reclaim
@@ -162,7 +164,7 @@ class SetupQualityScorer:
         return scores
     
     def score_fundamental_factors(self, data):
-        """Score factores fundamentales"""
+        """Score fundamental factors"""
         scores = {}
         
         # Catalyst Strength
@@ -201,7 +203,7 @@ class SetupQualityScorer:
         return scores
     
     def score_market_context(self, data):
-        """Score contexto de mercado"""
+        """Score market context"""
         scores = {}
         
         # Market Direction
@@ -240,7 +242,7 @@ class SetupQualityScorer:
         return scores
     
     def calculate_overall_score(self, data):
-        """Calcular score total del setup"""
+        """Calculate overall setup score"""
         technical_scores = self.score_technical_factors(data)
         fundamental_scores = self.score_fundamental_factors(data)
         market_scores = self.score_market_context(data)
@@ -301,7 +303,7 @@ class SetupPerformanceTracker:
         self.trade_history = []
         
     def record_trade(self, setup_data, trade_result):
-        """Registrar trade con setup quality y resultado"""
+        """Record trade with setup quality and result"""
         scorer = SetupQualityScorer()
         quality_score = scorer.calculate_overall_score(setup_data)
         
@@ -322,7 +324,7 @@ class SetupPerformanceTracker:
         self.trade_history.append(trade_record)
     
     def analyze_performance_by_grade(self):
-        """Analizar performance por grado de setup"""
+        """Analyze performance by setup grade"""
         if not self.trade_history:
             return {}
         
@@ -350,7 +352,7 @@ class SetupPerformanceTracker:
         return performance_by_grade
     
     def get_optimal_risk_allocation(self):
-        """Calcular allocation óptimo basado en historical performance"""
+        """Calculate optimal allocation based on historical performance"""
         performance = self.analyze_performance_by_grade()
         
         # Calculate Kelly-inspired allocation
@@ -388,7 +390,7 @@ class ConfidenceBasedSizer:
         self.performance_tracker = SetupPerformanceTracker()
         
     def calculate_confidence_multiplier(self, setup_data):
-        """Calcular multiplicador de confianza"""
+        """Calculate confidence multiplier"""
         scorer = SetupQualityScorer()
         quality_score = scorer.calculate_overall_score(setup_data)
         
@@ -559,7 +561,7 @@ class AsymmetricRiskManager:
         self.streak_adjuster = StreakAdjustedRisk(base_risk)
         
     def calculate_optimal_position_size(self, setup_data, entry_price, stop_price):
-        """Master function para calcular position size óptimo"""
+        """Master function to calculate optimal position size"""
         
         # 1. Score the setup
         quality_assessment = self.scorer.calculate_overall_score(setup_data)
@@ -603,7 +605,7 @@ class AsymmetricRiskManager:
         }
     
     def should_take_trade(self, setup_data, min_grade='C'):
-        """¿Debería tomar este trade?"""
+        """Should I take this trade?"""
         quality_assessment = self.scorer.calculate_overall_score(setup_data)
         grade = quality_assessment['grade']
         
@@ -673,7 +675,7 @@ def generate_asymmetric_risk_report(risk_manager):
     return report
 ```
 
-## Mi Setup Personal
+## My Personal Setup
 
 ```python
 # asymmetric_config.py
@@ -696,7 +698,7 @@ ASYMMETRIC_CONFIG = {
 
 # Usage
 def my_position_sizing_workflow(ticker, setup_data, entry_price, stop_price):
-    """Mi workflow completo de position sizing"""
+    """My complete position sizing workflow"""
     
     # Initialize manager
     risk_manager = AsymmetricRiskManager(
@@ -741,4 +743,4 @@ def my_position_sizing_workflow(ticker, setup_data, entry_price, stop_price):
     }
 ```
 
-Completada la sección de gestión de riesgo. Continuemos con las estrategias aplicadas a small caps.
+Risk management section completed. Let's continue with strategies applied to small caps.

@@ -1,20 +1,22 @@
-# Límites de Riesgo Diario
+> 🇪🇸 [Leer en Español](risk_limits.es.md) | 🇺🇸 **English**
 
-## El Circuit Breaker de tu Trading
+# Daily Risk Limits
 
-Los límites de riesgo diario son tu última línea de defensa contra el desastre. Un día malo puede destruir semanas de ganancias si no tienes límites claros y automatizados.
+## Your Trading Circuit Breaker
 
-## Por Qué Necesitas Límites
+Daily risk limits are your last line of defense against disaster. A bad day can destroy weeks of gains if you don't have clear, automated limits.
 
-### La Realidad Brutal
-- Un trader puede perder todo en un solo día sin límites
-- Las emociones se intensifican con las pérdidas
-- "Revenge trading" destruye cuentas
-- Los mejores traders tienen días terribles
+## Why You Need Limits
 
-### Ejemplo Real
+### The Brutal Reality
+- A trader can lose everything in a single day without limits
+- Emotions intensify with losses
+- "Revenge trading" destroys accounts
+- The best traders have terrible days
+
+### Real Example
 ```python
-# Sin límites de riesgo
+# Without risk limits
 account_start = 50000
 trades = [
     -500,   # Trade 1: -1%
@@ -32,7 +34,7 @@ for trade in trades:
 # Result: $42,550 (-14.9% in one day!)
 ```
 
-## Framework de Límites de Riesgo
+## Risk Limits Framework
 
 ### 1. Daily Loss Limit
 ```python
@@ -48,7 +50,7 @@ class DailyRiskManager:
         self.trading_halted = False
         
     def add_trade_result(self, pnl):
-        """Agregar resultado de trade"""
+        """Add trade result"""
         self.daily_trades.append({
             'pnl': pnl,
             'timestamp': pd.Timestamp.now(),
@@ -61,7 +63,7 @@ class DailyRiskManager:
         self.check_daily_limits()
         
     def check_daily_limits(self):
-        """Verificar si se excedieron límites"""
+        """Check if limits were exceeded"""
         if self.daily_pnl <= -self.max_daily_loss_amount:
             self.trading_halted = True
             self.send_alert(f"🚨 DAILY LOSS LIMIT HIT: ${self.daily_pnl:.2f}")
@@ -76,7 +78,7 @@ class DailyRiskManager:
         return True
     
     def can_take_trade(self, potential_loss):
-        """¿Puedo tomar este trade?"""
+        """Can I take this trade?"""
         if self.trading_halted:
             return False, "Trading halted due to daily loss limit"
         
@@ -88,7 +90,7 @@ class DailyRiskManager:
         return True, "Trade approved"
     
     def reset_daily_limits(self):
-        """Reset para nuevo día de trading"""
+        """Reset for new trading day"""
         self.daily_trades = []
         self.daily_pnl = 0
         self.trading_halted = False
@@ -96,9 +98,9 @@ class DailyRiskManager:
             delattr(self, 'warning_sent')
     
     def send_alert(self, message):
-        """Enviar alerta (Discord, email, etc.)"""
+        """Send alert (Discord, email, etc.)"""
         print(f"ALERT: {message}")
-        # Implementar envío real de alertas
+        # Implement actual alert sending
 ```
 
 ### 2. Maximum Positions Limit
@@ -111,7 +113,7 @@ class PositionLimitManager:
         self.sector_positions = {}   # {sector: [tickers]}
         
     def can_open_position(self, ticker, sector):
-        """¿Puedo abrir esta posición?"""
+        """Can I open this position?"""
         # Check total positions
         if len(self.current_positions) >= self.max_simultaneous_positions:
             return False, f"Max positions limit ({self.max_simultaneous_positions}) reached"
@@ -124,7 +126,7 @@ class PositionLimitManager:
         return True, "Position approved"
     
     def open_position(self, ticker, sector, position_info):
-        """Abrir nueva posición"""
+        """Open new position"""
         can_open, reason = self.can_open_position(ticker, sector)
         
         if not can_open:
@@ -141,7 +143,7 @@ class PositionLimitManager:
         return True, f"Position opened: {ticker}"
     
     def close_position(self, ticker):
-        """Cerrar posición"""
+        """Close position"""
         if ticker not in self.current_positions:
             return False, "Position not found"
         
@@ -162,7 +164,7 @@ class PositionLimitManager:
         return True, f"Position closed: {ticker}"
     
     def get_position_summary(self):
-        """Resumen de posiciones actuales"""
+        """Summary of current positions"""
         return {
             'total_positions': len(self.current_positions),
             'max_positions': self.max_simultaneous_positions,
@@ -192,7 +194,7 @@ class DrawdownLimitManager:
         """Update account value y check drawdown"""
         self.current_account_value = new_value
         
-        # Update peak si es nuevo high
+        # Update peak if new high
         if new_value > self.peak_account_value:
             self.peak_account_value = new_value
         
@@ -291,7 +293,7 @@ class TimeBasedRiskManager:
         }
     
     def can_trade_now(self):
-        """¿Puedo tradear ahora?"""
+        """Can I trade now?"""
         period, limits = self.get_current_time_limits()
         
         if period == 'after_hours':
@@ -309,7 +311,7 @@ class VelocityLimitManager:
         self.trade_timestamps = []
         
     def can_execute_trade(self):
-        """¿Puedo ejecutar otro trade?"""
+        """Can I execute another trade?"""
         now = pd.Timestamp.now()
         
         # Clean old trades (keep last 24 hours)
@@ -367,7 +369,7 @@ class IntegratedRiskManager:
         )
         
     def can_execute_trade(self, ticker, sector, potential_loss):
-        """Master check - ¿puedo ejecutar este trade?"""
+        """Master check - can I execute this trade?"""
         checks = {}
         
         # Daily loss check
@@ -430,7 +432,7 @@ class IntegratedRiskManager:
         self.account_value = new_account_value
     
     def get_risk_dashboard(self):
-        """Dashboard completo de riesgo"""
+        """Complete risk dashboard"""
         dd_status = self.drawdown_limits.check_drawdown_limits()
         position_summary = self.position_limits.get_position_summary()
         time_period, time_limits = self.time_limits.get_current_time_limits()
@@ -449,7 +451,7 @@ class IntegratedRiskManager:
         }
 ```
 
-## Alertas y Notifications
+## Alerts and Notifications
 
 ```python
 class RiskAlertSystem:
@@ -459,7 +461,7 @@ class RiskAlertSystem:
         self.alert_history = []
         
     def send_risk_alert(self, level, message, data=None):
-        """Enviar alerta de riesgo"""
+        """Send risk alert"""
         alert = {
             'timestamp': pd.Timestamp.now(),
             'level': level,  # 'info', 'warning', 'critical'
@@ -469,7 +471,7 @@ class RiskAlertSystem:
         
         self.alert_history.append(alert)
         
-        # Enviar según nivel
+        # Send based on level
         if level == 'critical':
             self.send_immediate_alert(message, data)
         elif level == 'warning':
@@ -478,7 +480,7 @@ class RiskAlertSystem:
             self.log_info_alert(message, data)
     
     def send_immediate_alert(self, message, data):
-        """Alerta inmediata (SMS, call, etc.)"""
+        """Immediate alert (SMS, call, etc.)"""
         print(f"🚨 CRITICAL ALERT: {message}")
         
         # Discord
@@ -490,12 +492,12 @@ class RiskAlertSystem:
             self.send_email_alert("CRITICAL TRADING ALERT", message, data)
     
     def send_discord_alert(self, message):
-        """Enviar a Discord"""
-        # Implementar webhook de Discord
+        """Send to Discord"""
+        # Implement Discord webhook
         pass
     
     def daily_risk_report(self, risk_manager):
-        """Reporte diario de riesgo"""
+        """Daily risk report"""
         dashboard = risk_manager.get_risk_dashboard()
         
         report = f"""
@@ -519,7 +521,7 @@ class RiskAlertSystem:
         return report
 ```
 
-## Mi Setup Personal
+## My Personal Setup
 
 ```python
 # risk_config.py
@@ -547,7 +549,7 @@ RISK_LIMITS = {
 }
 
 def initialize_risk_manager(account_value):
-    """Initialize mi risk manager personal"""
+    """Initialize my personal risk manager"""
     return IntegratedRiskManager(account_value, RISK_LIMITS)
 
 # Uso diario
@@ -562,6 +564,6 @@ else:
     print(f"Trade rejected: {trade_check['reason']}")
 ```
 
-## Siguiente Paso
+## Next Step
 
-Con los límites de riesgo establecidos, vamos a [Stop Loss y Trailing Stops](stops.md) para gestión táctica de riesgo.
+With risk limits established, let's move on to [Stop Loss and Trailing Stops](stops.md) for tactical risk management.

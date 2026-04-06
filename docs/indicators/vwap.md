@@ -1,29 +1,31 @@
-# VWAP y VWAP Reclaim
+> 🇪🇸 [Leer en Español](vwap.es.md) | 🇺🇸 **English**
 
-## ¿Qué es VWAP?
+# VWAP and VWAP Reclaim
 
-Volume Weighted Average Price - el precio promedio ponderado por volumen. Es básicamente el "precio justo" del día según donde se ejecutó la mayoría del volumen.
+## What is VWAP?
 
-## Por Qué Importa en Small Caps
+Volume Weighted Average Price - the volume-weighted average price. It is essentially the "fair price" of the day based on where most volume was executed.
 
-En small caps, VWAP es crucial porque:
-- Los market makers lo usan como referencia
-- Institucionales miden su performance vs VWAP
-- Actúa como imán en días de alto volumen
-- El "VWAP reclaim" es uno de los setups más confiables
+## Why It Matters in Small Caps
 
-## Cálculo Básico
+In small caps, VWAP is crucial because:
+- Market makers use it as a reference
+- Institutions measure their performance vs VWAP
+- Acts as a magnet on high-volume days
+- The "VWAP reclaim" is one of the most reliable setups
+
+## Basic Calculation
 
 ```python
 def calculate_vwap(df):
-    """Calcular VWAP para datos intradía"""
-    # Típico price (más preciso que solo close)
+    """Calculate VWAP for intraday data"""
+    # Typical price (more precise than just close)
     df['typical_price'] = (df['high'] + df['low'] + df['close']) / 3
     
-    # Volumen acumulado
+    # Cumulative volume
     df['cum_volume'] = df['volume'].cumsum()
     
-    # Precio x Volumen acumulado
+    # Cumulative price x volume
     df['cum_pv'] = (df['typical_price'] * df['volume']).cumsum()
     
     # VWAP
@@ -32,20 +34,20 @@ def calculate_vwap(df):
     return df
 ```
 
-## VWAP con Desviaciones Estándar
+## VWAP with Standard Deviations
 
 ```python
 def calculate_vwap_bands(df, num_std=2):
-    """VWAP con bandas de desviación estándar"""
-    # Primero calcular VWAP
+    """VWAP with standard deviation bands"""
+    # First calculate VWAP
     df = calculate_vwap(df)
     
-    # Calcular desviación
+    # Calculate deviation
     df['vwap_variance'] = df['volume'] * (df['typical_price'] - df['vwap']) ** 2
     df['cum_variance'] = df['vwap_variance'].cumsum()
     df['vwap_std'] = np.sqrt(df['cum_variance'] / df['cum_volume'])
     
-    # Bandas
+    # Bands
     df['vwap_upper'] = df['vwap'] + (num_std * df['vwap_std'])
     df['vwap_lower'] = df['vwap'] - (num_std * df['vwap_std'])
     
@@ -54,28 +56,28 @@ def calculate_vwap_bands(df, num_std=2):
 
 ## VWAP Reclaim Setup
 
-Este es mi setup favorito para small caps. Cuando un stock pierde VWAP y lo recupera con volumen, suele continuar.
+This is my favorite setup for small caps. When a stock loses VWAP and reclaims it with volume, it usually continues.
 
 ```python
 def detect_vwap_reclaim(df, lookback=10, volume_threshold=1.5):
-    """Detectar VWAP reclaim setup"""
-    # Calcular VWAP si no existe
+    """Detect VWAP reclaim setup"""
+    # Calculate VWAP if it doesn't exist
     if 'vwap' not in df.columns:
         df = calculate_vwap(df)
     
-    # Condiciones para reclaim
-    # 1. Estuvo debajo de VWAP
+    # Conditions for reclaim
+    # 1. Was below VWAP
     df['below_vwap'] = df['low'] < df['vwap']
     
-    # 2. Ahora está arriba con volumen
+    # 2. Now above with volume
     df['above_vwap'] = df['close'] > df['vwap']
     df['volume_spike'] = df['volume'] > df['volume'].rolling(20).mean() * volume_threshold
     
-    # 3. Reclaim = estuvo abajo y ahora está arriba con volumen
+    # 3. Reclaim = was below and now above with volume
     df['was_below'] = df['below_vwap'].rolling(lookback).max()
     df['vwap_reclaim'] = df['was_below'] & df['above_vwap'] & df['volume_spike']
     
-    # Agregar fuerza del reclaim
+    # Add reclaim strength
     df['reclaim_strength'] = np.where(
         df['vwap_reclaim'],
         (df['close'] - df['vwap']) / df['vwap'] * 100,
@@ -85,7 +87,7 @@ def detect_vwap_reclaim(df, lookback=10, volume_threshold=1.5):
     return df
 ```
 
-## VWAP Multi-Timeframe
+## Multi-Timeframe VWAP
 
 ```python
 class MultiTimeframeVWAP:
@@ -93,31 +95,31 @@ class MultiTimeframeVWAP:
         self.df = df
         
     def add_daily_vwap(self):
-        """VWAP del día actual"""
+        """Current day VWAP"""
         self.df['date'] = self.df.index.date
         daily_vwap = self.df.groupby('date').apply(calculate_vwap)
         self.df['daily_vwap'] = daily_vwap['vwap']
         
     def add_weekly_vwap(self):
-        """VWAP de la semana"""
+        """Weekly VWAP"""
         self.df['week'] = self.df.index.isocalendar().week
         weekly_vwap = self.df.groupby('week').apply(calculate_vwap)
         self.df['weekly_vwap'] = weekly_vwap['vwap']
         
     def add_anchored_vwap(self, anchor_date):
-        """VWAP anclado desde fecha específica (ej: desde earnings)"""
+        """Anchored VWAP from a specific date (e.g., from earnings)"""
         mask = self.df.index >= anchor_date
         anchored_data = self.df[mask].copy()
         anchored_data = calculate_vwap(anchored_data)
         self.df.loc[mask, 'anchored_vwap'] = anchored_data['vwap']
 ```
 
-## VWAP para Gap Trading
+## VWAP for Gap Trading
 
 ```python
 def vwap_gap_strategy(df, gap_threshold=10):
-    """Estrategia combinando gaps y VWAP"""
-    # Calcular gap
+    """Strategy combining gaps and VWAP"""
+    # Calculate gap
     df['gap_pct'] = (df['open'] - df['close'].shift(1)) / df['close'].shift(1) * 100
     
     # VWAP
@@ -127,28 +129,28 @@ def vwap_gap_strategy(df, gap_threshold=10):
     df['gap_up'] = df['gap_pct'] > gap_threshold
     df['holding_vwap'] = df['low'] > df['vwap']
     
-    # Señal cuando gap up se mantiene sobre VWAP
+    # Signal when gap up holds above VWAP
     df['signal'] = df['gap_up'] & df['holding_vwap']
     
-    # Stop: Pérdida de VWAP
-    df['stop_level'] = df['vwap'] * 0.99  # 1% debajo de VWAP
+    # Stop: Loss of VWAP
+    df['stop_level'] = df['vwap'] * 0.99  # 1% below VWAP
     
     return df
 ```
 
 ## VWAP Magnets
 
-En días de alta actividad, el precio tiende a volver a VWAP.
+On high-activity days, price tends to return to VWAP.
 
 ```python
 def identify_vwap_magnet(df, distance_threshold=0.05):
-    """Identificar cuando precio está muy lejos de VWAP"""
+    """Identify when price is very far from VWAP"""
     df = calculate_vwap(df)
     
-    # Distancia desde VWAP
+    # Distance from VWAP
     df['distance_from_vwap'] = (df['close'] - df['vwap']) / df['vwap']
     
-    # Extremos
+    # Extremes
     df['extreme_above'] = df['distance_from_vwap'] > distance_threshold
     df['extreme_below'] = df['distance_from_vwap'] < -distance_threshold
     
@@ -159,11 +161,11 @@ def identify_vwap_magnet(df, distance_threshold=0.05):
     return df
 ```
 
-## VWAP Breaks con Volume Profile
+## VWAP Breaks with Volume Profile
 
 ```python
 def vwap_volume_break(df, volume_multiplier=2):
-    """VWAP break con confirmación de volumen"""
+    """VWAP break with volume confirmation"""
     df = calculate_vwap(df)
     
     # Volume profile
@@ -174,11 +176,11 @@ def vwap_volume_break(df, volume_multiplier=2):
     df['vwap_break_up'] = (df['close'] > df['vwap']) & (df['open'] < df['vwap'])
     df['vwap_break_down'] = (df['close'] < df['vwap']) & (df['open'] > df['vwap'])
     
-    # Señales con volumen
+    # Signals with volume
     df['bullish_break'] = df['vwap_break_up'] & df['high_volume']
     df['bearish_break'] = df['vwap_break_down'] & df['high_volume']
     
-    # Agregar momentum
+    # Add momentum
     df['break_momentum'] = np.where(
         df['bullish_break'],
         df['close'] - df['vwap'],
@@ -188,7 +190,7 @@ def vwap_volume_break(df, volume_multiplier=2):
     return df
 ```
 
-## VWAP para Risk Management
+## VWAP for Risk Management
 
 ```python
 class VWAPRiskManager:
@@ -196,18 +198,18 @@ class VWAPRiskManager:
         self.position_type = position_type
         
     def calculate_stop_loss(self, df, cushion=0.01):
-        """Stop loss basado en VWAP"""
+        """VWAP-based stop loss"""
         if self.position_type == 'long':
-            # Long: stop debajo de VWAP
+            # Long: stop below VWAP
             df['stop_loss'] = df['vwap'] * (1 - cushion)
         else:
-            # Short: stop arriba de VWAP
+            # Short: stop above VWAP
             df['stop_loss'] = df['vwap'] * (1 + cushion)
             
         return df
     
     def position_health(self, df):
-        """Evaluar salud de la posición vs VWAP"""
+        """Evaluate position health vs VWAP"""
         if self.position_type == 'long':
             df['position_health'] = np.where(
                 df['close'] > df['vwap'],
@@ -228,7 +230,7 @@ class VWAPRiskManager:
 
 ```python
 def backtest_vwap_reclaim(df, initial_capital=10000):
-    """Backtest simple de VWAP reclaim"""
+    """Simple VWAP reclaim backtest"""
     df = detect_vwap_reclaim(df)
     
     # Trading logic
@@ -241,7 +243,7 @@ def backtest_vwap_reclaim(df, initial_capital=10000):
         
         # Entry
         if row['vwap_reclaim'] and position == 0:
-            shares = int(cash * 0.95 / row['close'])  # 95% del capital
+            shares = int(cash * 0.95 / row['close'])  # 95% of capital
             position = shares
             cash -= shares * row['close']
             
@@ -255,7 +257,7 @@ def backtest_vwap_reclaim(df, initial_capital=10000):
         
         # Exit
         elif position > 0:
-            # Stop loss: perdió VWAP
+            # Stop loss: lost VWAP
             if row['close'] < row['vwap'] * 0.99:
                 cash += position * row['close']
                 trades.append({
@@ -279,7 +281,7 @@ def backtest_vwap_reclaim(df, initial_capital=10000):
                 })
                 position = 0
     
-    # Calcular métricas
+    # Calculate metrics
     trades_df = pd.DataFrame(trades)
     if len(trades_df) > 1:
         wins = trades_df[trades_df['reason'].isin(['take_profit'])].shape[0]
@@ -297,12 +299,12 @@ def backtest_vwap_reclaim(df, initial_capital=10000):
         }
 ```
 
-## Tips de Trading Real
+## Real Trading Tips
 
 ### 1. Pre-Market VWAP
 ```python
 def calculate_premarket_vwap(df):
-    """VWAP solo de pre-market para referencia"""
+    """Pre-market only VWAP for reference"""
     premarket = df.between_time('04:00', '09:29')
     return calculate_vwap(premarket)
 ```
@@ -310,7 +312,7 @@ def calculate_premarket_vwap(df):
 ### 2. VWAP Speed
 ```python
 def vwap_acceleration(df, period=5):
-    """Qué tan rápido se mueve el precio respecto a VWAP"""
+    """How fast price moves relative to VWAP"""
     df['vwap_speed'] = (df['close'] - df['vwap']).diff(period)
     df['accelerating'] = df['vwap_speed'] > 0
     return df
@@ -319,7 +321,7 @@ def vwap_acceleration(df, period=5):
 ### 3. Multi-Day VWAP Levels
 ```python
 def key_vwap_levels(ticker, lookback_days=20):
-    """Niveles VWAP importantes de días anteriores"""
+    """Important VWAP levels from previous days"""
     levels = {}
     for i in range(lookback_days):
         date = pd.Timestamp.now() - pd.Timedelta(days=i)
@@ -330,7 +332,7 @@ def key_vwap_levels(ticker, lookback_days=20):
     return pd.Series(levels).sort_values()
 ```
 
-## Alertas en Tiempo Real
+## Real-Time Alerts
 
 ```python
 class VWAPAlerts:
@@ -353,6 +355,6 @@ class VWAPAlerts:
         return alerts
 ```
 
-## Siguiente Paso
+## Next Step
 
-Continuemos con [Medias Móviles](moving_averages.md) y cómo combinarlas con VWAP.
+Let's continue with [Moving Averages](moving_averages.md) and how to combine them with VWAP.

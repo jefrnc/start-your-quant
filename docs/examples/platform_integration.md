@@ -1,8 +1,10 @@
-# Integración Práctica entre Plataformas
+> 🇪🇸 [Leer en Español](platform_integration.es.md) | 🇺🇸 **English**
 
-## Workflow Completo: Yahoo Finance → Polygon → IBKR → QuantConnect
+# Practical Platform Integration
 
-### Pipeline de Datos Unificado
+## Complete Workflow: Yahoo Finance -> Polygon -> IBKR -> QuantConnect
+
+### Unified Data Pipeline
 ```python
 import yfinance as yf
 import pandas as pd
@@ -20,7 +22,7 @@ import time
 
 @dataclass
 class UnifiedQuote:
-    """Quote unificado entre plataformas"""
+    """Unified quote across platforms"""
     symbol: str
     timestamp: datetime
     bid: float
@@ -31,7 +33,7 @@ class UnifiedQuote:
 
 @dataclass
 class UnifiedBar:
-    """Barra OHLCV unificada"""
+    """Unified OHLCV bar"""
     symbol: str
     timestamp: datetime
     open: float
@@ -42,7 +44,7 @@ class UnifiedBar:
     source: str
 
 class DataProvider(ABC):
-    """Clase base para proveedores de datos"""
+    """Base class for data providers"""
     
     @abstractmethod
     async def get_quote(self, symbol: str) -> Optional[UnifiedQuote]:
@@ -58,19 +60,19 @@ class DataProvider(ABC):
         pass
 
 class YahooFinanceProvider(DataProvider):
-    """Proveedor Yahoo Finance"""
+    """Yahoo Finance provider"""
     
     def __init__(self):
         self.name = "yahoo"
         self.session = requests.Session()
     
     async def get_quote(self, symbol: str) -> Optional[UnifiedQuote]:
-        """Obtener quote en tiempo real"""
+        """Get real-time quote"""
         try:
             ticker = yf.Ticker(symbol)
             info = ticker.info
             
-            # Yahoo no siempre tiene bid/ask en tiempo real
+            # Yahoo doesn't always have real-time bid/ask
             last_price = info.get('regularMarketPrice', 0)
             bid = info.get('bid', last_price * 0.999)
             ask = info.get('ask', last_price * 1.001)
@@ -91,13 +93,13 @@ class YahooFinanceProvider(DataProvider):
     
     async def get_historical_data(self, symbol: str, start_date: str, 
                                 end_date: str, interval: str = "1d") -> pd.DataFrame:
-        """Obtener datos históricos"""
+        """Get historical data"""
         try:
             ticker = yf.Ticker(symbol)
             data = ticker.history(start=start_date, end=end_date, interval=interval)
             
             if not data.empty:
-                # Agregar metadatos
+                # Add metadata
                 data['source'] = self.name
                 data['symbol'] = symbol
             
@@ -107,7 +109,7 @@ class YahooFinanceProvider(DataProvider):
             return pd.DataFrame()
     
     def is_available(self) -> bool:
-        """Verificar disponibilidad"""
+        """Check availability"""
         try:
             test_ticker = yf.Ticker("AAPL")
             info = test_ticker.info
@@ -116,7 +118,7 @@ class YahooFinanceProvider(DataProvider):
             return False
 
 class PolygonProvider(DataProvider):
-    """Proveedor Polygon.io"""
+    """Polygon.io provider"""
     
     def __init__(self, api_key: str):
         self.api_key = api_key
@@ -125,7 +127,7 @@ class PolygonProvider(DataProvider):
         self.session = aiohttp.ClientSession()
     
     async def get_quote(self, symbol: str) -> Optional[UnifiedQuote]:
-        """Obtener quote en tiempo real"""
+        """Get real-time quote"""
         try:
             url = f"{self.base_url}/v2/last/nbbo/{symbol}"
             params = {"apikey": self.api_key}
@@ -142,7 +144,7 @@ class PolygonProvider(DataProvider):
                             timestamp=datetime.fromtimestamp(result['t'] / 1000),
                             bid=result.get('P', 0),
                             ask=result.get('p', 0),
-                            last=result.get('p', 0),  # Usar ask como aproximación
+                            last=result.get('p', 0),  # Use ask as approximation
                             volume=result.get('S', 0),
                             source=self.name
                         )
@@ -153,9 +155,9 @@ class PolygonProvider(DataProvider):
     
     async def get_historical_data(self, symbol: str, start_date: str, 
                                 end_date: str, interval: str = "1d") -> pd.DataFrame:
-        """Obtener datos históricos"""
+        """Get historical data"""
         try:
-            # Convertir intervalo a formato Polygon
+            # Convert interval to Polygon format
             timespan_map = {
                 "1m": ("minute", 1),
                 "5m": ("minute", 5),
@@ -206,27 +208,27 @@ class PolygonProvider(DataProvider):
         return pd.DataFrame()
     
     def is_available(self) -> bool:
-        """Verificar disponibilidad (simplificado)"""
+        """Check availability (simplified)"""
         return bool(self.api_key)
     
     async def close(self):
-        """Cerrar sesión"""
+        """Close session"""
         await self.session.close()
 
 class UnifiedDataManager:
-    """Gestor unificado de datos con fallback"""
+    """Unified data manager with fallback"""
     
     def __init__(self):
         self.providers: Dict[str, DataProvider] = {}
         self.provider_priority = []
         self.cache = {}
-        self.cache_ttl = 60  # 60 segundos
+        self.cache_ttl = 60  # 60 seconds
     
     def add_provider(self, provider: DataProvider, priority: int = 0):
-        """Agregar proveedor con prioridad"""
+        """Add provider with priority"""
         self.providers[provider.name] = provider
         
-        # Insertar en orden de prioridad
+        # Insert in priority order
         inserted = False
         for i, (name, prio) in enumerate(self.provider_priority):
             if priority > prio:
@@ -238,16 +240,16 @@ class UnifiedDataManager:
             self.provider_priority.append((provider.name, priority))
     
     async def get_quote(self, symbol: str) -> Optional[UnifiedQuote]:
-        """Obtener quote con fallback automático"""
+        """Get quote with automatic fallback"""
         
-        # Verificar cache
+        # Check cache
         cache_key = f"quote_{symbol}"
         if cache_key in self.cache:
             cached_data, timestamp = self.cache[cache_key]
             if (datetime.now() - timestamp).seconds < self.cache_ttl:
                 return cached_data
         
-        # Intentar proveedores en orden de prioridad
+        # Try providers in priority order
         for provider_name, _ in self.provider_priority:
             provider = self.providers.get(provider_name)
             
@@ -255,7 +257,7 @@ class UnifiedDataManager:
                 try:
                     quote = await provider.get_quote(symbol)
                     if quote:
-                        # Guardar en cache
+                        # Save to cache
                         self.cache[cache_key] = (quote, datetime.now())
                         logging.info(f"Quote for {symbol} from {provider_name}")
                         return quote
@@ -268,9 +270,9 @@ class UnifiedDataManager:
     
     async def get_historical_data(self, symbol: str, start_date: str, 
                                 end_date: str, interval: str = "1d") -> pd.DataFrame:
-        """Obtener datos históricos con fallback"""
+        """Get historical data with fallback"""
         
-        # Intentar proveedores en orden de prioridad
+        # Try providers in priority order
         for provider_name, _ in self.provider_priority:
             provider = self.providers.get(provider_name)
             
@@ -288,7 +290,7 @@ class UnifiedDataManager:
         return pd.DataFrame()
     
     def get_provider_status(self) -> Dict:
-        """Obtener estado de todos los proveedores"""
+        """Get status of all providers"""
         status = {}
         for name, provider in self.providers.items():
             status[name] = {
@@ -297,65 +299,65 @@ class UnifiedDataManager:
             }
         return status
 
-# Demo del sistema unificado
+# Unified system demo
 async def demo_unified_data_system():
-    """Demo del sistema unificado de datos"""
+    """Unified data system demo"""
     
-    print("🔄 Inicializando sistema unificado de datos...")
+    print("🔄 Initializing unified data system...")
     
-    # Crear manager
+    # Create manager
     data_manager = UnifiedDataManager()
     
-    # Agregar proveedores (Yahoo como backup, Polygon como primario)
+    # Add providers (Yahoo as backup, Polygon as primary)
     yahoo_provider = YahooFinanceProvider()
     data_manager.add_provider(yahoo_provider, priority=1)
     
-    # Polygon solo si tenemos API key
-    polygon_api_key = "YOUR_POLYGON_API_KEY"  # Reemplazar con tu API key
+    # Polygon only if we have API key
+    polygon_api_key = "YOUR_POLYGON_API_KEY"  # Replace with your API key
     if polygon_api_key != "YOUR_POLYGON_API_KEY":
         polygon_provider = PolygonProvider(polygon_api_key)
         data_manager.add_provider(polygon_provider, priority=2)
     
-    # Verificar estado
+    # Check status
     status = data_manager.get_provider_status()
-    print("📊 Estado de proveedores:")
+    print("📊 Provider status:")
     for name, info in status.items():
-        print(f"  {name}: {'✅' if info['available'] else '❌'} (prioridad: {info['priority']})")
+        print(f"  {name}: {'✅' if info['available'] else '❌'} (priority: {info['priority']})")
     
-    # Obtener quotes
+    # Get quotes
     symbols = ["AAPL", "TSLA", "NVDA"]
     
-    print(f"\n💰 Obteniendo quotes...")
+    print(f"\n💰 Fetching quotes...")
     for symbol in symbols:
         quote = await data_manager.get_quote(symbol)
         if quote:
             print(f"  {symbol}: ${quote.last:.2f} (bid: ${quote.bid:.2f}, ask: ${quote.ask:.2f}) [{quote.source}]")
         else:
-            print(f"  {symbol}: ❌ No disponible")
+            print(f"  {symbol}: ❌ Not available")
     
-    # Obtener datos históricos
-    print(f"\n📈 Obteniendo datos históricos...")
+    # Get historical data
+    print(f"\n📈 Fetching historical data...")
     start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
     end_date = datetime.now().strftime('%Y-%m-%d')
     
     historical_data = await data_manager.get_historical_data("AAPL", start_date, end_date)
     if not historical_data.empty:
-        print(f"  AAPL: {len(historical_data)} días de datos [{historical_data['source'].iloc[0]}]")
-        print(f"  Rango: ${historical_data['Low'].min():.2f} - ${historical_data['High'].max():.2f}")
+        print(f"  AAPL: {len(historical_data)} days of data [{historical_data['source'].iloc[0]}]")
+        print(f"  Range: ${historical_data['Low'].min():.2f} - ${historical_data['High'].max():.2f}")
     
     # Cleanup
     for provider in data_manager.providers.values():
         if hasattr(provider, 'close'):
             await provider.close()
 
-# Ejecutar demo
+# Run demo
 if __name__ == "__main__":
     asyncio.run(demo_unified_data_system())
 ```
 
-## Integración con Interactive Brokers TWS
+## Interactive Brokers TWS Integration
 
-### Conexión y Ejecución de Órdenes
+### Connection and Order Execution
 ```python
 from ib_insync import IB, Stock, MarketOrder, LimitOrder, Contract
 import pandas as pd
@@ -363,7 +365,7 @@ from typing import Dict, List, Optional
 import asyncio
 
 class IBKRIntegration:
-    """Integración con Interactive Brokers TWS"""
+    """Interactive Brokers TWS integration"""
     
     def __init__(self, host: str = "127.0.0.1", port: int = 7497, client_id: int = 1):
         self.ib = IB()
@@ -372,31 +374,31 @@ class IBKRIntegration:
         self.client_id = client_id
         self.connected = False
         
-        # Configurar callbacks
+        # Configure callbacks
         self.ib.orderStatusEvent += self._on_order_status
         self.ib.openOrderEvent += self._on_open_order
         self.ib.execDetailsEvent += self._on_execution
     
     async def connect(self) -> bool:
-        """Conectar a TWS/Gateway"""
+        """Connect to TWS/Gateway"""
         try:
             await self.ib.connectAsync(self.host, self.port, clientId=self.client_id)
             self.connected = True
-            print(f"✅ Conectado a IBKR TWS en {self.host}:{self.port}")
+            print(f"✅ Connected to IBKR TWS at {self.host}:{self.port}")
             return True
         except Exception as e:
-            print(f"❌ Error conectando a IBKR: {e}")
+            print(f"❌ Error connecting to IBKR: {e}")
             return False
     
     def disconnect(self):
-        """Desconectar de TWS"""
+        """Disconnect from TWS"""
         if self.connected:
             self.ib.disconnect()
             self.connected = False
-            print("📴 Desconectado de IBKR TWS")
+            print("📴 Disconnected from IBKR TWS")
     
     async def get_account_info(self) -> Dict:
-        """Obtener información de cuenta"""
+        """Get account information"""
         if not self.connected:
             return {}
         
@@ -404,13 +406,13 @@ class IBKRIntegration:
         portfolio = self.ib.portfolio()
         positions = self.ib.positions()
         
-        # Procesar valores de cuenta
+        # Process account values
         account_info = {}
         for av in account_values:
             if av.tag in ['NetLiquidation', 'TotalCashValue', 'BuyingPower']:
                 account_info[av.tag] = float(av.value)
         
-        # Procesar posiciones
+        # Process positions
         position_info = []
         for pos in positions:
             position_info.append({
@@ -429,17 +431,17 @@ class IBKRIntegration:
         }
     
     async def get_market_data(self, symbol: str) -> Optional[Dict]:
-        """Obtener datos de mercado en tiempo real"""
+        """Get real-time market data"""
         if not self.connected:
             return None
         
         try:
             contract = Stock(symbol, 'SMART', 'USD')
             
-            # Solicitar datos de mercado
+            # Request market data
             ticker = self.ib.reqMktData(contract, '', False, False)
             
-            # Esperar datos
+            # Wait for data
             await asyncio.sleep(2)
             
             if ticker.bid and ticker.ask:
@@ -452,43 +454,43 @@ class IBKRIntegration:
                     'timestamp': datetime.now()
                 }
         except Exception as e:
-            print(f"Error obteniendo datos de {symbol}: {e}")
+            print(f"Error fetching data for {symbol}: {e}")
         
         return None
     
     async def place_order(self, symbol: str, action: str, quantity: int, 
                          order_type: str = "MKT", limit_price: float = None) -> Optional[int]:
-        """Colocar orden"""
+        """Place order"""
         if not self.connected:
             return None
         
         try:
             contract = Stock(symbol, 'SMART', 'USD')
             
-            # Crear orden según tipo
+            # Create order by type
             if order_type.upper() == "MKT":
                 order = MarketOrder(action.upper(), quantity)
             elif order_type.upper() == "LMT" and limit_price:
                 order = LimitOrder(action.upper(), quantity, limit_price)
             else:
-                print(f"Tipo de orden no soportado: {order_type}")
+                print(f"Order type not supported: {order_type}")
                 return None
             
-            # Colocar orden
+            # Place order
             trade = self.ib.placeOrder(contract, order)
             
-            print(f"📝 Orden colocada: {action} {quantity} {symbol} @ {order_type}")
+            print(f"📝 Order placed: {action} {quantity} {symbol} @ {order_type}")
             if limit_price:
-                print(f"   Precio límite: ${limit_price:.2f}")
+                print(f"   Limit price: ${limit_price:.2f}")
             
             return trade.order.orderId
             
         except Exception as e:
-            print(f"Error colocando orden: {e}")
+            print(f"Error placing order: {e}")
             return None
     
     def _on_order_status(self, trade):
-        """Callback para cambios de estado de orden"""
+        """Callback for order status changes"""
         order = trade.order
         status = trade.orderStatus
         
@@ -497,16 +499,16 @@ class IBKRIntegration:
             print(f"   ✅ Ejecutada: {status.filled} @ ${status.avgFillPrice:.2f}")
     
     def _on_open_order(self, trade):
-        """Callback para órdenes abiertas"""
+        """Callback for open orders"""
         order = trade.order
-        print(f"📋 Orden abierta: {order.orderId} - {order.action} {order.totalQuantity} {trade.contract.symbol}")
+        print(f"📋 Open order: {order.orderId} - {order.action} {order.totalQuantity} {trade.contract.symbol}")
     
     def _on_execution(self, trade, fill):
-        """Callback para ejecuciones"""
-        print(f"⚡ Ejecución: {fill.shares} shares @ ${fill.price:.2f}")
+        """Callback for executions"""
+        print(f"⚡ Execution: {fill.shares} shares @ ${fill.price:.2f}")
 
 class IBKRDataFeed:
-    """Feed de datos en tiempo real desde IBKR"""
+    """Real-time data feed from IBKR"""
     
     def __init__(self, ibkr_integration: IBKRIntegration):
         self.ibkr = ibkr_integration
@@ -514,7 +516,7 @@ class IBKRDataFeed:
         self.data_callbacks = []
     
     def subscribe(self, symbol: str, callback=None):
-        """Suscribirse a datos de un símbolo"""
+        """Subscribe to symbol data"""
         if symbol not in self.subscriptions:
             self.subscriptions[symbol] = []
         
@@ -522,108 +524,108 @@ class IBKRDataFeed:
             self.subscriptions[symbol].append(callback)
     
     def add_data_callback(self, callback):
-        """Agregar callback global para datos"""
+        """Add global data callback"""
         self.data_callbacks.append(callback)
     
     async def start_feed(self):
-        """Iniciar feed de datos"""
+        """Start data feed"""
         if not self.ibkr.connected:
-            print("❌ IBKR no conectado")
+            print("❌ IBKR not connected")
             return
         
-        print("🔄 Iniciando feed de datos...")
+        print("🔄 Starting data feed...")
         
-        # Suscribirse a cada símbolo
+        # Subscribe to each symbol
         for symbol in self.subscriptions.keys():
             try:
                 contract = Stock(symbol, 'SMART', 'USD')
                 ticker = self.ibkr.ib.reqMktData(contract, '', False, False)
-                print(f"✅ Suscrito a {symbol}")
+                print(f"✅ Subscribed to {symbol}")
             except Exception as e:
-                print(f"❌ Error suscribiendo a {symbol}: {e}")
+                print(f"❌ Error subscribing to {symbol}: {e}")
         
-        # Procesar datos en loop
+        # Process data in loop
         while True:
             try:
                 for symbol in self.subscriptions.keys():
                     data = await self.ibkr.get_market_data(symbol)
                     if data:
-                        # Llamar callbacks específicos del símbolo
+                        # Call symbol-specific callbacks
                         for callback in self.subscriptions[symbol]:
                             callback(data)
                         
-                        # Llamar callbacks globales
+                        # Call global callbacks
                         for callback in self.data_callbacks:
                             callback(data)
                 
-                await asyncio.sleep(1)  # Actualizar cada segundo
+                await asyncio.sleep(1)  # Update every second
                 
             except Exception as e:
-                print(f"Error en feed: {e}")
+                print(f"Error in feed: {e}")
                 await asyncio.sleep(5)
 
-# Demo de integración con IBKR
+# IBKR integration demo
 async def demo_ibkr_integration():
-    """Demo de integración con IBKR"""
+    """IBKR integration demo"""
     
-    print("🔌 Demo de integración con Interactive Brokers...")
+    print("🔌 Interactive Brokers integration demo...")
     
-    # Crear integración
+    # Create integration
     ibkr = IBKRIntegration()
     
-    # Conectar (requiere TWS/Gateway ejecutándose)
+    # Connect (requires TWS/Gateway running)
     connected = await ibkr.connect()
     if not connected:
-        print("❌ No se pudo conectar a TWS. Asegúrate de que esté ejecutándose.")
+        print("❌ Could not connect to TWS. Make sure it is running.")
         return
     
     try:
-        # Obtener info de cuenta
+        # Get account info
         account_info = await ibkr.get_account_info()
-        print(f"\n💰 Información de cuenta:")
+        print(f"\n💰 Account information:")
         for key, value in account_info.get('account_values', {}).items():
             if isinstance(value, float):
                 print(f"  {key}: ${value:,.2f}")
         
-        print(f"\n📊 Posiciones actuales:")
+        print(f"\n📊 Current positions:")
         for pos in account_info.get('positions', []):
             if pos['position'] != 0:
                 print(f"  {pos['symbol']}: {pos['position']} shares @ ${pos['avg_cost']:.2f}")
-                print(f"    P&L no realizado: ${pos['unrealized_pnl']:.2f}")
+                print(f"    Unrealized P&L: ${pos['unrealized_pnl']:.2f}")
         
-        # Obtener datos de mercado
-        print(f"\n📈 Datos de mercado:")
+        # Get market data
+        print(f"\n📈 Market data:")
         symbols = ["AAPL", "TSLA"]
         for symbol in symbols:
             data = await ibkr.get_market_data(symbol)
             if data:
                 print(f"  {symbol}: ${data['last']:.2f} (bid: ${data['bid']:.2f}, ask: ${data['ask']:.2f})")
         
-        # Demo de orden (comentado para seguridad)
+        # Order demo (commented out for safety)
         # order_id = await ibkr.place_order("AAPL", "BUY", 1, "LMT", 150.00)
         # if order_id:
-        #     print(f"Orden colocada con ID: {order_id}")
+        #     print(f"Order placed with ID: {order_id}")
         
     finally:
-        # Desconectar
+        # Disconnect
         ibkr.disconnect()
 
 if __name__ == "__main__":
     asyncio.run(demo_ibkr_integration())
 ```
 
-## Integración con QuantConnect
+## QuantConnect Integration
 
-### Estrategia Híbrida Local/Cloud
+### Hybrid Local/Cloud Strategy
 ```python
-# Local strategy development que se puede portar a QuantConnect
+# Local strategy development that can be ported to QuantConnect
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
 class QuantConnectCompatibleStrategy:
-    """Estrategia compatible con QuantConnect"""
+    """QuantConnect-compatible strategy"""
     
     def __init__(self):
         self.name = "HybridMomentumStrategy"
@@ -632,7 +634,7 @@ class QuantConnectCompatibleStrategy:
         self.portfolio = {}
         self.universe = {}
         
-        # Configuración
+        # Configuration
         self.config = {
             'rebalance_frequency': 'daily',
             'max_positions': 3,
@@ -641,10 +643,10 @@ class QuantConnectCompatibleStrategy:
         }
     
     def initialize(self, data_manager):
-        """Inicializar estrategia (compatible con QC.Initialize)"""
+        """Initialize strategy (compatible with QC.Initialize)"""
         self.data_manager = data_manager
         
-        # Configurar universo
+        # Configure universe
         for symbol in self.symbols:
             self.universe[symbol] = {
                 'data': pd.DataFrame(),
@@ -652,27 +654,27 @@ class QuantConnectCompatibleStrategy:
                 'signals': []
             }
         
-        print(f"✅ Estrategia {self.name} inicializada")
+        print(f"Strategy {self.name} initialized")
     
     async def on_data(self, data: Dict):
-        """Procesar nuevos datos (compatible con QC.OnData)"""
+        """Process new data (compatible with QC.OnData)"""
         
-        # Actualizar datos para cada símbolo
+        # Update data for each symbol
         for symbol, price_data in data.items():
             if symbol in self.universe:
                 await self._update_symbol_data(symbol, price_data)
         
-        # Generar señales
+        # Generate signals
         signals = await self._generate_signals()
         
-        # Ejecutar trades si hay señales
+        # Execute trades if there are signals
         if signals:
             await self._execute_signals(signals)
     
     async def _update_symbol_data(self, symbol: str, price_data: Dict):
-        """Actualizar datos de símbolo"""
+        """Update symbol data"""
         
-        # Crear nueva fila
+        # Create new row
         new_row = pd.DataFrame([{
             'timestamp': price_data['timestamp'],
             'open': price_data['open'],
@@ -682,21 +684,21 @@ class QuantConnectCompatibleStrategy:
             'volume': price_data['volume']
         }])
         
-        # Agregar a datos existentes
+        # Add to existing data
         symbol_data = self.universe[symbol]['data']
         symbol_data = pd.concat([symbol_data, new_row], ignore_index=True)
         
-        # Mantener solo los últimos N períodos
+        # Keep only the last N periods
         if len(symbol_data) > self.lookback_period * 2:
             symbol_data = symbol_data.tail(self.lookback_period * 2)
         
         self.universe[symbol]['data'] = symbol_data
         
-        # Actualizar indicadores
+        # Update indicators
         await self._update_indicators(symbol)
     
     async def _update_indicators(self, symbol: str):
-        """Actualizar indicadores técnicos"""
+        """Update technical indicators"""
         
         data = self.universe[symbol]['data']
         
@@ -726,7 +728,7 @@ class QuantConnectCompatibleStrategy:
         self.universe[symbol]['indicators'] = indicators
     
     def _calculate_rsi(self, prices: pd.Series, period: int = 14) -> pd.Series:
-        """Calcular RSI"""
+        """Calculate RSI"""
         delta = prices.diff()
         gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
@@ -734,7 +736,7 @@ class QuantConnectCompatibleStrategy:
         return 100 - (100 / (1 + rs))
     
     async def _generate_signals(self) -> List[Dict]:
-        """Generar señales de trading"""
+        """Generate trading signals"""
         
         signals = []
         
@@ -746,22 +748,22 @@ class QuantConnectCompatibleStrategy:
             if len(data) < self.lookback_period:
                 continue
             
-            # Obtener valores actuales
+            # Get current values
             current_price = data['close'].iloc[-1]
             current_rsi = indicators['rsi'].iloc[-1]
             current_momentum = indicators['momentum'].iloc[-1]
             current_macd = indicators['macd'].iloc[-1]
             current_signal = indicators['macd_signal'].iloc[-1]
             
-            # Lógica de señales
+            # Signal logic
             signal_strength = 0
             signal_type = None
             
-            # Momentum positivo
+            # Positive momentum
             if current_momentum > self.config['momentum_threshold']:
                 signal_strength += 30
             
-            # RSI no sobrecomprado
+            # RSI not overbought
             if 30 < current_rsi < 70:
                 signal_strength += 20
             
@@ -773,7 +775,7 @@ class QuantConnectCompatibleStrategy:
             if current_price > indicators['sma_20'].iloc[-1]:
                 signal_strength += 25
             
-            # Determinar tipo de señal
+            # Determine signal type
             if signal_strength >= 70:
                 signal_type = "BUY"
             elif signal_strength <= 30:
@@ -796,22 +798,22 @@ class QuantConnectCompatibleStrategy:
         return signals
     
     async def _execute_signals(self, signals: List[Dict]):
-        """Ejecutar señales (placeholder para integración real)"""
+        """Execute signals (placeholder for real integration)"""
         
         for signal in signals:
             symbol = signal['symbol']
             signal_type = signal['type']
             strength = signal['strength']
             
-            print(f"🎯 Señal {signal_type} para {symbol} (fuerza: {strength})")
+            print(f"🎯 Signal {signal_type} for {symbol} (strength: {strength})")
             
-            # Aquí se integraría con el broker real
+            # Here you would integrate with the real broker
             # await self.broker.place_order(...)
     
     def get_performance_metrics(self) -> Dict:
-        """Obtener métricas de performance"""
+        """Get performance metrics"""
         
-        # Placeholder - en implementación real calcularía métricas reales
+        # Placeholder - in real implementation would calculate real metrics
         return {
             'strategy_name': self.name,
             'total_signals': sum(len(info['signals']) for info in self.universe.values()),
@@ -819,7 +821,7 @@ class QuantConnectCompatibleStrategy:
             'last_update': datetime.now()
         }
 
-# Código para QuantConnect (archivo separado: main.py)
+# Code for QuantConnect (separate file: main.py)
 QUANTCONNECT_CODE = '''
 # QuantConnect Strategy Implementation
 from AlgorithmImports import *
@@ -937,21 +939,21 @@ class HybridMomentumAlgorithm(QCAlgorithm):
                 self.Debug(f"Selling {self.symbols[symbol]}")
 '''
 
-# Utilidad para sincronizar estrategias
+# Utility for synchronizing strategies
 class StrategySync:
-    """Sincronizar estrategia entre local y QuantConnect"""
+    """Synchronize strategy between local and QuantConnect"""
     
     def __init__(self, local_strategy: QuantConnectCompatibleStrategy):
         self.local_strategy = local_strategy
         self.qc_code_template = QUANTCONNECT_CODE
     
     def export_to_quantconnect(self, filename: str = "main.py"):
-        """Exportar estrategia a formato QuantConnect"""
+        """Export strategy to QuantConnect format"""
         
-        # Personalizar código basado en configuración local
+        # Customize code based on local configuration
         qc_code = self.qc_code_template
         
-        # Reemplazar parámetros
+        # Replace parameters
         qc_code = qc_code.replace(
             "self.momentum_threshold = 0.1",
             f"self.momentum_threshold = {self.local_strategy.config['momentum_threshold']}"
@@ -962,27 +964,27 @@ class StrategySync:
             f"self.max_positions = {self.local_strategy.config['max_positions']}"
         )
         
-        # Guardar archivo
+        # Save file
         with open(filename, 'w') as f:
             f.write(qc_code)
         
-        print(f"✅ Estrategia exportada a {filename}")
-        print("📁 Sube este archivo a tu proyecto en QuantConnect")
+        print(f"Strategy exported to {filename}")
+        print("📁 Upload this file to your QuantConnect project")
     
     def backtest_locally(self, start_date: str, end_date: str):
-        """Ejecutar backtest local antes de usar en QC"""
+        """Run local backtest before using in QC"""
         
-        print(f"🔬 Ejecutando backtest local...")
+        print(f"🔬 Running local backtest...")
         
-        # Simular datos
+        # Simulate data
         symbols = self.local_strategy.symbols
         
-        # Esta sería la integración con tu data manager real
+        # This would be the integration with your real data manager
         # data = await self.data_manager.get_historical_data(symbols, start_date, end_date)
         
-        print(f"📊 Backtest completado para período {start_date} a {end_date}")
+        print(f"📊 Backtest completed for period {start_date} to {end_date}")
         
-        # Retornar métricas de ejemplo
+        # Return example metrics
         return {
             'total_return': 0.15,
             'sharpe_ratio': 1.2,
@@ -990,19 +992,19 @@ class StrategySync:
             'trades': 45
         }
 
-# Demo de integración QuantConnect
+# QuantConnect integration demo
 async def demo_quantconnect_integration():
-    """Demo de integración con QuantConnect"""
+    """QuantConnect integration demo"""
     
-    print("🚀 Demo de integración con QuantConnect...")
+    print("🚀 QuantConnect integration demo...")
     
-    # Crear estrategia local
+    # Create local strategy
     strategy = QuantConnectCompatibleStrategy()
     
-    # Simular inicialización (necesitarías tu data manager real)
+    # Simulate initialization (you would need your real data manager)
     # await strategy.initialize(data_manager)
     
-    # Simular algunos datos de ejemplo
+    # Simulate some example data
     sample_data = {
         "SPY": {
             'timestamp': datetime.now(),
@@ -1016,34 +1018,34 @@ async def demo_quantconnect_integration():
     
     # await strategy.on_data(sample_data)
     
-    # Configurar sincronización
+    # Configure synchronization
     sync = StrategySync(strategy)
     
-    # Ejecutar backtest local
+    # Run local backtest
     backtest_results = sync.backtest_locally("2023-01-01", "2023-12-31")
-    print(f"📈 Resultados del backtest:")
+    print(f"📈 Backtest results:")
     for metric, value in backtest_results.items():
         if isinstance(value, float):
             print(f"  {metric}: {value:.2%}" if 'return' in metric or 'drawdown' in metric else f"  {metric}: {value:.2f}")
         else:
             print(f"  {metric}: {value}")
     
-    # Exportar a QuantConnect
+    # Export to QuantConnect
     sync.export_to_quantconnect("hybrid_momentum_strategy.py")
     
-    print(f"\n📋 Próximos pasos:")
-    print("1. Revisa el archivo hybrid_momentum_strategy.py")
-    print("2. Sube el archivo a tu proyecto en QuantConnect")
-    print("3. Ejecuta el backtest en la plataforma")
-    print("4. Compara resultados con el backtest local")
+    print(f"\n📋 Next steps:")
+    print("1. Review the hybrid_momentum_strategy.py file")
+    print("2. Upload the file to your QuantConnect project")
+    print("3. Run the backtest on the platform")
+    print("4. Compare results with the local backtest")
 
 if __name__ == "__main__":
     asyncio.run(demo_quantconnect_integration())
 ```
 
-## Dashboard de Monitoreo Multi-Plataforma
+## Multi-Platform Monitoring Dashboard
 
-### Sistema de Monitoreo Centralizado
+### Centralized Monitoring System
 ```python
 import streamlit as st
 import plotly.graph_objects as go
@@ -1056,7 +1058,7 @@ import asyncio
 from typing import Dict, List
 
 class MultiPlatformDashboard:
-    """Dashboard para monitorear múltiples plataformas"""
+    """Dashboard for monitoring multiple platforms"""
     
     def __init__(self):
         self.data_sources = {}
@@ -1065,19 +1067,19 @@ class MultiPlatformDashboard:
         self.alerts = []
     
     def add_data_source(self, name: str, provider):
-        """Agregar fuente de datos"""
+        """Add data source"""
         self.data_sources[name] = provider
     
     def add_trading_account(self, name: str, account_integration):
-        """Agregar cuenta de trading"""
+        """Add trading account"""
         self.trading_accounts[name] = account_integration
     
     def add_strategy(self, name: str, strategy):
-        """Agregar estrategia"""
+        """Add strategy"""
         self.strategies[name] = strategy
     
     async def get_unified_portfolio_view(self) -> Dict:
-        """Obtener vista unificada del portfolio"""
+        """Get unified portfolio view"""
         
         portfolio_summary = {
             'total_equity': 0,
@@ -1086,7 +1088,7 @@ class MultiPlatformDashboard:
             'account_breakdown': {}
         }
         
-        # Agregar datos de cada cuenta
+        # Add data from each account
         for account_name, account in self.trading_accounts.items():
             try:
                 account_info = await account.get_account_info()
@@ -1094,7 +1096,7 @@ class MultiPlatformDashboard:
                 account_equity = account_info.get('account_values', {}).get('NetLiquidation', 0)
                 portfolio_summary['total_equity'] += account_equity
                 
-                # Agregar posiciones
+                # Add positions
                 for pos in account_info.get('positions', []):
                     if pos['position'] != 0:
                         portfolio_summary['positions'].append({
@@ -1109,12 +1111,12 @@ class MultiPlatformDashboard:
                 }
                 
             except Exception as e:
-                st.error(f"Error obteniendo datos de {account_name}: {e}")
+                st.error(f"Error fetching data from {account_name}: {e}")
         
         return portfolio_summary
     
     async def get_data_feed_status(self) -> Dict:
-        """Obtener estado de feeds de datos"""
+        """Get data feed status"""
         
         feed_status = {}
         
@@ -1148,7 +1150,7 @@ class MultiPlatformDashboard:
         return feed_status
     
     async def get_strategy_performance(self) -> Dict:
-        """Obtener performance de estrategias"""
+        """Get strategy performance"""
         
         strategy_performance = {}
         
@@ -1158,7 +1160,7 @@ class MultiPlatformDashboard:
                     metrics = strategy.get_performance_metrics()
                     strategy_performance[strategy_name] = metrics
                 else:
-                    # Mock metrics para demo
+                    # Mock metrics for demo
                     strategy_performance[strategy_name] = {
                         'total_trades': np.random.randint(10, 100),
                         'win_rate': np.random.uniform(0.4, 0.8),
@@ -1171,7 +1173,7 @@ class MultiPlatformDashboard:
         return strategy_performance
 
 def create_streamlit_dashboard():
-    """Crear dashboard con Streamlit"""
+    """Create dashboard with Streamlit"""
     
     st.set_page_config(
         page_title="Trading Multi-Platform Dashboard",
@@ -1181,11 +1183,11 @@ def create_streamlit_dashboard():
     
     st.title("📊 Multi-Platform Trading Dashboard")
     
-    # Inicializar dashboard (normalmente esto estaría en session_state)
+    # Initialize dashboard (normally this would be in session_state)
     if 'dashboard' not in st.session_state:
         st.session_state.dashboard = MultiPlatformDashboard()
         
-        # Agregar fuentes mock para demo
+        # Add mock sources for demo
         st.session_state.dashboard.data_sources = {
             'Yahoo Finance': {'status': 'online'},
             'Polygon.io': {'status': 'online'},
@@ -1199,12 +1201,12 @@ def create_streamlit_dashboard():
     
     dashboard = st.session_state.dashboard
     
-    # Sidebar para controles
+    # Sidebar for controls
     with st.sidebar:
-        st.header("🔧 Controles")
+        st.header("🔧 Controls")
         
         auto_refresh = st.checkbox("Auto Refresh", value=True)
-        refresh_interval = st.slider("Intervalo (seg)", 10, 300, 30)
+        refresh_interval = st.slider("Interval (sec)", 10, 300, 30)
         
         if st.button("🔄 Refresh Manual"):
             st.rerun()
@@ -1214,10 +1216,10 @@ def create_streamlit_dashboard():
             status_icon = "🟢" if info.get('status') == 'online' else "🔴"
             st.write(f"{status_icon} {source}")
     
-    # Métricas principales
+    # Main metrics
     col1, col2, col3, col4 = st.columns(4)
     
-    # Mock data para demo
+    # Mock data for demo
     total_equity = sum(acc['equity'] for acc in dashboard.trading_accounts.values())
     total_positions = sum(acc['positions'] for acc in dashboard.trading_accounts.values())
     daily_pnl = np.random.uniform(-2000, 3000)
@@ -1251,7 +1253,7 @@ def create_streamlit_dashboard():
             "All Online" if data_sources_online == len(dashboard.data_sources) else "Some Offline"
         )
     
-    # Gráficos principales
+    # Main charts
     col1, col2 = st.columns(2)
     
     with col1:
@@ -1296,7 +1298,7 @@ def create_streamlit_dashboard():
         styled_df = feed_status_df.style.applymap(color_status, subset=['Status'])
         st.dataframe(styled_df, use_container_width=True)
     
-    # Posiciones actuales
+    # Current positions
     st.subheader("📋 Current Positions")
     
     # Mock positions data
@@ -1394,7 +1396,7 @@ def create_streamlit_dashboard():
         
         st.plotly_chart(fig_strategy, use_container_width=True)
     
-    # Alerts y notificaciones
+    # Alerts and notifications
     st.subheader("🚨 Alerts & Notifications")
     
     # Mock alerts
@@ -1418,9 +1420,9 @@ def create_streamlit_dashboard():
         time.sleep(refresh_interval)
         st.rerun()
 
-# Ejecutar dashboard
+# Run dashboard
 if __name__ == "__main__":
     create_streamlit_dashboard()
 ```
 
-Este sistema de integración multi-plataforma proporciona una base sólida para conectar y coordinar diferentes fuentes de datos, brokers y estrategias en un workflow unificado de trading cuantitativo.
+This multi-platform integration system provides a solid foundation for connecting and coordinating different data sources, brokers, and strategies in a unified quantitative trading workflow.

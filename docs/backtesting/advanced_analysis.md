@@ -1,8 +1,10 @@
-# Análisis Cuantitativo Avanzado
+> 🇪🇸 [Leer en Español](advanced_analysis.es.md) | 🇺🇸 **English**
 
-## Detección de Pump & Dump con Machine Learning
+# Advanced Quantitative Analysis
 
-### Características del Modelo
+## Pump & Dump Detection with Machine Learning
+
+### Model Features
 ```python
 import pandas as pd
 import numpy as np
@@ -22,7 +24,7 @@ class PumpDumpDetector:
         self.is_trained = False
         
     def create_features(self, df):
-        """Crear features para detectar pump & dump"""
+        """Create features to detect pump & dump"""
         features = pd.DataFrame(index=df.index)
         
         # Price-based features
@@ -61,7 +63,7 @@ class PumpDumpDetector:
         return features.fillna(0)
     
     def calculate_rsi(self, prices, periods=14):
-        """Calcular RSI"""
+        """Calculate RSI"""
         delta = prices.diff()
         gain = (delta.where(delta > 0, 0)).rolling(window=periods).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(window=periods).mean()
@@ -70,7 +72,7 @@ class PumpDumpDetector:
         return rsi
     
     def calculate_bollinger_position(self, prices, periods=20):
-        """Posición dentro de Bollinger Bands"""
+        """Position within Bollinger Bands"""
         sma = prices.rolling(periods).mean()
         std = prices.rolling(periods).std()
         upper_band = sma + (std * 2)
@@ -80,32 +82,32 @@ class PumpDumpDetector:
         return bb_position.clip(0, 1)
     
     def count_consecutive_green(self, df):
-        """Contar días verdes consecutivos"""
+        """Count consecutive green days"""
         green_days = (df['close'] > df['open']).astype(int)
         consecutive = green_days * (green_days.groupby((green_days != green_days.shift()).cumsum()).cumcount() + 1)
         return consecutive
     
     def detect_failed_breakout(self, df, lookback=5):
-        """Detectar failed breakouts"""
+        """Detect failed breakouts"""
         rolling_high = df['high'].rolling(lookback).max()
         breakout = df['high'] > rolling_high.shift(1)
         
-        # Failed breakout: rompe high pero no puede mantenerlo
+        # Failed breakout: breaks the high but can't hold it
         failed = breakout & (df['close'] < df['high'] * 0.95)
         return failed.astype(int)
     
     def create_labels(self, df, forward_days=5, dump_threshold=-0.30):
-        """Crear labels para training (1 = dump incoming, 0 = normal)"""
-        # Look forward para ver si hay dump
+        """Create labels for training (1 = dump incoming, 0 = normal)"""
+        # Look forward to see if there's a dump
         future_returns = df['close'].shift(-forward_days) / df['close'] - 1
         
-        # Label = 1 si hay caída >30% en los próximos 5 días
+        # Label = 1 if there's a >30% drop in the next 5 days
         labels = (future_returns < dump_threshold).astype(int)
         
         return labels[:-forward_days]  # Remove last days without future data
     
     def train_model(self, historical_data, symbols):
-        """Entrenar modelo con datos históricos"""
+        """Train model with historical data"""
         all_features = []
         all_labels = []
         
@@ -162,7 +164,7 @@ class PumpDumpDetector:
         }
     
     def predict_dump_probability(self, current_data):
-        """Predecir probabilidad de dump"""
+        """Predict dump probability"""
         if not self.is_trained:
             raise ValueError("Model must be trained first")
         
@@ -179,9 +181,9 @@ class PumpDumpDetector:
         }
 ```
 
-## Análisis de Correlaciones Dinámicas
+## Dynamic Correlation Analysis
 
-### Correlaciones Rolling
+### Rolling Correlations
 ```python
 class DynamicCorrelationAnalysis:
     def __init__(self, window=30):
@@ -189,7 +191,7 @@ class DynamicCorrelationAnalysis:
         self.correlation_history = {}
         
     def calculate_rolling_correlations(self, returns_data, benchmark='SPY'):
-        """Calcular correlaciones rolling con benchmark"""
+        """Calculate rolling correlations with benchmark"""
         correlations = {}
         
         for symbol in returns_data.columns:
@@ -209,7 +211,7 @@ class DynamicCorrelationAnalysis:
         return correlations
     
     def calculate_trend(self, series, periods=10):
-        """Calcular tendencia de correlación"""
+        """Calculate correlation trend"""
         if len(series) < periods:
             return 0
         
@@ -219,11 +221,11 @@ class DynamicCorrelationAnalysis:
         return (recent - previous) / abs(previous) if previous != 0 else 0
     
     def identify_correlation_breakdowns(self, correlations, threshold=0.3):
-        """Identificar breakdowns de correlación (oportunidades de short)"""
+        """Identify correlation breakdowns (short opportunities)"""
         breakdowns = []
         
         for symbol, corr_data in correlations.items():
-            # Breakdown = correlación históricamente alta pero actualmente baja
+            # Breakdown = historically high correlation but currently low
             if (corr_data['avg_correlation'] > 0.5 and 
                 corr_data['current_correlation'] < threshold):
                 
@@ -241,7 +243,7 @@ class DynamicCorrelationAnalysis:
         return sorted(breakdowns, key=lambda x: x['severity'], reverse=True)
     
     def sector_correlation_heatmap(self, returns_data, sector_mapping):
-        """Crear heatmap de correlaciones por sector"""
+        """Create sector correlation heatmap"""
         sector_correlations = {}
         
         # Group by sector
@@ -267,7 +269,7 @@ class DynamicCorrelationAnalysis:
 
 ## Statistical Arbitrage Framework
 
-### Pairs Trading Avanzado
+### Advanced Pairs Trading
 ```python
 class StatisticalArbitrageFramework:
     def __init__(self):
@@ -275,7 +277,7 @@ class StatisticalArbitrageFramework:
         self.cointegration_results = {}
         
     def find_cointegrated_pairs(self, price_data, min_correlation=0.7):
-        """Encontrar pares cointegrados"""
+        """Find cointegrated pairs"""
         from statsmodels.tsa.stattools import coint
         
         symbols = list(price_data.columns)
@@ -318,7 +320,7 @@ class StatisticalArbitrageFramework:
         return sorted(cointegrated_pairs, key=lambda x: x['p_value'])
     
     def calculate_spread_metrics(self, price_data, pair):
-        """Calcular métricas del spread"""
+        """Calculate spread metrics"""
         symbol1, symbol2 = pair
         
         # Calculate spread using linear regression
@@ -352,7 +354,7 @@ class StatisticalArbitrageFramework:
         return spread_stats
     
     def generate_pairs_signals(self, spread_stats, entry_threshold=2.0, exit_threshold=0.5):
-        """Generar señales de pairs trading"""
+        """Generate pairs trading signals"""
         z_score = spread_stats['z_score']
         
         if abs(z_score) > entry_threshold:
@@ -402,7 +404,7 @@ class MarketRegimeDetector:
         self.current_regime = None
         
     def detect_volatility_regime(self, returns, lookback=20):
-        """Detectar régimen de volatilidad"""
+        """Detect volatility regime"""
         rolling_vol = returns.rolling(lookback).std() * np.sqrt(252)  # Annualized
         
         vol_percentiles = {
@@ -430,7 +432,7 @@ class MarketRegimeDetector:
         }
     
     def detect_trend_regime(self, prices, short_window=20, long_window=50):
-        """Detectar régimen de tendencia"""
+        """Detect trend regime"""
         short_ma = prices.rolling(short_window).mean()
         long_ma = prices.rolling(long_window).mean()
         
@@ -459,7 +461,7 @@ class MarketRegimeDetector:
         }
     
     def adaptive_strategy_parameters(self, volatility_regime, trend_regime):
-        """Adaptar parámetros de estrategia según régimen"""
+        """Adapt strategy parameters based on regime"""
         adaptations = {
             'position_sizing': 1.0,
             'stop_loss_multiplier': 1.0,
@@ -506,7 +508,7 @@ class PerformanceAttribution:
         self.attribution_results = {}
         
     def calculate_factor_exposures(self, returns, factor_returns):
-        """Calcular exposiciones a factores"""
+        """Calculate factor exposures"""
         from sklearn.linear_model import LinearRegression
         
         # Align data
@@ -533,7 +535,7 @@ class PerformanceAttribution:
         }
     
     def decompose_returns(self, strategy_returns, factor_returns, factor_exposures):
-        """Descomponer returns en factores + alpha"""
+        """Decompose returns into factors + alpha"""
         decomposition = pd.DataFrame(index=strategy_returns.index)
         
         # Factor contributions
@@ -559,4 +561,4 @@ class PerformanceAttribution:
         return decomposition
 ```
 
-Este framework de análisis cuantitativo avanzado permite identificar oportunidades de short selling con mayor precisión y gestionar el riesgo de manera más sofisticada.
+This advanced quantitative analysis framework enables identifying short selling opportunities with greater precision and managing risk in a more sophisticated manner.

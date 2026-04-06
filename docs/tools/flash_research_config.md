@@ -1,20 +1,22 @@
-# Configuraciones para Flash Research
+> 🇪🇸 [Leer en Español](flash_research_config.es.md) | 🇺🇸 **English**
 
-## Overview de Flash Research
+# Flash Research Configurations
 
-Flash Research es una plataforma avanzada de screening y análisis que se especializa en market microstructure y detección de patrones institucionales. Es particularmente útil para identificar:
+## Flash Research Overview
 
-- Flujo de órdenes institucionales
-- Actividad inusual de opciones
+Flash Research is an advanced screening and analysis platform that specializes in market microstructure and institutional pattern detection. It is particularly useful for identifying:
+
+- Institutional order flow
+- Unusual options activity
 - Dark pool prints
-- Patrones de acumulación/distribución
+- Accumulation/distribution patterns
 
-## Configuraciones Base
+## Base Configurations
 
-### Filtros Universales para Short Selling
+### Universal Filters for Short Selling
 
 ```python
-# Configuración base para scanner de Flash Research
+# Base configuration for Flash Research scanner
 FLASH_RESEARCH_CONFIG = {
     'base_filters': {
         'exchange': ['NASDAQ', 'NYSE'],
@@ -38,11 +40,11 @@ FLASH_RESEARCH_CONFIG = {
 }
 ```
 
-### Query Templates por Estrategia
+### Query Templates by Strategy
 
 #### First Red Day Pattern
 ```sql
--- Flash Research Query para First Red Day
+-- Flash Research Query for First Red Day
 SELECT 
     symbol,
     price,
@@ -74,7 +76,7 @@ LIMIT 20;
 
 #### Parabolic Exhaustion
 ```sql
--- Query para Parabolic Exhaustion
+-- Query for Parabolic Exhaustion
 SELECT 
     symbol,
     price,
@@ -104,7 +106,7 @@ LIMIT 15;
 
 #### Gap and Crap
 ```sql
--- Query para Gap and Crap
+-- Query for Gap and Crap
 SELECT 
     symbol,
     price,
@@ -130,9 +132,9 @@ ORDER BY
 LIMIT 10;
 ```
 
-## Sistema de Scoring Avanzado
+## Advanced Scoring System
 
-### Implementación del Scoring
+### Scoring Implementation
 ```python
 class FlashResearchScorer:
     def __init__(self):
@@ -144,10 +146,10 @@ class FlashResearchScorer:
         }
         
     def calculate_momentum_score(self, data):
-        """Score de momentum (30% del total)"""
+        """Momentum score (30% of total)"""
         score = 0
         
-        # Ganancia total desde base
+        # Total gain from base
         total_gain = data.get('total_gain_percent', 0)
         if total_gain >= 100:
             score += 40
@@ -156,7 +158,7 @@ class FlashResearchScorer:
         elif total_gain >= 30:
             score += 10
         
-        # Días consecutivos verdes
+        # Consecutive green days
         consecutive_days = data.get('consecutive_green_days', 0)
         if consecutive_days >= 5:
             score += 30
@@ -165,17 +167,17 @@ class FlashResearchScorer:
         elif consecutive_days >= 2:
             score += 10
         
-        # Aceleración del movimiento
+        # Movement acceleration
         if data.get('accelerating_momentum', False):
             score += 20
         
         return min(score, 100)
     
     def calculate_volume_score(self, data):
-        """Score de volumen (25% del total)"""
+        """Volume score (25% of total)"""
         score = 0
         
-        # Múltiplo sobre promedio
+        # Multiple over average
         volume_ratio = data.get('volume_ratio', 1)
         if volume_ratio >= 10:
             score += 40
@@ -184,9 +186,9 @@ class FlashResearchScorer:
         elif volume_ratio >= 3:
             score += 20
         
-        # Patrón de volumen
+        # Volume pattern
         if data.get('volume_decreasing_today', False):
-            score += 30  # Distribución
+            score += 30  # Distribution
         
         if data.get('heavy_selling_detected', False):
             score += 20
@@ -194,19 +196,19 @@ class FlashResearchScorer:
         return min(score, 100)
     
     def calculate_technical_score(self, data):
-        """Score técnico (25% del total)"""
+        """Technical score (25% of total)"""
         score = 0
         
-        # Distancia de SMA 20
+        # Distance from SMA 20
         sma_distance = data.get('distance_from_sma20_percent', 0)
         if sma_distance >= 50:
-            score += 30  # Muy sobreextendido
+            score += 30  # Very overextended
         elif sma_distance >= 30:
             score += 20
         elif sma_distance >= 15:
             score += 10
         
-        # RSI divergencia
+        # RSI divergence
         if data.get('rsi_divergence', False):
             score += 30
         
@@ -222,7 +224,7 @@ class FlashResearchScorer:
         return min(score, 100)
     
     def calculate_risk_score(self, data):
-        """Score de riesgo (20% del total)"""
+        """Risk score (20% of total)"""
         score = 0
         
         # Float size
@@ -242,7 +244,7 @@ class FlashResearchScorer:
         if data.get('locate_available', False):
             score += 30
         
-        # Costo de locate
+        # Locate cost
         locate_cost = data.get('locate_cost_annual_percent', 100)
         if locate_cost < 10:
             score += 20
@@ -252,7 +254,7 @@ class FlashResearchScorer:
         return min(score, 100)
     
     def calculate_total_score(self, data):
-        """Score total ponderado"""
+        """Weighted total score"""
         momentum_score = self.calculate_momentum_score(data)
         volume_score = self.calculate_volume_score(data)
         technical_score = self.calculate_technical_score(data)
@@ -265,7 +267,7 @@ class FlashResearchScorer:
             risk_score * self.weights['risk']
         )
         
-        # Clasificar setup
+        # Classify setup
         if total_score >= 80:
             setup_grade = 'A+'
         elif total_score >= 60:
@@ -288,13 +290,13 @@ class FlashResearchScorer:
         }
 ```
 
-## Configuración de Watchlists
+## Watchlist Configuration
 
-### Criterios de Watchlist
+### Watchlist Criteria
 ```python
 WATCHLIST_CRITERIA = {
     'tier_1_targets': {
-        'description': 'Máxima prioridad - Setup perfecto',
+        'description': 'Maximum priority - Perfect setup',
         'criteria': {
             'total_score': {'min': 80},
             'consecutive_green_days': {'min': 3},
@@ -307,7 +309,7 @@ WATCHLIST_CRITERIA = {
         'position_size_multiplier': 1.0
     },
     'tier_2_targets': {
-        'description': 'Buena probabilidad - Setup sólido',
+        'description': 'Good probability - Solid setup',
         'criteria': {
             'total_score': {'min': 60},
             'consecutive_green_days': {'min': 2},
@@ -319,7 +321,7 @@ WATCHLIST_CRITERIA = {
         'position_size_multiplier': 0.75
     },
     'tier_3_targets': {
-        'description': 'Monitoreo - Setup marginal',
+        'description': 'Monitoring - Marginal setup',
         'criteria': {
             'total_score': {'min': 40},
             'volume_ratio': {'min': 2},
@@ -331,9 +333,9 @@ WATCHLIST_CRITERIA = {
 }
 ```
 
-## Alertas y Monitoreo
+## Alerts and Monitoring
 
-### Sistema de Alertas Flash Research
+### Flash Research Alert System
 ```python
 class FlashResearchAlerts:
     def __init__(self, api_credentials):
@@ -342,7 +344,7 @@ class FlashResearchAlerts:
         self.active_targets = {}
         
     def setup_real_time_alerts(self):
-        """Configurar alertas en tiempo real"""
+        """Configure real-time alerts"""
         alert_configs = {
             'first_red_day': {
                 'trigger_conditions': [
@@ -379,7 +381,7 @@ class FlashResearchAlerts:
         return alert_configs
     
     def process_flash_research_data(self, market_data):
-        """Procesar data de Flash Research y generar alertas"""
+        """Process Flash Research data and generate alerts"""
         alerts = []
         
         for symbol, data in market_data.items():
@@ -412,7 +414,7 @@ class FlashResearchAlerts:
         return alerts
     
     def identify_strategy_type(self, data):
-        """Identificar tipo de estrategia más apropiado"""
+        """Identify most appropriate strategy type"""
         if (data.get('consecutive_green_days', 0) >= 2 and 
             data.get('gap_percent', 0) < 0):
             return 'first_red_day'
@@ -431,10 +433,10 @@ class FlashResearchAlerts:
             return 'general_short'
     
     def calculate_suggested_stop(self, data):
-        """Calcular stop loss sugerido"""
+        """Calculate suggested stop loss"""
         current_price = data.get('current_price', 0)
         
-        # Stop basado en tipo de setup
+        # Stop based on setup type
         if data.get('premarket_high'):
             pm_high_stop = data['premarket_high'] * 1.02
         else:
@@ -443,15 +445,15 @@ class FlashResearchAlerts:
         day_high_stop = data.get('day_high', current_price) * 1.02
         percentage_stop = current_price * 1.08  # 8% stop
         
-        # Usar el más conservador (más alto para shorts)
+        # Use the most conservative (highest for shorts)
         suggested_stop = max(pm_high_stop, day_high_stop, percentage_stop)
         
         return round(suggested_stop, 2)
 ```
 
-## Integración con APIs
+## API Integration
 
-### Configuración de API Flash Research
+### Flash Research API Configuration
 ```python
 class FlashResearchAPI:
     def __init__(self, api_key, base_url):
@@ -463,7 +465,7 @@ class FlashResearchAPI:
         }
     
     def get_screening_results(self, strategy_type, limit=50):
-        """Obtener resultados de screening"""
+        """Get screening results"""
         endpoint = f"{self.base_url}/screen/{strategy_type}"
         
         params = {
@@ -481,7 +483,7 @@ class FlashResearchAPI:
             raise Exception(f"API Error: {response.status_code} - {response.text}")
     
     def get_real_time_data(self, symbols):
-        """Obtener datos en tiempo real"""
+        """Get real-time data"""
         endpoint = f"{self.base_url}/realtime"
         
         payload = {
@@ -499,7 +501,7 @@ class FlashResearchAPI:
             raise Exception(f"API Error: {response.status_code} - {response.text}")
     
     def setup_websocket_alerts(self, alert_configs):
-        """Configurar alertas vía WebSocket"""
+        """Configure alerts via WebSocket"""
         import websocket
         
         def on_message(ws, message):
@@ -523,4 +525,4 @@ class FlashResearchAPI:
         return ws
 ```
 
-Esta configuración permite aprovechar completamente las capacidades de Flash Research para identificar oportunidades de short selling con alta precisión.
+This configuration allows you to fully leverage Flash Research's capabilities for identifying short selling opportunities with high precision.
