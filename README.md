@@ -12,7 +12,9 @@ Learn quantitative trading in a structured way, at your own pace, with real exam
 
 ## ⚠️ Disclaimer
 
-Most of the content in this repository is a **compilation I've been putting together from various courses, seminars, talks, and public material**. It's a starting point, not an absolute truth.
+This repository reflects my personal learning journey in quantitative trading. The ideas and concepts come from **my experience studying courses, attending seminars and talks, reading books, and practicing in the markets**. For several academic and technical topics, I used AI tools (Perplexity, Claude, ChatGPT) to help me develop and articulate my thoughts more completely — but the core ideas, structure, and trading perspective are my own.
+
+It's a starting point, not an absolute truth.
 
 **A note about language:** My native language is Spanish, so you may find occasional grammatical errors or awkward phrasing in the English content. If you spot anything that could be improved — whether it's a translation issue, a technical correction, or an expansion on any topic — **please don't hesitate to send a pull request**. Question the content — the idea is for this to be a useful foundation that grows with community contributions.
 

@@ -12,7 +12,9 @@ Aprende trading cuantitativo de forma estructurada, a tu propio ritmo, con ejemp
 
 ## ⚠️ Disclaimer
 
-Gran parte del contenido de este repositorio son **recopilaciones que fui haciendo de distintos cursos, seminarios, charlas y material público**. Es un punto de partida, no una verdad absoluta.
+Este repositorio refleja mi camino personal aprendiendo trading cuantitativo. Las ideas y conceptos vienen de **mi experiencia estudiando cursos, asistiendo a seminarios y charlas, leyendo libros, y practicando en los mercados**. Para varios temas académicos y técnicos, usé herramientas de IA (Perplexity, Claude, ChatGPT) para ayudarme a desarrollar y articular mis ideas de manera más completa — pero las ideas centrales, la estructura y la perspectiva de trading son mías.
+
+Es un punto de partida, no una verdad absoluta.
 
 Si encontrás alguna **mejora, corrección o ampliación** de algún tema, **no dudes en enviar un pull request**. Cuestioná el contenido — la idea es que esto sea útil como base y que crezca con los aportes de la comunidad.
 
