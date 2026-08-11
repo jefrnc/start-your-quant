@@ -192,3 +192,12 @@ Any improvement, correction, or observation is greatly appreciated:
 ---
 
 > **⚠️ Risk Disclaimer:** This content is purely educational. Trading involves risk of loss. Always trade with proper risk management.
+
+---
+
+## Support this project
+
+Free, and maintained on my own time. Sponsorship covers the market data and broker API access
+behind these tools, and keeps them working when brokers change their export formats.
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-jefrnc-EA4AAA?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/jefrnc)
